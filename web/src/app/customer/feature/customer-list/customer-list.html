@@ -1,0 +1,40 @@
+<!-- Header Section-->
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-8">
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-foreground">Clientes</h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          Lista de todos os clientes em sua organização.
+        </p>
+      </div>
+      <button class="gap-2" (click)="openSheet()">
+        <ng-icon name="lucidePlus" class="size-4" />
+        Novo Cliente
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <customer-list-ui [loading]="loading()" [customers]="customers()" (deleted)="openDialog($event)">
+    <pagination [page]="page()" [total]="totalCustomers()" [perPage]="10" />
+  </customer-list-ui>
+</section>
+
+<sheet
+  title="Novo cliente"
+  description="Preencha os campos abaixo para criar um novo cliente"
+  class="sm:max-w-md"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <customer-form-ui (closed)="closeSheet()" (submitted)="handleSubmit($event)" />
+</sheet>
+
+<confirmation
+  title="Deletar cliente"
+  description="Tem certeza que deseja deletar este cliente? Essa ação não pode ser desfeita."
+  [isActive]="isDialogActive()"
+  (closed)="closeDialog()"
+/>

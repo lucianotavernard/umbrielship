@@ -1,0 +1,45 @@
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
+    <!-- Main Content Column -->
+    <div class="grid grid-cols-1 gap-6 lg:col-span-2">
+      <customer-detail-ui [customer]="customer()" [loading]="loading()" (edited)="editCustomer()" />
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="grid grid-cols-1 gap-6">
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+          <div class="flex p-3 bg-background rounded-lg shadow-xs">
+            <ng-icon name="lucideMapPin" class="!size-4" />
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold">Localização & Endereço</h3>
+            <p class="text-xs text-muted-foreground">Onde o cliente está localizado?</p>
+          </div>
+        </header>
+
+        <div class="p-4">
+          <div class="animate-pulse">
+            <skeleton class="block w-full h-72 rounded-xl" />
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<sheet
+  title="Novo cliente"
+  description="Preencha os campos abaixo para criar um novo cliente"
+  class="sm:max-w-md"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <customer-form-ui
+    [loading]="submitting()"
+    [customer]="customer()"
+    (closed)="closeSheet()"
+    (submitted)="handleSubmit($event)"
+  />
+</sheet>

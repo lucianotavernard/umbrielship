@@ -1,0 +1,93 @@
+<section aria-labelledby="account-header" class="relative">
+  <div class="overflow-hidden bg-popover rounded-2xl shadow-xs border">
+    <div class="p-6 sm:p-8">
+      @if (loading()) {
+        <div class="animate-pulse flex flex-col gap-6">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex flex-col flex-1 space-y-4">
+              <skeleton class="h-9 rounded-md w-2/3" />
+              <skeleton class="h-16 rounded-md w-full" />
+            </div>
+            <skeleton class="w-28 h-10 rounded-lg" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <skeleton class="h-24 rounded-xl" />
+            <skeleton class="h-24 rounded-xl" />
+          </div>
+        </div>
+      } @else if (customer(); as customer) {
+        <div class="flex flex-col gap-6">
+          <!-- Header Section -->
+          <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <section class="flex-1 min-w-0">
+              <!-- Account Type Badge -->
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider"
+                >
+                  <ng-icon name="lucideBuilding2" class="!size-4" />
+                  Cliente
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h1 class="text-2xl font-extrabold text-foreground sm:text-3xl tracking-tight mb-3">
+                {{ customer.name }}
+              </h1>
+            </section>
+
+            <!-- Actions -->
+            <section class="flex items-center gap-3 flex-shrink-0">
+              <button safetunerButton variant="outline" (click)="editCustomer()">
+                <ng-icon name="lucidePencil" class="!size-4" />
+                Editar Cliente
+              </button>
+            </section>
+          </header>
+
+          <!-- Info Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Address Card -->
+            @if (customer.address) {
+              <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+                <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                  <ng-icon name="lucideMapPin" class="!size-5" />
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-semibold uppercase tracking-wider mb-1">Endereço</p>
+                  <p class="text-sm font-medium text-muted-foreground truncate">
+                    {{ customer.address.address }}
+                  </p>
+                  <p class="text-sm text-muted-foreground">
+                    {{ customer.address.city }}
+                    @if (customer.address.state) {
+                      , {{ customer.address.state }}
+                    }
+                  </p>
+                </div>
+              </div>
+            }
+
+            <!-- Contact Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideMail" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
+                  Detalhes do Cliente
+                </p>
+                <p class="text-sm font-medium text-muted-foreground">{{ customer.name }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  {{ customer.email }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
