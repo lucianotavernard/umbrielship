@@ -17,10 +17,4 @@ export class CustomerDetailUi {
   customer = input.required<CustomerDto | null>();
 
   loading = input(false);
-
-  edited = output<void>();
-
-  editCustomer() {
-    this.edited.emit();
-  }
 }

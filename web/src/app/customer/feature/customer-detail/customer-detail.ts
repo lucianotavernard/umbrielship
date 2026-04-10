@@ -3,11 +3,12 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMapPin } from '@ng-icons/lucide';
+import { lucideMapPin, lucidePlus } from '@ng-icons/lucide';
 
 import { toast } from '@/shared/ui/toaster';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Sheet } from '@/shared/ui/sheet';
+import { Button } from '@/shared/ui/button';
 
 import { CustomerDto, CustomerResponseDto } from '@/customer/data-access/dto/customer.dto';
 import { CustomerDetailUi } from '@/customer/ui/customer-detail/customer-detail';
@@ -16,8 +17,8 @@ import { CustomerFormUi } from '@/customer/ui/customer-form/customer-form';
 @Component({
   selector: 'customer-detail',
   templateUrl: './customer-detail.html',
-  imports: [NgIcon, Skeleton, Sheet, CustomerDetailUi, CustomerFormUi],
-  viewProviders: [provideIcons({ lucideMapPin })],
+  imports: [NgIcon, Skeleton, Sheet, Button, CustomerDetailUi, CustomerFormUi],
+  viewProviders: [provideIcons({ lucideMapPin, lucidePlus })],
 })
 export class CustomerDetail {
   private readonly http = inject(HttpClient);
@@ -38,6 +39,10 @@ export class CustomerDetail {
 
   closeSheet() {
     this.isSheetActive.set(false);
+  }
+
+  openSheet() {
+    this.isSheetActive.set(true);
   }
 
   handleSubmit(customer: Omit<CustomerDto, 'id'>) {
