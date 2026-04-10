@@ -4,24 +4,40 @@
   >
     <div class="mx-auto max-w-7xl px-6 py-4">
       <div class="flex items-center justify-between">
-        <nav class="flex items-center gap-8">
-          <a
-            routerLink="/dashboard"
-            routerLinkActive="text-primary"
-            class="text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
-          >
-            Dashboard
-          </a>
-          <a
-            routerLink="/customers"
-            routerLinkActive="text-primary"
-            class="text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
-          >
-            Clientes
-          </a>
+        <nav class="lg:flex items-center gap-2">
+          <a routerLink="/dashboard" routerLinkActive="bg-accent text-accent-foreground" variant="ghost"> Dashboard </a>
+          <a routerLink="/customers" routerLinkActive="bg-accent text-accent-foreground" variant="ghost"> Clientes </a>
         </nav>
 
-        <div class="flex-1"></div>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2">
+            <button variant="ghost" size="icon-sm" (click)="toggleDarkMode()">
+              <ng-icon [name]="isDarkMode() ? 'lucideSun' : 'lucideMoon'" class="!size-4" />
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            @if (loading()) {
+              <div class="grid flex-1 justify-items-end gap-1 text-right text-sm leading-tight">
+                <skeleton class="h-4 w-32 rounded" />
+                <skeleton class="h-3 w-44 rounded" />
+              </div>
+              <skeleton class="h-8 w-8 shrink-0 rounded-lg" />
+            } @else if (user(); as user) {
+              <div class="grid flex-1 text-right text-sm leading-tight">
+                <span class="truncate font-medium">{{ user.name }}</span>
+                <span class="truncate text-xs text-muted-foreground">
+                  {{ user.email }}
+                </span>
+              </div>
+
+              <avatar class="h-8 w-8 rounded-lg grayscale">
+                <img avatarImage src="https://github.com/shadcn.png" alt="CN" />
+                <avatar-fallback class="rounded-lg">CN</avatar-fallback>
+              </avatar>
+            }
+          </div>
+        </div>
       </div>
     </div>
   </header>

@@ -8,29 +8,31 @@
   </div>
 </header>
 
-<div class="flex flex-1 flex-col">
-  <div class="@container/main flex flex-1 flex-col gap-2">
-    <div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <section-cards />
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <div class="flex flex-1 flex-col">
+    <div class="@container/main flex flex-1 flex-col gap-2">
+      <div class="flex flex-col gap-4 md:gap-6">
+        <section-cards />
 
-      <div class="px-4 lg:px-6">
-        <card class="@container/card">
-          <card-header>
-            <card-description>Atividade recente</card-description>
-            <div class="line-clamp-1 flex gap-2 font-medium">
-              Quando houver dados, as últimas ações aparecerão aqui.
-            </div>
-          </card-header>
+        <div>
+          <card class="@container/card">
+            <card-header>
+              <card-description>Atividade recente</card-description>
+              <div class="line-clamp-1 flex gap-2 font-medium">
+                Quando houver dados, as últimas ações aparecerão aqui.
+              </div>
+            </card-header>
 
-          <card-content>
-            <div
-              class="mt-6 flex min-h-[200px] items-center justify-center rounded-lg border border-dashed"
-            >
-              <p class="text-sm text-muted-foreground">Nenhum evento ainda</p>
-            </div>
-          </card-content>
-        </card>
+            <card-content>
+              <div
+                class="mt-6 flex min-h-[200px] items-center justify-center rounded-lg border border-dashed"
+              >
+                <p class="text-sm text-muted-foreground">Nenhum evento ainda</p>
+              </div>
+            </card-content>
+          </card>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</section>

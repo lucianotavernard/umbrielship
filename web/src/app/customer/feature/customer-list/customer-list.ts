@@ -10,6 +10,7 @@ import { Sheet } from '@/shared/ui/sheet';
 import { Button } from '@/shared/ui/button';
 import { Pagination } from '@/shared/ui/pagination';
 import { Confirmation } from '@/shared/ui/confirmation';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 import { CustomerDto, CustomersResponseDto } from '@/customer/data-access/dto/customer.dto';
 import { CustomerListUi } from '@/customer/ui/customer-list/customer-list';
@@ -18,7 +19,7 @@ import { CustomerFormUi } from '@/customer/ui/customer-form/customer-form';
 @Component({
   selector: 'customer-list',
   templateUrl: './customer-list.html',
-  imports: [NgIcon, Button, Pagination, Sheet, Confirmation, CustomerListUi, CustomerFormUi],
+  imports: [NgIcon, Button, Pagination, Sheet, Skeleton, Confirmation, CustomerListUi, CustomerFormUi],
   viewProviders: [provideIcons({ lucideUsers, lucidePlus })],
 })
 export class CustomerList {
