@@ -8,8 +8,8 @@
       </div>
 
       <button class="gap-2" (click)="openSheet()">
-        <ng-icon name="lucidePlus" class="size-4" />
-        Novo Cliente
+        <ng-icon name="lucidePencil" class="size-4" />
+        Editar Cliente
       </button>
     </div>
   </div>
@@ -47,8 +47,8 @@
 </section>
 
 <sheet
-  title="Novo cliente"
-  description="Preencha os campos abaixo para criar um novo cliente"
+  title="Editar cliente"
+  description="Preencha os campos abaixo para atualizar as informações do cliente"
   class="sm:max-w-md"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"

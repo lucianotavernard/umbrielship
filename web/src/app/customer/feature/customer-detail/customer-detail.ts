@@ -3,7 +3,7 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMapPin, lucidePlus } from '@ng-icons/lucide';
+import { lucideMapPin, lucidePencil } from '@ng-icons/lucide';
 
 import { toast } from '@/shared/ui/toaster';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -18,7 +18,7 @@ import { CustomerFormUi } from '@/customer/ui/customer-form/customer-form';
   selector: 'customer-detail',
   templateUrl: './customer-detail.html',
   imports: [NgIcon, Skeleton, Sheet, Button, CustomerDetailUi, CustomerFormUi],
-  viewProviders: [provideIcons({ lucideMapPin, lucidePlus })],
+  viewProviders: [provideIcons({ lucideMapPin, lucidePencil })],
 })
 export class CustomerDetail {
   private readonly http = inject(HttpClient);
