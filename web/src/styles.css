@@ -193,3 +193,53 @@
     @apply bg-background text-foreground;
   }
 }
+
+select,
+::picker(select) {
+  appearance: base-select;
+}
+
+::picker(select) {
+  border: 0 !important;
+
+  top: calc(anchor(bottom) + 4px);
+
+  opacity: 0;
+  transition: all 0.4s allow-discrete;
+}
+
+::picker(select):popover-open {
+  opacity: 1;
+}
+
+.ng-select-container {
+  @apply !h-full !mt-0.5;
+}
+
+.ng-arrow-wrapper {
+  @apply !hidden;
+}
+
+.ng-placeholder {
+  @apply !mt-0.5 !text-sm !text-muted-foreground;
+}
+
+.ng-input input {
+  @apply !h-full !text-sm hover:cursor-pointer placeholder:text-muted-foreground;
+}
+
+.ng-option.ng-option-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.ng-dropdown-panel {
+  @apply left-0 p-1 border shadow-md bg-popover !mt-2;
+}
+
+.ng-dropdown-panel.ng-select-top {
+  @apply bottom-full mb-0.5 rounded;
+}
+
+.ng-dropdown-panel.ng-select-bottom {
+  @apply top-full mt-0.5 rounded;
+}

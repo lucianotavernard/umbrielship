@@ -4,9 +4,7 @@ import { email, form, FormField, required } from '@angular/forms/signals';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideBuilding2, lucideMapPin, lucideLoader2 } from '@ng-icons/lucide';
 
-import { FormGroup } from '@/shared/ui/form/form-group';
-import { Label } from '@/shared/ui/form/label';
-import { Input } from '@/shared/ui/form/input';
+import { FormGroup, Label, Input, Combobox } from '@/shared/ui/form';
 import { Button } from '@/shared/ui/button';
 
 import { AuthService } from '@/identity/data-access/service/auth.service';
@@ -16,7 +14,7 @@ import { CustomerDto } from '@/customer/data-access/dto/customer.dto';
 @Component({
   selector: 'customer-form-ui',
   templateUrl: './customer-form.html',
-  imports: [NgIcon, FormField, FormGroup, Label, Input, Button],
+  imports: [NgIcon, FormField, FormGroup, Label, Input, Combobox, Button],
   viewProviders: [provideIcons({ lucideBuilding2, lucideMapPin, lucideLoader2 })],
 })
 export class CustomerFormUi {
@@ -28,6 +26,36 @@ export class CustomerFormUi {
 
   closed = output<void>();
   submitted = output<Omit<CustomerDto, 'id'>>();
+
+  states = signal([
+    { value: 'AC', label: 'Acre' },
+    { value: 'AL', label: 'Alagoas' },
+    { value: 'AP', label: 'Amapá' },
+    { value: 'AM', label: 'Amazonas' },
+    { value: 'BA', label: 'Bahia' },
+    { value: 'CE', label: 'Ceará' },
+    { value: 'DF', label: 'Distrito Federal' },
+    { value: 'ES', label: 'Espírito Santo' },
+    { value: 'GO', label: 'Goiás' },
+    { value: 'MA', label: 'Maranhão' },
+    { value: 'MT', label: 'Mato Grosso' },
+    { value: 'MS', label: 'Mato Grosso do Sul' },
+    { value: 'MG', label: 'Minas Gerais' },
+    { value: 'PA', label: 'Pará' },
+    { value: 'PB', label: 'Paraíba' },
+    { value: 'PR', label: 'Paraná' },
+    { value: 'PE', label: 'Pernambuco' },
+    { value: 'PI', label: 'Piauí' },
+    { value: 'RJ', label: 'Rio de Janeiro' },
+    { value: 'RN', label: 'Rio Grande do Norte' },
+    { value: 'RS', label: 'Rio Grande do Sul' },
+    { value: 'RO', label: 'Rondônia' },
+    { value: 'RR', label: 'Roraima' },
+    { value: 'SC', label: 'Santa Catarina' },
+    { value: 'SP', label: 'São Paulo' },
+    { value: 'SE', label: 'Sergipe' },
+    { value: 'TO', label: 'Tocantins' },
+  ])
 
   customerSignal = signal({
     name: '',
@@ -71,10 +99,21 @@ export class CustomerFormUi {
 
   close() {
     this.closed.emit();
+    this.customerSignal.set({
+      name: '',
+      email: '',
+      phone: '',
+      address: {
+        address: '',
+        city: '',
+        state: '',
+      },
+    })
   }
 
   handleSubmit(event: Event) {
     event.preventDefault();
-    this.submitted.emit(this.customerSignal());
+    // this.submitted.emit(this.customerSignal());
+    console.log(this.customerSignal());
   }
 }

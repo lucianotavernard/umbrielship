@@ -48,10 +48,10 @@
         <label for="city">Cidade</label>
         <input type="text" placeholder="São Paulo" [formField]="customerForm.address.city" />
       </form-group>
-      
+
       <form-group class="sm:col-span-3">
         <label for="state">Estado</label>
-        <input type="text" placeholder="SP" [formField]="customerForm.address.state" />
+        <combobox [formField]="customerForm.address.state" [options]="states()" placeholder="Selecione o estado" />
       </form-group>
     </div>
   </section>

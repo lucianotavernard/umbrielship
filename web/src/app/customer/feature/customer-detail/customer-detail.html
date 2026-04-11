@@ -45,9 +45,24 @@
         </header>
 
         <div class="p-4">
-          <div class="animate-pulse">
-            <skeleton class="block w-full h-72 rounded-xl" />
-          </div>
+          @if (loading()) {
+            <div class="animate-pulse">
+              <skeleton class="block w-full h-72 rounded-xl" />
+            </div>
+          } @else if (mapEmbedSrc(); as src) {
+            <iframe
+              class="block w-full h-72 rounded-xl border-0 bg-muted"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+              [title]="'Mapa do endereço do cliente'"
+              [src]="src"
+            ></iframe>
+          } @else {
+            <p class="text-sm text-muted-foreground px-1 py-8 text-center">
+              Cadastre um endereço no cliente para ver a localização no mapa.
+            </p>
+          }
         </div>
       </section>
     </div>
