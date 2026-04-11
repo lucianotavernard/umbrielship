@@ -4,7 +4,7 @@ import { VesselEntity } from '../entity/vessel.entity';
 import { VesselRepository } from '../interface/vessel.repository';
 
 type FetchVesselsUseCaseRequest = {
-  customerId: string;
+  customerId?: string;
   skip: number;
   take: number;
 };
@@ -23,12 +23,24 @@ export class FetchVesselsUseCase {
     take,
     skip,
   }: FetchVesselsUseCaseRequest): Promise<FetchVesselsUseCaseResponse> {
-    const { data: vessels, total } =
-      await this.vesselRepository.findManyByCustomerId(
-        customerId,
-        take,
-        skip,
-      );
+    if (customerId) {
+      const { data: vessels, total } =
+        await this.vesselRepository.findManyByCustomerId(
+          customerId,
+          take,
+          skip,
+        );
+
+      return {
+        vessels,
+        total,
+      };
+    }
+
+    const { data: vessels, total } = await this.vesselRepository.findMany(
+      take,
+      skip,
+    );
 
     return {
       vessels,

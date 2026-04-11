@@ -10,7 +10,7 @@ import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-d
 
 import { GetVesselByIdUseCase } from '@/customer/core/use-case/get-vessel-by-id.use-case';
 
-@Controller('/customers/:customerId/vessels/:id')
+@Controller('/vessels/:id')
 export class GetVesselController {
   constructor(private getVesselById: GetVesselByIdUseCase) {}
 

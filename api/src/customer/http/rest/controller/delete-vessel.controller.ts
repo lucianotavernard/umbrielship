@@ -11,20 +11,18 @@ import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-d
 
 import { DeleteVesselUseCase } from '@/customer/core/use-case/delete-vessel.use-case';
 
-@Controller('/customers/:customerId/vessels/:id')
+@Controller('/vessels/:id')
 export class DeleteVesselController {
   constructor(private deleteVessel: DeleteVesselUseCase) {}
 
   @Delete()
   @HttpCode(204)
   async handle(
-    @Param('customerId') customerId: string,
     @Param('id') vesselId: string,
   ) {
     try {
       await this.deleteVessel.handle({
         id: vesselId,
-        customerId,
       });
     } catch (error) {
       if (error instanceof NotFoundDomainException) {

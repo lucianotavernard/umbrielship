@@ -17,6 +17,7 @@ import { VesselTypeEnum } from '@/customer/core/entity/vessel.entity';
 import { CreateVesselUseCase } from '@/customer/core/use-case/create-vessel.use-case';
 
 const createVesselBodySchema = z.object({
+  customerId: z.uuid(),
   imoNumber: z.string(),
   name: z.string(),
   type: z.enum(Object.values(VesselTypeEnum)),
@@ -25,7 +26,7 @@ const createVesselBodySchema = z.object({
 
 type CreateVesselBodySchema = z.infer<typeof createVesselBodySchema>;
 
-@Controller('/customers/:customerId/vessels')
+@Controller('/vessels')
 export class CreateVesselController {
   constructor(private createVessel: CreateVesselUseCase) {}
 
@@ -36,7 +37,7 @@ export class CreateVesselController {
     @Param('customerId') customerId: string,
   ) {
     try {
-      const { imoNumber, name, type, length } = body;
+      const { customerId, imoNumber, name, type, length } = body;
 
       const result = await this.createVessel.handle({
         imoNumber,

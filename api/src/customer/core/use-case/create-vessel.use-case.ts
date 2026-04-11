@@ -3,14 +3,14 @@ import { Injectable } from '@nestjs/common';
 import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-domain.exception';
 import { AlreadyExistsDomainException } from '@/shared/lib/core/exception/already-exists-domain.exception';
 
-import { VesselEntity } from '../entity/vessel.entity';
+import { VesselEntity, VesselType } from '../entity/vessel.entity';
 import { CustomerRepository } from '../interface/customer.repository';
 import { VesselRepository } from '../interface/vessel.repository';
 
 type CreateVesselUseCaseRequest = {
   imoNumber: string;
   name: string;
-  type: VesselEntity['type'];
+  type: VesselType;
   length: number;
   customerId: string;
 };

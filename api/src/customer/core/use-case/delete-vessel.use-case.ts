@@ -6,17 +6,16 @@ import { VesselRepository } from '../interface/vessel.repository';
 
 type DeleteVesselUseCaseRequest = {
   id: string;
-  customerId: string;
 };
 
 @Injectable()
 export class DeleteVesselUseCase {
   constructor(private vesselRepository: VesselRepository) {}
 
-  async handle({ id, customerId }: DeleteVesselUseCaseRequest): Promise<void> {
+  async handle({ id }: DeleteVesselUseCaseRequest): Promise<void> {
     const vessel = await this.vesselRepository.findById(id);
 
-    if (!vessel || vessel.customerId !== customerId) {
+    if (!vessel) {
       throw new NotFoundDomainException('Vessel not found');
     }
 

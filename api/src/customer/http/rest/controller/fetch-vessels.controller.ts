@@ -5,6 +5,8 @@ import { ZodValidationPipe } from '@/shared/lib/http/pipe/zod-validation.pipe';
 
 import { FetchVesselsUseCase } from '@/customer/core/use-case/fetch-vessels.use-case';
 
+const customerIdQueryParamSchema = z.string().optional();
+
 const pageQueryParamSchema = z
   .string()
   .optional()
@@ -14,13 +16,16 @@ const pageQueryParamSchema = z
 
 type PageQueryParamSchema = z.infer<typeof pageQueryParamSchema>;
 
-@Controller('/customers/:customerId/vessels')
+type CustomerIdQueryParamSchema = z.infer<typeof customerIdQueryParamSchema>;
+
+@Controller('/vessels')
 export class FetchVesselsController {
   constructor(private fetchVessels: FetchVesselsUseCase) {}
 
   @Get()
   async handle(
-    @Param('customerId') customerId: string,
+    @Query('customerId', new ZodValidationPipe(customerIdQueryParamSchema))
+    customerId: CustomerIdQueryParamSchema,
     @Query('page', new ZodValidationPipe(pageQueryParamSchema))
     page: PageQueryParamSchema,
   ) {

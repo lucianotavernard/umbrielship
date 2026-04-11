@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-domain.exception';
 
-import { VesselEntity } from '../entity/vessel.entity';
 import { VesselRepository } from '../interface/vessel.repository';
+import { VesselDetailEntity } from '../entity/vessel-detail.entity';
 
 type GetVesselByIdUseCaseRequest = {
   id: string;
 };
 
 type GetVesselByIdUseCaseResponse = {
-  vessel: VesselEntity;
+  vessel: VesselDetailEntity;
 };
 
 @Injectable()

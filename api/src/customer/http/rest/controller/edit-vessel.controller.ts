@@ -15,6 +15,7 @@ import { VesselTypeEnum } from '@/customer/core/entity/vessel.entity';
 import { EditVesselUseCase } from '@/customer/core/use-case/edit-vessel.use-case';
 
 const editVesselBodySchema = z.object({
+  customerId: z.uuid(),
   name: z.string(),
   type: z.enum(Object.values(VesselTypeEnum)),
   length: z.number().positive(),
@@ -30,11 +31,10 @@ export class EditVesselController {
   async handle(
     @Body(new ZodValidationPipe(editVesselBodySchema))
     body: EditVesselBodySchema,
-    @Param('customerId') customerId: string,
     @Param('id') vesselId: string,
   ) {
     try {
-      const { name, type, length } = body;
+      const { name, type, length, customerId } = body;
 
       const result = await this.editVessel.handle({
         vesselId,
