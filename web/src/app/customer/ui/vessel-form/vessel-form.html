@@ -1,0 +1,94 @@
+<form class="flex flex-col gap-6 h-[calc(100vh-106px)]" (submit)="handleSubmit($event)">
+  <section class="rounded-2xl shadow-xs border overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+      <div class="flex p-3 bg-background rounded-lg shadow-xs">
+        <ng-icon name="lucideShip" class="!size-4" />
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold">Detalhes da Embarcação</h3>
+        <p class="text-xs text-muted-foreground">Informações básicas sobre a embarcação</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6 p-6">
+      <form-group class="sm:col-span-full">
+        <label for="name">Nome</label>
+        <input type="text" placeholder="Acme Inc" [formField]="vesselForm.name" />
+      </form-group>
+    </div>
+  </section>
+
+  <section class="rounded-2xl shadow-xs border overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+      <div class="flex p-3 bg-background rounded-lg shadow-xs">
+        <ng-icon name="lucideBuilding2" class="!size-4" />
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold">Customer</h3>
+        <p class="text-xs text-muted-foreground">Associação da embarcação com um cliente cliente</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6 p-6">
+      <form-group class="sm:col-span-3">
+        <label for="customerId">Cliente</label>
+        <combobox
+          [options]="customerOptions()"
+          [formField]="vesselForm.customerId"
+          placeholder="Selecione o cliente"
+        />
+      </form-group>
+
+      <form-group class="sm:col-span-3">
+        <label for="customerId">Status</label>
+        <combobox [value]="'ACTIVE'" [options]="statuses()" placeholder="Status" />
+      </form-group>
+    </div>
+  </section>
+
+  <section class="rounded-2xl shadow-xs border overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+      <div class="flex p-3 bg-background rounded-lg shadow-xs">
+        <ng-icon name="lucideMapPin" class="!size-4" />
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold">Tipo & Comprimento</h3>
+        <p class="text-xs text-muted-foreground">
+          Informações sobre o tipo e comprimento da embarcação
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6 p-6">
+      <form-group class="sm:col-span-full">
+        <label for="email">Número IMO</label>
+        <input type="text" placeholder="1234567" [formField]="vesselForm.imoNumber" />
+      </form-group>
+
+      <form-group class="sm:col-span-4">
+        <label for="type">Tipo de Embarcação</label>
+        <combobox
+          [formField]="vesselForm.type"
+          [options]="types()"
+          placeholder="Selecione o tipo"
+        />
+      </form-group>
+
+      <form-group class="sm:col-span-2">
+        <label for="length">Comprimento</label>
+        <input type="number" placeholder="100" [formField]="vesselForm.length" />
+      </form-group>
+    </div>
+  </section>
+
+  <footer class="flex items-center justify-end gap-3">
+    <button type="button" variant="outline" (click)="close()">Cancelar</button>
+
+    <button type="submit" [disabled]="loading()">
+      @if (loading()) {
+        <ng-icon name="lucideLoader2" class="!size-4 animate-spin" />
+      }
+      Salvar
+    </button>
+  </footer>
+</form>

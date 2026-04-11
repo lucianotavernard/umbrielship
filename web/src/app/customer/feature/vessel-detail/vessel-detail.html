@@ -1,0 +1,104 @@
+<!-- Header Section-->
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <button type="button" variant="ghost" class="gap-2" (click)="goBack()">
+      <ng-icon name="lucideArrowLeft" class="size-4" />
+      Voltar para Embarcações
+    </button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
+    <!-- Main Content Column -->
+    <div class="grid grid-cols-1 gap-6 lg:col-span-2">
+      <vessel-detail-ui
+        [vessel]="vessel()"
+        [loading]="loading()"
+        (edited)="openSheet()"
+      />
+
+      <!-- Vessels Section -->
+      <!-- <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex items-center justify-between gap-3 px-6 py-4 border-b bg-popover">
+          <div class="flex items-center gap-3">
+            <div class="flex p-3 bg-background rounded-lg shadow-xs">
+              <ng-icon name="lucideShip" class="!size-4" />
+            </div>
+
+            <div>
+              <h3 class="text-sm font-semibold">Embarcações</h3>
+              <p class="text-xs text-muted-foreground">
+                Lista de embarcações registradas para o cliente.
+              </p>
+            </div>
+          </div>
+
+          <button type="button" (click)="openNewVesselSheet()">
+            <ng-icon name="lucidePlus" class="size-4 mr-1" />
+            Nova Embarcação
+          </button>
+        </header>
+
+        <div class="p-4">
+          <vessel-list-ui [vessels]="vessels()" [loading]="loadingVessels()">
+            <pagination [page]="page()" [total]="totalVessels()" [perPage]="10" />
+          </vessel-list-ui>
+        </div>
+      </section> -->
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="grid grid-cols-1 gap-6">
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex items-center gap-3 px-6 py-4 border-b bg-popover">
+          <div class="flex p-3 bg-background rounded-lg shadow-xs">
+            <ng-icon name="lucideMapPin" class="!size-4" />
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold">Localização & Endereço</h3>
+            <p class="text-xs text-muted-foreground">Onde o cliente está localizado?</p>
+          </div>
+        </header>
+
+        <div class="p-4">
+          @if (!vessel()?.customer) {
+            <div class="animate-pulse">
+              <skeleton class="block w-full h-72 rounded-xl" />
+            </div>
+          } @else if (mapEmbedSrc(); as src) {
+            <iframe
+              class="block w-full h-72 rounded-xl border-0 bg-muted"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+              [title]="'Mapa do endereço do cliente'"
+              [src]="src"
+            ></iframe>
+          } @else {
+            <p class="text-sm text-muted-foreground px-1 py-8 text-center">
+              Cadastre um endereço no cliente para ver a localização no mapa.
+            </p>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<sheet
+  title="Editar embarcação"
+  description="Preencha os campos abaixo para atualizar as informações da embarcação"
+  class="sm:max-w-md"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <vessel-form-ui
+    [loading]="submitting()"
+    [customers]="customers()"
+    [vessel]="selectedVessel()"
+    (closed)="closeSheet()"
+    (submitted)="handleSubmit($event)"
+  />
+</sheet>

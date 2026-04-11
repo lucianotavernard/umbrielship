@@ -1,0 +1,95 @@
+<section aria-labelledby="account-header" class="relative">
+  <div class="overflow-hidden bg-popover rounded-2xl shadow-xs border">
+    <div class="p-6 sm:p-8">
+      @if (loading()) {
+        <div class="animate-pulse flex flex-col gap-6">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex flex-col flex-1 space-y-4">
+              <skeleton class="h-9 rounded-md w-2/3" />
+              <skeleton class="h-16 rounded-md w-full" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <skeleton class="h-24 rounded-xl" />
+            <skeleton class="h-24 rounded-xl" />
+          </div>
+        </div>
+      } @else if (vessel(); as vessel) {
+        <div class="flex flex-col gap-6">
+          <!-- Header Section -->
+          <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <section class="flex items-center justify-between gap-6 w-full">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-4">
+                  <!-- Avatar -->
+                  <div class="flex items-center justify-center size-12 rounded-lg bg-muted">
+                    <span class="text-sm font-semibold text-primary">
+                      {{ avatar() }}
+                    </span>
+                  </div>
+
+                  <!-- Title -->
+                  <div>
+                    <h1 class="text-2xl font-bold text-foreground">
+                      {{ vessel.name }}
+                    </h1>
+                    <p class="text-sm text-muted-foreground flex items-center gap-1">
+                      <ng-icon name="lucideIdCard" class="!size-4 mr-1" /> {{ vessel.imoNumber }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button class="gap-2" (click)="editVessel()">
+                  <ng-icon name="lucidePencil" class="size-4" />
+                  Editar Embarcação
+                </button>
+              </div>
+            </section>
+          </header>
+
+          <!-- Info Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Contact Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideShip" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
+                  Detalhes da Embarcação
+                </p>
+                <p class="text-sm font-medium text-muted-foreground">{{ vessel.name }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  {{ vessel.type }}, {{ vessel.length }}
+                  {{ vessel.length === 1 ? 'metro' : 'metros' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Customer Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideBuilding2" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
+                  Detalhes do Cliente
+                </p>
+                <p class="text-sm font-medium text-muted-foreground">{{ vessel.customer.name }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  {{ vessel.customer.address.address }},
+                  {{ vessel.customer.address.city }},
+                  {{ vessel.customer.address.state }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

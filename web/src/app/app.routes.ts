@@ -22,7 +22,9 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./shared/feature/layout/internal-layout/internal-layout').then((m) => m.InternalLayout),
+      import('./shared/feature/layout/internal-layout/internal-layout').then(
+        (m) => m.InternalLayout,
+      ),
     children: [
       {
         path: 'dashboard',
@@ -40,7 +42,24 @@ export const routes: Routes = [
           {
             path: ':id',
             loadComponent: () =>
-              import('./customer/feature/customer-detail/customer-detail').then((m) => m.CustomerDetail),
+              import('./customer/feature/customer-detail/customer-detail').then(
+                (m) => m.CustomerDetail,
+              ),
+          },
+        ],
+      },
+      {
+        path: 'vessels',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./customer/feature/vessel-list/vessel-list').then((m) => m.VesselList),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./customer/feature/vessel-detail/vessel-detail').then((m) => m.VesselDetail),
           },
         ],
       },
@@ -51,8 +70,7 @@ export const routes: Routes = [
     children: [
       {
         path: '404',
-        loadComponent: () =>
-          import('./shared/feature/exception/not-found').then((m) => m.NotFound),
+        loadComponent: () => import('./shared/feature/exception/not-found').then((m) => m.NotFound),
       },
       {
         path: 'forbidden',

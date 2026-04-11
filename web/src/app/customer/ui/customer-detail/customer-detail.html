@@ -18,26 +18,58 @@
         <div class="flex flex-col gap-6">
           <!-- Header Section -->
           <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <section class="flex-1 min-w-0">
-              <!-- Account Type Badge -->
-              <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider"
-                >
-                  <ng-icon name="lucideBuilding2" class="!size-4" />
-                  Cliente
-                </span>
+            <section class="flex items-center justify-between gap-6 w-full">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-4">
+                  <!-- Avatar -->
+                  <div class="flex items-center justify-center size-12 rounded-lg bg-muted">
+                    <span class="text-sm font-semibold text-primary">
+                      @let firstName = customer.name.split(' ')[0];
+                      @let lastName = customer.name.split(' ')[1];
+                      {{ firstName.charAt(0) }}{{ lastName.charAt(0) }}
+                    </span>
+                  </div>
+
+                  <!-- Title -->
+                  <div>
+                    <h1 class="text-2xl font-bold text-foreground">
+                      {{ customer.name }}
+                    </h1>
+                    <p class="text-sm text-muted-foreground flex items-center gap-1">
+                      <ng-icon name="lucideMail" class="!size-4 mr-1" /> {{ customer.email }}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <!-- Title -->
-              <h1 class="text-2xl font-extrabold text-foreground sm:text-3xl tracking-tight mb-3">
-                {{ customer.name }}
-              </h1>
+              <div class="flex gap-2">
+                <button class="gap-2" (click)="editCustomer()">
+                  <ng-icon name="lucidePencil" class="size-4" />
+                  Editar Cliente
+                </button>
+              </div>
             </section>
           </header>
 
           <!-- Info Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Contact Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideBuilding2" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
+                  Detalhes do Cliente
+                </p>
+                <p class="text-sm font-medium text-muted-foreground">{{ customer.name }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  Cliente para gerenciamento de embarcações
+                </p>
+              </div>
+            </div>
+            
             <!-- Address Card -->
             @if (customer.address) {
               <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
@@ -59,23 +91,6 @@
                 </div>
               </div>
             }
-
-            <!-- Contact Card -->
-            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
-              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
-                <ng-icon name="lucideMail" class="!size-5" />
-              </div>
-
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
-                  Detalhes do Cliente
-                </p>
-                <p class="text-sm font-medium text-muted-foreground">{{ customer.name }}</p>
-                <p class="text-xs text-muted-foreground mt-0.5">
-                  Cliente para gerenciamento de embarcações
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       }

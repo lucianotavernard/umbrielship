@@ -1,0 +1,48 @@
+<!-- Header Section-->
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-8">
+    <div class="flex items-start justify-between gap-4">
+      @if (loading()) {
+        <div class="grid min-w-0 flex-1 gap-2">
+          <skeleton class="h-9 w-64 max-w-full" />
+          <skeleton class="h-4 w-80 max-w-full rounded" />
+        </div>
+        <skeleton class="h-10 w-40 shrink-0 rounded-md" />
+      } @else {
+        <div>
+          <h1 class="text-3xl font-bold tracking-tight text-foreground">Embarcações</h1>
+          <p class="mt-2 text-sm text-muted-foreground">
+            Lista de todas as embarcações registradas.
+          </p>
+        </div>
+        <button class="gap-2" (click)="openSheet()">
+          <ng-icon name="lucidePlus" class="size-4" />
+          Nova Embarcação
+        </button>
+      }
+    </div>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <vessel-list-ui [loading]="loading()" [vessels]="vessels()" (deleted)="openDialog($event)">
+    <pagination [page]="page()" [total]="total()" [perPage]="10" />
+  </vessel-list-ui>
+</section>
+
+<sheet
+  title="Nova embarcação"
+  description="Preencha os campos abaixo para criar uma nova embarcação"
+  class="sm:max-w-md"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <vessel-form-ui (closed)="closeSheet()" (submitted)="handleSubmit($event)" />
+</sheet>
+
+<confirmation
+  title="Deletar cliente"
+  description="Tem certeza que deseja deletar este cliente? Essa ação não pode ser desfeita."
+  [isActive]="isDialogActive()"
+  (closed)="closeDialog()"
+/>

@@ -1,0 +1,160 @@
+<div class="overflow-hidden rounded-lg border">
+  <div class="relative w-full overflow-x-auto">
+    <table class="w-full caption-bottom text-sm">
+      <thead class="[&_tr]:border-b sticky top-0 z-10 bg-muted">
+        <tr
+          class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted"
+        >
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Embarcação
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Tipo
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Comprimento
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            <span class="sr-only">Opções</span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="[&_tr:last-child]:border-0 **:data-[slot=table-cell]:first:w-8">
+        @if (loading()) {
+          @for (_ of [1, 2, 3]; track $index) {
+            <tr
+              class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+            >
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+              >
+                <div class="flex items-center gap-3 w-fit">
+                  <skeleton class="size-10 shrink-0" />
+                  <div class="grid gap-2">
+                    <skeleton class="w-50 h-4 rounded" />
+                    <skeleton class="w-40 h-4 rounded" />
+                  </div>
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+              >
+                <div class="flex items-center gap-3">
+                  <skeleton class="w-52 h-4 rounded" />
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+              >
+                <div class="flex items-center gap-3">
+                  <skeleton class="w-52 h-4 rounded" />
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+              >
+                <div class="flex justify-center">
+                  <skeleton class="size-8 rounded-md" />
+                </div>
+              </td>
+            </tr>
+          }
+        } @else {
+          @for (vessel of vessels(); track vessel.id) {
+            <tr
+              class="group border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+            >
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+                [routerLink]="['/vessels', vessel.id]"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex bg-muted rounded-md p-3 text-sm font-medium">
+                    @let firstName = vessel.name.split(' ')[0];
+                    @let lastName = vessel.name.split(' ')[1];
+                    {{ firstName.charAt(0) }}{{ lastName.charAt(0) }}
+                  </div>
+
+                  <div class="grid gap-1">
+                    <span class="text-sm font-medium">{{ vessel.imoNumber }}</span>
+                    <span class="text-sm text-muted-foreground">
+                      {{ vessel.name }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+                [routerLink]="['/vessels', vessel.id]"
+              >
+                <div class="flex items-center gap-2">
+                  <ng-icon name="lucideShip" class="text-gray-400 size-3" />
+                  <span class="text-sm truncate">
+                    {{ vessel.type }}
+                  </span>
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+                [routerLink]="['/customers/', vessel.customerId, 'vessels/', vessel.id]"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="text-sm truncate">
+                    {{ vessel.length }} {{ vessel.length === 1 ? 'metro' : 'metros' }}
+                  </span>
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+              >
+                <div
+                  class="flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    class="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                    [title]="'Deletar embarcação'"
+                    (click)="deleteVessel(vessel)"
+                  >
+                    <ng-icon name="lucideTrash2" class="size-3.5" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">
+                <div class="flex flex-col items-center justify-center py-12 px-4">
+                  <div class="flex mb-2 bg-muted rounded-full p-3 text-xl">
+                    <ng-icon name="lucideShip" class="text-muted-foreground" />
+                  </div>
+                  <p class="text-base font-medium text-muted-foreground mb-1">
+                    Nenhuma embarcação encontrada
+                  </p>
+                  <p class="text-sm text-center max-w-sm">
+                    Nenhuma embarcação registrada encontrada.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-4">
+  <ng-content select="pagination" />
+</div>

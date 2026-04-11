@@ -32,6 +32,7 @@ export type BadgeVariants = VariantProps<typeof badgeVariants>;
   selector: 'badge',
   host: {
     'data-slot': 'badge',
+    '[class]': 'computedClass()',
     '[attr.data-variant]': 'variant()',
   },
 })
