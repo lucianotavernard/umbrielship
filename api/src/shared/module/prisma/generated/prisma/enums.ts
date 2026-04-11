@@ -16,3 +16,16 @@ export const UserRole = {
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const VesselType = {
+  CARGO: 'CARGO',
+  TANKER: 'TANKER',
+  PASSENGER: 'PASSENGER',
+  FISHING: 'FISHING',
+  BULK_CARRIER: 'BULK_CARRIER',
+  CONTAINER: 'CONTAINER',
+  OTHER: 'OTHER'
+} as const
+
+export type VesselType = (typeof VesselType)[keyof typeof VesselType]

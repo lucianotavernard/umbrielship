@@ -30,6 +30,18 @@ model User {
   @@map("users")
 }
 
+enum VesselType {
+  CARGO
+  TANKER
+  PASSENGER
+  FISHING
+  BULK_CARRIER
+  CONTAINER
+  OTHER
+
+  @@map("vessel_type")
+}
+
 model Customer {
   id    String @id @default(uuid())
   name  String
@@ -37,8 +49,22 @@ model Customer {
   phone String
 
   address CustomerAddress?
+  vessels Vessel[]
 
   @@map("customers")
+}
+
+model Vessel {
+  id         String     @id @default(uuid())
+  customerId String
+  imoNumber  String     @unique
+  name       String
+  type       VesselType
+  length     Float
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("vessels")
 }
 
 model CustomerAddress {

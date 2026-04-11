@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Customer: 'Customer',
+  Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress'
 } as const
 
@@ -91,6 +92,18 @@ export const CustomerScalarFieldEnum = {
 } as const
 
 export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
+
+
+export const VesselScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  imoNumber: 'imoNumber',
+  name: 'name',
+  type: 'type',
+  length: 'length'
+} as const
+
+export type VesselScalarFieldEnum = (typeof VesselScalarFieldEnum)[keyof typeof VesselScalarFieldEnum]
 
 
 export const CustomerAddressScalarFieldEnum = {

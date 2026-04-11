@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Customer: 'Customer',
+  Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress'
 } as const
 
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "customer" | "customerAddress"
+    modelProps: "user" | "customer" | "vessel" | "customerAddress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -554,6 +555,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Vessel: {
+      payload: Prisma.$VesselPayload<ExtArgs>
+      fields: Prisma.VesselFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VesselFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VesselFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        findFirst: {
+          args: Prisma.VesselFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VesselFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        findMany: {
+          args: Prisma.VesselFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>[]
+        }
+        create: {
+          args: Prisma.VesselCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        createMany: {
+          args: Prisma.VesselCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VesselCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>[]
+        }
+        delete: {
+          args: Prisma.VesselDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        update: {
+          args: Prisma.VesselUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        deleteMany: {
+          args: Prisma.VesselDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VesselUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VesselUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>[]
+        }
+        upsert: {
+          args: Prisma.VesselUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VesselPayload>
+        }
+        aggregate: {
+          args: Prisma.VesselAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVessel>
+        }
+        groupBy: {
+          args: Prisma.VesselGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VesselGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VesselCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VesselCountAggregateOutputType> | number
+        }
+      }
+    }
     CustomerAddress: {
       payload: Prisma.$CustomerAddressPayload<ExtArgs>
       fields: Prisma.CustomerAddressFieldRefs
@@ -688,6 +763,18 @@ export const CustomerScalarFieldEnum = {
 export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
 
 
+export const VesselScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  imoNumber: 'imoNumber',
+  name: 'name',
+  type: 'type',
+  length: 'length'
+} as const
+
+export type VesselScalarFieldEnum = (typeof VesselScalarFieldEnum)[keyof typeof VesselScalarFieldEnum]
+
+
 export const CustomerAddressScalarFieldEnum = {
   id: 'id',
   customerId: 'customerId',
@@ -746,6 +833,34 @@ export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VesselType'
+ */
+export type EnumVesselTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VesselType'>
+    
+
+
+/**
+ * Reference to a field of type 'VesselType[]'
+ */
+export type ListEnumVesselTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VesselType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 
@@ -859,6 +974,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   customer?: Prisma.CustomerOmit
+  vessel?: Prisma.VesselOmit
   customerAddress?: Prisma.CustomerAddressOmit
 }
 

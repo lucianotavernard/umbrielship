@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
+import { AlreadyExistsDomainException } from '@/shared/lib/core/exception/already-exists-domain.exception';
 import { ZodValidationPipe } from '@/shared/lib/http/pipe/zod-validation.pipe';
 
-import { CustomerAlreadyExistException } from '@/customer/core/exception/customer-already-exists.exception';
 import { CreateCustomerUseCase } from '@/customer/core/use-case/create-customer.use-case';
 
 const createCustomerBodySchema = z.object({
@@ -47,7 +47,7 @@ export class CreateCustomerController {
         customer: result.customer,
       };
     } catch (error) {
-      if (error instanceof CustomerAlreadyExistException) {
+      if (error instanceof AlreadyExistsDomainException) {
         throw new ConflictException(error.message);
       }
 

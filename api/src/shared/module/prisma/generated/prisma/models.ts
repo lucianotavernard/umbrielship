@@ -10,5 +10,6 @@
  */
 export type * from './models/User.js'
 export type * from './models/Customer.js'
+export type * from './models/Vessel.js'
 export type * from './models/CustomerAddress.js'
 export type * from './commonInputTypes.js'

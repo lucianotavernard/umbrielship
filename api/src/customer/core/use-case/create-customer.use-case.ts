@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
+import { AlreadyExistsDomainException } from '@/shared/lib/core/exception/already-exists-domain.exception';
+
 import { CustomerEntity } from '../entity/customer.entity';
-import { CustomerAlreadyExistException } from '../exception/customer-already-exists.exception';
 import { CustomerRepository } from '../interface/customer.repository';
 
 type CreateCustomerUseCaseRequest = {
@@ -32,7 +33,7 @@ export class CreateCustomerUseCase {
     let customer = await this.customerRepository.findByEmail(email);
 
     if (customer) {
-      throw new CustomerAlreadyExistException();
+      throw new AlreadyExistsDomainException('Customer already exists');
     }
 
     customer = new CustomerEntity({

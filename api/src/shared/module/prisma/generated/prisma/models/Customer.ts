@@ -175,6 +175,7 @@ export type CustomerWhereInput = {
   email?: Prisma.StringFilter<"Customer"> | string
   phone?: Prisma.StringFilter<"Customer"> | string
   address?: Prisma.XOR<Prisma.CustomerAddressNullableScalarRelationFilter, Prisma.CustomerAddressWhereInput> | null
+  vessels?: Prisma.VesselListRelationFilter
 }
 
 export type CustomerOrderByWithRelationInput = {
@@ -183,6 +184,7 @@ export type CustomerOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   address?: Prisma.CustomerAddressOrderByWithRelationInput
+  vessels?: Prisma.VesselOrderByRelationAggregateInput
 }
 
 export type CustomerWhereUniqueInput = Prisma.AtLeast<{
@@ -194,6 +196,7 @@ export type CustomerWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Customer"> | string
   phone?: Prisma.StringFilter<"Customer"> | string
   address?: Prisma.XOR<Prisma.CustomerAddressNullableScalarRelationFilter, Prisma.CustomerAddressWhereInput> | null
+  vessels?: Prisma.VesselListRelationFilter
 }, "id" | "email">
 
 export type CustomerOrderByWithAggregationInput = {
@@ -222,6 +225,7 @@ export type CustomerCreateInput = {
   email: string
   phone: string
   address?: Prisma.CustomerAddressCreateNestedOneWithoutCustomerInput
+  vessels?: Prisma.VesselCreateNestedManyWithoutCustomerInput
 }
 
 export type CustomerUncheckedCreateInput = {
@@ -230,6 +234,7 @@ export type CustomerUncheckedCreateInput = {
   email: string
   phone: string
   address?: Prisma.CustomerAddressUncheckedCreateNestedOneWithoutCustomerInput
+  vessels?: Prisma.VesselUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type CustomerUpdateInput = {
@@ -238,6 +243,7 @@ export type CustomerUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.CustomerAddressUpdateOneWithoutCustomerNestedInput
+  vessels?: Prisma.VesselUpdateManyWithoutCustomerNestedInput
 }
 
 export type CustomerUncheckedUpdateInput = {
@@ -246,6 +252,7 @@ export type CustomerUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.CustomerAddressUncheckedUpdateOneWithoutCustomerNestedInput
+  vessels?: Prisma.VesselUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type CustomerCreateManyInput = {
@@ -295,6 +302,20 @@ export type CustomerScalarRelationFilter = {
   isNot?: Prisma.CustomerWhereInput
 }
 
+export type CustomerCreateNestedOneWithoutVesselsInput = {
+  create?: Prisma.XOR<Prisma.CustomerCreateWithoutVesselsInput, Prisma.CustomerUncheckedCreateWithoutVesselsInput>
+  connectOrCreate?: Prisma.CustomerCreateOrConnectWithoutVesselsInput
+  connect?: Prisma.CustomerWhereUniqueInput
+}
+
+export type CustomerUpdateOneRequiredWithoutVesselsNestedInput = {
+  create?: Prisma.XOR<Prisma.CustomerCreateWithoutVesselsInput, Prisma.CustomerUncheckedCreateWithoutVesselsInput>
+  connectOrCreate?: Prisma.CustomerCreateOrConnectWithoutVesselsInput
+  upsert?: Prisma.CustomerUpsertWithoutVesselsInput
+  connect?: Prisma.CustomerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerUpdateToOneWithWhereWithoutVesselsInput, Prisma.CustomerUpdateWithoutVesselsInput>, Prisma.CustomerUncheckedUpdateWithoutVesselsInput>
+}
+
 export type CustomerCreateNestedOneWithoutAddressInput = {
   create?: Prisma.XOR<Prisma.CustomerCreateWithoutAddressInput, Prisma.CustomerUncheckedCreateWithoutAddressInput>
   connectOrCreate?: Prisma.CustomerCreateOrConnectWithoutAddressInput
@@ -309,11 +330,60 @@ export type CustomerUpdateOneRequiredWithoutAddressNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerUpdateToOneWithWhereWithoutAddressInput, Prisma.CustomerUpdateWithoutAddressInput>, Prisma.CustomerUncheckedUpdateWithoutAddressInput>
 }
 
+export type CustomerCreateWithoutVesselsInput = {
+  id?: string
+  name: string
+  email: string
+  phone: string
+  address?: Prisma.CustomerAddressCreateNestedOneWithoutCustomerInput
+}
+
+export type CustomerUncheckedCreateWithoutVesselsInput = {
+  id?: string
+  name: string
+  email: string
+  phone: string
+  address?: Prisma.CustomerAddressUncheckedCreateNestedOneWithoutCustomerInput
+}
+
+export type CustomerCreateOrConnectWithoutVesselsInput = {
+  where: Prisma.CustomerWhereUniqueInput
+  create: Prisma.XOR<Prisma.CustomerCreateWithoutVesselsInput, Prisma.CustomerUncheckedCreateWithoutVesselsInput>
+}
+
+export type CustomerUpsertWithoutVesselsInput = {
+  update: Prisma.XOR<Prisma.CustomerUpdateWithoutVesselsInput, Prisma.CustomerUncheckedUpdateWithoutVesselsInput>
+  create: Prisma.XOR<Prisma.CustomerCreateWithoutVesselsInput, Prisma.CustomerUncheckedCreateWithoutVesselsInput>
+  where?: Prisma.CustomerWhereInput
+}
+
+export type CustomerUpdateToOneWithWhereWithoutVesselsInput = {
+  where?: Prisma.CustomerWhereInput
+  data: Prisma.XOR<Prisma.CustomerUpdateWithoutVesselsInput, Prisma.CustomerUncheckedUpdateWithoutVesselsInput>
+}
+
+export type CustomerUpdateWithoutVesselsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.CustomerAddressUpdateOneWithoutCustomerNestedInput
+}
+
+export type CustomerUncheckedUpdateWithoutVesselsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.CustomerAddressUncheckedUpdateOneWithoutCustomerNestedInput
+}
+
 export type CustomerCreateWithoutAddressInput = {
   id?: string
   name: string
   email: string
   phone: string
+  vessels?: Prisma.VesselCreateNestedManyWithoutCustomerInput
 }
 
 export type CustomerUncheckedCreateWithoutAddressInput = {
@@ -321,6 +391,7 @@ export type CustomerUncheckedCreateWithoutAddressInput = {
   name: string
   email: string
   phone: string
+  vessels?: Prisma.VesselUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type CustomerCreateOrConnectWithoutAddressInput = {
@@ -344,6 +415,7 @@ export type CustomerUpdateWithoutAddressInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  vessels?: Prisma.VesselUpdateManyWithoutCustomerNestedInput
 }
 
 export type CustomerUncheckedUpdateWithoutAddressInput = {
@@ -351,8 +423,38 @@ export type CustomerUncheckedUpdateWithoutAddressInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  vessels?: Prisma.VesselUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
+
+/**
+ * Count Type CustomerCountOutputType
+ */
+
+export type CustomerCountOutputType = {
+  vessels: number
+}
+
+export type CustomerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  vessels?: boolean | CustomerCountOutputTypeCountVesselsArgs
+}
+
+/**
+ * CustomerCountOutputType without action
+ */
+export type CustomerCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerCountOutputType
+   */
+  select?: Prisma.CustomerCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CustomerCountOutputType without action
+ */
+export type CustomerCountOutputTypeCountVesselsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VesselWhereInput
+}
 
 
 export type CustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -361,6 +463,8 @@ export type CustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   email?: boolean
   phone?: boolean
   address?: boolean | Prisma.Customer$addressArgs<ExtArgs>
+  vessels?: boolean | Prisma.Customer$vesselsArgs<ExtArgs>
+  _count?: boolean | Prisma.CustomerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["customer"]>
 
 export type CustomerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -387,6 +491,8 @@ export type CustomerSelectScalar = {
 export type CustomerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone", ExtArgs["result"]["customer"]>
 export type CustomerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   address?: boolean | Prisma.Customer$addressArgs<ExtArgs>
+  vessels?: boolean | Prisma.Customer$vesselsArgs<ExtArgs>
+  _count?: boolean | Prisma.CustomerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CustomerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type CustomerIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -395,6 +501,7 @@ export type $CustomerPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Customer"
   objects: {
     address: Prisma.$CustomerAddressPayload<ExtArgs> | null
+    vessels: Prisma.$VesselPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -796,6 +903,7 @@ readonly fields: CustomerFieldRefs;
 export interface Prisma__CustomerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   address<T extends Prisma.Customer$addressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Customer$addressArgs<ExtArgs>>): Prisma.Prisma__CustomerAddressClient<runtime.Types.Result.GetResult<Prisma.$CustomerAddressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  vessels<T extends Prisma.Customer$vesselsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Customer$vesselsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VesselPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1238,6 +1346,30 @@ export type Customer$addressArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   include?: Prisma.CustomerAddressInclude<ExtArgs> | null
   where?: Prisma.CustomerAddressWhereInput
+}
+
+/**
+ * Customer.vessels
+ */
+export type Customer$vesselsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Vessel
+   */
+  select?: Prisma.VesselSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Vessel
+   */
+  omit?: Prisma.VesselOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VesselInclude<ExtArgs> | null
+  where?: Prisma.VesselWhereInput
+  orderBy?: Prisma.VesselOrderByWithRelationInput | Prisma.VesselOrderByWithRelationInput[]
+  cursor?: Prisma.VesselWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VesselScalarFieldEnum | Prisma.VesselScalarFieldEnum[]
 }
 
 /**

@@ -10,9 +10,9 @@ import {
 import { z } from 'zod';
 
 import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/shared/lib/core/exception/already-exists-domain.exception';
 import { ZodValidationPipe } from '@/shared/lib/http/pipe/zod-validation.pipe';
 
-import { CustomerAlreadyExistException } from '@/customer/core/exception/customer-already-exists.exception';
 import { EditCustomerUseCase } from '@/customer/core/use-case/edit-customer.use-case';
 
 const editCustomerBodySchema = z.object({
@@ -57,7 +57,7 @@ export class EditCustomerController {
         throw new NotFoundException(error.message);
       }
 
-      if (error instanceof CustomerAlreadyExistException) {
+      if (error instanceof AlreadyExistsDomainException) {
         throw new ConflictException(error.message);
       }
 
