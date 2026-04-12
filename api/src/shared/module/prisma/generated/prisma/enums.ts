@@ -29,3 +29,22 @@ export const VesselType = {
 } as const
 
 export type VesselType = (typeof VesselType)[keyof typeof VesselType]
+
+
+export const WorkOrderStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type WorkOrderStatus = (typeof WorkOrderStatus)[keyof typeof WorkOrderStatus]
+
+
+export const WorkOrderServiceStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type WorkOrderServiceStatus = (typeof WorkOrderServiceStatus)[keyof typeof WorkOrderServiceStatus]

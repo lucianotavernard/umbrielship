@@ -225,6 +225,7 @@ export type VesselWhereInput = {
   type?: Prisma.EnumVesselTypeFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatFilter<"Vessel"> | number
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
+  workOrders?: Prisma.WorkOrderListRelationFilter
 }
 
 export type VesselOrderByWithRelationInput = {
@@ -235,6 +236,7 @@ export type VesselOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
+  workOrders?: Prisma.WorkOrderOrderByRelationAggregateInput
 }
 
 export type VesselWhereUniqueInput = Prisma.AtLeast<{
@@ -248,6 +250,7 @@ export type VesselWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.EnumVesselTypeFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatFilter<"Vessel"> | number
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
+  workOrders?: Prisma.WorkOrderListRelationFilter
 }, "id" | "imoNumber">
 
 export type VesselOrderByWithAggregationInput = {
@@ -283,6 +286,7 @@ export type VesselCreateInput = {
   type: $Enums.VesselType
   length: number
   customer: Prisma.CustomerCreateNestedOneWithoutVesselsInput
+  workOrders?: Prisma.WorkOrderCreateNestedManyWithoutVesselInput
 }
 
 export type VesselUncheckedCreateInput = {
@@ -292,6 +296,7 @@ export type VesselUncheckedCreateInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  workOrders?: Prisma.WorkOrderUncheckedCreateNestedManyWithoutVesselInput
 }
 
 export type VesselUpdateInput = {
@@ -301,6 +306,7 @@ export type VesselUpdateInput = {
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
   customer?: Prisma.CustomerUpdateOneRequiredWithoutVesselsNestedInput
+  workOrders?: Prisma.WorkOrderUpdateManyWithoutVesselNestedInput
 }
 
 export type VesselUncheckedUpdateInput = {
@@ -310,6 +316,7 @@ export type VesselUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  workOrders?: Prisma.WorkOrderUncheckedUpdateManyWithoutVesselNestedInput
 }
 
 export type VesselCreateManyInput = {
@@ -346,6 +353,11 @@ export type VesselListRelationFilter = {
 
 export type VesselOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type VesselScalarRelationFilter = {
+  is?: Prisma.VesselWhereInput
+  isNot?: Prisma.VesselWhereInput
 }
 
 export type VesselCountOrderByAggregateInput = {
@@ -425,6 +437,20 @@ export type VesselUncheckedUpdateManyWithoutCustomerNestedInput = {
   deleteMany?: Prisma.VesselScalarWhereInput | Prisma.VesselScalarWhereInput[]
 }
 
+export type VesselCreateNestedOneWithoutWorkOrdersInput = {
+  create?: Prisma.XOR<Prisma.VesselCreateWithoutWorkOrdersInput, Prisma.VesselUncheckedCreateWithoutWorkOrdersInput>
+  connectOrCreate?: Prisma.VesselCreateOrConnectWithoutWorkOrdersInput
+  connect?: Prisma.VesselWhereUniqueInput
+}
+
+export type VesselUpdateOneRequiredWithoutWorkOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.VesselCreateWithoutWorkOrdersInput, Prisma.VesselUncheckedCreateWithoutWorkOrdersInput>
+  connectOrCreate?: Prisma.VesselCreateOrConnectWithoutWorkOrdersInput
+  upsert?: Prisma.VesselUpsertWithoutWorkOrdersInput
+  connect?: Prisma.VesselWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.VesselUpdateToOneWithWhereWithoutWorkOrdersInput, Prisma.VesselUpdateWithoutWorkOrdersInput>, Prisma.VesselUncheckedUpdateWithoutWorkOrdersInput>
+}
+
 export type EnumVesselTypeFieldUpdateOperationsInput = {
   set?: $Enums.VesselType
 }
@@ -443,6 +469,7 @@ export type VesselCreateWithoutCustomerInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  workOrders?: Prisma.WorkOrderCreateNestedManyWithoutVesselInput
 }
 
 export type VesselUncheckedCreateWithoutCustomerInput = {
@@ -451,6 +478,7 @@ export type VesselUncheckedCreateWithoutCustomerInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  workOrders?: Prisma.WorkOrderUncheckedCreateNestedManyWithoutVesselInput
 }
 
 export type VesselCreateOrConnectWithoutCustomerInput = {
@@ -491,6 +519,58 @@ export type VesselScalarWhereInput = {
   length?: Prisma.FloatFilter<"Vessel"> | number
 }
 
+export type VesselCreateWithoutWorkOrdersInput = {
+  id?: string
+  imoNumber: string
+  name: string
+  type: $Enums.VesselType
+  length: number
+  customer: Prisma.CustomerCreateNestedOneWithoutVesselsInput
+}
+
+export type VesselUncheckedCreateWithoutWorkOrdersInput = {
+  id?: string
+  customerId: string
+  imoNumber: string
+  name: string
+  type: $Enums.VesselType
+  length: number
+}
+
+export type VesselCreateOrConnectWithoutWorkOrdersInput = {
+  where: Prisma.VesselWhereUniqueInput
+  create: Prisma.XOR<Prisma.VesselCreateWithoutWorkOrdersInput, Prisma.VesselUncheckedCreateWithoutWorkOrdersInput>
+}
+
+export type VesselUpsertWithoutWorkOrdersInput = {
+  update: Prisma.XOR<Prisma.VesselUpdateWithoutWorkOrdersInput, Prisma.VesselUncheckedUpdateWithoutWorkOrdersInput>
+  create: Prisma.XOR<Prisma.VesselCreateWithoutWorkOrdersInput, Prisma.VesselUncheckedCreateWithoutWorkOrdersInput>
+  where?: Prisma.VesselWhereInput
+}
+
+export type VesselUpdateToOneWithWhereWithoutWorkOrdersInput = {
+  where?: Prisma.VesselWhereInput
+  data: Prisma.XOR<Prisma.VesselUpdateWithoutWorkOrdersInput, Prisma.VesselUncheckedUpdateWithoutWorkOrdersInput>
+}
+
+export type VesselUpdateWithoutWorkOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  imoNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
+  length?: Prisma.FloatFieldUpdateOperationsInput | number
+  customer?: Prisma.CustomerUpdateOneRequiredWithoutVesselsNestedInput
+}
+
+export type VesselUncheckedUpdateWithoutWorkOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customerId?: Prisma.StringFieldUpdateOperationsInput | string
+  imoNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
+  length?: Prisma.FloatFieldUpdateOperationsInput | number
+}
+
 export type VesselCreateManyCustomerInput = {
   id?: string
   imoNumber: string
@@ -505,6 +585,7 @@ export type VesselUpdateWithoutCustomerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  workOrders?: Prisma.WorkOrderUpdateManyWithoutVesselNestedInput
 }
 
 export type VesselUncheckedUpdateWithoutCustomerInput = {
@@ -513,6 +594,7 @@ export type VesselUncheckedUpdateWithoutCustomerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  workOrders?: Prisma.WorkOrderUncheckedUpdateManyWithoutVesselNestedInput
 }
 
 export type VesselUncheckedUpdateManyWithoutCustomerInput = {
@@ -524,6 +606,35 @@ export type VesselUncheckedUpdateManyWithoutCustomerInput = {
 }
 
 
+/**
+ * Count Type VesselCountOutputType
+ */
+
+export type VesselCountOutputType = {
+  workOrders: number
+}
+
+export type VesselCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  workOrders?: boolean | VesselCountOutputTypeCountWorkOrdersArgs
+}
+
+/**
+ * VesselCountOutputType without action
+ */
+export type VesselCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VesselCountOutputType
+   */
+  select?: Prisma.VesselCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * VesselCountOutputType without action
+ */
+export type VesselCountOutputTypeCountWorkOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkOrderWhereInput
+}
+
 
 export type VesselSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -533,6 +644,8 @@ export type VesselSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   type?: boolean
   length?: boolean
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  workOrders?: boolean | Prisma.Vessel$workOrdersArgs<ExtArgs>
+  _count?: boolean | Prisma.VesselCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vessel"]>
 
 export type VesselSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -567,6 +680,8 @@ export type VesselSelectScalar = {
 export type VesselOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "imoNumber" | "name" | "type" | "length", ExtArgs["result"]["vessel"]>
 export type VesselInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
+  workOrders?: boolean | Prisma.Vessel$workOrdersArgs<ExtArgs>
+  _count?: boolean | Prisma.VesselCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VesselIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
@@ -579,6 +694,7 @@ export type $VesselPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Vessel"
   objects: {
     customer: Prisma.$CustomerPayload<ExtArgs>
+    workOrders: Prisma.$WorkOrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -982,6 +1098,7 @@ readonly fields: VesselFieldRefs;
 export interface Prisma__VesselClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   customer<T extends Prisma.CustomerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerDefaultArgs<ExtArgs>>): Prisma.Prisma__CustomerClient<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  workOrders<T extends Prisma.Vessel$workOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vessel$workOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1415,6 +1532,30 @@ export type VesselDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Vessels to delete.
    */
   limit?: number
+}
+
+/**
+ * Vessel.workOrders
+ */
+export type Vessel$workOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkOrder
+   */
+  select?: Prisma.WorkOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkOrder
+   */
+  omit?: Prisma.WorkOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkOrderInclude<ExtArgs> | null
+  where?: Prisma.WorkOrderWhereInput
+  orderBy?: Prisma.WorkOrderOrderByWithRelationInput | Prisma.WorkOrderOrderByWithRelationInput[]
+  cursor?: Prisma.WorkOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkOrderScalarFieldEnum | Prisma.WorkOrderScalarFieldEnum[]
 }
 
 /**

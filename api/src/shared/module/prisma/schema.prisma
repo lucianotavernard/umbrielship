@@ -54,6 +54,61 @@ model Customer {
   @@map("customers")
 }
 
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+
+  @@map("work_order_status")
+}
+
+enum WorkOrderServiceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+
+  @@map("work_order_service_status")
+}
+
+model WorkOrder {
+  id        String          @id @default(uuid())
+  vesselId  String
+  startDate DateTime
+  endDate   DateTime
+  status    WorkOrderStatus @default(PENDING)
+
+  vessel   Vessel             @relation(fields: [vesselId], references: [id])
+  services WorkOrderService[]
+
+  @@map("work_orders")
+}
+
+model WorkOrderService {
+  id          String                 @id @default(uuid())
+  workOrderId String
+  name        String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  status      WorkOrderServiceStatus @default(PENDING)
+
+  workOrder WorkOrder               @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  images    WorkOrderServiceImage[]
+
+  @@map("work_order_services")
+}
+
+model WorkOrderServiceImage {
+  id        String @id @default(uuid())
+  serviceId String
+  url       String
+
+  service WorkOrderService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("work_order_service_images")
+}
+
 model Vessel {
   id         String     @id @default(uuid())
   customerId String
@@ -62,7 +117,8 @@ model Vessel {
   type       VesselType
   length     Float
 
-  customer Customer @relation(fields: [customerId], references: [id])
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  workOrders WorkOrder[]
 
   @@map("vessels")
 }

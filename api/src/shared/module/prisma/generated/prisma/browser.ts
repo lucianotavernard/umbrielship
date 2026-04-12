@@ -28,6 +28,21 @@ export type User = Prisma.UserModel
  */
 export type Customer = Prisma.CustomerModel
 /**
+ * Model WorkOrder
+ * 
+ */
+export type WorkOrder = Prisma.WorkOrderModel
+/**
+ * Model WorkOrderService
+ * 
+ */
+export type WorkOrderService = Prisma.WorkOrderServiceModel
+/**
+ * Model WorkOrderServiceImage
+ * 
+ */
+export type WorkOrderServiceImage = Prisma.WorkOrderServiceImageModel
+/**
  * Model Vessel
  * 
  */

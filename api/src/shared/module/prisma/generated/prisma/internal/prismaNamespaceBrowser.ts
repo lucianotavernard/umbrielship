@@ -53,6 +53,9 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Customer: 'Customer',
+  WorkOrder: 'WorkOrder',
+  WorkOrderService: 'WorkOrderService',
+  WorkOrderServiceImage: 'WorkOrderServiceImage',
   Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress'
 } as const
@@ -92,6 +95,39 @@ export const CustomerScalarFieldEnum = {
 } as const
 
 export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
+
+
+export const WorkOrderScalarFieldEnum = {
+  id: 'id',
+  vesselId: 'vesselId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status'
+} as const
+
+export type WorkOrderScalarFieldEnum = (typeof WorkOrderScalarFieldEnum)[keyof typeof WorkOrderScalarFieldEnum]
+
+
+export const WorkOrderServiceScalarFieldEnum = {
+  id: 'id',
+  workOrderId: 'workOrderId',
+  name: 'name',
+  description: 'description',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status'
+} as const
+
+export type WorkOrderServiceScalarFieldEnum = (typeof WorkOrderServiceScalarFieldEnum)[keyof typeof WorkOrderServiceScalarFieldEnum]
+
+
+export const WorkOrderServiceImageScalarFieldEnum = {
+  id: 'id',
+  serviceId: 'serviceId',
+  url: 'url'
+} as const
+
+export type WorkOrderServiceImageScalarFieldEnum = (typeof WorkOrderServiceImageScalarFieldEnum)[keyof typeof WorkOrderServiceImageScalarFieldEnum]
 
 
 export const VesselScalarFieldEnum = {

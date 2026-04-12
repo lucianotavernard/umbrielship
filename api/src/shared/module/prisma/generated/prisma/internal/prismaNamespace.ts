@@ -386,6 +386,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Customer: 'Customer',
+  WorkOrder: 'WorkOrder',
+  WorkOrderService: 'WorkOrderService',
+  WorkOrderServiceImage: 'WorkOrderServiceImage',
   Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress'
 } as const
@@ -403,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "customer" | "vessel" | "customerAddress"
+    modelProps: "user" | "customer" | "workOrder" | "workOrderService" | "workOrderServiceImage" | "vessel" | "customerAddress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -552,6 +555,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CustomerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CustomerCountAggregateOutputType> | number
+        }
+      }
+    }
+    WorkOrder: {
+      payload: Prisma.$WorkOrderPayload<ExtArgs>
+      fields: Prisma.WorkOrderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkOrderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkOrderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkOrderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkOrderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        findMany: {
+          args: Prisma.WorkOrderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>[]
+        }
+        create: {
+          args: Prisma.WorkOrderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        createMany: {
+          args: Prisma.WorkOrderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkOrderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkOrderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        update: {
+          args: Prisma.WorkOrderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkOrderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkOrderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkOrderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkOrderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkOrderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkOrder>
+        }
+        groupBy: {
+          args: Prisma.WorkOrderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkOrderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderCountAggregateOutputType> | number
+        }
+      }
+    }
+    WorkOrderService: {
+      payload: Prisma.$WorkOrderServicePayload<ExtArgs>
+      fields: Prisma.WorkOrderServiceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkOrderServiceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkOrderServiceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        findFirst: {
+          args: Prisma.WorkOrderServiceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkOrderServiceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        findMany: {
+          args: Prisma.WorkOrderServiceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>[]
+        }
+        create: {
+          args: Prisma.WorkOrderServiceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        createMany: {
+          args: Prisma.WorkOrderServiceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkOrderServiceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>[]
+        }
+        delete: {
+          args: Prisma.WorkOrderServiceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        update: {
+          args: Prisma.WorkOrderServiceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkOrderServiceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkOrderServiceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkOrderServiceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkOrderServiceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServicePayload>
+        }
+        aggregate: {
+          args: Prisma.WorkOrderServiceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkOrderService>
+        }
+        groupBy: {
+          args: Prisma.WorkOrderServiceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderServiceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkOrderServiceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderServiceCountAggregateOutputType> | number
+        }
+      }
+    }
+    WorkOrderServiceImage: {
+      payload: Prisma.$WorkOrderServiceImagePayload<ExtArgs>
+      fields: Prisma.WorkOrderServiceImageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkOrderServiceImageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkOrderServiceImageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        findFirst: {
+          args: Prisma.WorkOrderServiceImageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkOrderServiceImageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        findMany: {
+          args: Prisma.WorkOrderServiceImageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>[]
+        }
+        create: {
+          args: Prisma.WorkOrderServiceImageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        createMany: {
+          args: Prisma.WorkOrderServiceImageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkOrderServiceImageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>[]
+        }
+        delete: {
+          args: Prisma.WorkOrderServiceImageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        update: {
+          args: Prisma.WorkOrderServiceImageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkOrderServiceImageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkOrderServiceImageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkOrderServiceImageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkOrderServiceImageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkOrderServiceImagePayload>
+        }
+        aggregate: {
+          args: Prisma.WorkOrderServiceImageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkOrderServiceImage>
+        }
+        groupBy: {
+          args: Prisma.WorkOrderServiceImageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderServiceImageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkOrderServiceImageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkOrderServiceImageCountAggregateOutputType> | number
         }
       }
     }
@@ -763,6 +988,39 @@ export const CustomerScalarFieldEnum = {
 export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
 
 
+export const WorkOrderScalarFieldEnum = {
+  id: 'id',
+  vesselId: 'vesselId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status'
+} as const
+
+export type WorkOrderScalarFieldEnum = (typeof WorkOrderScalarFieldEnum)[keyof typeof WorkOrderScalarFieldEnum]
+
+
+export const WorkOrderServiceScalarFieldEnum = {
+  id: 'id',
+  workOrderId: 'workOrderId',
+  name: 'name',
+  description: 'description',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status'
+} as const
+
+export type WorkOrderServiceScalarFieldEnum = (typeof WorkOrderServiceScalarFieldEnum)[keyof typeof WorkOrderServiceScalarFieldEnum]
+
+
+export const WorkOrderServiceImageScalarFieldEnum = {
+  id: 'id',
+  serviceId: 'serviceId',
+  url: 'url'
+} as const
+
+export type WorkOrderServiceImageScalarFieldEnum = (typeof WorkOrderServiceImageScalarFieldEnum)[keyof typeof WorkOrderServiceImageScalarFieldEnum]
+
+
 export const VesselScalarFieldEnum = {
   id: 'id',
   customerId: 'customerId',
@@ -833,6 +1091,48 @@ export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'UserRole[]'
  */
 export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkOrderStatus'
+ */
+export type EnumWorkOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkOrderStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkOrderStatus[]'
+ */
+export type ListEnumWorkOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkOrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkOrderServiceStatus'
+ */
+export type EnumWorkOrderServiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkOrderServiceStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkOrderServiceStatus[]'
+ */
+export type ListEnumWorkOrderServiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkOrderServiceStatus[]'>
     
 
 
@@ -974,6 +1274,9 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   customer?: Prisma.CustomerOmit
+  workOrder?: Prisma.WorkOrderOmit
+  workOrderService?: Prisma.WorkOrderServiceOmit
+  workOrderServiceImage?: Prisma.WorkOrderServiceImageOmit
   vessel?: Prisma.VesselOmit
   customerAddress?: Prisma.CustomerAddressOmit
 }
