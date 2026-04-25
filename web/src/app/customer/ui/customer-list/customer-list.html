@@ -13,12 +13,17 @@
           <th
             class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
           >
-            Address
+            E-mail
           </th>
           <th
             class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
           >
-            <span class="sr-only">Options</span>
+            Endereço
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            <span class="sr-only">Opções</span>
           </th>
         </tr>
       </thead>
@@ -65,17 +70,12 @@
                 class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
                 [routerLink]="['/customers/', customer.id]"
               >
-                <div class="flex items-center gap-3">
-                  <div class="flex bg-muted rounded-md p-3 text-xl">
-                    <ng-icon name="lucideBuilding2" class="text-muted-foreground" />
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideBuilding2" class="!size-3" />
                   </div>
 
-                  <div class="grid gap-1">
-                    <span class="text-sm font-medium">{{ customer.name }}</span>
-                    <span class="text-sm text-muted-foreground">
-                      {{ customer.email }}
-                    </span>
-                  </div>
+                  <span class="text-sm font-medium">{{ customer.name }}</span>
                 </div>
               </td>
               <td
@@ -83,7 +83,22 @@
                 [routerLink]="['/customers/', customer.id]"
               >
                 <div class="flex items-center gap-2">
-                  <ng-icon name="lucideMapPin" class="text-gray-400 size-3" />
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideMail" class="!size-3" />
+                  </div>
+
+                  <span class="text-sm">{{ customer.email }}</span>
+                </div>
+              </td>
+              <td
+                class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+                [routerLink]="['/customers/', customer.id]"
+              >
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideMapPin" class="!size-3" />
+                  </div>
+                  
                   <span class="text-sm truncate">
                     {{ customer.address.address }}, {{ customer.address.city }}
                     @if (customer.address.state) {
@@ -133,5 +148,5 @@
 </div>
 
 <div class="mt-4">
-<ng-content select="pagination" />
+  <ng-content select="pagination" />
 </div>

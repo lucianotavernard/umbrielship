@@ -1,20 +1,19 @@
 import { randomUUID } from 'crypto';
 
-import { WorkOrderServiceImageEntity } from './work-order-service-image.entity';
-import { WorkOrderServiceEntity } from './work-order-service.entity';
 import { WorkOrderStatus } from './work-order.entity';
 
-export type WorkOrderServiceWithImages = {
-  service: WorkOrderServiceEntity;
-  images: WorkOrderServiceImageEntity[];
+type VesselValueObject = {
+  vesselId: string;
+  name: string;
+  type: string;
+  length: number;
 };
 
 export type WorkOrderDetailEntityProps = {
-  vesselId: string;
   startDate: Date;
   endDate: Date;
   status: WorkOrderStatus;
-  services: WorkOrderServiceWithImages[];
+  vessel: VesselValueObject;
 };
 
 export class WorkOrderDetailEntity {
@@ -23,7 +22,7 @@ export class WorkOrderDetailEntity {
   startDate: Date;
   endDate: Date;
   status: WorkOrderStatus;
-  services: WorkOrderServiceWithImages[];
+  vessel: VesselValueObject;
 
   constructor(props: WorkOrderDetailEntityProps, id?: string) {
     Object.assign(this, props);

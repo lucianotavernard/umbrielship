@@ -1,0 +1,122 @@
+<div class="overflow-hidden rounded-lg border">
+  <div class="relative w-full overflow-x-auto">
+    <table class="w-full caption-bottom text-sm">
+      <thead class="[&_tr]:border-b sticky top-0 z-10 bg-muted">
+        <tr
+          class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted"
+        >
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Serviço
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Iniciado em
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Finalizado em
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Status
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="[&_tr:last-child]:border-0 **:data-[slot=table-cell]:first:w-8">
+        @if (loading()) {
+          @for (_ of [1, 2, 3]; track $index) {
+            <tr
+              class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+            >
+              <td class="p-2 align-middle whitespace-nowrap">
+                <skeleton class="w-56 h-4 rounded" />
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <skeleton class="w-6 h-6 rounded" />
+                  <skeleton class="w-32 h-4 rounded" />
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <skeleton class="w-6 h-6 rounded" />
+                  <skeleton class="w-32 h-4 rounded" />
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap">
+                <skeleton class="w-32 h-4 rounded" />
+              </td>
+            </tr>
+          }
+        } @else {
+          @for (service of services(); track service.id) {
+            <tr
+              class="group border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+            >
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideWrench" class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    {{ service.name }}
+                  </span>
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideCalendar" class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    {{ service.startDate | date: 'shortDate' }}
+                  </span>
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideCalendar" class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    {{ service.endDate | date: 'shortDate' }}
+                  </span>
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                @let status = getStatus(service.status);
+                <badge variant="secondary">{{ status }}</badge>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">
+                <div class="flex flex-col items-center justify-center py-12 px-4">
+                  <div class="flex mb-2 bg-muted rounded-md p-3 text-xl">
+                    <ng-icon name="lucideWrench" class="text-muted-foreground" />
+                  </div>
+                  <p class="text-base font-medium text-muted-foreground mb-1">
+                    Nenhum serviço executado
+                  </p>
+                  <p class="text-sm text-center max-w-sm">
+                    Não há serviços registrados para esta ordem.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-4">
+  <ng-content select="pagination" />
+</div>

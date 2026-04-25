@@ -1,0 +1,45 @@
+<form class="flex flex-col gap-6 h-[calc(100vh-106px)]" (submit)="handleSubmit($event)">
+  <section class="rounded-2xl shadow-xs border overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+      <div class="flex p-3 bg-background rounded-lg shadow-xs">
+        <ng-icon name="lucideClipboardList" class="!size-4" />
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold">Ordem de serviço</h3>
+        <p class="text-xs text-muted-foreground">Datas e status da ordem</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6 p-6">
+      <form-group class="sm:col-span-3">
+        <label for="wo-start">Início</label>
+        <input id="wo-start" type="datetime-local" [formField]="workOrderForm.startDate" />
+      </form-group>
+
+      <form-group class="sm:col-span-3">
+        <label for="wo-end">Término</label>
+        <input id="wo-end" type="datetime-local" [formField]="workOrderForm.endDate" />
+      </form-group>
+
+      <form-group class="sm:col-span-full">
+        <label for="wo-status">Status</label>
+        <combobox
+          [options]="statusOptions()"
+          [formField]="workOrderForm.status"
+          placeholder="Status"
+        />
+      </form-group>
+    </div>
+  </section>
+
+  <footer class="flex items-center justify-end gap-3">
+    <button type="button" variant="outline" (click)="close()">Cancelar</button>
+
+    <button type="submit" [disabled]="loading()">
+      @if (loading()) {
+        <ng-icon name="lucideLoader2" class="!size-4 animate-spin" />
+      }
+      Salvar
+    </button>
+  </footer>
+</form>

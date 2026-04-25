@@ -1,29 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
+import { Paginate } from '@/shared/lib/core/type/paginate';
 import {
+  Vessel as PrismaVessel,
   WorkOrder as PrismaWorkOrder,
-  WorkOrderService as PrismaWorkOrderService,
-  WorkOrderServiceImage as PrismaWorkOrderServiceImage,
 } from '@/shared/module/prisma/generated/prisma/client';
 import { PrismaService } from '@/shared/module/prisma/service/prisma.service';
-import { Paginate } from '@/shared/lib/core/type/paginate';
 
 import { WorkOrderDetailEntity } from '@/work-order/core/entity/work-order-detail.entity';
-import { WorkOrderServiceImageEntity } from '@/work-order/core/entity/work-order-service-image.entity';
-import {
-  WorkOrderServiceEntity,
-  WorkOrderServiceStatus,
-} from '@/work-order/core/entity/work-order-service.entity';
 import {
   WorkOrderEntity,
   WorkOrderStatus,
 } from '@/work-order/core/entity/work-order.entity';
 import { WorkOrderRepository } from '@/work-order/core/interface/work-order.repository';
 
-type PrismaWorkOrderWithServices = PrismaWorkOrder & {
-  services: Array<
-    PrismaWorkOrderService & { images: PrismaWorkOrderServiceImage[] }
-  >;
+type PrismaWorkOrderWithVessel = PrismaWorkOrder & {
+  vessel: PrismaVessel;
 };
 
 @Injectable()
@@ -34,9 +26,7 @@ export class PrismaWorkOrdersRepository implements WorkOrderRepository {
     const workOrder = await this.prisma.workOrder.findUnique({
       where: { id },
       include: {
-        services: {
-          include: { images: true },
-        },
+        vessel: true,
       },
     });
 
@@ -122,36 +112,19 @@ export class PrismaWorkOrdersRepository implements WorkOrderRepository {
   }
 
   private toDetailDomain(
-    prismaWorkOrder: PrismaWorkOrderWithServices,
+    prismaWorkOrder: PrismaWorkOrderWithVessel,
   ): WorkOrderDetailEntity {
-    const services = prismaWorkOrder.services.map((svc) => ({
-      service: new WorkOrderServiceEntity(
-        {
-          workOrderId: svc.workOrderId,
-          name: svc.name,
-          description: svc.description,
-          startDate: svc.startDate,
-          endDate: svc.endDate,
-          status: svc.status as WorkOrderServiceStatus,
-        },
-        svc.id,
-      ),
-      images: svc.images.map(
-        (img) =>
-          new WorkOrderServiceImageEntity(
-            { serviceId: img.serviceId, url: img.url },
-            img.id,
-          ),
-      ),
-    }));
-
     return new WorkOrderDetailEntity(
       {
-        vesselId: prismaWorkOrder.vesselId,
+        vessel: {
+          vesselId: prismaWorkOrder.vessel.id,
+          name: prismaWorkOrder.vessel.name,
+          type: prismaWorkOrder.vessel.type,
+          length: prismaWorkOrder.vessel.length,
+        },
         startDate: prismaWorkOrder.startDate,
         endDate: prismaWorkOrder.endDate,
-        status: prismaWorkOrder.status as WorkOrderStatus,
-        services,
+        status: prismaWorkOrder.status,
       },
       prismaWorkOrder.id,
     );

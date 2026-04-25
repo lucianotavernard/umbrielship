@@ -113,7 +113,6 @@ export class CustomerFormUi {
 
   handleSubmit(event: Event) {
     event.preventDefault();
-    // this.submitted.emit(this.customerSignal());
-    console.log(this.customerSignal());
+    this.submitted.emit(this.customerSignal());
   }
 }

@@ -23,8 +23,9 @@
                 <div class="flex items-center gap-3 mb-4">
                   <!-- Avatar -->
                   <div class="flex items-center justify-center size-12 rounded-lg bg-muted">
-                    <span class="text-sm font-semibold text-primary">
-                      {{ avatar() }}
+                    <span class="text-xl font-bold text-primary">
+                      @let avatar = getVesselAvatar(vessel);
+                      {{ avatar }}
                     </span>
                   </div>
 
@@ -58,12 +59,13 @@
               </div>
 
               <div class="min-w-0 flex-1">
+                @let vesselType = getVesselType(vessel.type);
                 <p class="text-xs font-semibold uppercase tracking-wider mb-1">
                   Detalhes da Embarcação
                 </p>
                 <p class="text-sm font-medium text-muted-foreground">{{ vessel.name }}</p>
                 <p class="text-xs text-muted-foreground mt-0.5">
-                  {{ vessel.type }}, {{ vessel.length }}
+                  {{ vesselType }}, {{ vessel.length }}
                   {{ vessel.length === 1 ? 'metro' : 'metros' }}
                 </p>
               </div>

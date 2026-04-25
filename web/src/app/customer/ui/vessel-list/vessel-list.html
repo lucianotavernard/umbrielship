@@ -77,29 +77,26 @@
                 class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
                 [routerLink]="['/vessels', vessel.id]"
               >
-                <div class="flex items-center gap-3">
-                  <div class="flex bg-muted rounded-md p-3 text-sm font-medium">
-                    @let firstName = vessel.name.split(' ')[0];
-                    @let lastName = vessel.name.split(' ')[1];
-                    {{ firstName.charAt(0) }}{{ lastName.charAt(0) }}
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideFlag" class="!size-3" />
                   </div>
 
-                  <div class="grid gap-1">
-                    <span class="text-sm font-medium">{{ vessel.imoNumber }}</span>
-                    <span class="text-sm text-muted-foreground">
-                      {{ vessel.name }}
-                    </span>
-                  </div>
+                  <span class="text-sm text-muted-foreground">{{ vessel.name }}</span>
                 </div>
               </td>
               <td
                 class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
                 [routerLink]="['/vessels', vessel.id]"
               >
+                @let vesselType = getVesselType(vessel.type);
                 <div class="flex items-center gap-2">
-                  <ng-icon name="lucideShip" class="text-gray-400 size-3" />
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideShipWheel" class="!size-3" />
+                  </div>
+
                   <span class="text-sm truncate">
-                    {{ vessel.type }}
+                    {{ vesselType }}
                   </span>
                 </div>
               </td>
@@ -108,6 +105,10 @@
                 [routerLink]="['/customers/', vessel.customerId, 'vessels/', vessel.id]"
               >
                 <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideRuler" class="!size-3" />
+                  </div>
+
                   <span class="text-sm truncate">
                     {{ vessel.length }} {{ vessel.length === 1 ? 'metro' : 'metros' }}
                   </span>

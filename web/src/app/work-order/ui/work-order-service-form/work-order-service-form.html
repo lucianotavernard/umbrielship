@@ -1,0 +1,60 @@
+<!-- <form class="flex flex-col gap-6 h-[calc(100vh-106px)]" (submit)="handleSubmit($event)">
+  <section class="rounded-2xl shadow-xs border overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 border-b bg-muted">
+      <div class="flex p-3 bg-background rounded-lg shadow-xs">
+        <ng-icon name="lucideWrench" class="!size-4" />
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold">Serviço</h3>
+        <p class="text-xs text-muted-foreground">Nome, descrição e período</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-6 p-6">
+      <form-group class="sm:col-span-full">
+        <label for="svc-name">Nome</label>
+        <input id="svc-name" type="text" [formField]="serviceForm.name" />
+      </form-group>
+
+      <form-group class="sm:col-span-full">
+        <label for="svc-desc">Descrição</label>
+        <textarea
+          id="svc-desc"
+          rows="3"
+          class="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30"
+          [formField]="serviceForm.description"
+        ></textarea>
+      </form-group>
+
+      <form-group class="sm:col-span-3">
+        <label for="svc-start">Início</label>
+        <input id="svc-start" type="datetime-local" [formField]="serviceForm.startLocal" />
+      </form-group>
+
+      <form-group class="sm:col-span-3">
+        <label for="svc-end">Término</label>
+        <input id="svc-end" type="datetime-local" [formField]="serviceForm.endLocal" />
+      </form-group>
+
+      <form-group class="sm:col-span-full">
+        <label for="svc-status">Status</label>
+        <combobox
+          [options]="statusOptions()"
+          [formField]="serviceForm.status"
+          placeholder="Status"
+        />
+      </form-group>
+    </div>
+  </section>
+
+  <footer class="flex items-center justify-end gap-3">
+    <button type="button" variant="outline" (click)="close()">Cancelar</button>
+
+    <button type="submit" [disabled]="loading()">
+      @if (loading()) {
+        <ng-icon name="lucideLoader2" class="!size-4 animate-spin" />
+      }
+      Salvar
+    </button>
+  </footer>
+</form> -->

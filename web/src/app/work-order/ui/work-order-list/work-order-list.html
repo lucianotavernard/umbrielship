@@ -1,0 +1,116 @@
+<div class="overflow-hidden rounded-lg border">
+  <div class="relative w-full overflow-x-auto">
+    <table class="w-full caption-bottom text-sm">
+      <thead class="[&_tr]:border-b sticky top-0 z-10 bg-muted">
+        <tr
+          class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted"
+        >
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Ordem
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Docagem
+          </th>
+
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Desdocagem
+          </th>
+          <th
+            class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]"
+          >
+            Status
+          </th>
+        </tr>
+      </thead>
+
+      <tbody class="[&_tr:last-child]:border-0 **:data-[slot=table-cell]:first:w-8">
+        @if (loading()) {
+          @for (_ of [1, 2, 3]; track $index) {
+            <tr
+              class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+            >
+              <td class="p-2 align-middle whitespace-nowrap">
+                <skeleton class="w-56 h-4 rounded" />
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap">
+                <skeleton class="w-32 h-4 rounded" />
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap">
+                <skeleton class="ml-auto block w-20 h-8 rounded-md" />
+              </td>
+            </tr>
+          }
+        } @else {
+          @for (workOrder of workOrders(); track workOrder.id) {
+            <tr
+              class="group border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+              [routerLink]="['/work-orders', workOrder.id]"
+            >
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideFlag " class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    #{{ workOrder.id.slice(0, 8).toUpperCase() }}
+                  </span>
+                </div>
+              </td>
+
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideCalendar" class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    {{ workOrder.startDate | date: 'longDate' }}
+                  </span>
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <div class="flex shrink-0 p-1.5 bg-muted rounded-md">
+                    <ng-icon name="lucideCalendar" class="!size-3" />
+                  </div>
+                  <span class="text-sm text-muted-foreground">
+                    {{ workOrder.endDate | date: 'longDate' }}
+                  </span>
+                </div>
+              </td>
+              <td class="p-2 align-middle whitespace-nowrap cursor-pointer">
+                @let status = getStatus(workOrder.status);
+                <badge variant="secondary">{{ status }}</badge>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3">
+                <div class="flex flex-col items-center justify-center py-12 px-4">
+                  <div class="flex mb-2 bg-muted rounded-full p-3 text-xl">
+                    <ng-icon name="lucideClipboardList" class="text-muted-foreground" />
+                  </div>
+                  <p class="text-base font-medium text-muted-foreground mb-1">
+                    Nenhuma ordem de serviço
+                  </p>
+                  <p class="text-sm text-center max-w-sm">
+                    Não há ordens de serviço registradas para esta embarcação.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-4">
+  <ng-content select="pagination" />
+</div>

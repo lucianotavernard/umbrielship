@@ -3,7 +3,7 @@
   <div class="mx-auto max-w-7xl px-6 py-4">
     <button type="button" variant="ghost" class="gap-2" (click)="goBack()">
       <ng-icon name="lucideArrowLeft" class="size-4" />
-      Voltar para Embarcações
+      Voltar para detalhes do cliente
     </button>
   </div>
 </header>
@@ -12,40 +12,31 @@
   <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
     <!-- Main Content Column -->
     <div class="grid grid-cols-1 gap-6 lg:col-span-2">
-      <vessel-detail-ui
-        [vessel]="vessel()"
-        [loading]="loading()"
-        (edited)="openSheet()"
-      />
+      <vessel-detail-ui [vessel]="vessel()" [loading]="loading()" (edited)="openSheet()" />
 
-      <!-- Vessels Section -->
-      <!-- <section class="rounded-2xl shadow-xs border overflow-hidden">
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
         <header class="flex items-center justify-between gap-3 px-6 py-4 border-b bg-popover">
           <div class="flex items-center gap-3">
             <div class="flex p-3 bg-background rounded-lg shadow-xs">
-              <ng-icon name="lucideShip" class="!size-4" />
+              <ng-icon name="lucideClipboardList" class="!size-4" />
             </div>
 
             <div>
-              <h3 class="text-sm font-semibold">Embarcações</h3>
-              <p class="text-xs text-muted-foreground">
-                Lista de embarcações registradas para o cliente.
-              </p>
+              <h3 class="text-sm font-semibold">Ordens de serviço</h3>
+              <p class="text-xs text-muted-foreground">Ordens vinculadas a esta embarcação.</p>
             </div>
           </div>
 
-          <button type="button" (click)="openNewVesselSheet()">
+          <button type="button" (click)="openWorkOrderSheet()">
             <ng-icon name="lucidePlus" class="size-4 mr-1" />
-            Nova Embarcação
+            Nova ordem
           </button>
         </header>
 
         <div class="p-4">
-          <vessel-list-ui [vessels]="vessels()" [loading]="loadingVessels()">
-            <pagination [page]="page()" [total]="totalVessels()" [perPage]="10" />
-          </vessel-list-ui>
+          <work-order-list-ui [workOrders]="workOrders()" [loading]="loadingWorkOrders()" />
         </div>
-      </section> -->
+      </section>
     </div>
 
     <!-- Sidebar Column -->
@@ -100,5 +91,19 @@
     [vessel]="selectedVessel()"
     (closed)="closeSheet()"
     (submitted)="handleSubmit($event)"
+  />
+</sheet>
+
+<sheet
+  title="Nova ordem de serviço"
+  description="Preencha os campos abaixo para criar uma nova ordem de serviço"
+  class="sm:max-w-md"
+  [isActive]="isWorkOrderSheetActive()"
+  (closed)="closeWorkOrderSheet()"
+>
+  <work-order-form-ui
+    [loading]="submittingWorkOrder()"
+    (closed)="closeWorkOrderSheet()"
+    (submitted)="handleSubmitWorkOrder($event)"
   />
 </sheet>

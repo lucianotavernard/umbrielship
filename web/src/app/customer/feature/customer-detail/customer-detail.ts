@@ -5,7 +5,13 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideMapPin, lucidePencil, lucideShip, lucidePlus, lucideArrowLeft } from '@ng-icons/lucide';
+import {
+  lucideMapPin,
+  lucidePencil,
+  lucideShip,
+  lucidePlus,
+  lucideArrowLeft,
+} from '@ng-icons/lucide';
 
 import { toast } from '@/shared/ui/toaster';
 import { Sheet } from '@/shared/ui/sheet';
@@ -37,7 +43,9 @@ import { VesselFormUi } from '@/customer/ui/vessel-form/vessel-form';
     VesselListUi,
     VesselFormUi,
   ],
-  viewProviders: [provideIcons({ lucideMapPin, lucidePencil, lucideShip, lucidePlus, lucideArrowLeft })],
+  viewProviders: [
+    provideIcons({ lucideMapPin, lucidePencil, lucideShip, lucidePlus, lucideArrowLeft }),
+  ],
 })
 export class CustomerDetail {
   private readonly router = inject(Router);
@@ -53,7 +61,7 @@ export class CustomerDetail {
       total: 0,
     },
   });
-  
+
   page = signal(1);
   submittingNewCustomer = signal(false);
   isCustomerSheetActive = signal(false);
@@ -139,13 +147,14 @@ export class CustomerDetail {
       });
   }
 
-  handleSubmitVessel(vessel: Omit<VesselDto, 'id' | 'customerId'>) {
+  handleSubmitVessel(vessel: Omit<VesselDto, 'id' | 'customer'>) {
     this.submittingNewVessel.set(true);
 
     const customerId = this.id();
+    vessel.customerId = customerId!;
 
     this.http
-      .post<VesselDto>(`/api/customers/${customerId}/vessels`, vessel)
+      .post<VesselDto>(`/api/vessels`, vessel)
       .pipe(finalize(() => this.submittingNewVessel.set(false)))
       .subscribe({
         next: () => {

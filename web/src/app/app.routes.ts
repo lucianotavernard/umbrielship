@@ -63,6 +63,18 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'work-orders',
+        children: [
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./work-order/feature/work-order-detail/work-order-detail').then(
+                (m) => m.WorkOrderDetail,
+              ),
+          },
+        ],
+      },
     ],
   },
   {

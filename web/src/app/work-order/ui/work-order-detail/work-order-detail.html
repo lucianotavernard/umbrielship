@@ -1,0 +1,101 @@
+<section class="relative">
+  <div class="overflow-hidden bg-popover rounded-2xl shadow-xs border">
+    <div class="p-6 sm:p-8">
+      @if (loading()) {
+        <div
+          class="animate-pulse flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+        >
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <skeleton class="size-12 rounded-lg shrink-0" />
+            <div class="flex-1 space-y-2 min-w-0">
+              <skeleton class="h-8 max-w-[12rem] rounded-md" />
+              <skeleton class="h-4 max-w-[20rem] rounded-md" />
+            </div>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <skeleton class="h-6 w-28 rounded-full" />
+            <skeleton class="h-10 w-36 rounded-md" />
+          </div>
+        </div>
+      } @else if (workOrder(); as workOrder) {
+        <div class="flex flex-col gap-6">
+          <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex fle-col gap-2">
+              <div class="flex flex-col gap-2">
+                <h1 class="text-3xl font-extrabold tracking-tight text-foreground">
+                  Ordem de serviço #{{ workOrder.id.slice(0, 8).toUpperCase() }}
+                </h1>
+
+                <div class="flex gap-2">
+                  <badge variant="secondary">{{ status() }}</badge>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+              <button type="button" class="gap-2" (click)="editWorkOrder()">
+                <ng-icon name="lucidePencil" class="size-4" />
+                Editar ordem de serviço
+              </button>
+            </div>
+          </header>
+
+          <!-- Info Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Contact Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideShip" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">
+                  Embarcação
+                </p>
+                <p class="text-sm font-medium text-muted-foreground">{{ workOrder.vessel.name }}</p>
+                <!-- <p class="text-xs text-muted-foreground mt-0.5">
+                  {{ workOrder.vessel.type }}, {{ workOrder.vessel.length }}
+                  {{ workOrder.vessel.length === 1 ? 'metro' : 'metros' }}
+                </p> -->
+              </div>
+            </div>
+
+            <!-- Start Date Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideCalendar" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">Data de Docagem</p>
+                <p class="text-sm font-medium text-muted-foreground">
+                  {{ workOrder.startDate | date: 'longDate' }}
+                </p>
+                <p class="capitalize text-xs text-muted-foreground mt-0.5">
+                  {{ workOrder.startDate | date: 'EEEE' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- End Date Card -->
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-background border">
+              <div class="flex flex-shrink-0 p-2.5 bg-muted rounded-lg shadow-xs">
+                <ng-icon name="lucideCalendar" class="!size-5" />
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wider mb-1">Data de Desdocagem</p>
+                <p class="text-sm font-medium text-muted-foreground">
+                  {{ workOrder.endDate | date: 'longDate' }}
+                </p>
+                <p class="capitalize text-xs text-muted-foreground mt-0.5">
+                  {{ workOrder.endDate | date: 'EEEE' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

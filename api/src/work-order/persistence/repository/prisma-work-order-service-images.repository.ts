@@ -10,6 +10,18 @@ import { WorkOrderServiceImageRepository } from '@/work-order/core/interface/wor
 export class PrismaWorkOrderServiceImagesRepository implements WorkOrderServiceImageRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findById(id: string): Promise<WorkOrderServiceImageEntity | null> {
+    const row = await this.prisma.workOrderServiceImage.findUnique({
+      where: { id },
+    });
+
+    if (!row) {
+      return null;
+    }
+
+    return this.toDomain(row);
+  }
+
   async findManyByServiceId(
     serviceId: string,
   ): Promise<WorkOrderServiceImageEntity[]> {

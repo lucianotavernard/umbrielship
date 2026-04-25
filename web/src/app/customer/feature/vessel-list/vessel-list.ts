@@ -64,7 +64,7 @@ export class VesselList {
     this.selectedVessel.set(null);
   }
 
-  handleSubmit(vessel: Omit<VesselDto, 'id'>) {
+  handleSubmit(vessel: Omit<VesselDto, 'id' | 'customer'>) {
     this.submitting.set(true);
 
     this.http

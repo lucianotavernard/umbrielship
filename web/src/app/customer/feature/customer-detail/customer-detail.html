@@ -110,6 +110,8 @@
   (closed)="closeNewVesselSheet()"
 >
   <vessel-form-ui
+    [customers]="customer() ? [customer()!] : []"
+    [customer]="customer()"
     [loading]="submittingNewVessel()"
     (closed)="closeNewVesselSheet()"
     (submitted)="handleSubmitVessel($event)"

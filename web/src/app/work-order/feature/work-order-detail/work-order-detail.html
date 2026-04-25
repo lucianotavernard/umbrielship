@@ -1,0 +1,99 @@
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <button type="button" variant="ghost" class="gap-2" (click)="goBack()">
+      <ng-icon name="lucideArrowLeft" class="size-4" />
+      Voltar para detalhes da embarcação
+    </button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
+    <!-- Main Content Column -->
+    <div class="grid grid-cols-1 gap-6 lg:col-span-2">
+      <work-order-detail-ui
+        [workOrder]="workOrder()"
+        [loading]="loading()"
+        (edited)="opensSheet()"
+      />
+
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex items-center justify-between gap-3 px-6 py-4 border-b bg-popover">
+          <div class="flex items-center gap-3">
+            <div class="flex p-3 bg-background rounded-lg shadow-xs">
+              <ng-icon name="lucideWrench" class="!size-4" />
+            </div>
+
+            <div>
+              <h3 class="text-sm font-semibold">Serviços</h3>
+              <p class="text-xs text-muted-foreground">Serviços executados nesta ordem</p>
+            </div>
+          </div>
+
+          <button type="button" disabled>
+            <ng-icon name="lucidePlus" class="size-4 mr-1" />
+            Novo serviço
+          </button>
+        </header>
+
+        <div class="p-6">
+          <work-order-service-list-ui
+            [loading]="loadingWorkOrderServices()"
+            [services]="workOrderServices()"
+          />
+        </div>
+      </section>
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="grid grid-cols-1 gap-6">
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex items-center gap-3 px-6 py-4 border-b bg-popover">
+          <div class="flex p-3 bg-background rounded-lg shadow-xs">
+            <ng-icon name="lucideHistory" class="!size-4" />
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold">Atividade recente</h3>
+            <p class="text-xs text-muted-foreground">
+              Acompanhe todas as alterações e atualizações
+            </p>
+          </div>
+        </header>
+
+        <div class="p-4">
+          <div class="flow-root overflow-h-scroll pr-2">
+            <ul class="flex flex-col gap-1">
+              <li>
+                <div class="flex flex-col items-center py-8">
+                  <div class="flex mb-2 bg-muted rounded-lg p-3 text-xl">
+                    <ng-icon name="lucideHistory" class="!size-8 text-muted-foreground" />
+                  </div>
+                  <p class="text-sm font-medium text-foreground">Nenhuma atividade recente</p>
+                  <p class="text-xs text-muted-foreground mt-1">
+                    As atividades aparecerão aqui à medida que forem realizadas
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<sheet
+  title="Editar ordem de serviço"
+  description="Preencha os campos abaixo para atualizar as informações da ordem de serviço"
+  class="sm:max-w-md"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <work-order-form-ui
+    [loading]="submitting()"
+    [workOrder]="workOrder()"
+    (closed)="closeSheet()"
+    (submitted)="handleSubmit($event)"
+  />
+</sheet>

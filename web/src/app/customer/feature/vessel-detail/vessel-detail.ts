@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideArrowLeft,
+  lucideClipboardList,
   lucideMapPin,
   lucidePencil,
   lucidePlus,
@@ -23,16 +24,41 @@ import { GOOGLE_MAPS_EMBED_API_KEY } from '@/shared/config/google-maps';
 
 import { VesselDto, VesselResponseDto } from '@/customer/data-access/dto/vessel.dto';
 import { CustomersResponseDto } from '@/customer/data-access/dto/customer.dto';
+import {
+  WorkOrderDto,
+  WorkOrdersResponseDto,
+  type WorkOrderResponseDto,
+  type WorkOrderStatusDto,
+} from '@/work-order/data-access/dto/work-order.dto';
 
 import { VesselDetailUi } from '@/customer/ui/vessel-detail/vessel-detail';
 import { VesselFormUi } from '@/customer/ui/vessel-form/vessel-form';
+import { WorkOrderListUi } from '@/work-order/ui/work-order-list/work-order-list';
+import { WorkOrderFormUi } from '@/work-order/ui/work-order-form/work-order-form';
 
 @Component({
   selector: 'vessel-detail',
   templateUrl: './vessel-detail.html',
-  imports: [NgIcon, Skeleton, Sheet, Button, Pagination, VesselDetailUi, VesselFormUi],
+  imports: [
+    NgIcon,
+    Skeleton,
+    Sheet,
+    Button,
+    Pagination,
+    VesselDetailUi,
+    VesselFormUi,
+    WorkOrderListUi,
+    WorkOrderFormUi,
+  ],
   viewProviders: [
-    provideIcons({ lucideMapPin, lucidePencil, lucideShip, lucidePlus, lucideArrowLeft }),
+    provideIcons({
+      lucideMapPin,
+      lucidePencil,
+      lucideShip,
+      lucidePlus,
+      lucideArrowLeft,
+      lucideClipboardList,
+    }),
   ],
 })
 export class VesselDetail {
@@ -50,9 +76,22 @@ export class VesselDetail {
     },
   });
 
+  workOrdersResource = httpResource<WorkOrdersResponseDto>(
+    () => `/api/work-orders?vesselId=${this.id()}`,
+    {
+      defaultValue: {
+        workOrders: [],
+        total: 0,
+      },
+    },
+  );
+
   page = signal(1);
   submitting = signal(false);
   isSheetActive = signal(false);
+
+  submittingWorkOrder = signal(false);
+  isWorkOrderSheetActive = signal(false);
 
   selectedVessel = signal<VesselDto | null>(null);
 
@@ -61,6 +100,10 @@ export class VesselDetail {
 
   customers = computed(() => this.customersResource.value().customers);
   loadingCustomers = computed(() => this.customersResource.isLoading());
+
+  workOrders = computed(() => this.workOrdersResource.value().workOrders);
+  totalWorkOrders = computed(() => this.workOrdersResource.value().total);
+  loadingWorkOrders = computed(() => this.workOrdersResource.isLoading());
 
   /** Iframe src for Google Maps (address search / Embed API). */
   mapEmbedSrc = computed((): SafeResourceUrl | null => {
@@ -118,6 +161,36 @@ export class VesselDetail {
         error: () => {
           toast.error('Erro ao atualizar embarcação', {
             description: 'Ocorreu um erro ao atualizar a embarcação.',
+          });
+        },
+      });
+  }
+
+  openWorkOrderSheet() {
+    this.isWorkOrderSheetActive.set(true);
+  }
+
+  closeWorkOrderSheet() {
+    this.isWorkOrderSheetActive.set(false);
+  }
+
+  handleSubmitWorkOrder(workOrder: Omit<WorkOrderDto, 'id'>) {
+    this.submittingWorkOrder.set(true);
+    this.http
+      .post<WorkOrderResponseDto>('/api/work-orders', workOrder)
+      .pipe(finalize(() => this.submittingWorkOrder.set(false)))
+      .subscribe({
+        next: () => {
+          this.workOrdersResource.reload();
+          this.closeWorkOrderSheet();
+
+          toast.success('Ordem criada com sucesso', {
+            description: 'A ordem de serviço foi adicionada com sucesso.',
+          });
+        },
+        error: () => {
+          toast.error('Erro ao criar nova ordem', {
+            description: 'Ocorreu um erro ao adicionar ordem de serviço à embarcação.',
           });
         },
       });

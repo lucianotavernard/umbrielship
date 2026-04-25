@@ -23,6 +23,7 @@ export class VesselFormUi {
   loading = input(false);
   vessel = input<VesselDto | null>(null);
 
+  customer = input<CustomerDto | null>(null);
   customers = input<CustomerDto[]>([]);
 
   closed = output<void>();
@@ -66,6 +67,7 @@ export class VesselFormUi {
   constructor() {
     effect(() => {
       const vessel = this.vessel();
+      const customer = this.customer();
 
       if (vessel) {
         this.vesselSignal.set({
@@ -75,6 +77,13 @@ export class VesselFormUi {
           imoNumber: vessel.imoNumber,
           customerId: vessel.customerId,
         });
+      }
+
+      if (customer) {
+        this.vesselSignal.update((state) => ({
+          ...state,
+          customerId: customer.id,
+        }));
       }
     });
   }
@@ -86,7 +95,7 @@ export class VesselFormUi {
       type: '',
       length: 0,
       imoNumber: '',
-      customerId: '',
+      customerId: this.customer()?.id ?? '',
     });
   }
 

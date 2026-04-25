@@ -40,4 +40,9 @@ export class AuthService {
 
     return this.http.get<WhoamiResponse>(url);
   }
+
+  logout() {
+    localStorage.removeItem('@umbriel:access-token');
+    this.isAuthenticated.set(false);
+  }
 }
