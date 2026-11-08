@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { AlreadyExistsDomainException } from '@/shared/lib/core/exception/already-exists-domain.exception';
+import { NotFoundDomainException } from '@/shared/lib/core/exception/not-found-domain.exception';
 
 import { CustomerEntity } from '../entity/customer.entity';
 import { CustomerRepository } from '../interface/customer.repository';
@@ -35,7 +36,7 @@ export class EditCustomerUseCase {
     const customer = await this.customerRepository.findById(customerId);
 
     if (!customer) {
-      throw new NotFoundException('Customer not found');
+      throw new NotFoundDomainException('Customer not found');
     }
 
     const existingCustomer = await this.customerRepository.findByEmail(email);
