@@ -213,6 +213,13 @@ Acme's own domain (Item, Stock, Purchase, Staff...) is not umbrielship's and is 
 - `GET /organizations*` and the other internal routes answer 403 (not 404) to a member of a non-internal Organization, as the table above says; acme answers 404
 - The session payload is resolved on every request from the User's active Organization (`ResolveSessionUseCase`), which is what makes a switch reach every session of that User (AC 22)
 
+**Found while building S3 (plan changed in the same commit as the docs):**
+
+- TypeScript 6 (acme's `^6.0.2`) makes `strict` the default, and the S2 code already compiled under it: S3 needed no code fix for door 4's `strict`, only the config (`"strict": true`, `strictPropertyInitialization` off as in acme; the explicit `strictNullChecks`, `noImplicitAny` and `strictBindCallApply` `false` overrides are gone)
+- `nest build` rewrites the `@/` alias by itself, so `tsc-alias` and `ts-loader` leave `package.json`; with `rootDir` `./src` the entry point is `dist/main.js` and `start:prod` is `node dist/main` (was `dist/src/main.js`)
+- `ROADMAP.md` items 5 and 6 read `built` and item 1's Status names `GET /me`, because AD-007 absorbed them and `roadmap-execution` would otherwise build them again; item 7 is untouched
+- Until S4 the web calls `GET /whoami`, which S2 renamed `GET /me` (AD-015): the shipped web cannot load the signed-in User against this API
+
 ## Sources
 
 - Request "migrar toda a arquitetura baseada no acme" - binding - scope
