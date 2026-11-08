@@ -56,6 +56,102 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: C64 (api/identity)
 - last seen: 2026-11-08T12:56:13Z
 
+### L-008 - Assert a compiler flag in every config the build reads, not only the base tsconfig.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `api/platform` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C67 (api/tsconfig.build.json) (api/platform)
+- last seen: 2026-11-08T13:28:15Z
+
+### L-009 - A doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `docs` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C73 (AGENTS.md) (docs)
+- last seen: 2026-11-08T13:28:15Z
+
+### L-010 - An import-specifier scan must cover dot-only paths, vi.doMock and vi.importActual, and demand the exact extension the claim names.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `api/platform` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C68 (api/test/platform.spec.ts) (api/platform)
+- last seen: 2026-11-08T13:28:16Z
+
+### L-011 - Spot-check each factual sentence of a rewritten doc against the code; a presence check on tokens does not prove a sentence true.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `docs` · harmful: 0
+- features: acme-architecture-migration
+- evidence: S3 modular-architecture skill, EditWorkOrderUseCase (docs)
+- last seen: 2026-11-08T13:28:16Z
+
+### L-012 - State a database rule in a glossary only when the schema enforces it; otherwise name the code that upholds it.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `docs` · harmful: 0
+- features: acme-architecture-migration
+- evidence: S3 CONTEXT.md, internal Organization (docs)
+- last seen: 2026-11-08T13:28:16Z
+
+### L-013 - Assert the attribute selector the screen criterion names, not a bare element.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C87 organization-list.spec.ts (web)
+- last seen: 2026-11-08T20:07:41Z
+
+### L-014 - Assert the HTTP method together with the path, not only that the path string occurs.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C82 authentication.service.ts (web)
+- last seen: 2026-11-08T20:07:41Z
+
+### L-015 - Assert a reload is absent while the request is outstanding and present once after the success status.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C85 internal-layout.spec.ts (web)
+- last seen: 2026-11-08T20:07:41Z
+
+### L-016 - Run a sign-in failure with the app interceptor installed, and rethrow the 401 from that request.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C84 auth.interceptor.ts (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-017 - Keep submit disabled while a form is invalid, and assert each length bound on its own.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C97 user-form.spec.ts (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-018 - Assert the multipart field name the server reads, not only that the body is form data.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C91 work-order-detail.spec.ts (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-019 - Assert an attribute prefix as the words immediately followed by the backticked value.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C96 layout.spec.mjs (web) (+1 more)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-020 - Assert the element and its attribute together, not a substring a nested class also contains.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C83 layout.spec.mjs (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-021 - Assert the HTTP method on every request a screen criterion names.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C88 organization-detail.spec.ts (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-022 - Assert the fields sit inside the container the criterion names.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C87 organization-list.spec.ts t-sheet (web)
+- last seen: 2026-11-08T20:07:42Z
+
+### L-023 - Enforce a stated length bound on the form that posts it, and assert the first value past that bound does not emit.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C87 organization-form.ts (web)
+- last seen: 2026-11-08T20:07:42Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

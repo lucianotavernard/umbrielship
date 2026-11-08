@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 8,
+  "next_id": 24,
   "lessons": [
     {
       "id": "L-001",
@@ -130,6 +130,295 @@
       ],
       "created": "2026-11-08T12:56:13Z",
       "last_seen": "2026-11-08T12:56:13Z"
+    },
+    {
+      "id": "L-008",
+      "key": "surviving_mutant::assert a compiler flag in every config the build reads not only the base tsconfig",
+      "text": "Assert a compiler flag in every config the build reads, not only the base tsconfig.",
+      "signal": "surviving_mutant",
+      "scope": "api/platform",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C67 (api/tsconfig.build.json) (api/platform)"
+      ],
+      "created": "2026-11-08T13:28:15Z",
+      "last_seen": "2026-11-08T13:28:15Z"
+    },
+    {
+      "id": "L-009",
+      "key": "surviving_mutant::a doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case",
+      "text": "A doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case.",
+      "signal": "surviving_mutant",
+      "scope": "docs",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C73 (AGENTS.md) (docs)"
+      ],
+      "created": "2026-11-08T13:28:15Z",
+      "last_seen": "2026-11-08T13:28:15Z"
+    },
+    {
+      "id": "L-010",
+      "key": "spec_precision_gap::an import specifier scan must cover dot only paths vi domock and vi importactual and demand the exact extension the claim names",
+      "text": "An import-specifier scan must cover dot-only paths, vi.doMock and vi.importActual, and demand the exact extension the claim names.",
+      "signal": "spec_precision_gap",
+      "scope": "api/platform",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C68 (api/test/platform.spec.ts) (api/platform)"
+      ],
+      "created": "2026-11-08T13:28:16Z",
+      "last_seen": "2026-11-08T13:28:16Z"
+    },
+    {
+      "id": "L-011",
+      "key": "ac_gap::spot check each factual sentence of a rewritten doc against the code a presence check on tokens does not prove a sentence true",
+      "text": "Spot-check each factual sentence of a rewritten doc against the code; a presence check on tokens does not prove a sentence true.",
+      "signal": "ac_gap",
+      "scope": "docs",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "S3 modular-architecture skill, EditWorkOrderUseCase (docs)"
+      ],
+      "created": "2026-11-08T13:28:16Z",
+      "last_seen": "2026-11-08T13:28:16Z"
+    },
+    {
+      "id": "L-012",
+      "key": "ac_gap::state a database rule in a glossary only when the schema enforces it otherwise name the code that upholds it",
+      "text": "State a database rule in a glossary only when the schema enforces it; otherwise name the code that upholds it.",
+      "signal": "ac_gap",
+      "scope": "docs",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "S3 CONTEXT.md, internal Organization (docs)"
+      ],
+      "created": "2026-11-08T13:28:16Z",
+      "last_seen": "2026-11-08T13:28:16Z"
+    },
+    {
+      "id": "L-013",
+      "key": "surviving_mutant::assert the attribute selector the screen criterion names not a bare element",
+      "text": "Assert the attribute selector the screen criterion names, not a bare element.",
+      "signal": "surviving_mutant",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C87 organization-list.spec.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:41Z",
+      "last_seen": "2026-11-08T20:07:41Z"
+    },
+    {
+      "id": "L-014",
+      "key": "surviving_mutant::assert the http method together with the path not only that the path string occurs",
+      "text": "Assert the HTTP method together with the path, not only that the path string occurs.",
+      "signal": "surviving_mutant",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C82 authentication.service.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:41Z",
+      "last_seen": "2026-11-08T20:07:41Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::assert a reload is absent while the request is outstanding and present once after the success status",
+      "text": "Assert a reload is absent while the request is outstanding and present once after the success status.",
+      "signal": "surviving_mutant",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C85 internal-layout.spec.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:41Z",
+      "last_seen": "2026-11-08T20:07:41Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::run a sign in failure with the app interceptor installed and rethrow the 401 from that request",
+      "text": "Run a sign-in failure with the app interceptor installed, and rethrow the 401 from that request.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C84 auth.interceptor.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_precision_gap::keep submit disabled while a form is invalid and assert each length bound on its own",
+      "text": "Keep submit disabled while a form is invalid, and assert each length bound on its own.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C97 user-form.spec.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-018",
+      "key": "spec_precision_gap::assert the multipart field name the server reads not only that the body is form data",
+      "text": "Assert the multipart field name the server reads, not only that the body is form data.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C91 work-order-detail.spec.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-019",
+      "key": "spec_precision_gap::assert an attribute prefix as the words immediately followed by the backticked value",
+      "text": "Assert an attribute prefix as the words immediately followed by the backticked value.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C96 layout.spec.mjs (web)",
+        "C96 layout.spec.mjs attribute value (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-020",
+      "key": "spec_precision_gap::assert the element and its attribute together not a substring a nested class also contains",
+      "text": "Assert the element and its attribute together, not a substring a nested class also contains.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C83 layout.spec.mjs (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-021",
+      "key": "spec_precision_gap::assert the http method on every request a screen criterion names",
+      "text": "Assert the HTTP method on every request a screen criterion names.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C88 organization-detail.spec.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-022",
+      "key": "spec_precision_gap::assert the fields sit inside the container the criterion names",
+      "text": "Assert the fields sit inside the container the criterion names.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C87 organization-list.spec.ts t-sheet (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-023",
+      "key": "ac_gap::enforce a stated length bound on the form that posts it and assert the first value past that bound does not emit",
+      "text": "Enforce a stated length bound on the form that posts it, and assert the first value past that bound does not emit.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C87 organization-form.ts (web)"
+      ],
+      "created": "2026-11-08T20:07:42Z",
+      "last_seen": "2026-11-08T20:07:42Z"
     }
   ]
 }
