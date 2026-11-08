@@ -1,8 +1,8 @@
 # acme-architecture-migration proofs
 
-**HEAD**: bf26ce9
+**HEAD**: 3601caa
 **Tree**: dirty - .cursor/skills/, CONTEXT.md, ROADMAP.md
-**Result**: 67 pass, 0 fail; mutations 0 killed, 0 not
+**Result**: 67 pass, 0 fail; mutations 5 killed, 1 not
 
 | Check | Proof | Ran | Passed | Result |
 | --- | --- | --- | --- | --- |
@@ -73,3 +73,14 @@
 | C65 | `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test` | 54 | - | pass |
 | Build | `cd api && npm run build` | - | - | pass |
 | Build | `cd api && npm run lint` | - | - | pass |
+
+## Mutations
+
+| Mutation | Location | Killed |
+| --- | --- | --- |
+| switch organization: membership check dropped | `api/src/package/identity/auth/switch-organization.use-case.ts:25` | yes |
+| internal guard: administrator role check dropped | `api/src/package/identity/organization/internal-administrator.guard.ts:17` | yes |
+| delivery: third failure no longer records failed (bound shifted by one) | `api/src/package/identity/invitation/deliver-invitation.use-case.ts:92` | yes |
+| send invitation: internal Organization accepted | `api/src/package/identity/invitation/send-invitation.use-case.ts:59` | yes |
+| accept invitation: already-accepted 409 guard dropped | `api/src/package/identity/invitation/accept-invitation.use-case.ts:30` | no |
+| backoff: first retry waits 10 s instead of 5 s | `api/src/package/identity/invitation/invitation-delivery.queue.ts:25` | yes |
