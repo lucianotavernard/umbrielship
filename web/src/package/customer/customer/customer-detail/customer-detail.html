@@ -1,0 +1,30 @@
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <button tButton type="button" variant="ghost" (click)="goBack()">Voltar para Clientes</button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  @if (customer(); as customer) {
+    <h1 class="text-3xl font-bold">{{ customer.name }}</h1>
+    <p class="mt-2 text-sm text-muted-foreground">{{ customer.email }}</p>
+    <p class="mt-1 text-sm">
+      {{ customer.address.address }}, {{ customer.address.city }}
+      @if (customer.address.state) {
+        , {{ customer.address.state }}
+      }
+    </p>
+  }
+
+  <h2 class="mt-8 text-sm font-semibold">Embarcações</h2>
+  <p class="text-xs text-muted-foreground">Lista de embarcações registradas para o cliente.</p>
+  <ul class="mt-4 divide-y rounded-lg border">
+    @for (vessel of vessels(); track vessel.id) {
+      <li class="px-4 py-3">
+        <a [routerLink]="vesselLink(vessel)">{{ vessel.name }}</a>
+      </li>
+    } @empty {
+      <li class="px-4 py-8 text-center text-muted-foreground">Nenhuma embarcação encontrada</li>
+    }
+  </ul>
+</section>

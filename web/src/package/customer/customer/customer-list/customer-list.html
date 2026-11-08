@@ -1,0 +1,31 @@
+<header class="border-b border-border">
+  <div class="mx-auto flex max-w-7xl items-start justify-between gap-4 px-6 py-8">
+    @if (loading()) {
+      <div class="grid flex-1 gap-2">
+        <t-skeleton class="h-9 w-64" />
+        <t-skeleton class="h-4 w-80" />
+      </div>
+    } @else {
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">Clientes</h1>
+        <p class="mt-2 text-sm text-muted-foreground">Lista de todos os clientes em sua organização.</p>
+      </div>
+      <button tButton type="button" (click)="openSheet()">Novo Cliente</button>
+    }
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <customer-list-ui [loading]="loading()" [customers]="customers()">
+    <t-pagination [page]="page()" [total]="total()" [perPage]="perPage" (changed)="changePage($event)" />
+  </customer-list-ui>
+</section>
+
+<t-sheet
+  title="Novo cliente"
+  description="Preencha os campos abaixo para criar um novo cliente"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <customer-form-ui (closed)="closeSheet()" (submitted)="createCustomer($event)" />
+</t-sheet>

@@ -1,0 +1,56 @@
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <button tButton type="button" variant="ghost" (click)="goBack()">Voltar para detalhes da embarcação</button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  @if (workOrder(); as workOrder) {
+    <div class="flex items-start justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">{{ workOrder.vessel.name }}</h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          {{ workOrder.startDate | date: 'longDate' }} — {{ workOrder.endDate | date: 'longDate' }}
+        </p>
+        <p class="text-sm">{{ statusLabels[workOrder.status] }}</p>
+      </div>
+      <button tButton type="button" (click)="isSheetActive.set(true)">Editar</button>
+    </div>
+  }
+
+  <div class="mt-8 flex items-center justify-between">
+    <div>
+      <h2 class="text-sm font-semibold">Serviços</h2>
+      <p class="text-xs text-muted-foreground">Serviços executados nesta ordem</p>
+    </div>
+    <button tButton type="button" (click)="isServiceSheetActive.set(true)">Novo serviço</button>
+  </div>
+
+  <div class="mt-4">
+    <work-order-service-list-ui
+      [loading]="loadingServices()"
+      [services]="services()"
+      (fileSelected)="upload($event)"
+    />
+  </div>
+
+  <p class="mt-8 text-sm font-medium">Nenhuma atividade recente</p>
+</section>
+
+<t-sheet
+  title="Editar ordem"
+  description="Atualize o período e o status"
+  [isActive]="isSheetActive()"
+  (closed)="isSheetActive.set(false)"
+>
+  <work-order-form-ui (closed)="isSheetActive.set(false)" (submitted)="save($event)" />
+</t-sheet>
+
+<t-sheet
+  title="Novo serviço"
+  description="Registre um serviço executado nesta ordem"
+  [isActive]="isServiceSheetActive()"
+  (closed)="isServiceSheetActive.set(false)"
+>
+  <work-order-service-form-ui (closed)="isServiceSheetActive.set(false)" (submitted)="createService($event)" />
+</t-sheet>

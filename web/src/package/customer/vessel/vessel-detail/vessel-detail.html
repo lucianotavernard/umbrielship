@@ -1,0 +1,34 @@
+<header class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <button tButton type="button" variant="ghost" (click)="goBack()">Voltar para detalhes do cliente</button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  @if (vessel(); as vessel) {
+    <h1 class="text-3xl font-bold">{{ vessel.name }}</h1>
+    <p class="mt-2 text-sm text-muted-foreground">IMO {{ vessel.imoNumber }} · {{ typeLabel(vessel.type) }}</p>
+    <p class="text-sm">{{ vessel.length }} {{ vessel.length === 1 ? 'metro' : 'metros' }}</p>
+  }
+
+  <div class="mt-8 flex items-center justify-between">
+    <div>
+      <h2 class="text-sm font-semibold">Ordens de serviço</h2>
+      <p class="text-xs text-muted-foreground">Ordens vinculadas a esta embarcação.</p>
+    </div>
+    <button tButton type="button" (click)="openSheet()">Nova ordem</button>
+  </div>
+
+  <div class="mt-4">
+    <work-order-list-ui [loading]="loadingWorkOrders()" [workOrders]="workOrders()" />
+  </div>
+</section>
+
+<t-sheet
+  title="Nova ordem"
+  description="Informe o período e o status da ordem de serviço"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <work-order-form-ui (closed)="closeSheet()" (submitted)="createWorkOrder($event)" />
+</t-sheet>
