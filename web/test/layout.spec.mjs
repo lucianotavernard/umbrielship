@@ -129,7 +129,8 @@ test('[C82] the session read is GET /api/me', () => {
     assert.equal(read(file).toLowerCase().includes('whoami'), false, file);
   }
   const service = read(path.join(web, 'src/package/identity/authentication/authentication.service.ts'));
-  assert.match(service, /\/api\/me/);
+  assert.match(service, /this\.http\.get<MeResponse>\('\/api\/me'\)/);
+  assert.equal(service.includes("this.http.post<MeResponse>('/api/me'"), false);
 });
 
 test('[C83] lists are tables with the Portuguese empty copy', () => {
@@ -154,7 +155,8 @@ test('[C96] AGENTS.md describes the Angular 22 web', () => {
     'web/src/package/<context>/<module>/',
     '@Service()',
     'Signal Forms',
-    't-',
+    'button[tButton]',
+    'table[tTable]',
     'GET /me',
   ]) {
     assert.ok(text.includes(phrase), phrase);

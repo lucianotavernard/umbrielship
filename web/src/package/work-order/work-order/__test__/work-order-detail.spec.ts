@@ -59,7 +59,8 @@ describe('WorkOrderDetail', () => {
 
     const uploaded = controller.expectOne('/api/work-orders/wo-1/services/svc-1/images');
     expect(uploaded.request.method).toBe('POST');
-    expect(uploaded.request.body instanceof FormData).toBe(true);
+    expect(uploaded.request.body).toBeInstanceOf(FormData);
+    expect((uploaded.request.body as FormData).get('file')).toBe(file);
     uploaded.flush({ image: { id: 'img-1', url: '/uploads/work-order-service-images/photo.png' } });
   });
 });

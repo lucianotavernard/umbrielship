@@ -39,7 +39,7 @@ describe('OrganizationList', () => {
     });
     await settle();
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('table')?.textContent).toContain('Atlantic');
+    expect(element.querySelector('table[tTable]')?.textContent).toContain('Atlantic');
     expect(element.textContent).toContain('ops@atlantic.test');
 
     [...element.querySelectorAll('button')].find((button) => button.textContent?.includes('Nova Organização'))?.click();

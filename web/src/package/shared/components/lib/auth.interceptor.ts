@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(clonedRequest).pipe(
     catchError((response: HttpErrorResponse) => {
-      if (response.status === 401) {
+      if (response.status === 401 && !req.url.includes('/sessions')) {
         localStorage.removeItem(TOKEN_KEY);
         authenticationService.isAuthenticated.set(false);
         authenticationService.activeOrganizationId.set(null);

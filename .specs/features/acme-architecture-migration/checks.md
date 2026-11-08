@@ -4,7 +4,7 @@ Mutations: 3
 Build: `cd api && npm run build`; `cd api && npm run lint`; `cd web && npm run build`
 Plan: `.specs/features/acme-architecture-migration/plan.md`
 
-96 checks in 4 slices (S1 C1-C29, S2 C30-C65, S3 C66-C76, S4 C77-C96) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · door 4 (runtime) in S3, proofs C66-C71 · 0 open
+97 checks in 4 slices (S1 C1-C29, S2 C30-C65, S3 C66-C76, S4 C77-C97) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · door 4 (runtime) in S3, proofs C66-C71 · 0 open
 
 The web has no lint script (`AGENTS.md`), so the Build line names `npm run build` in `web/` and does not invent one.
 
@@ -312,8 +312,11 @@ Proof: walk - sign in, open Clientes, read the table or the empty copy, use pagi
 **C95** - The layout shows the Organization switcher, and `/invitations/accept?secret=abc` renders the accept form before any submit (AC 29, AC 31)
 Proof: walk - read the switcher in the layout and open the invitation accept route until the form is on screen
 
-**C96** - `AGENTS.md` names Angular 22, `web/src/package/<context>/<module>/`, `@Service()`, Signal Forms, the element prefix `t-` and the attribute prefix `t`, and `GET /me`. It does not describe the web as `feature/ui/data-access` and it does not say the web calls `whoami` (AC 26, AD-015)
+**C96** - `AGENTS.md` names Angular 22, `web/src/package/<context>/<module>/`, `@Service()`, Signal Forms, the element prefix `t-`, the attribute selectors `button[tButton]` and `table[tTable]`, and `GET /me`. It does not describe the web as `feature/ui/data-access` and it does not say the web calls `whoami` (AC 26, AD-015)
 Proof: `node --test --test-name-pattern '\[C96\]' web/test/layout.spec.mjs`
+
+**C97** - The user form does not emit a name of 81 characters or a password of 7 characters. It does emit name `Ana` and password `secret-pass` (Surface `POST /users`: name 1-80, password 8-72)
+Proof: `cd web && npx ng test --watch=false --filter='\[C97\]'`
 
 ## Coverage
 
@@ -412,7 +415,7 @@ S3 sweep (C66-C76):
 
 S4 sweep (C77-C96):
 
-- validation: C81 (Signal Forms required and email), C84 (the posted body), C92 (the customer body)
+- validation: C81 (Signal Forms required and email), C84 (the posted body), C92 (the customer body), C97 (name 1-80, password 8-72)
 - failure modes: C84 (401), C89 (404 and 409), C86 (forbidden)
 - idempotency: n/a - the web does not retry a write; a second accept is the API 409 the page shows (C89)
 - authorization: C86 (internal Administrator), C82 (session from `GET /me`, no Organization in the query)
@@ -434,3 +437,4 @@ S4 sweep (C77-C96):
 - **Abandoned:** none; C21 was reworded before the build closed: it first claimed `vesselId` is kept, but `EditWorkOrderUseCase` reads it from a detail entity that never carries it (see the plan, criterion 13); the claim now says "under the same `id`"
 - **Boundary (S4 checks):** C77-C96 frozen before the web build. Context7 tools are not in this session. The table selector is `table[tTable]`, not an element `t-table`. The folder is `web/src/package/`, as criterion 26 writes it.
 - **Walked:** Signed in at `/auth` with the seeded administrator, which stored the token and opened `/dashboard`. The layout read `/me` and showed `Umbrielship` (one Membership, so the switcher is the name, with no menu) beside the user `Administrator`. Clientes opened on an empty table, `Nenhum cliente encontrado`, with pagination on page `1`. The `t-sheet` "Novo cliente" submitted Atlantic / ops@atlantic.test and the row came back (`Rua 1, Santos , SP`). Eleven customers still left the control on page `1`, because the API `total` for `page` stays the known defect in ROADMAP item 7. Administração opened the Organizations table with `Umbrielship`. `/invitations/accept?secret=abc` rendered "Aceitar convite" and the explanation before any submit. A second Organization was not picked: the signed-in user holds one Membership.
+- **Dispatched:** Verifier (independent sub-agent) for S4 at `HEAD` 8b4faac, diff range db56a20..8b4faac (web commits 1ed573e, db56a20, 47c3e32, 606bd01, 8b4faac) - not returned yet

@@ -66,9 +66,10 @@ describe('InternalLayout', () => {
     const request = controller.expectOne('/api/organizations/switch');
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({ organizationId: 'org-b' });
+    expect(reload).not.toHaveBeenCalled();
     request.flush(null, { status: 204, statusText: 'No Content' });
     await settle();
-    expect(reload).toHaveBeenCalled();
+    expect(reload).toHaveBeenCalledTimes(1);
   });
 
   it('[C85] one membership renders the name and posts nothing', async () => {

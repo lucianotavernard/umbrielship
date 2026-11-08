@@ -33,7 +33,7 @@ export type UserFormValue = Omit<CreateUserRequest, 'organizationId'>;
       </t-form-group>
       <footer class="flex justify-end gap-3">
         <button tButton type="button" variant="outline" (click)="closed.emit()">Cancelar</button>
-        <button tButton type="submit">Salvar</button>
+        <button tButton type="submit" [disabled]="userForm().invalid()">Salvar</button>
       </footer>
     </form>
   `,
@@ -66,6 +66,7 @@ export class UserForm {
 
   submitForm(event: Event) {
     event.preventDefault();
+    if (this.userForm().invalid()) return;
     const value = this.userForm().value();
     this.submitted.emit({
       name: value.name,

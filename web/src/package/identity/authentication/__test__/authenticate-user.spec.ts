@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { AuthenticateUser } from '../authenticate-user/authenticate-user';
+import { authInterceptor } from '../../../shared/components/lib/auth.interceptor';
 
 @Component({ template: '' })
 class Dashboard {}
@@ -16,9 +17,12 @@ describe('AuthenticateUser', () => {
     localStorage.clear();
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
-        provideRouter([{ path: 'dashboard', component: Dashboard }]),
+        provideRouter([
+          { path: 'dashboard', component: Dashboard },
+          { path: 'auth', component: Dashboard },
+        ]),
       ],
     });
     controller = TestBed.inject(HttpTestingController);
