@@ -1,7 +1,6 @@
-import { HashComparer } from '@/shared/module/cryptography/interface/hash-comparer';
-import { HashGenerator } from '@/shared/module/cryptography/interface/hash-generator';
+import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher';
 
-export class FakeHasher implements HashGenerator, HashComparer {
+export class FakeHasher implements Hasher {
   async hash(plain: string): Promise<string> {
     return `${plain}-hashed`;
   }

@@ -1,20 +1,20 @@
-import { WorkOrderServiceImageEntity } from '@/work-order/core/entity/work-order-service-image.entity';
-import { WorkOrderServiceImageRepository } from '@/work-order/core/interface/work-order-service-image.repository';
+import { WorkOrderServiceImage } from '@/package/work-order/work-order-service-image/work-order-service-image.entity';
+import { IWorkOrderServiceImagesRepository } from '@/package/work-order/work-order-service-image/contracts/work-order-service-image-repository.contract';
 
-export class InMemoryWorkOrderServiceImagesRepository implements WorkOrderServiceImageRepository {
-  public items: WorkOrderServiceImageEntity[] = [];
+export class InMemoryWorkOrderServiceImagesRepository implements IWorkOrderServiceImagesRepository {
+  public items: WorkOrderServiceImage[] = [];
 
-  async findById(id: string): Promise<WorkOrderServiceImageEntity | null> {
+  async findById(id: string): Promise<WorkOrderServiceImage | null> {
     return this.items.find((item) => item.id === id) ?? null;
   }
 
   async findManyByServiceId(
     serviceId: string,
-  ): Promise<WorkOrderServiceImageEntity[]> {
+  ): Promise<WorkOrderServiceImage[]> {
     return this.items.filter((item) => item.serviceId === serviceId);
   }
 
-  async create(image: WorkOrderServiceImageEntity): Promise<void> {
+  async create(image: WorkOrderServiceImage): Promise<void> {
     this.items.push(image);
   }
 

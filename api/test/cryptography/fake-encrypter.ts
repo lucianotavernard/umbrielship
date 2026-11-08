@@ -1,4 +1,4 @@
-import { Encrypter } from '@/shared/module/cryptography/interface/encrypter';
+import { Encrypter } from '@/package/shared/module/cryptography/contracts/encrypter';
 
 export class FakeEncrypter implements Encrypter {
   async encrypt(payload: Record<string, unknown>): Promise<string> {

@@ -4,7 +4,7 @@ Mutations: 3
 Build: `cd api && npm run build`; `cd api && npm run lint`
 Plan: `.specs/features/acme-architecture-migration/plan.md`
 
-29 checks in 1 slice (S1 only; S2-S4 are frozen in their own turns, see Handoff) · 0 one-way doors in S1 · 0 open
+65 checks in 2 slices (S1 C1-C29, S2 C30-C65; S3-S4 are frozen in their own turns, see Handoff) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · 0 open
 
 ## Checks
 
@@ -26,82 +26,198 @@ Proof: `cd api && npx vitest run test/tooling.spec.ts -t "\[C4\]"`
 Proof: `cd api && npm run lint`
 
 **C6** - `CreateCustomerUseCase` with an email already stored throws `AlreadyExistsDomainException('Customer already exists')` and stores nothing more; with a new email it stores the customer with the given address and returns it (AC 3)
-Proof: `cd api && npx vitest run src/customer/core/use-case/create-customer.use-case.spec.ts -t "\[C6\]"`
+Proof: `cd api && npx vitest run src/package/customer/customer/__test__/create-customer.use-case.spec.ts -t "\[C6\]"`
 
 **C7** - `EditCustomerUseCase` throws `NotFoundDomainException('Customer not found')` for an unknown id; throws `AlreadyExistsDomainException('Customer already exists')` when the new email belongs to another Customer and accepts the Customer's own email; keeps the stored phone when none (omitted or `null`) is given; merges a partial address over the stored one; saves the result (AC 1, AC 10)
-Proof: `cd api && npx vitest run src/customer/core/use-case/edit-customer.use-case.spec.ts -t "\[C7\]"`
+Proof: `cd api && npx vitest run src/package/customer/customer/__test__/edit-customer.use-case.spec.ts -t "\[C7\]"`
 
 **C8** - `FetchCustomersUseCase` with `take` 2 and `skip` 1 over 3 customers returns the 2nd and 3rd and `total` 3 (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/fetch-customers.use-case.spec.ts -t "\[C8\]"`
+Proof: `cd api && npx vitest run src/package/customer/customer/__test__/fetch-customers.use-case.spec.ts -t "\[C8\]"`
 
 **C9** - `GetCustomerByIdUseCase` returns the Customer for a known id and throws `NotFoundDomainException('Customer not found')` otherwise (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/get-customer-by-id.use-case.spec.ts -t "\[C9\]"`
+Proof: `cd api && npx vitest run src/package/customer/customer/__test__/get-customer-by-id.use-case.spec.ts -t "\[C9\]"`
 
 **C10** - `CreateVesselUseCase` throws `AlreadyExistsDomainException('Vessel already exists')` for an IMO number already stored, even when the Customer is also unknown (the duplicate is checked first); throws `NotFoundDomainException('Customer not found')` for an unknown Customer and stores nothing; otherwise stores the Vessel (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/create-vessel.use-case.spec.ts -t "\[C10\]"`
+Proof: `cd api && npx vitest run src/package/customer/vessel/__test__/create-vessel.use-case.spec.ts -t "\[C10\]"`
 
 **C11** - `DeleteVesselUseCase` throws `NotFoundDomainException('Vessel not found')` for an unknown id, and removes exactly that Vessel otherwise (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/delete-vessel.use-case.spec.ts -t "\[C11\]"`
+Proof: `cd api && npx vitest run src/package/customer/vessel/__test__/delete-vessel.use-case.spec.ts -t "\[C11\]"`
 
 **C12** - `EditVesselUseCase` throws `NotFoundDomainException('Vessel not found')` for an unknown id or a `customerId` that does not own the Vessel; otherwise changes `name`, `type` and `length` and keeps `imoNumber` and `customerId` (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/edit-vessel.use-case.spec.ts -t "\[C12\]"`
+Proof: `cd api && npx vitest run src/package/customer/vessel/__test__/edit-vessel.use-case.spec.ts -t "\[C12\]"`
 
 **C13** - `FetchVesselsUseCase` with a `customerId` returns only that Customer's Vessels and their count as `total`; without it returns every Vessel; `take` and `skip` apply to both (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/fetch-vessels.use-case.spec.ts -t "\[C13\]"`
+Proof: `cd api && npx vitest run src/package/customer/vessel/__test__/fetch-vessels.use-case.spec.ts -t "\[C13\]"`
 
 **C14** - `GetVesselByIdUseCase` returns the Vessel with its Customer for a known id and throws `NotFoundDomainException('Vessel not found')` otherwise (AC 1)
-Proof: `cd api && npx vitest run src/customer/core/use-case/get-vessel-by-id.use-case.spec.ts -t "\[C14\]"`
+Proof: `cd api && npx vitest run src/package/customer/vessel/__test__/get-vessel-by-id.use-case.spec.ts -t "\[C14\]"`
 
 **C15** - `AuthenticateUserUseCase` throws `WrongCredentialsException` for an unknown email and for a wrong password, and for the right password returns an `accessToken` encrypted from the payload `{ sub: <user id> }` (AC 1)
-Proof: `cd api && npx vitest run src/identity/core/use-case/authenticate-user.use-case.spec.ts -t "\[C15\]"`
+Proof: `cd api && npx vitest run src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts -t "\[C15\]"`
 
-**C16** - `GetUserByIdUseCase` returns exactly `id`, `name` and `email` (never the password) for a known id and throws `NotFoundDomainException('User not found')` otherwise (AC 1)
-Proof: `cd api && npx vitest run src/identity/core/use-case/get-user-by-id.use-case.spec.ts -t "\[C16\]"`
+**C16** - `GetProfileUseCase` (the `GET /me` read, AD-015) returns `{ user: { id, name, email, role, organization: { id, name, isInternal }, organizations } }` where `role` and `organization` are the Role and the Organization of the active Membership and `organizations` lists every Membership by Organization name with its Role, never the password; throws `NotFoundDomainException('User not found')` for an unknown id and `NotFoundDomainException('Organization not found')` when the active Organization has no Membership (AC 1, AC 22)
+Proof: `cd api && npx vitest run src/package/identity/auth/__test__/get-profile.use-case.spec.ts -t "\[C16\]"`
 
 **C17** - `CreateWorkOrderUseCase` throws `NotFoundDomainException('Vessel not found')` for an unknown `vesselId` and stores nothing; for a known one stores the WorkOrder with the given dates and status (AC 2)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/create-work-order.use-case.spec.ts -t "\[C17\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order/__test__/create-work-order.use-case.spec.ts -t "\[C17\]"`
 
 **C18** - `CreateWorkOrderServiceUseCase` throws `NotFoundDomainException('Work order not found')` for an unknown WorkOrder and stores nothing; otherwise stores the service under that `workOrderId` (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/create-work-order-service.use-case.spec.ts -t "\[C18\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/__test__/create-work-order-service.use-case.spec.ts -t "\[C18\]"`
 
 **C19** - `DeleteWorkOrderUseCase` throws `NotFoundDomainException('Work order not found')` for an unknown id, and removes exactly that WorkOrder otherwise (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/delete-work-order.use-case.spec.ts -t "\[C19\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order/__test__/delete-work-order.use-case.spec.ts -t "\[C19\]"`
 
 **C20** - `DeleteWorkOrderServiceUseCase` throws `NotFoundDomainException('Work order service not found')` for an unknown service or one that belongs to another WorkOrder, and removes exactly that service otherwise (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/delete-work-order-service.use-case.spec.ts -t "\[C20\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/__test__/delete-work-order-service.use-case.spec.ts -t "\[C20\]"`
 
 **C21** - `EditWorkOrderUseCase` throws `NotFoundDomainException('Work order not found')` for an unknown id; otherwise saves the new `startDate`, `endDate` and `status` under the same `id` (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/edit-work-order.use-case.spec.ts -t "\[C21\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order/__test__/edit-work-order.use-case.spec.ts -t "\[C21\]"`
 
 **C22** - `EditWorkOrderServiceUseCase` throws `NotFoundDomainException('Work order service not found')` for an unknown service or one of another WorkOrder; otherwise saves `name`, `description`, `startDate`, `endDate` and `status` and keeps `workOrderId` (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/edit-work-order-service.use-case.spec.ts -t "\[C22\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/__test__/edit-work-order-service.use-case.spec.ts -t "\[C22\]"`
 
 **C23** - `FetchWorkOrderServiceImagesUseCase` throws `NotFoundDomainException('Work order service not found')` for an unknown service or one of another WorkOrder; otherwise returns only the images of that service (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/fetch-work-order-service-images.use-case.spec.ts -t "\[C23\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service-image/__test__/fetch-work-order-service-images.use-case.spec.ts -t "\[C23\]"`
 
 **C24** - `FetchWorkOrderServicesUseCase` throws `NotFoundDomainException('Work order not found')` for an unknown WorkOrder; otherwise returns only the services of that WorkOrder (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/fetch-work-order-services.use-case.spec.ts -t "\[C24\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/__test__/fetch-work-order-services.use-case.spec.ts -t "\[C24\]"`
 
 **C25** - `FetchWorkOrdersUseCase` with a `vesselId` returns only that Vessel's WorkOrders and their count as `total`; without it returns every WorkOrder; `take` and `skip` apply to both (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/fetch-work-orders.use-case.spec.ts -t "\[C25\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order/__test__/fetch-work-orders.use-case.spec.ts -t "\[C25\]"`
 
 **C26** - `GetWorkOrderByIdUseCase` returns the WorkOrder with its Vessel for a known id and throws `NotFoundDomainException('Work order not found')` otherwise (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/get-work-order-by-id.use-case.spec.ts -t "\[C26\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order/__test__/get-work-order-by-id.use-case.spec.ts -t "\[C26\]"`
 
 **C27** - `GetWorkOrderServiceByIdUseCase` returns the service for a known id of that WorkOrder and throws `NotFoundDomainException('Work order service not found')` for an unknown one or one of another WorkOrder (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/get-work-order-service-by-id.use-case.spec.ts -t "\[C27\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/__test__/get-work-order-service-by-id.use-case.spec.ts -t "\[C27\]"`
 
 **C28** - `RemoveWorkOrderServiceImageUseCase` throws `NotFoundDomainException('Work order service not found')` for an unknown service or one of another WorkOrder; throws `NotFoundDomainException('Work order service image not found')` for an unknown image or one of another service; otherwise deletes the image row and the file at `<cwd>/<stored url>`, still succeeds when the file is already gone (`ENOENT`), and rethrows any other file-system error (`EACCES`, `EPERM`, `EISDIR`) after the row was deleted (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/remove-work-order-service-image.use-case.spec.ts -t "\[C28\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service-image/__test__/remove-work-order-service-image.use-case.spec.ts -t "\[C28\]"`
 
 **C29** - `AddWorkOrderServiceImageUseCase` throws `NotFoundDomainException('Work order service not found')` for an unknown service or one of another WorkOrder and stores nothing; otherwise stores the image with that `serviceId` and `url` (AC 1)
-Proof: `cd api && npx vitest run src/work-order/core/use-case/add-work-order-service-image.use-case.spec.ts -t "\[C29\]"`
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service-image/__test__/add-work-order-service-image.use-case.spec.ts -t "\[C29\]"`
+
+### S2 - The API follows the acme layout and tenancy
+
+Layout and contract (criteria 6, 7, 10, 11, 13)
+
+**C30** - `api/src/package/` holds `customer/{customer,vessel}`, `work-order/{work-order,work-order-service,work-order-service-image}`, `identity/{auth,user,organization,invitation}` and `shared/`; every aggregate folder has a `__test__/`; every aggregate that has a repository contract has a `contracts/`; no folder named `core`, `http` or `persistence` exists under `api/src`; each `*.use-case.ts` declares exactly one exported class (AC 6)
+Proof: `cd api && npx vitest run test/layout.spec.ts -t "\[C30\]"`
+
+**C31** - No exported class under `api/src/package` ends in `Entity`; every `contracts/*-repository.contract.ts` declares `abstract class I<Plural>Repository` for its aggregate (`ICustomersRepository`, `IVesselsRepository`, `IWorkOrdersRepository`, `IWorkOrderServicesRepository`, `IWorkOrderServiceImagesRepository`, `IUsersRepository`, `IOrganizationsRepository`, `IInvitationsRepository`) and no `core/interface` file exists (AC 7)
+Proof: `cd api && npx vitest run test/layout.spec.ts -t "\[C31\]"`
+
+**C32** - The controllers expose exactly the 13 `work-order` routes and 9 `customer` routes with the URLs of today, `POST /sessions`, `GET /me` (and no `GET /whoami`), and the 13 identity routes of the plan's Surface, each in one controller per aggregate (`CustomerController`, `VesselController`, `WorkOrderController`, `WorkOrderServiceController`, `WorkOrderServiceImageController`, `AuthenticationController`, `OrganizationController`, `UserController`, `InvitationController`), no file with two controller classes (AC 6, AC 13)
+Proof: `cd api && npx vitest run test/layout.spec.ts -t "\[C32\]"`
+
+**C33** - For each controller handler that calls a use case, a `NotFoundDomainException` becomes `NotFoundException` (404), an `AlreadyExistsDomainException` becomes `ConflictException` (409) where the use case can throw it, a `ConflictDomainException` becomes `ConflictException`, and any other `Error('database down')` is rethrown unchanged (not an `HttpException`, so Nest answers 500); `WrongCredentialsException` on `POST /sessions` becomes `UnauthorizedException` (401) (AC 10)
+Proof: `cd api && npx vitest run src/package -t "\[C33\]"`
+
+**C34** - Every `catch` block in a controller ends with `throw error;` and no controller file contains `BadRequestException(error` or `InternalServerErrorException` (AC 10)
+Proof: `cd api && npx vitest run test/layout.spec.ts -t "\[C34\]"`
+
+**C35** - Customer tenancy: `FetchCustomersUseCase` for Organization A over 2 customers of A and 1 of B returns the 2 of A and `total` 2; `GetCustomerByIdUseCase` and `EditCustomerUseCase` called with B's customer id from A throw `NotFoundDomainException('Customer not found')` and change nothing; `CreateCustomerUseCase` accepts the same email in two Organizations (2 stored) and rejects `Ops@Atlantic.test` after `ops@atlantic.test` in the same Organization with `AlreadyExistsDomainException('Customer already exists')` (AC 8, AC 9)
+Proof: `cd api && npx vitest run src/package/customer/customer/ -t "\[C35\]"`
+
+**C36** - Vessel tenancy: `9074729` registered in A and in B stores 2 vessels; `abc123` then `ABC123` in A throws `AlreadyExistsDomainException('Vessel already exists')` and stores one; `CreateVesselUseCase` with a Customer of B from A throws `NotFoundDomainException('Customer not found')`; `GetVesselByIdUseCase`, `EditVesselUseCase`, `DeleteVesselUseCase` called with B's vessel id from A throw `NotFoundDomainException('Vessel not found')` and keep B's vessel; `FetchVesselsUseCase` from A, with and without `customerId`, returns only A's vessels and A's `total` (AC 8, AC 9)
+Proof: `cd api && npx vitest run src/package/customer/vessel/ -t "\[C36\]"`
+
+**C37** - WorkOrder tenancy: `CreateWorkOrderUseCase` from A with B's `vesselId` throws `NotFoundDomainException('Vessel not found')` through `CustomerFacade` and stores nothing; `GetWorkOrderByIdUseCase`, `EditWorkOrderUseCase`, `DeleteWorkOrderUseCase` with B's work order id from A throw `NotFoundDomainException('Work order not found')`; `FetchWorkOrdersUseCase` from A, with and without `vesselId`, returns only A's work orders and A's `total`; the detail of a work order of A names its Vessel read through `CustomerFacade` (`vesselId`, `name`, `type`, `length`) (AC 8, AC 11)
+Proof: `cd api && npx vitest run src/package/work-order/work-order/ -t "\[C37\]"`
+
+**C38** - WorkOrderService tenancy: `CreateWorkOrderServiceUseCase`, `FetchWorkOrderServicesUseCase`, `GetWorkOrderServiceByIdUseCase`, `EditWorkOrderServiceUseCase`, `DeleteWorkOrderServiceUseCase` called from A with a work order (or a service) of B throw `NotFoundDomainException` (`'Work order not found'` or `'Work order service not found'`) and change nothing (AC 8)
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service/ -t "\[C38\]"`
+
+**C39** - WorkOrderServiceImage tenancy: `AddWorkOrderServiceImageUseCase`, `FetchWorkOrderServiceImagesUseCase`, `RemoveWorkOrderServiceImageUseCase` called from A with a service or image of B throw `NotFoundDomainException`, add or delete nothing, and leave B's file on disk (AC 8)
+Proof: `cd api && npx vitest run src/package/work-order/work-order-service-image/ -t "\[C39\]"`
+
+**C40** - `CustomerFacade.findVesselById(organizationId, id)` returns a plain `{ id, name, type, length, customerId }` for a Vessel of that Organization and `null` for an unknown id or a Vessel of another Organization; it reads no Customer data (AC 11)
+Proof: `cd api && npx vitest run src/package/customer/__test__/customer.facade.spec.ts -t "\[C40\]"`
+
+**C41** - No file under `api/src/package/work-order` imports anything from `package/customer` except `customer.module` and `customer.facade`, and `CustomerModule` exports only `CustomerFacade` (AC 11)
+Proof: `cd api && npx vitest run test/layout.spec.ts -t "\[C41\]"`
+
+Schema, backfill and seed (criteria 9, 12, 14, 15); each proof builds a throwaway PostgreSQL 17 with Docker, applies the pre-S2 migrations, inserts the fixture, applies the S2 migrations
+
+**C42** - With 2 customers (with addresses), 3 vessels, 4 work orders, 5 services and 2 images before the migration, every table has the same count after, every row of `customers`, `customer_addresses`, `vessels`, `work_orders`, `work_order_services`, `work_order_service_images` has `organizationId` equal to the id of Organization "Umbrielship" (`isInternal` true, 1 Organization), and each of the 6 columns is NOT NULL (AC 12)
+Proof: `bash api/test/db/migration-check.sh backfill`
+
+**C43** - 3 Users (`MANAGER`, `DEVELOPER`, `USER`) before the migration end with exactly 1 Membership each in "Umbrielship", Role `administrator`, `administrator`, `operator`, `users.activeOrganizationId` = that Organization, no column `users.role` and no type `UserRole` (AC 14)
+Proof: `bash api/test/db/migration-check.sh roles`
+
+**C44** - After the migrations: the same IMO number inserts in two Organizations and `abc123` then `ABC123` in one fails with a unique violation; the same holds for `customers.email`, `users.email` (`Maria@x.test` then `maria@x.test`) and `organizations.name` and `email`; a work order inserts with a `vesselId` that no vessel has (no foreign key) and `\d work_orders` lists no foreign key to `vessels`; every tenant table has an index on `organizationId` (AC 9, AC 12)
+Proof: `bash api/test/db/migration-check.sh constraints`
+
+**C45** - Applying every migration to an empty database leaves no drift: `prisma migrate diff` from the migrated database to `schema.prisma` exits 0 with an empty diff, and `prisma migrate deploy` is idempotent (second run applies nothing) (AC 12, AC 14)
+Proof: `bash api/test/db/migration-check.sh drift`
+
+**C46** - `prisma db seed` against an empty database creates Organization "Umbrielship" with `isInternal` true and one User holding one Administrator Membership in it, with `activeOrganizationId` set; against the backfilled database (Organization "Umbrielship" and Users already there) and run twice it creates no second Organization and no second User with the seeded email: counts after the second run equal the counts after the first (AC 15)
+Proof: `bash api/test/db/migration-check.sh seed`
+
+Identity (criteria 15 to 22)
+
+**C47** - `ResolveSessionUseCase` returns `{ sub, organizationId, role, internal }` for the User's active Organization and the Role of the Membership there (`administrator` in the internal Organization gives `internal` true); throws `NotFoundDomainException` for an unknown User and for an active Organization with no Membership (AC 22)
+Proof: `cd api && npx vitest run src/package/identity/auth/__test__/resolve-session.use-case.spec.ts -t "\[C47\]"`
+
+**C48** - `SwitchOrganizationUseCase` sets `activeOrganizationId` to an Organization the User holds a Membership in, so the next `ResolveSessionUseCase` for that User returns it (a token issued before the switch included); throws `NotFoundDomainException('Organization not found')` for an Organization the User is not a member of, and for one that does not exist, and changes nothing (AC 22)
+Proof: `cd api && npx vitest run src/package/identity/auth/__test__/switch-organization.use-case.spec.ts -t "\[C48\]"`
+
+**C49** - `CreateOrganizationUseCase` stores a non-internal Organization (`isInternal` false) and returns `{ id, name, email, isInternal }`; throws `AlreadyExistsDomainException` when the name exists in another letter case (`acme` after `Acme`) and when the email exists in another letter case (AC 16)
+Proof: `cd api && npx vitest run src/package/identity/organization/__test__/create-organization.use-case.spec.ts -t "\[C49\]"`
+
+**C50** - `InternalAdministratorGuard` throws `ForbiddenException` for a User whose active Organization is not internal, for an internal `operator`, and for a request with no user, and returns true for an internal `administrator` (AC 16)
+Proof: `cd api && npx vitest run src/package/identity/organization/__test__/internal-administrator.guard.spec.ts -t "\[C50\]"`
+
+**C51** - `CreateUserUseCase` stores the User with its hashed password (never the plain one), one Membership with the given Role in the given Organization and `activeOrganizationId` set to it, and returns `{ id, name, email, role, organizationName }` without the password; throws `AlreadyExistsDomainException('User already exists')` when the email exists in another letter case; throws `NotFoundDomainException('Organization not found')` for an unknown Organization and stores nothing (AC 17)
+Proof: `cd api && npx vitest run src/package/identity/user/__test__/create-user.use-case.spec.ts -t "\[C51\]"`
+
+**C52** - `SendInvitationUseCase` for an existing User and a non-internal Organization stores an Invitation with status `pending`, delivery status `queued`, a 64-character hex secret that differs between two Invitations, enqueues its id once, and returns `{ id, email, organizationName, role, status, deliveryStatus }` with no `secret`; throws `ConflictDomainException` when the User already holds a Membership there, when the Organization is internal, and when an Invitation is already pending; throws `NotFoundDomainException` for an unknown User or Organization and stores and enqueues nothing; when the queue throws, the Invitation stays stored `queued` and the response is still returned (AC 18)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/send-invitation.use-case.spec.ts -t "\[C52\]"`
+
+**C53** - `ResendInvitationUseCase` requeues a pending Invitation whose delivery is `delivered` or `failed` (status `queued`, attempts 0, same secret, enqueued once) and answers `deliveryStatus` `queued`; throws `ConflictDomainException('Invitation already accepted')` for an accepted one, `ConflictDomainException('Invitation delivery already queued')` for one already `queued`, `NotFoundDomainException` for an unknown id (AC 18)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/resend-invitation.use-case.spec.ts -t "\[C53\]"`
+
+**C54** - `AcceptInvitationUseCase` with a valid secret adds a Membership with the invited Role in the invited Organization, marks the Invitation `accepted`, keeps the User's earlier Memberships and its `activeOrganizationId`, and returns `{ organizationName }`; throws `NotFoundDomainException('Invitation not found')` for an unknown secret and `ConflictDomainException('Invitation already accepted')` for a second accept of the same secret, which adds no second Membership (AC 21)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/accept-invitation.use-case.spec.ts -t "\[C54\]"`
+
+**C55** - `DeliverInvitationUseCase` sends one email through `InvitationDelivery` to the User's email with the acceptance link `<WEB_ORIGIN>/invitations/accept?secret=<secret>` (a trailing `/` on `WEB_ORIGIN` does not double) and records `delivered` with attempts 1; a failing attempt 1 records `queued`, attempts 1 and answers `retry`, a failing attempt 2 the same with attempts 2, a failing attempt 3 records `failed` with attempts 3 and `lastDeliveryFailureAt` set; a delivery that has not settled after 5 000 ms counts as a failed attempt (fake timers: 4 999 ms is still waiting, 5 000 ms fails); an accepted or unknown Invitation answers `skipped` and sends nothing (AC 19)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/deliver-invitation.use-case.spec.ts -t "\[C55\]"`
+
+**C56** - The queue adapter: `invitationDeliveryBackoff(1)` is 5 000 and `invitationDeliveryBackoff(2)` is 10 000; the job options are `jobId` = the Invitation id, `attempts` 3, custom backoff, `removeOnComplete` and `removeOnFail` true; `InvitationDeliveryQueueProducer.enqueue` adds a job `{ invitationId }` with those options and rejects when the queue does not answer in 2 000 ms; `InvitationDeliveryQueueConsumer.process` calls the use case and throws only when the outcome is `retry` (AC 19)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/invitation-delivery-queue.spec.ts -t "\[C56\]"`
+
+**C57** - `RecoverInvitationDeliveriesUseCase` with 2 pending Invitations `queued`, 1 `delivered` and 1 accepted still `queued` enqueues exactly the 2 pending queued ones and touches the others, and keeps going when one enqueue throws; `InvitationDeliveryRecovery.onApplicationBootstrap` runs it (AC 20)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/recover-invitation-deliveries.use-case.spec.ts -t "\[C57\]"`
+
+**C58** - `EmailInvitationDelivery` sends through `EmailSender` one message to the User's email, subject `Convite para <organization name>`, with the acceptance link in the text and the HTML, the organization name HTML-escaped, and the Role as `Administrador` or `Operador`; `NodemailerEmailSender` creates its transport from `MAIL_HOST` and `MAIL_PORT`, authenticates only when both `MAIL_USER` and `MAIL_PASS` are set, and sends from `MAIL_FROM` (AC 19)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/email-invitation-delivery.spec.ts src/package/shared/module/mail/__test__/nodemailer-email-sender.spec.ts -t "\[C58\]"`
+
+**C59** - `FetchOrganizationsUseCase` with `perPage` 2 over 3 Organizations returns the first 2 by name and `total` 3, and page 2 returns the third; `GetOrganizationByIdUseCase` returns `{ id, name, email, isInternal }` for a known id and throws `NotFoundDomainException('Organization not found')` otherwise (Surface `GET /organizations`, `GET /organizations/:id`)
+Proof: `cd api && npx vitest run src/package/identity/organization/__test__ -t "\[C59\]"`
+
+**C60** - `FetchOrganizationUsersUseCase` returns `{ id, name, email, role }` of the Users holding a Membership in the Organization with the Role of that Membership, paged, and `total`; `CountOrganizationRolesUseCase` returns `[{ role: 'administrator', users: n }, { role: 'operator', users: m }]` in that order, with `0` for a Role nobody holds; both throw `NotFoundDomainException('Organization not found')` for an unknown Organization (Surface `GET /organizations/:id/users`, `/roles`)
+Proof: `cd api && npx vitest run src/package/identity/user/__test__ -t "\[C60\]"`
+
+**C61** - `FetchUsersUseCase` with `notInOrganizationId` returns only the Users with no Membership in that Organization, as `{ id, name, email }`, paged, and `total` (Surface `GET /users`)
+Proof: `cd api && npx vitest run src/package/identity/user/__test__/fetch-users.use-case.spec.ts -t "\[C61\]"`
+
+**C62** - `FetchInvitationsUseCase` returns the Organization's Invitations newest first as `{ id, email, role, status, deliveryStatus }`, never the secret, paged, and `total`; throws `NotFoundDomainException('Organization not found')` for an unknown Organization (Surface `GET /organizations/:id/invitations`)
+Proof: `cd api && npx vitest run src/package/identity/invitation/__test__/fetch-invitations.use-case.spec.ts -t "\[C62\]"`
+
+**C63** - The config factory accepts `REDIS_URL` `redis://localhost:6379` and `rediss://r.example:6380`, `WEB_ORIGIN` `http://localhost:4200`, `MAIL_HOST`, `MAIL_PORT` `1025`, `MAIL_FROM`, and optional `MAIL_USER` and `MAIL_PASS`; it throws `ConfigException` when any of `REDIS_URL`, `WEB_ORIGIN`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` is missing, when `REDIS_URL` is `http://x`, and when `MAIL_PORT` is `abc` (door 7)
+Proof: `cd api && npx vitest run src/package/shared/module/config/__test__/shared-config.spec.ts -t "\[C63\]"`
+
+**C64** - Against a real stack (PostgreSQL, Redis and Mailpit in Docker, the built API from `dist/` booted with the 12 env vars) the walk answers: `POST /sessions` 201 and 401 on a wrong password; `GET /me` 200 with Organization "Umbrielship", `isInternal` true and Role `administrator`; `GET /whoami` 404; two Organizations A and B created through `POST /organizations` (201) and a repeat in another letter case 409; a User of each; `GET /vessels/<B's id>` from A 404, `GET /customers` from A lists only A's, `POST /work-orders` with B's `vesselId` from A 404 `Vessel not found`; `9074729` in A and in B 201 and 201 and `abc123` then `ABC123` in A 201 and 409; `POST /invitations` 201 without `secret`, then the email arrives in Mailpit with the link, `POST /invitations/accept` 200 with `organizationName` and a second accept 409; `POST /organizations/switch` 204 and 404; a non-administrator gets 403 on `GET /organizations`; with Redis stopped before an Invitation is sent the request still answers 201, and after the API restarts with Redis back the Invitation email arrives (recovery); with PostgreSQL stopped `GET /customers` answers 500 (AC 8, AC 9, AC 10, AC 16, AC 17, AC 18, AC 19, AC 20, AC 21, AC 22)
+Proof: `bash api/test/smoke/api-smoke.sh`
+
+**C65** - `npm run test` in `api/` exits 0 with the S2 suite (AC 23)
+Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
 
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
 | --- | --- | --- |
-| use cases, one spec each (24) | `CreateCustomer` C6 · `EditCustomer` C7 · `FetchCustomers` C8 · `GetCustomerById` C9 · `CreateVessel` C10 · `DeleteVessel` C11 · `EditVessel` C12 · `FetchVessels` C13 · `GetVesselById` C14 · `AuthenticateUser` C15 · `GetUserById` C16 · `CreateWorkOrder` C17 · `CreateWorkOrderService` C18 · `DeleteWorkOrder` C19 · `DeleteWorkOrderService` C20 · `EditWorkOrder` C21 · `EditWorkOrderService` C22 · `FetchWorkOrderServiceImages` C23 · `FetchWorkOrderServices` C24 · `FetchWorkOrders` C25 · `GetWorkOrderById` C26 · `GetWorkOrderServiceById` C27 · `RemoveWorkOrderServiceImage` C28 · `AddWorkOrderServiceImage` C29; all 24 present: C1 | - |
+| use cases, one spec each (24) | `CreateCustomer` C6 · `EditCustomer` C7 · `FetchCustomers` C8 · `GetCustomerById` C9 · `CreateVessel` C10 · `DeleteVessel` C11 · `EditVessel` C12 · `FetchVessels` C13 · `GetVesselById` C14 · `AuthenticateUser` C15 · `GetProfile` C16 (replaces `GetUserById`, AD-015) · `CreateWorkOrder` C17 · `CreateWorkOrderService` C18 · `DeleteWorkOrder` C19 · `DeleteWorkOrderService` C20 · `EditWorkOrder` C21 · `EditWorkOrderService` C22 · `FetchWorkOrderServiceImages` C23 · `FetchWorkOrderServices` C24 · `FetchWorkOrders` C25 · `GetWorkOrderById` C26 · `GetWorkOrderServiceById` C27 · `RemoveWorkOrderServiceImage` C28 · `AddWorkOrderServiceImage` C29; all 24 present: C1 | - |
 | in-memory repositories in `api/test/repositories/` (6) | customers · vessels · users · work orders · work order services · work order service images: C3 (table-driven over all 6) | - |
 | criteria of S1 (5) | AC 1 C1, C2, C6-C29 · AC 2 C17 · AC 3 C6 · AC 4 C3 · AC 5 C4, C5 | - |
 | domain exceptions thrown by use cases (3) | `NotFoundDomainException` C7, C9-C12, C14, C16-C29 · `AlreadyExistsDomainException` C6, C7, C10 · `WrongCredentialsException` C15 | - |
@@ -109,6 +225,31 @@ Proof: `cd api && npx vitest run src/work-order/core/use-case/add-work-order-ser
 
 - Claims naming a thrown exception: every one asserts the class and the message in the same spec.
 - Routes and controllers: out of S1, so no status code is claimed here (criterion 10 is S2).
+| use cases added by S2 (22 new: 3 organization, 4 user, 1 auth session, 1 auth switch, 5 invitation, 1 deliver, 1 recover... see rows below) | `ResolveSession` C47 · `SwitchOrganization` C48 · `GetProfile` C16 · `CreateOrganization` C49 · `FetchOrganizations` C59 · `GetOrganizationById` C59 · `CreateUser` C51 · `FetchOrganizationUsers` C60 · `CountOrganizationRoles` C60 · `FetchUsers` C61 · `SendInvitation` C52 · `ResendInvitation` C53 · `AcceptInvitation` C54 · `FetchInvitations` C62 · `DeliverInvitation` C55 · `RecoverInvitationDeliveries` C57 (16 new use cases; `test/use-case-specs.spec.ts` also fails for any use case without a spec) | - |
+| tenant use cases, other-Organization boundary (22 = 4 customer + 5 vessel + 5 work order + 5 service + 3 image) | customer C35 · vessel C36 · work order C37 · service C38 · image C39, each proof tagged per aggregate over every use case of it | - |
+| aggregate controllers (9) | `CustomerController` C32, C33 · `VesselController` C32, C33 · `WorkOrderController` C32, C33 · `WorkOrderServiceController` C32, C33 · `WorkOrderServiceImageController` C32, C33 · `AuthenticationController` C32, C33 · `OrganizationController` C32, C33 · `UserController` C32, C33 · `InvitationController` C32, C33 | - |
+| repository contracts renamed (8) | `ICustomersRepository` · `IVesselsRepository` · `IWorkOrdersRepository` · `IWorkOrderServicesRepository` · `IWorkOrderServiceImagesRepository` · `IUsersRepository` · `IOrganizationsRepository` · `IInvitationsRepository`: C31 (table-driven over all 8) | - |
+| tenant tables with `organizationId` NOT NULL (6) | `customers` · `customer_addresses` · `vessels` · `work_orders` · `work_order_services` · `work_order_service_images`: C42 (table-driven over all 6), index C44 | - |
+| Role mapping of existing Users (3) | `MANAGER` C43 · `DEVELOPER` C43 · `USER` C43 | - |
+| scoped uniqueness (5) | `vessels.imoNumber` C44, C36 · `customers.email` C44, C35 · `users.email` C44, C51 · `organizations.name` C44, C49 · `organizations.email` C44, C49 | - |
+| delivery attempts (3) | attempt 1 C55 · attempt 2 C55 · attempt 3 C55; backoff 5 s C56 · 10 s C56 | - |
+| `POST /sessions` statuses (2) | 201 C64 · 401 C33, C64 | - |
+| `GET /me` statuses (2) | 200 C16, C64 · 401 C64 | - |
+| `POST /organizations/switch` statuses (3) | 204 C48, C64 · 404 C48, C64 · 401 C64 | - |
+| `GET /organizations` statuses (4) | 200 C59, C64 · 401 C64 · 403 C50, C64 | - |
+| `POST /organizations` statuses (4) | 201 C49, C64 · 409 C49, C33, C64 · 401 C64 · 403 C50 | - |
+| `GET /organizations/:id` statuses (4) | 200 C59 · 404 C59, C33 · 401 C64 · 403 C50 | - |
+| `GET /organizations/:id/users` statuses (4) | 200 C60 · 404 C60, C33 · 401 C64 · 403 C50 | - |
+| `GET /organizations/:id/roles` statuses (4) | 200 C60 · 404 C60, C33 · 401 C64 · 403 C50 | - |
+| `GET /organizations/:id/invitations` statuses (4) | 200 C62 · 404 C62, C33 · 401 C64 · 403 C50 | - |
+| `GET /users` statuses (3) | 200 C61 · 401 C64 · 403 C50 | - |
+| `POST /users` statuses (5) | 201 C51 · 409 C51, C33 · 404 C51, C33 · 401 C64 · 403 C50 | - |
+| `POST /invitations` statuses (5) | 201 C52, C64 · 404 C52, C33 · 409 C52, C33 · 401 C64 · 403 C50 | - |
+| `POST /invitations/:id/resend` statuses (5) | 200 C53 · 404 C53, C33 · 409 C53, C33 · 401 C64 · 403 C50 | - |
+| `POST /invitations/accept` statuses (3) | 200 C54, C64 · 404 C54, C33 · 409 C54, C33, C64 | - |
+| the 22 existing routes' statuses (404 for another Organization, 409, 404, 500 on unexpected) | 404 C35-C39, C64 · 409 C35, C36, C64 · 500 C33, C64 | - |
+| startup config: Redis, mail, web origin (assemblies that read `process.env`: 1 - the Nest `ConfigModule`; the seed and `prisma.config.ts` read `DATABASE_URL` themselves) | `sharedConfigFactory` C63 | - |
+| criteria of S2 (18: AC 6-23) | AC 6 C30, C32 · AC 7 C31 · AC 8 C35-C39, C64 · AC 9 C35, C36, C44, C64 · AC 10 C33, C34, C64 · AC 11 C37, C40, C41 · AC 12 C42, C44, C45 · AC 13 C32, C64, C6-C29 · AC 14 C43, C45 · AC 15 C46 · AC 16 C49, C50, C64 · AC 17 C51, C64 · AC 18 C52, C53, C64 · AC 19 C55, C56, C58, C64 · AC 20 C57, C64 · AC 21 C54, C64 · AC 22 C47, C48, C64 · AC 23 C65, Build | - |
 
 ## Swept
 
@@ -122,9 +263,21 @@ Proof: `cd api && npx vitest run src/work-order/core/use-case/add-work-order-ser
 - state transitions: n/a - WorkOrder and service status are written, not guarded, by any use case today
 - observability: n/a - no logging requirement in this slice
 
+S2 sweep (C30-C65):
+
+- validation: C63 (config), C52 (invitation conflicts), controllers keep Zod schemas (C33 maps the failures)
+- failure modes: C52 (queue down keeps the row), C55 (attempts 1-3, 5 s timeout), C56 (2 s enqueue timeout), C57 (one enqueue throws), C64 (Redis down, PostgreSQL down)
+- idempotency: C53 (resend), C54 (second accept), C56 (`jobId` = Invitation id), C46 (seed twice)
+- authorization: C50, C64 (internal Administrator guard), C47 (session from the Membership), C35-C39 (other-Organization boundary)
+- concurrency: C44 (database unique indexes decide races, not a read-then-write check); the race itself is not exercised
+- data lifecycle: C42, C43 (backfill), C45 (no drift), C54 (accept keeps earlier Memberships)
+- dependency failure: C52, C57, C64
+- state transitions: C52, C53, C54, C55 (pending/accepted, queued/delivered/failed)
+- observability: n/a - no logging requirement in the plan
+
 ## Handoff
 
 - **Settled mid-build:** none
 - **Dispatched:** Verifier (independent sub-agent) for S1 at `HEAD` 3a4e826 plus the uncommitted working tree (the user forbade commits this turn) - returned: 5 findings, all fixed in the working tree
-- **Boundary:** C1-C29 closed at `acf4b70`; `proofs.md` green at that `HEAD`, 6 of 6 mutations killed, gate green; S2-S4 not started
+- **Boundary:** C1-C29 closed at `acf4b70`; `proofs.md` green at that `HEAD`, 6 of 6 mutations killed, gate green; S2-S4 not started at that point
 - **Abandoned:** none; C21 was reworded before the build closed: it first claimed `vesselId` is kept, but `EditWorkOrderUseCase` reads it from a detail entity that never carries it (see the plan, criterion 13); the claim now says "under the same `id`"

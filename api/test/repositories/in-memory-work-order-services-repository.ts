@@ -1,24 +1,24 @@
-import { WorkOrderServiceEntity } from '@/work-order/core/entity/work-order-service.entity';
-import { WorkOrderServiceRepository } from '@/work-order/core/interface/work-order-service.repository';
+import { WorkOrderService } from '@/package/work-order/work-order-service/work-order-service.entity';
+import { IWorkOrderServicesRepository } from '@/package/work-order/work-order-service/contracts/work-order-service-repository.contract';
 
-export class InMemoryWorkOrderServicesRepository implements WorkOrderServiceRepository {
-  public items: WorkOrderServiceEntity[] = [];
+export class InMemoryWorkOrderServicesRepository implements IWorkOrderServicesRepository {
+  public items: WorkOrderService[] = [];
 
-  async findById(id: string): Promise<WorkOrderServiceEntity | null> {
+  async findById(id: string): Promise<WorkOrderService | null> {
     return this.items.find((item) => item.id === id) ?? null;
   }
 
   async findManyByWorkOrderId(
     workOrderId: string,
-  ): Promise<WorkOrderServiceEntity[]> {
+  ): Promise<WorkOrderService[]> {
     return this.items.filter((item) => item.workOrderId === workOrderId);
   }
 
-  async create(service: WorkOrderServiceEntity): Promise<void> {
+  async create(service: WorkOrderService): Promise<void> {
     this.items.push(service);
   }
 
-  async save(service: WorkOrderServiceEntity): Promise<void> {
+  async save(service: WorkOrderService): Promise<void> {
     const index = this.items.findIndex((item) => item.id === service.id);
     if (index >= 0) this.items[index] = service;
   }

@@ -1,16 +1,16 @@
-import { Paginate } from '@/shared/lib/core/type/paginate';
-import { WorkOrderDetailEntity } from '@/work-order/core/entity/work-order-detail.entity';
-import { WorkOrderEntity } from '@/work-order/core/entity/work-order.entity';
-import { WorkOrderRepository } from '@/work-order/core/interface/work-order.repository';
+import { Paginate } from '@/package/shared/lib/type/paginate';
+import { WorkOrderDetail } from '@/package/work-order/work-order/work-order-detail.entity';
+import { WorkOrder } from '@/package/work-order/work-order/work-order.entity';
+import { IWorkOrdersRepository } from '@/package/work-order/work-order/contracts/work-order-repository.contract';
 
-import { InMemoryVesselsRepository } from './in-memory-vessels-repository';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
 
-export class InMemoryWorkOrdersRepository implements WorkOrderRepository {
-  public items: WorkOrderEntity[] = [];
+export class InMemoryWorkOrdersRepository implements IWorkOrdersRepository {
+  public items: WorkOrder[] = [];
 
   constructor(private readonly vessels: InMemoryVesselsRepository) {}
 
-  async findById(id: string): Promise<WorkOrderDetailEntity | null> {
+  async findById(id: string): Promise<WorkOrderDetail | null> {
     const workOrder = this.items.find((item) => item.id === id);
 
     if (!workOrder) return null;
@@ -23,7 +23,7 @@ export class InMemoryWorkOrdersRepository implements WorkOrderRepository {
       throw new Error(`in-memory: vessel ${workOrder.vesselId} is not seeded`);
     }
 
-    return new WorkOrderDetailEntity(
+    return WorkOrderDetail.create(
       {
         startDate: workOrder.startDate,
         endDate: workOrder.endDate,
@@ -39,10 +39,7 @@ export class InMemoryWorkOrdersRepository implements WorkOrderRepository {
     );
   }
 
-  async findMany(
-    take: number,
-    skip: number,
-  ): Promise<Paginate<WorkOrderEntity>> {
+  async findMany(take: number, skip: number): Promise<Paginate<WorkOrder>> {
     return {
       data: this.items.slice(skip, skip + take),
       total: this.items.length,
@@ -53,17 +50,17 @@ export class InMemoryWorkOrdersRepository implements WorkOrderRepository {
     vesselId: string,
     take: number,
     skip: number,
-  ): Promise<Paginate<WorkOrderEntity>> {
+  ): Promise<Paginate<WorkOrder>> {
     const owned = this.items.filter((item) => item.vesselId === vesselId);
 
     return { data: owned.slice(skip, skip + take), total: owned.length };
   }
 
-  async create(workOrder: WorkOrderEntity): Promise<void> {
+  async create(workOrder: WorkOrder): Promise<void> {
     this.items.push(workOrder);
   }
 
-  async save(workOrder: WorkOrderEntity): Promise<void> {
+  async save(workOrder: WorkOrder): Promise<void> {
     const index = this.items.findIndex((item) => item.id === workOrder.id);
     if (index >= 0) this.items[index] = workOrder;
   }

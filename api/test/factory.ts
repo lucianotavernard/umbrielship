@@ -1,15 +1,27 @@
-import { CustomerEntity } from '@/customer/core/entity/customer.entity';
-import { VesselEntity } from '@/customer/core/entity/vessel.entity';
-import { User } from '@/shared/module/prisma/generated/prisma/client';
-import { WorkOrderServiceImageEntity } from '@/work-order/core/entity/work-order-service-image.entity';
-import { WorkOrderServiceEntity } from '@/work-order/core/entity/work-order-service.entity';
-import { WorkOrderEntity } from '@/work-order/core/entity/work-order.entity';
+import {
+  Customer,
+  CustomerProps,
+} from '@/package/customer/customer/customer.entity';
+import { Vessel, VesselProps } from '@/package/customer/vessel/vessel.entity';
+import { User, UserProps } from '@/package/identity/user/user.entity';
+import {
+  WorkOrderServiceImage,
+  WorkOrderServiceImageProps,
+} from '@/package/work-order/work-order-service-image/work-order-service-image.entity';
+import {
+  WorkOrderService,
+  WorkOrderServiceProps,
+} from '@/package/work-order/work-order-service/work-order-service.entity';
+import {
+  WorkOrder,
+  WorkOrderProps,
+} from '@/package/work-order/work-order/work-order.entity';
 
 export const makeCustomer = (
-  override: Partial<ConstructorParameters<typeof CustomerEntity>[0]> = {},
+  override: Partial<CustomerProps> = {},
   id?: string,
 ) =>
-  new CustomerEntity(
+  Customer.create(
     {
       name: 'Atlantic Shipping',
       email: 'ops@atlantic.test',
@@ -20,11 +32,8 @@ export const makeCustomer = (
     id,
   );
 
-export const makeVessel = (
-  override: Partial<ConstructorParameters<typeof VesselEntity>[0]> = {},
-  id?: string,
-) =>
-  new VesselEntity(
+export const makeVessel = (override: Partial<VesselProps> = {}, id?: string) =>
+  Vessel.create(
     {
       name: 'Aurora',
       type: 'CARGO',
@@ -37,10 +46,10 @@ export const makeVessel = (
   );
 
 export const makeWorkOrder = (
-  override: Partial<ConstructorParameters<typeof WorkOrderEntity>[0]> = {},
+  override: Partial<WorkOrderProps> = {},
   id?: string,
 ) =>
-  new WorkOrderEntity(
+  WorkOrder.create(
     {
       vesselId: 'vessel-1',
       startDate: new Date('2026-01-10T00:00:00.000Z'),
@@ -52,12 +61,10 @@ export const makeWorkOrder = (
   );
 
 export const makeService = (
-  override: Partial<
-    ConstructorParameters<typeof WorkOrderServiceEntity>[0]
-  > = {},
+  override: Partial<WorkOrderServiceProps> = {},
   id?: string,
 ) =>
-  new WorkOrderServiceEntity(
+  WorkOrderService.create(
     {
       workOrderId: 'work-order-1',
       name: 'Hull cleaning',
@@ -71,12 +78,10 @@ export const makeService = (
   );
 
 export const makeImage = (
-  override: Partial<
-    ConstructorParameters<typeof WorkOrderServiceImageEntity>[0]
-  > = {},
+  override: Partial<WorkOrderServiceImageProps> = {},
   id?: string,
 ) =>
-  new WorkOrderServiceImageEntity(
+  WorkOrderServiceImage.create(
     {
       serviceId: 'service-1',
       url: '/uploads/work-order-service-images/photo.png',
@@ -85,11 +90,19 @@ export const makeImage = (
     id,
   );
 
-export const makeUser = (override: Partial<User> = {}): User => ({
-  id: 'user-1',
-  name: 'Maria Souza',
-  email: 'maria@umbrielship.test',
-  password: 'secret123-hashed',
-  role: 'USER',
-  ...override,
-});
+export const makeUser = (
+  override: Partial<UserProps> & { id?: string } = {},
+) => {
+  const { id = 'user-1', ...props } = override;
+
+  return User.create(
+    {
+      name: 'Maria Souza',
+      email: 'maria@umbrielship.test',
+      password: 'secret123-hashed',
+      role: 'USER',
+      ...props,
+    },
+    id,
+  );
+};

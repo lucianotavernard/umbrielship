@@ -1,7 +1,7 @@
-import { UserRepository } from '@/identity/core/interface/user.repository';
-import { User } from '@/shared/module/prisma/generated/prisma/client';
+import { IUsersRepository } from '@/package/identity/user/contracts/user-repository.contract';
+import { User } from '@/package/identity/user/user.entity';
 
-export class InMemoryUsersRepository implements UserRepository {
+export class InMemoryUsersRepository implements IUsersRepository {
   public items: User[] = [];
 
   async findByEmail(email: string): Promise<User | null> {

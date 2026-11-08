@@ -1,0 +1,43 @@
+import { Injectable } from '@nestjs/common';
+
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+
+import { WorkOrderServiceImage } from './work-order-service-image.entity';
+import { IWorkOrderServiceImagesRepository } from './contracts/work-order-service-image-repository.contract';
+import { IWorkOrderServicesRepository } from '../work-order-service/contracts/work-order-service-repository.contract';
+
+type FetchWorkOrderServiceImagesUseCaseRequest = {
+  workOrderId: string;
+  serviceId: string;
+};
+
+type FetchWorkOrderServiceImagesUseCaseResponse = {
+  images: WorkOrderServiceImage[];
+};
+
+@Injectable()
+export class FetchWorkOrderServiceImagesUseCase {
+  constructor(
+    private readonly workOrderServicesRepository: IWorkOrderServicesRepository,
+    private readonly workOrderServiceImagesRepository: IWorkOrderServiceImagesRepository,
+  ) {}
+
+  async handle(
+    input: FetchWorkOrderServiceImagesUseCaseRequest,
+  ): Promise<FetchWorkOrderServiceImagesUseCaseResponse> {
+    const service = await this.workOrderServicesRepository.findById(
+      input.serviceId,
+    );
+
+    if (!service || service.workOrderId !== input.workOrderId) {
+      throw new NotFoundDomainException('Work order service not found');
+    }
+
+    const images =
+      await this.workOrderServiceImagesRepository.findManyByServiceId(
+        input.serviceId,
+      );
+
+    return { images };
+  }
+}

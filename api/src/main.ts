@@ -5,8 +5,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-import { ConfigService } from '@/shared/module/config/service/config.service';
-import type { Config } from '@/shared/module/config/util/config.type';
+import { ConfigService } from '@/package/shared/module/config/config.service';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -19,7 +18,7 @@ async function bootstrap() {
 
   app.useStaticAssets(uploadsRoot, { prefix: '/uploads' });
 
-  const configService = app.get<ConfigService<Config>>(ConfigService);
+  const configService = app.get<ConfigService>(ConfigService);
   const port = configService.get('port');
 
   await app.listen(port);

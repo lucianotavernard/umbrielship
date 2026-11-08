@@ -1,33 +1,30 @@
-import { CustomerEntity } from '@/customer/core/entity/customer.entity';
-import { CustomerRepository } from '@/customer/core/interface/customer.repository';
-import { Paginate } from '@/shared/lib/core/type/paginate';
+import { Customer } from '@/package/customer/customer/customer.entity';
+import { ICustomersRepository } from '@/package/customer/customer/contracts/customer-repository.contract';
+import { Paginate } from '@/package/shared/lib/type/paginate';
 
-export class InMemoryCustomersRepository implements CustomerRepository {
-  public items: CustomerEntity[] = [];
+export class InMemoryCustomersRepository implements ICustomersRepository {
+  public items: Customer[] = [];
 
-  async findById(id: string): Promise<CustomerEntity | null> {
+  async findById(id: string): Promise<Customer | null> {
     return this.items.find((customer) => customer.id === id) ?? null;
   }
 
-  async findByEmail(email: string): Promise<CustomerEntity | null> {
+  async findByEmail(email: string): Promise<Customer | null> {
     return this.items.find((customer) => customer.email === email) ?? null;
   }
 
-  async findMany(
-    take: number,
-    skip: number,
-  ): Promise<Paginate<CustomerEntity>> {
+  async findMany(take: number, skip: number): Promise<Paginate<Customer>> {
     return {
       data: this.items.slice(skip, skip + take),
       total: this.items.length,
     };
   }
 
-  async create(customer: CustomerEntity): Promise<void> {
+  async create(customer: Customer): Promise<void> {
     this.items.push(customer);
   }
 
-  async save(customer: CustomerEntity): Promise<void> {
+  async save(customer: Customer): Promise<void> {
     const index = this.items.findIndex((item) => item.id === customer.id);
     if (index >= 0) this.items[index] = customer;
   }
