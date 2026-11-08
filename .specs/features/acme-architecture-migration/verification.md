@@ -1,12 +1,49 @@
 # Acme architecture migration verification
 
-**Verdict**: FAIL
-**Mutations**: 6 - probed C48, C50, C52, C54, C55, C56
-**Mutations (S3)**: 3 - probed C67 (build tsconfig `strict` override), C71 (`start:dev` script broken), C73 (stale `core/use-case` in AGENTS.md); 1 killed, 2 not at first, all 3 killed after the fix (`mutations-s3.json`)
-**Proofs**: `proofs.md` at 3601caa
+**Verdict**: PASS
+**Mutations**: 3 - probed C87, C82, C85; all killed at `cb58059` and re-run after `4bdf804`
+**Proofs**: `proofs.md` re-run after the closing commit
 **Verifier**: independent sub-agent (author != verifier)
 
 ## Findings
+
+### S4
+
+Re-judged at `cb58059`. `proofs.md` at this HEAD already records the three declared mutations killed; they were not rerun and `mutations.json` was not replaced. No capture binds S4. Throwaway specs ran at this HEAD and were deleted.
+
+Unnamed values that held: a user name of 80 characters, a password of 8 characters, and a password of 72 characters each emit (`user-form` throwaway). A customer `total` of 10 shows no page-2 control and requests no `page=2` (`perPage` is 10).
+
+Held at this HEAD (the assertion that locks the rule):
+
+- Organizations `table[tTable]` — `web/src/package/identity/organization/__test__/organization-list.spec.ts:42` `querySelector('table[tTable]')?.textContent`
+- `authentication.service.ts` reads GET `/api/me` — `web/test/layout.spec.mjs:132` matches `this.http.get<MeResponse>('/api/me')`
+- The switch reloads only after the 204 — `web/src/package/identity/authentication/__test__/internal-layout.spec.ts:69` `expect(reload).not.toHaveBeenCalled()` before the flush, and `:72` `toHaveBeenCalledTimes(1)` after status 204
+- A 401 on `POST /sessions` shows `E-mail ou senha incorretos.` with the interceptor installed — `web/src/package/identity/authentication/__test__/authenticate-user.spec.ts:20` provides `authInterceptor`, `:84` expects that sentence; `web/src/package/shared/components/lib/auth.interceptor.ts:28` rethrows when the URL includes `/sessions`
+- The user form refuses a name of 81, a password of 7, and a password of 73 — `web/src/package/identity/user/components/user-form.ts:36` `[disabled]="userForm().invalid()"` and `:69` returns before `emit` when invalid; `web/src/package/identity/user/__test__/user-form.spec.ts` asserts the button is disabled and `emitted` stays `[]` for those three values
+- The service-image field is `file` — `web/src/package/work-order/work-order/__test__/work-order-detail.spec.ts:63` `(body as FormData).get('file')` is the selected file
+
+The rows below are closed by the commit in `Closed`. The three mutations in `mutations.json` stay the ones `proofs.md` killed.
+
+| Finding | Evidence | Fix | Closed |
+| --- | --- | --- | --- |
+| The Organizations table passes C87 with the `tTable` attribute removed | mutation `organizations table drops the tTable attribute` not killed at `8b4faac`. `organization-list.spec.ts` queried `table` | assert `table[tTable]` | `fd28f26`: C87 queries `table[tTable]`; the mutation is killed |
+| `authentication.service.ts` passes C82 when `GET /api/me` becomes `POST /api/me` | mutation `session read GET /api/me becomes POST` not killed at `8b4faac` | assert an `http.get` of the path `/api/me` | `fd28f26`: C82 matches `this.http.get<MeResponse>('/api/me')`; the mutation is killed |
+| The layout passes C85 when it reloads before `POST /organizations/switch` returns 204 | mutation `organization switch reloads before the 204` not killed at `8b4faac` | assert `reload` is uncalled while the switch request is outstanding, and called once after the 204 | `fd28f26`: C85 asserts `not.toHaveBeenCalled()` before the flush and `toHaveBeenCalledTimes(1)` after status 204; the mutation is killed |
+| A 401 on sign-in does not show `E-mail ou senha incorretos.` when the app interceptor is installed | `auth.interceptor.ts` answered every HTTP 401 with `EMPTY`. C84 had no interceptor | rethrow 401 from `POST /sessions`, and run C84 with `authInterceptor` | `fd28f26`: a 401 whose URL includes `/sessions` is rethrown; C84 installs `authInterceptor` |
+| The user form submits a password of length 7 and a name of length 81 | submit was always enabled and `submitForm` always emitted | keep the submit disabled while `userForm().invalid()`, and assert those two values do not emit | `cb58059`: submit stays disabled, and a name of 81, a password of 7 and a password of 73 each leave `emitted` empty |
+| The service-image upload passes C91 for any multipart field name | the spec asserted `FormData` only | assert `body.get('file')` is the selected file | `fd28f26`: C91 asserts `get('file')` is the selected file |
+| C96 stays green when AGENTS.md drops the attribute prefix | the spec required `t-` and had no separate attribute-prefix phrase | assert the attribute prefix on its own (`attribute prefix` and `` `t` ``) | `4bdf804`: C96 matches `attribute prefix `t`` so a value of `acme` fails |
+| C96 stays green when the attribute prefix value is `acme` | separate checks for the words and for a backticked t anywhere; line 29 still has `` `t` `` | assert that "attribute prefix" is immediately followed by a backticked t | `4bdf804`: C96 matches `attribute prefix `t`` |
+| Customer, vessel, work-order, user and invitation tables pass without `table[tTable]` | C83 `/tTable/` matches `tTableHeader`. User and invitation lists were outside the list | assert `<table tTable>` on the four C83 templates and on the Users and Invitations templates | `4bdf804`: C83 matches `<table tTable>` on all six templates |
+| The layout session read and three writes can change verb and stay green | `/api/me`, `/api/users`, `/api/invitations`, `/api/invitations/accept` and the customer pages did not assert the method | assert GET on the layout `/api/me` and on both customer pages, and POST on the three writes | `4bdf804`: C85, C88, C89 and C90 assert those methods |
+| C87 stays green when the create form is outside `t-sheet` | the spec filled `#organization-name` and never queried `t-sheet` | assert the name and email fields are inside `t-sheet` | `4bdf804`: C87 queries `t-sheet #organization-name` and `t-sheet #organization-email` |
+| The organization form emits a name of 81 characters | no `maxLength`, submit always enabled, `submitForm` always emitted | `maxLength(path.name, 80)`, disable submit while invalid, and assert a name of 81 does not emit | `4bdf804`: the form refuses a name of 81 and C87 asserts the button is disabled and `emitted` is empty |
+
+### S1-S3 (closed)
+
+**Mutations (S2)**: 6 - probed C48, C50, C52, C54, C55, C56
+**Mutations (S3)**: 3 - probed C67 (build tsconfig `strict` override), C71 (`start:dev` script broken), C73 (stale `core/use-case` in AGENTS.md); 1 killed, 2 not at first, all 3 killed after the fix (`mutations-s3.json`)
+**Proofs at close**: `proofs.md` at 3601caa, then the S3 fixes
 
 | Finding | Evidence | Fix | Closed |
 | --- | --- | --- | --- |

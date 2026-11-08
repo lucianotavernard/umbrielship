@@ -1,8 +1,23 @@
 [
-{"file":"api/src/package/identity/auth/switch-organization.use-case.ts","old":"(membership) => membership.organizationId === organizationId,","new":"() => true,","proof":"cd api && npx vitest run src/package/identity/auth/__test__/switch-organization.use-case.spec.ts -t \"\\[C48\\]\"","label":"switch organization: membership check dropped"},
-{"file":"api/src/package/identity/organization/internal-administrator.guard.ts","old":"user.role !== 'administrator'","new":"false","proof":"cd api && npx vitest run src/package/identity/organization/__test__/internal-administrator.guard.spec.ts -t \"\\[C50\\]\"","label":"internal guard: administrator role check dropped"},
-{"file":"api/src/package/identity/invitation/deliver-invitation.use-case.ts","old":"attempts >= MAX_DELIVERY_ATTEMPTS","new":"attempts > MAX_DELIVERY_ATTEMPTS","proof":"cd api && npx vitest run src/package/identity/invitation/__test__/deliver-invitation.use-case.spec.ts -t \"\\[C55\\]\"","label":"delivery: third failure no longer records failed (bound shifted by one)"},
-{"file":"api/src/package/identity/invitation/send-invitation.use-case.ts","old":"if (destination.isInternal)","new":"if (false)","proof":"cd api && npx vitest run src/package/identity/invitation/__test__/send-invitation.use-case.spec.ts -t \"\\[C52\\]\"","label":"send invitation: internal Organization accepted"},
-{"file":"api/src/package/identity/invitation/accept-invitation.use-case.ts","old":"invitation.status === 'accepted'","new":"false","proof":"cd api && npx vitest run src/package/identity/invitation/__test__/accept-invitation.use-case.spec.ts -t \"\\[C54\\]\"","label":"accept invitation: already-accepted 409 guard dropped"},
-{"file":"api/src/package/identity/invitation/invitation-delivery.queue.ts","old":"attemptsMade <= 1","new":"attemptsMade <= 0","proof":"cd api && npx vitest run src/package/identity/invitation/__test__/invitation-delivery-queue.spec.ts -t \"\\[C56\\]\"","label":"backoff: first retry waits 10 s instead of 5 s"}
+  {
+    "file": "web/src/package/identity/organization/components/organization-list.ts",
+    "old": "<table tTable>",
+    "new": "<table>",
+    "proof": "cd web && npx ng test --watch=false --filter='\\[C87\\]'",
+    "label": "organizations table drops the tTable attribute"
+  },
+  {
+    "file": "web/src/package/identity/authentication/authentication.service.ts",
+    "old": "return this.http.get<MeResponse>('/api/me');",
+    "new": "return this.http.post<MeResponse>('/api/me', {});",
+    "proof": "node --test --test-name-pattern '\\[C82\\]' web/test/layout.spec.mjs",
+    "label": "session read GET /api/me becomes POST"
+  },
+  {
+    "file": "web/src/package/shared/components/internal-layout.ts",
+    "old": "this.authenticationService.switchOrganization(organizationId).subscribe({\n      next: () => this.reloadPage(),",
+    "new": "this.reloadPage();\n    this.authenticationService.switchOrganization(organizationId).subscribe({\n      next: () => undefined,",
+    "proof": "cd web && npx ng test --watch=false --filter='\\[C85\\]'",
+    "label": "organization switch reloads before the 204"
+  }
 ]
