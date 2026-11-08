@@ -19,7 +19,7 @@ import { CreateCustomerRequest, CustomerService, GetCustomersResponse } from '..
 })
 export class CustomerList {
   private readonly customerService = inject(CustomerService);
-  private readonly customerForm = viewChild.required(CustomerForm);
+  private readonly customerForm = viewChild(CustomerForm);
 
   private readonly customerResource = httpResource<GetCustomersResponse>(
     () => `/api/customers?page=${this.page()}`,
@@ -39,7 +39,6 @@ export class CustomerList {
   }
 
   openSheet() {
-    this.customerForm().reset();
     this.isSheetActive.set(true);
   }
 
@@ -48,14 +47,14 @@ export class CustomerList {
   }
 
   createCustomer(customer: CreateCustomerRequest) {
-    this.customerForm().loading.set(true);
+    this.customerForm()?.loading.set(true);
     this.customerService.createCustomer(customer).subscribe({
       next: () => {
         toast.success('Cliente criado com sucesso', {
           description: 'O cliente foi criado com sucesso.',
         });
-        this.customerForm().loading.set(false);
-        this.customerForm().reset();
+        this.customerForm()?.loading.set(false);
+        this.customerForm()?.reset();
         this.closeSheet();
         this.customerResource.reload();
       },
@@ -63,7 +62,7 @@ export class CustomerList {
         toast.error('Erro ao criar cliente', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar o cliente.'),
         });
-        this.customerForm().loading.set(false);
+        this.customerForm()?.loading.set(false);
       },
     });
   }

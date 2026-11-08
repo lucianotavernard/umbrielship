@@ -21,7 +21,7 @@ import {
 })
 export class OrganizationList {
   private readonly organizationService = inject(OrganizationService);
-  private readonly organizationForm = viewChild.required(OrganizationForm);
+  private readonly organizationForm = viewChild(OrganizationForm);
 
   private readonly organizationResource = httpResource<GetOrganizationsResponse>(
     () => `/api/organizations?page=${this.page()}&per_page=${this.perPage}`,
@@ -41,7 +41,6 @@ export class OrganizationList {
   }
 
   openSheet() {
-    this.organizationForm().reset();
     this.isSheetActive.set(true);
   }
 

@@ -20,7 +20,7 @@ import { CreateVesselRequest, GetVesselsResponse, Vessel, VesselService } from '
 })
 export class VesselList {
   private readonly vesselService = inject(VesselService);
-  private readonly vesselForm = viewChild.required(VesselForm);
+  private readonly vesselForm = viewChild(VesselForm);
 
   private readonly vesselsResource = httpResource<GetVesselsResponse>(
     () => `/api/vessels?page=${this.page()}`,
@@ -45,7 +45,6 @@ export class VesselList {
   }
 
   openSheet() {
-    this.vesselForm().reset();
     this.isSheetActive.set(true);
   }
 
