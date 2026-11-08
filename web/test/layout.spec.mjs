@@ -142,9 +142,15 @@ test('[C83] lists are tables with the Portuguese empty copy', () => {
   ];
   for (const [file, copy] of lists) {
     const text = read(path.join(web, file));
-    assert.match(text, /tTable/);
+    assert.match(text, /<table tTable>/);
     assert.ok(text.includes(copy), copy);
     assert.equal(text.includes('<card'), false, file);
+  }
+  for (const file of [
+    'src/package/identity/user/components/user-list.ts',
+    'src/package/identity/invitation/components/invitation-list.ts',
+  ]) {
+    assert.match(read(path.join(web, file)), /<table tTable>/, file);
   }
 });
 
@@ -156,14 +162,13 @@ test('[C96] AGENTS.md describes the Angular 22 web', () => {
     '@Service()',
     'Signal Forms',
     't-',
-    'attribute prefix',
     'button[tButton]',
     'table[tTable]',
     'GET /me',
   ]) {
     assert.ok(text.includes(phrase), phrase);
   }
-  assert.ok(text.includes('`t`'), 'attribute prefix `t`');
+  assert.match(text, /attribute prefix `t`/);
   assert.equal(text.includes('feature/ui/data-access'), false);
   assert.equal(text.toLowerCase().includes('whoami'), false);
 });

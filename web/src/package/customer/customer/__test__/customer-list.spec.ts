@@ -34,6 +34,7 @@ describe('CustomerList', () => {
     const fixture = TestBed.createComponent(CustomerList);
     await settle();
     const first = controller.expectOne('/api/customers?page=1');
+    expect(first.request.method).toBe('GET');
     expect(first.request.url).not.toContain('organizationId');
     first.flush({
       customers: [{ id: 'c1', name: 'A', email: 'a@a.test', phone: null, address: { address: 'Rua', city: 'Santos', state: 'SP' } }],
@@ -44,6 +45,7 @@ describe('CustomerList', () => {
     [...element.querySelectorAll('a')].find((link) => link.textContent?.trim() === '2')?.click();
     await settle();
     const second = controller.expectOne('/api/customers?page=2');
+    expect(second.request.method).toBe('GET');
     expect(second.request.url).not.toContain('organizationId');
     second.flush({ customers: [], total: 11 });
   });

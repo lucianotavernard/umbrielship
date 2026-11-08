@@ -111,6 +111,7 @@ describe('OrganizationDetail', () => {
     element.querySelector<HTMLButtonElement>('#user-name')?.closest('form')?.requestSubmit();
     await settle();
     const created = controller.expectOne('/api/users');
+    expect(created.request.method).toBe('POST');
     expect(created.request.body).toEqual({
       name: 'Ana',
       email: 'ana@atlantic.test',
@@ -129,6 +130,7 @@ describe('OrganizationDetail', () => {
     element.querySelector<HTMLButtonElement>('#invitation-user')?.closest('form')?.requestSubmit();
     await settle();
     const sent = controller.expectOne('/api/invitations');
+    expect(sent.request.method).toBe('POST');
     expect(sent.request.body).toEqual({
       userId: 'user-1',
       organizationId: 'org-1',

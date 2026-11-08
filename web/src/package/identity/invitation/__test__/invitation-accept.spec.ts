@@ -33,6 +33,7 @@ describe('InvitationAccept', () => {
     [...element.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Confirmar')?.click();
     await settle();
     const request = controller.expectOne('/api/invitations/accept');
+    expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({ secret: 'abc' });
     return { element, request };
   }

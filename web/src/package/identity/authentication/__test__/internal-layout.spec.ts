@@ -52,7 +52,9 @@ describe('InternalLayout', () => {
       { id: 'org-a', name: 'Umbrielship', isInternal: true, role: 'administrator' },
       { id: 'org-b', name: 'Atlantic', isInternal: false, role: 'operator' },
     ];
-    controller.expectOne('/api/me').flush(profile(organizations, 'org-a'));
+    const session = controller.expectOne('/api/me');
+    expect(session.request.method).toBe('GET');
+    session.flush(profile(organizations, 'org-a'));
     await settle();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -75,7 +77,9 @@ describe('InternalLayout', () => {
   it('[C85] one membership renders the name and posts nothing', async () => {
     TestBed.createComponent(InternalLayout);
     await settle();
-    controller.expectOne('/api/me').flush(
+    const session = controller.expectOne('/api/me');
+    expect(session.request.method).toBe('GET');
+    session.flush(
       profile([{ id: 'org-a', name: 'Umbrielship', isInternal: true, role: 'administrator' }], 'org-a'),
     );
     await settle();

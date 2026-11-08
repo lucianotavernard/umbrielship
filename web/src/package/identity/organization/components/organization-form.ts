@@ -1,5 +1,5 @@
 import { Component, output, signal } from '@angular/core';
-import { email, form, FormField, required } from '@angular/forms/signals';
+import { email, form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { Button } from '../../../shared/components/ui/button';
 import { FormGroup, Input, Label } from '../../../shared/components/ui/form';
@@ -19,7 +19,7 @@ import { FormGroup, Input, Label } from '../../../shared/components/ui/form';
       </t-form-group>
       <footer class="flex justify-end gap-3">
         <button tButton type="button" variant="outline" (click)="closed.emit()">Cancelar</button>
-        <button tButton type="submit">Salvar</button>
+        <button tButton type="submit" [disabled]="organizationForm().invalid()">Salvar</button>
       </footer>
     </form>
   `,
@@ -32,6 +32,7 @@ export class OrganizationForm {
 
   organizationForm = form(this.model, (path) => {
     required(path.name);
+    maxLength(path.name, 80);
     email(path.email);
     required(path.email);
   });
@@ -42,6 +43,7 @@ export class OrganizationForm {
 
   submitForm(event: Event) {
     event.preventDefault();
+    if (this.organizationForm().invalid()) return;
     this.submitted.emit(this.organizationForm().value());
   }
 }

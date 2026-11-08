@@ -44,9 +44,13 @@ describe('OrganizationList', () => {
 
     [...element.querySelectorAll('button')].find((button) => button.textContent?.includes('Nova Organização'))?.click();
     await settle();
+    const sheet = element.querySelector('t-sheet');
+    expect(sheet?.querySelector('#organization-name')).toBeTruthy();
+    expect(sheet?.querySelector('#organization-email')).toBeTruthy();
     fill(element, '#organization-name', 'Atlantic');
     fill(element, '#organization-email', 'ops@atlantic.test');
-    element.querySelector<HTMLButtonElement>('button[type="submit"]')?.click();
+    await settle();
+    element.querySelector<HTMLButtonElement>('t-sheet button[type="submit"]')?.click();
     await settle();
 
     const created = controller.expectOne('/api/organizations');
