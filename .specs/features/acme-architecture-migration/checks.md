@@ -312,10 +312,10 @@ Proof: walk - sign in, open Clientes, read the table or the empty copy, use pagi
 **C95** - The layout shows the Organization switcher, and `/invitations/accept?secret=abc` renders the accept form before any submit (AC 29, AC 31)
 Proof: walk - read the switcher in the layout and open the invitation accept route until the form is on screen
 
-**C96** - `AGENTS.md` names Angular 22, `web/src/package/<context>/<module>/`, `@Service()`, Signal Forms, the element prefix `t-`, the attribute selectors `button[tButton]` and `table[tTable]`, and `GET /me`. It does not describe the web as `feature/ui/data-access` and it does not say the web calls `whoami` (AC 26, AD-015)
+**C96** - `AGENTS.md` names Angular 22, `web/src/package/<context>/<module>/`, `@Service()`, Signal Forms, the element prefix `t-`, the attribute prefix `t`, the attribute selectors `button[tButton]` and `table[tTable]`, and `GET /me`. It does not describe the web as `feature/ui/data-access` and it does not say the web calls `whoami` (AC 26, AD-015)
 Proof: `node --test --test-name-pattern '\[C96\]' web/test/layout.spec.mjs`
 
-**C97** - The user form does not emit a name of 81 characters or a password of 7 characters. It does emit name `Ana` and password `secret-pass` (Surface `POST /users`: name 1-80, password 8-72)
+**C97** - The user form submit stays disabled while the form is invalid. It does not emit a name of 81 characters, a password of 7 characters, or a password of 73 characters. It does emit name `Ana` and password `secret-pass` (Surface `POST /users`: name 1-80, password 8-72)
 Proof: `cd web && npx ng test --watch=false --filter='\[C97\]'`
 
 ## Coverage

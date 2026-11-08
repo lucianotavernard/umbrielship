@@ -24,13 +24,42 @@ describe('UserForm', () => {
     return { fixture, emitted, element: fixture.nativeElement as HTMLElement };
   }
 
-  it('[C97] does not emit a name of 81 characters or a password of 7', async () => {
-    const { element, emitted } = await render();
-    fill(element, '#user-name', 'A'.repeat(81));
+  function submitButton(element: HTMLElement) {
+    const button = element.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (!button) throw new Error('submit');
+    return button;
+  }
+
+  async function fillValid(element: HTMLElement, overrides: Partial<Record<'name' | 'password', string>> = {}) {
+    fill(element, '#user-name', overrides.name ?? 'Ana');
     fill(element, '#user-email', 'ana@atlantic.test');
-    fill(element, '#user-password', '1234567');
+    fill(element, '#user-password', overrides.password ?? 'secret-pass');
     fill(element, '#user-role', 'operator');
     await settle();
+  }
+
+  it('[C97] does not emit a name of 81 characters', async () => {
+    const { element, emitted } = await render();
+    await fillValid(element, { name: 'A'.repeat(81) });
+    expect(submitButton(element).disabled).toBe(true);
+    element.querySelector('form')?.requestSubmit();
+    await settle();
+    expect(emitted).toEqual([]);
+  });
+
+  it('[C97] does not emit a password of 7 characters', async () => {
+    const { element, emitted } = await render();
+    await fillValid(element, { password: '1234567' });
+    expect(submitButton(element).disabled).toBe(true);
+    element.querySelector('form')?.requestSubmit();
+    await settle();
+    expect(emitted).toEqual([]);
+  });
+
+  it('[C97] does not emit a password of 73 characters', async () => {
+    const { element, emitted } = await render();
+    await fillValid(element, { password: 'p'.repeat(73) });
+    expect(submitButton(element).disabled).toBe(true);
     element.querySelector('form')?.requestSubmit();
     await settle();
     expect(emitted).toEqual([]);
@@ -38,11 +67,8 @@ describe('UserForm', () => {
 
   it('[C97] emits Ana and secret-pass', async () => {
     const { element, emitted } = await render();
-    fill(element, '#user-name', 'Ana');
-    fill(element, '#user-email', 'ana@atlantic.test');
-    fill(element, '#user-password', 'secret-pass');
-    fill(element, '#user-role', 'operator');
-    await settle();
+    await fillValid(element);
+    expect(submitButton(element).disabled).toBe(false);
     element.querySelector('form')?.requestSubmit();
     await settle();
     expect(emitted).toEqual([

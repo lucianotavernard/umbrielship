@@ -155,12 +155,15 @@ test('[C96] AGENTS.md describes the Angular 22 web', () => {
     'web/src/package/<context>/<module>/',
     '@Service()',
     'Signal Forms',
+    't-',
+    'attribute prefix',
     'button[tButton]',
     'table[tTable]',
     'GET /me',
   ]) {
     assert.ok(text.includes(phrase), phrase);
   }
+  assert.ok(text.includes('`t`'), 'attribute prefix `t`');
   assert.equal(text.includes('feature/ui/data-access'), false);
   assert.equal(text.toLowerCase().includes('whoami'), false);
 });
