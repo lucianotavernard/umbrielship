@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { z } from 'zod';
 
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 import { ConfigService } from '@/package/shared/module/config/config.service';
+
+import { ResolveSessionUseCase } from './resolve-session.use-case';
 
 const tokenPayloadSchema = z.object({
   sub: z.uuid(),
@@ -13,7 +16,10 @@ const tokenPayloadSchema = z.object({
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private resolveSession: ResolveSessionUseCase,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -21,7 +27,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // The active Organization is read from the User on every request, so a switch
+  // takes effect for every session of that User.
   async validate(payload: unknown): Promise<UserPayload> {
-    return tokenPayloadSchema.parse(payload);
+    const { sub } = tokenPayloadSchema.parse(payload);
+
+    try {
+      return await this.resolveSession.handle({ userId: sub });
+    } catch (error) {
+      if (error instanceof NotFoundDomainException) {
+        throw new UnauthorizedException();
+      }
+
+      throw error;
+    }
   }
 }

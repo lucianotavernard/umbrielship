@@ -15,14 +15,14 @@ describe('DeleteWorkOrderUseCase', () => {
   beforeEach(() => {
     const customers = new InMemoryCustomersRepository();
     const vessels = new InMemoryVesselsRepository(customers);
-    workOrders = new InMemoryWorkOrdersRepository(vessels);
+    workOrders = new InMemoryWorkOrdersRepository();
     sut = new DeleteWorkOrderUseCase(workOrders);
     customers.items.push(makeCustomer({}, 'customer-1'));
     vessels.items.push(makeVessel({ customerId: 'customer-1' }, 'vessel-1'));
   });
 
   it('[C19] throws NotFoundDomainException for an unknown id', async () => {
-    const promise = sut.handle({ id: 'missing' });
+    const promise = sut.handle({ organizationId: 'org-1', id: 'missing' });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order not found');
@@ -31,7 +31,7 @@ describe('DeleteWorkOrderUseCase', () => {
   it('[C19] removes exactly that work order', async () => {
     workOrders.items.push(makeWorkOrder({}, 'wo1'), makeWorkOrder({}, 'wo2'));
 
-    await sut.handle({ id: 'wo1' });
+    await sut.handle({ organizationId: 'org-1', id: 'wo1' });
 
     expect(workOrders.items.map((item) => item.id)).toEqual(['wo2']);
   });

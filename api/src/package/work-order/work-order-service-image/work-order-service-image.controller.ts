@@ -18,6 +18,8 @@ import type { Express } from 'express';
 import { diskStorage } from 'multer';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
 import { AddWorkOrderServiceImageUseCase } from './add-work-order-service-image.use-case';
 import { FetchWorkOrderServiceImagesUseCase } from './fetch-work-order-service-images.use-case';
@@ -51,11 +53,13 @@ export class WorkOrderServiceImageController {
 
   @Get()
   async get(
+    @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
     @Param('serviceId') serviceId: string,
   ) {
     try {
       const { images } = await this.fetchWorkOrderServiceImages.handle({
+        organizationId: user.organizationId,
         workOrderId,
         serviceId,
       });
@@ -73,6 +77,7 @@ export class WorkOrderServiceImageController {
   @Post()
   @UseInterceptors(FileInterceptor('file', serviceImageMulterOptions()))
   async upload(
+    @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
     @Param('serviceId') serviceId: string,
     @UploadedFile() file: Express.Multer.File | undefined,
@@ -85,6 +90,7 @@ export class WorkOrderServiceImageController {
 
     try {
       const { image } = await this.addWorkOrderServiceImage.handle({
+        organizationId: user.organizationId,
         workOrderId,
         serviceId,
         url,
@@ -103,12 +109,14 @@ export class WorkOrderServiceImageController {
   @Delete(':id')
   @HttpCode(204)
   async delete(
+    @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
     @Param('serviceId') serviceId: string,
     @Param('id') imageId: string,
   ) {
     try {
       await this.removeWorkOrderServiceImage.handle({
+        organizationId: user.organizationId,
         workOrderId,
         serviceId,
         imageId,

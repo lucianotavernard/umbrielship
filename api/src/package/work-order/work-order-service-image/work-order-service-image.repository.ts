@@ -10,9 +10,12 @@ import { IWorkOrderServiceImagesRepository } from './contracts/work-order-servic
 export class PrismaWorkOrderServiceImagesRepository implements IWorkOrderServiceImagesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<WorkOrderServiceImage | null> {
-    const row = await this.prisma.workOrderServiceImage.findUnique({
-      where: { id },
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderServiceImage | null> {
+    const row = await this.prisma.workOrderServiceImage.findFirst({
+      where: { id, organizationId },
     });
 
     if (!row) {
@@ -23,10 +26,11 @@ export class PrismaWorkOrderServiceImagesRepository implements IWorkOrderService
   }
 
   async findManyByServiceId(
+    organizationId: string,
     serviceId: string,
   ): Promise<WorkOrderServiceImage[]> {
     const rows = await this.prisma.workOrderServiceImage.findMany({
-      where: { serviceId },
+      where: { organizationId, serviceId },
     });
 
     return rows.map((row) => this.toDomain(row));
@@ -36,6 +40,7 @@ export class PrismaWorkOrderServiceImagesRepository implements IWorkOrderService
     await this.prisma.workOrderServiceImage.create({
       data: {
         id: image.id,
+        organizationId: image.organizationId,
         serviceId: image.serviceId,
         url: image.url,
       },
@@ -53,6 +58,7 @@ export class PrismaWorkOrderServiceImagesRepository implements IWorkOrderService
   ): WorkOrderServiceImage {
     return WorkOrderServiceImage.create(
       {
+        organizationId: prismaRow.organizationId,
         serviceId: prismaRow.serviceId,
         url: prismaRow.url,
       },

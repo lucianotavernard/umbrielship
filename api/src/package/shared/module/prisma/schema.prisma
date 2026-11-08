@@ -13,21 +13,88 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
-  USER
-  MANAGER
-  DEVELOPER
+enum Role {
+  administrator
+  operator
+
+  @@map("role")
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+
+  @@map("invitation_status")
+}
+
+enum InvitationDeliveryStatus {
+  queued
+  delivered
+  failed
+
+  @@map("invitation_delivery_status")
+}
+
+model Organization {
+  id         String   @id @default(uuid())
+  name       String   @unique @db.Citext
+  email      String   @unique @db.Citext
+  isInternal Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  memberships Membership[]
+  invitations Invitation[]
+  activeUsers User[]
+
+  @@map("organizations")
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  password String
+  id                   String  @id @default(uuid())
+  name                 String
+  email                String  @unique @db.Citext
+  password             String
+  activeOrganizationId String?
 
-  role UserRole @default(USER)
+  activeOrganization Organization? @relation(fields: [activeOrganizationId], references: [id])
+  memberships        Membership[]
+  invitations        Invitation[]
 
   @@map("users")
+}
+
+model Membership {
+  id             String @id @default(uuid())
+  userId         String
+  organizationId String
+  role           Role
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("memberships")
+}
+
+model Invitation {
+  id                    String                   @id @default(uuid())
+  userId                String
+  organizationId        String
+  role                  Role
+  secret                String                   @unique
+  status                InvitationStatus         @default(pending)
+  deliveryStatus        InvitationDeliveryStatus @default(queued)
+  deliveryAttempts      Int                      @default(0)
+  lastDeliveryFailureAt DateTime?
+  createdAt             DateTime                 @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([deliveryStatus])
+  @@map("invitations")
 }
 
 enum VesselType {
@@ -43,14 +110,17 @@ enum VesselType {
 }
 
 model Customer {
-  id    String @id @default(uuid())
-  name  String
-  email String @unique
-  phone String
+  id             String @id @default(uuid())
+  organizationId String
+  name           String
+  email          String @db.Citext
+  phone          String
 
   address CustomerAddress?
   vessels Vessel[]
 
+  @@unique([organizationId, email])
+  @@index([organizationId])
   @@map("customers")
 }
 
@@ -72,65 +142,75 @@ enum WorkOrderServiceStatus {
 }
 
 model WorkOrder {
-  id        String          @id @default(uuid())
-  vesselId  String
-  startDate DateTime
-  endDate   DateTime
-  status    WorkOrderStatus @default(PENDING)
+  id             String          @id @default(uuid())
+  organizationId String
+  vesselId       String
+  startDate      DateTime
+  endDate        DateTime
+  status         WorkOrderStatus @default(PENDING)
 
-  vessel   Vessel             @relation(fields: [vesselId], references: [id])
   services WorkOrderService[]
 
+  @@index([organizationId])
+  @@index([vesselId])
   @@map("work_orders")
 }
 
 model WorkOrderService {
-  id          String                 @id @default(uuid())
-  workOrderId String
-  name        String
-  description String
-  startDate   DateTime
-  endDate     DateTime
-  status      WorkOrderServiceStatus @default(PENDING)
+  id             String                 @id @default(uuid())
+  organizationId String
+  workOrderId    String
+  name           String
+  description    String
+  startDate      DateTime
+  endDate        DateTime
+  status         WorkOrderServiceStatus @default(PENDING)
 
   workOrder WorkOrder               @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   images    WorkOrderServiceImage[]
 
+  @@index([organizationId])
   @@map("work_order_services")
 }
 
 model WorkOrderServiceImage {
-  id        String @id @default(uuid())
-  serviceId String
-  url       String
+  id             String @id @default(uuid())
+  organizationId String
+  serviceId      String
+  url            String
 
   service WorkOrderService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
   @@map("work_order_service_images")
 }
 
 model Vessel {
-  id         String     @id @default(uuid())
-  customerId String
-  imoNumber  String     @unique
-  name       String
-  type       VesselType
-  length     Float
+  id             String     @id @default(uuid())
+  organizationId String
+  customerId     String
+  imoNumber      String     @db.Citext
+  name           String
+  type           VesselType
+  length         Float
 
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  workOrders WorkOrder[]
+  customer Customer @relation(fields: [customerId], references: [id])
 
+  @@unique([organizationId, imoNumber])
+  @@index([organizationId])
   @@map("vessels")
 }
 
 model CustomerAddress {
-  id         String @id @default(uuid())
-  customerId String @unique
-  address    String
-  city       String
-  state      String
+  id             String @id @default(uuid())
+  organizationId String
+  customerId     String @unique
+  address        String
+  city           String
+  state          String
 
   customer Customer @relation(fields: [customerId], references: [id])
 
+  @@index([organizationId])
   @@map("customer_addresses")
 }

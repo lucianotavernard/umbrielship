@@ -22,7 +22,7 @@ describe('GetVesselByIdUseCase', () => {
     customers.items.push(makeCustomer({ name: 'Atlantic' }, 'c1'));
     vessels.items.push(makeVessel({ customerId: 'c1' }, 'v1'));
 
-    const { vessel } = await sut.handle({ id: 'v1' });
+    const { vessel } = await sut.handle({ organizationId: 'org-1', id: 'v1' });
 
     expect(vessel.id).toBe('v1');
     expect(vessel.customer.id).toBe('c1');
@@ -30,7 +30,7 @@ describe('GetVesselByIdUseCase', () => {
   });
 
   it('[C14] throws NotFoundDomainException for an unknown id', async () => {
-    const promise = sut.handle({ id: 'missing' });
+    const promise = sut.handle({ organizationId: 'org-1', id: 'missing' });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Vessel not found');

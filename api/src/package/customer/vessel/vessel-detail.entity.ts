@@ -9,6 +9,7 @@ export type VesselDetailProps = VesselProps & {
 
 export class VesselDetail {
   id: string;
+  organizationId: string;
   name: string;
   type: VesselProps['type'];
   length: number;
@@ -18,6 +19,7 @@ export class VesselDetail {
 
   private constructor(props: VesselDetailProps, id?: string) {
     this.id = id ?? randomUUID();
+    this.organizationId = props.organizationId;
     this.name = props.name;
     this.type = props.type;
     this.length = props.length;

@@ -46,6 +46,7 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
 
   it('[C28] throws NotFoundDomainException for an unknown service', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 'missing',
       imageId: 'i1',
@@ -58,6 +59,7 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
 
   it('[C28] throws NotFoundDomainException for a service of another work order', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo2',
       serviceId: 's1',
       imageId: 'i1',
@@ -70,6 +72,7 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
 
   it('[C28] throws NotFoundDomainException for an unknown image', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 's1',
       imageId: 'missing',
@@ -83,6 +86,7 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
     await writeFile(join(cwd, url), 'x');
 
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 's2',
       imageId: 'i1',
@@ -97,7 +101,12 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
   it('[C28] deletes the image row and the file under the working directory', async () => {
     await writeFile(join(cwd, url), 'x');
 
-    await sut.handle({ workOrderId: 'wo1', serviceId: 's1', imageId: 'i1' });
+    await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 's1',
+      imageId: 'i1',
+    });
 
     expect(images.items).toHaveLength(0);
     expect(await readdir(folder())).toEqual([]);
@@ -105,7 +114,12 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
 
   it('[C28] still succeeds when the file is already gone', async () => {
     await expect(
-      sut.handle({ workOrderId: 'wo1', serviceId: 's1', imageId: 'i1' }),
+      sut.handle({
+        organizationId: 'org-1',
+        workOrderId: 'wo1',
+        serviceId: 's1',
+        imageId: 'i1',
+      }),
     ).resolves.toBeUndefined();
 
     expect(images.items).toHaveLength(0);
@@ -118,7 +132,12 @@ describe('RemoveWorkOrderServiceImageUseCase', () => {
       vi.spyOn(fsPromises, 'unlink').mockRejectedValue(failure);
 
       await expect(
-        sut.handle({ workOrderId: 'wo1', serviceId: 's1', imageId: 'i1' }),
+        sut.handle({
+          organizationId: 'org-1',
+          workOrderId: 'wo1',
+          serviceId: 's1',
+          imageId: 'i1',
+        }),
       ).rejects.toBe(failure);
 
       expect(images.items).toHaveLength(0);

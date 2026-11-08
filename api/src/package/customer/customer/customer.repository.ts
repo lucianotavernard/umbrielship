@@ -14,13 +14,14 @@ import { Customer } from './customer.entity';
 export class PrismaCustomersRepository implements ICustomersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<Customer | null> {
-    const customer = await this.prisma.customer.findUnique({
+  async findById(organizationId: string, id: string): Promise<Customer | null> {
+    const customer = await this.prisma.customer.findFirst({
       include: {
         address: true,
       },
       where: {
         id,
+        organizationId,
       },
     });
 
@@ -31,13 +32,16 @@ export class PrismaCustomersRepository implements ICustomersRepository {
     return this.toDomain(customer);
   }
 
-  async findByEmail(email: string): Promise<Customer | null> {
+  async findByEmail(
+    organizationId: string,
+    email: string,
+  ): Promise<Customer | null> {
     const customer = await this.prisma.customer.findUnique({
       include: {
         address: true,
       },
       where: {
-        email,
+        organizationId_email: { organizationId, email },
       },
     });
 
@@ -48,12 +52,19 @@ export class PrismaCustomersRepository implements ICustomersRepository {
     return this.toDomain(customer);
   }
 
-  async findMany(take: number, skip: number): Promise<Paginate<Customer>> {
-    const total = await this.prisma.customer.count({ take, skip });
+  async findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<Customer>> {
+    const total = await this.prisma.customer.count({
+      where: { organizationId },
+    });
     const data = await this.prisma.customer.findMany({
       include: {
         address: true,
       },
+      where: { organizationId },
       take,
       skip,
     });
@@ -70,12 +81,14 @@ export class PrismaCustomersRepository implements ICustomersRepository {
     await this.prisma.customer.create({
       data: {
         id: customer.id,
+        organizationId: customer.organizationId,
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
         address: customer.address
           ? {
               create: {
+                organizationId: customer.organizationId,
                 address: customer.address.address,
                 city: customer.address.city,
                 state: customer.address.state,
@@ -87,7 +100,7 @@ export class PrismaCustomersRepository implements ICustomersRepository {
   }
 
   async save(customer: Customer): Promise<void> {
-    let address = await this.prisma.customerAddress.findUnique({
+    const address = await this.prisma.customerAddress.findUnique({
       where: {
         customerId: customer.id,
       },
@@ -121,6 +134,7 @@ export class PrismaCustomersRepository implements ICustomersRepository {
   ): Customer {
     return Customer.create(
       {
+        organizationId: customer.organizationId,
         name: customer.name,
         email: customer.email,
         phone: customer.phone,

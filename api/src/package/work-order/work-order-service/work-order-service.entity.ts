@@ -10,6 +10,7 @@ export type WorkOrderServiceStatus =
   (typeof WORK_ORDER_SERVICE_STATUSES)[number];
 
 export type WorkOrderServiceProps = {
+  organizationId: string;
   workOrderId: string;
   name: string;
   description: string;
@@ -20,6 +21,7 @@ export type WorkOrderServiceProps = {
 
 export class WorkOrderService {
   id: string;
+  organizationId: string;
   workOrderId: string;
   name: string;
   description: string;
@@ -29,6 +31,7 @@ export class WorkOrderService {
 
   private constructor(props: WorkOrderServiceProps, id?: string) {
     this.id = id ?? randomUUID();
+    this.organizationId = props.organizationId;
     this.workOrderId = props.workOrderId;
     this.name = props.name;
     this.description = props.description;

@@ -16,6 +16,8 @@ import { z } from 'zod';
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
 import { CreateVesselUseCase } from './create-vessel.use-case';
 import { DeleteVesselUseCase } from './delete-vessel.use-case';
@@ -68,6 +70,7 @@ export class VesselController {
 
   @Get('/vessels')
   async get(
+    @CurrentUser() user: UserPayload,
     @Query('customerId', new ZodValidationPipe(customerIdQueryParamSchema))
     customerId: CustomerIdQueryParamSchema,
     @Query('page', new ZodValidationPipe(pageQueryParamSchema))
@@ -76,7 +79,12 @@ export class VesselController {
     const take = page * 10;
     const skip = (page - 1) * 10;
 
-    const result = await this.fetchVessels.handle({ customerId, take, skip });
+    const result = await this.fetchVessels.handle({
+      organizationId: user.organizationId,
+      customerId,
+      take,
+      skip,
+    });
 
     return {
       vessels: result.vessels,
@@ -85,9 +93,15 @@ export class VesselController {
   }
 
   @Get('/vessels/:id')
-  async getById(@Param('id') vesselId: string) {
+  async getById(
+    @CurrentUser() user: UserPayload,
+    @Param('id') vesselId: string,
+  ) {
     try {
-      const { vessel } = await this.getVesselById.handle({ id: vesselId });
+      const { vessel } = await this.getVesselById.handle({
+        organizationId: user.organizationId,
+        id: vesselId,
+      });
 
       return { vessel };
     } catch (error) {
@@ -101,6 +115,7 @@ export class VesselController {
 
   @Post('/vessels')
   async create(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(createVesselBodySchema))
     body: CreateVesselBodySchema,
   ) {
@@ -108,6 +123,7 @@ export class VesselController {
       const { customerId, imoNumber, name, type, length } = body;
 
       const result = await this.createVessel.handle({
+        organizationId: user.organizationId,
         imoNumber,
         name,
         type,
@@ -131,6 +147,7 @@ export class VesselController {
 
   @Put('/customers/:customerId/vessels/:id')
   async edit(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(editVesselBodySchema))
     body: EditVesselBodySchema,
     @Param('id') vesselId: string,
@@ -139,6 +156,7 @@ export class VesselController {
       const { name, type, length, customerId } = body;
 
       const result = await this.editVessel.handle({
+        organizationId: user.organizationId,
         vesselId,
         customerId,
         name,
@@ -158,9 +176,15 @@ export class VesselController {
 
   @Delete('/vessels/:id')
   @HttpCode(204)
-  async delete(@Param('id') vesselId: string) {
+  async delete(
+    @CurrentUser() user: UserPayload,
+    @Param('id') vesselId: string,
+  ) {
     try {
-      await this.deleteVessel.handle({ id: vesselId });
+      await this.deleteVessel.handle({
+        organizationId: user.organizationId,
+        id: vesselId,
+      });
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);

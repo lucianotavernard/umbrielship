@@ -14,6 +14,7 @@ describe('FetchCustomersUseCase', () => {
     );
 
     const result = await new FetchCustomersUseCase(customers).handle({
+      organizationId: 'org-1',
       take: 2,
       skip: 1,
     });

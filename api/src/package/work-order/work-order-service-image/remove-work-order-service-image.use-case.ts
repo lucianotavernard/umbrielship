@@ -8,6 +8,7 @@ import { IWorkOrderServiceImagesRepository } from './contracts/work-order-servic
 import { IWorkOrderServicesRepository } from '../work-order-service/contracts/work-order-service-repository.contract';
 
 type RemoveWorkOrderServiceImageUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   serviceId: string;
   imageId: string;
@@ -29,6 +30,7 @@ export class RemoveWorkOrderServiceImageUseCase {
     input: RemoveWorkOrderServiceImageUseCaseRequest,
   ): Promise<void> {
     const service = await this.workOrderServicesRepository.findById(
+      input.organizationId,
       input.serviceId,
     );
 
@@ -37,6 +39,7 @@ export class RemoveWorkOrderServiceImageUseCase {
     }
 
     const image = await this.workOrderServiceImagesRepository.findById(
+      input.organizationId,
       input.imageId,
     );
 

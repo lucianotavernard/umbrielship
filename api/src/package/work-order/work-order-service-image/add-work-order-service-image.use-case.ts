@@ -7,6 +7,7 @@ import { IWorkOrderServiceImagesRepository } from './contracts/work-order-servic
 import { IWorkOrderServicesRepository } from '../work-order-service/contracts/work-order-service-repository.contract';
 
 type AddWorkOrderServiceImageUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   serviceId: string;
   url: string;
@@ -27,6 +28,7 @@ export class AddWorkOrderServiceImageUseCase {
     input: AddWorkOrderServiceImageUseCaseRequest,
   ): Promise<AddWorkOrderServiceImageUseCaseResponse> {
     const service = await this.workOrderServicesRepository.findById(
+      input.organizationId,
       input.serviceId,
     );
 
@@ -35,6 +37,7 @@ export class AddWorkOrderServiceImageUseCase {
     }
 
     const image = WorkOrderServiceImage.create({
+      organizationId: input.organizationId,
       serviceId: input.serviceId,
       url: input.url,
     });

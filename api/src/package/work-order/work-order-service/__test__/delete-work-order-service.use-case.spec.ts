@@ -20,14 +20,22 @@ describe('DeleteWorkOrderServiceUseCase', () => {
   });
 
   it('[C20] throws NotFoundDomainException for an unknown service', async () => {
-    const promise = sut.handle({ workOrderId: 'wo1', serviceId: 'missing' });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 'missing',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order service not found');
   });
 
   it('[C20] throws NotFoundDomainException for a service of another work order and removes nothing', async () => {
-    const promise = sut.handle({ workOrderId: 'wo2', serviceId: 's1' });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo2',
+      serviceId: 's1',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order service not found');
@@ -35,7 +43,11 @@ describe('DeleteWorkOrderServiceUseCase', () => {
   });
 
   it('[C20] removes exactly that service', async () => {
-    await sut.handle({ workOrderId: 'wo1', serviceId: 's1' });
+    await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 's1',
+    });
 
     expect(services.items.map((item) => item.id)).toEqual(['s2']);
   });

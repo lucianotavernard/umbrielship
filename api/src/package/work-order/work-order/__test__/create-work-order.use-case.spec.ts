@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { CustomerFacade } from '@/package/customer/customer.facade';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 
 import { makeCustomer, makeVessel } from '@test/factory';
@@ -21,13 +22,14 @@ describe('CreateWorkOrderUseCase', () => {
   beforeEach(() => {
     const customers = new InMemoryCustomersRepository();
     vessels = new InMemoryVesselsRepository(customers);
-    workOrders = new InMemoryWorkOrdersRepository(vessels);
-    sut = new CreateWorkOrderUseCase(workOrders, vessels);
+    workOrders = new InMemoryWorkOrdersRepository();
+    sut = new CreateWorkOrderUseCase(workOrders, new CustomerFacade(vessels));
     customers.items.push(makeCustomer({}, 'customer-1'));
   });
 
   it('[C17] throws NotFoundDomainException for an unknown vesselId and stores nothing', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       vesselId: 'missing',
       status: 'PENDING',
       ...dates,
@@ -42,6 +44,7 @@ describe('CreateWorkOrderUseCase', () => {
     vessels.items.push(makeVessel({ customerId: 'customer-1' }, 'v1'));
 
     const { workOrder } = await sut.handle({
+      organizationId: 'org-1',
       vesselId: 'v1',
       status: 'IN_PROGRESS',
       ...dates,

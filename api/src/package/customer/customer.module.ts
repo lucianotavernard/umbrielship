@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module';
 
+import { CustomerFacade } from './customer.facade';
 import { ICustomersRepository } from './customer/contracts/customer-repository.contract';
 import { CreateCustomerUseCase } from './customer/create-customer.use-case';
 import { CustomerController } from './customer/customer.controller';
@@ -31,10 +32,10 @@ import { PrismaVesselsRepository } from './vessel/vessel.repository';
     FetchVesselsUseCase,
     GetVesselByIdUseCase,
     DeleteVesselUseCase,
+    CustomerFacade,
     { provide: ICustomersRepository, useClass: PrismaCustomersRepository },
     { provide: IVesselsRepository, useClass: PrismaVesselsRepository },
   ],
-  // Temporary: replaced by CustomerFacade in the tenancy step.
-  exports: [IVesselsRepository],
+  exports: [CustomerFacade],
 })
 export class CustomerModule {}

@@ -7,6 +7,7 @@ export type CustomerAddress = {
 };
 
 export type CustomerProps = {
+  organizationId: string;
   name: string;
   email: string;
   phone?: string | null;
@@ -15,6 +16,7 @@ export type CustomerProps = {
 
 export class Customer {
   id: string;
+  organizationId: string;
   name: string;
   email: string;
   phone: string;
@@ -22,6 +24,7 @@ export class Customer {
 
   private constructor(props: CustomerProps, id?: string) {
     this.id = id ?? randomUUID();
+    this.organizationId = props.organizationId;
     this.name = props.name;
     this.email = props.email;
     this.phone = props.phone as string;

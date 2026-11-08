@@ -4,6 +4,7 @@ import { WorkOrder } from './work-order.entity';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
 
 type FetchWorkOrdersUseCaseRequest = {
+  organizationId: string;
   vesselId?: string;
   take: number;
   skip: number;
@@ -19,6 +20,7 @@ export class FetchWorkOrdersUseCase {
   constructor(private readonly workOrdersRepository: IWorkOrdersRepository) {}
 
   async handle({
+    organizationId,
     vesselId,
     take,
     skip,
@@ -26,6 +28,7 @@ export class FetchWorkOrdersUseCase {
     if (vesselId) {
       const { data: workOrders, total } =
         await this.workOrdersRepository.findManyByVesselId(
+          organizationId,
           vesselId,
           take,
           skip,
@@ -35,7 +38,7 @@ export class FetchWorkOrdersUseCase {
     }
 
     const { data: workOrders, total } =
-      await this.workOrdersRepository.findMany(take, skip);
+      await this.workOrdersRepository.findMany(organizationId, take, skip);
 
     return { workOrders, total };
   }

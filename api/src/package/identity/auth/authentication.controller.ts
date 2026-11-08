@@ -15,8 +15,8 @@ import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator
 import { Public } from '@/package/shared/module/auth/public';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
-import { GetUserByIdUseCase } from '../user/get-user-by-id.use-case';
 import { AuthenticateUserUseCase } from './authenticate-user.use-case';
+import { GetProfileUseCase } from './get-profile.use-case';
 import { WrongCredentialsException } from './wrong-credentials.exception';
 
 const authenticateUserBodySchema = z.object({
@@ -30,7 +30,7 @@ type AuthenticateUserBodySchema = z.infer<typeof authenticateUserBodySchema>;
 export class AuthenticationController {
   constructor(
     private authenticateUser: AuthenticateUserUseCase,
-    private getUserById: GetUserByIdUseCase,
+    private getProfile: GetProfileUseCase,
   ) {}
 
   @Public()
@@ -54,10 +54,10 @@ export class AuthenticationController {
     }
   }
 
-  @Get('/whoami')
-  async getUser(@CurrentUser() currentUser: UserPayload) {
+  @Get('/me')
+  async getMe(@CurrentUser() currentUser: UserPayload) {
     try {
-      const { user } = await this.getUserById.handle({ id: currentUser.sub });
+      const { user } = await this.getProfile.handle(currentUser.sub);
 
       return { user };
     } catch (error) {

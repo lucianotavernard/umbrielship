@@ -6,6 +6,7 @@ import { Customer } from './customer.entity';
 import { ICustomersRepository } from './contracts/customer-repository.contract';
 
 type CreateCustomerUseCaseRequest = {
+  organizationId: string;
   name: string;
   email: string;
   phone?: string | null;
@@ -25,18 +26,23 @@ export class CreateCustomerUseCase {
   constructor(private customersRepository: ICustomersRepository) {}
 
   async handle({
+    organizationId,
     name,
     email,
     phone,
     address,
   }: CreateCustomerUseCaseRequest): Promise<CreateCustomerUseCaseResponse> {
-    const existing = await this.customersRepository.findByEmail(email);
+    const existing = await this.customersRepository.findByEmail(
+      organizationId,
+      email,
+    );
 
     if (existing) {
       throw new AlreadyExistsDomainException('Customer already exists');
     }
 
     const customer = Customer.create({
+      organizationId,
       name,
       email,
       phone,

@@ -28,21 +28,33 @@ describe('FetchWorkOrderServiceImagesUseCase', () => {
   });
 
   it('[C23] throws NotFoundDomainException for an unknown service', async () => {
-    const promise = sut.handle({ workOrderId: 'wo1', serviceId: 'missing' });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 'missing',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order service not found');
   });
 
   it('[C23] throws NotFoundDomainException for a service of another work order', async () => {
-    const promise = sut.handle({ workOrderId: 'wo2', serviceId: 's1' });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo2',
+      serviceId: 's1',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order service not found');
   });
 
   it('[C23] returns only the images of that service', async () => {
-    const result = await sut.handle({ workOrderId: 'wo1', serviceId: 's1' });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 's1',
+    });
 
     expect(result.images.map((image) => image.id)).toEqual(['i1', 'i3']);
   });

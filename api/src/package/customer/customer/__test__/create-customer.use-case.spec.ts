@@ -17,6 +17,7 @@ describe('CreateCustomerUseCase', () => {
 
   it('[C6] stores a customer with a new email and the given address', async () => {
     const { customer } = await sut.handle({
+      organizationId: 'org-1',
       name: 'Atlantic Shipping',
       email: 'ops@atlantic.test',
       phone: '+55 13 99999-0000',
@@ -37,6 +38,7 @@ describe('CreateCustomerUseCase', () => {
     customers.items.push(makeCustomer({ email: 'ops@atlantic.test' }));
 
     const promise = sut.handle({
+      organizationId: 'org-1',
       name: 'Other',
       email: 'ops@atlantic.test',
       address: { address: 'x', city: 'y', state: 'z' },

@@ -10,6 +10,7 @@ import { IWorkOrdersRepository } from '../work-order/contracts/work-order-reposi
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
 
 type CreateWorkOrderServiceUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   name: string;
   description: string;
@@ -33,6 +34,7 @@ export class CreateWorkOrderServiceUseCase {
     input: CreateWorkOrderServiceUseCaseRequest,
   ): Promise<CreateWorkOrderServiceUseCaseResponse> {
     const workOrder = await this.workOrdersRepository.findById(
+      input.organizationId,
       input.workOrderId,
     );
 
@@ -41,6 +43,7 @@ export class CreateWorkOrderServiceUseCase {
     }
 
     const service = WorkOrderService.create({
+      organizationId: input.organizationId,
       workOrderId: input.workOrderId,
       name: input.name,
       description: input.description,

@@ -204,6 +204,15 @@ Acme's own domain (Item, Stock, Purchase, Staff...) is not umbrielship's and is 
 | acme: `acme-` selector prefix | `t-` and attribute prefix `t` | y - AD-012 |
 | acme: Organization detail holds Users and Invitations (acme AD-005) | the same, in Portuguese | y - AD-013 |
 
+**Found while building S2 (plan changed in the same commit as the code):**
+
+- `GET /work-orders/:id` reads the Vessel through `CustomerFacade`; without the foreign key (door 5) a work order may outlive its Vessel, and then the answer is `404 Vessel not found`. Deleting a Vessel that still has work orders is no longer refused by the database; the rule belongs to the user (open question)
+- `PUT /work-orders/:id` now returns `vesselId` (the use case reads a plain WorkOrder, not the detail); an added field, nothing removed
+- `customer_addresses.customerId` was declared `@unique` in `schema.prisma` but the applied migrations never created the index; the tenancy migration creates it
+- The tenancy migration creates Organization "Umbrielship" only when the database already holds a User or a Customer; on an empty database the seed creates it (AC 15)
+- `GET /organizations*` and the other internal routes answer 403 (not 404) to a member of a non-internal Organization, as the table above says; acme answers 404
+- The session payload is resolved on every request from the User's active Organization (`ResolveSessionUseCase`), which is what makes a switch reach every session of that User (AC 22)
+
 ## Sources
 
 - Request "migrar toda a arquitetura baseada no acme" - binding - scope

@@ -10,9 +10,12 @@ import { IWorkOrderServicesRepository } from './contracts/work-order-service-rep
 export class PrismaWorkOrderServicesRepository implements IWorkOrderServicesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<WorkOrderService | null> {
-    const row = await this.prisma.workOrderService.findUnique({
-      where: { id },
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderService | null> {
+    const row = await this.prisma.workOrderService.findFirst({
+      where: { id, organizationId },
     });
 
     if (!row) {
@@ -23,10 +26,11 @@ export class PrismaWorkOrderServicesRepository implements IWorkOrderServicesRepo
   }
 
   async findManyByWorkOrderId(
+    organizationId: string,
     workOrderId: string,
   ): Promise<WorkOrderService[]> {
     const rows = await this.prisma.workOrderService.findMany({
-      where: { workOrderId },
+      where: { organizationId, workOrderId },
     });
 
     return rows.map((row) => this.toDomain(row));
@@ -36,6 +40,7 @@ export class PrismaWorkOrderServicesRepository implements IWorkOrderServicesRepo
     await this.prisma.workOrderService.create({
       data: {
         id: service.id,
+        organizationId: service.organizationId,
         workOrderId: service.workOrderId,
         name: service.name,
         description: service.description,
@@ -68,6 +73,7 @@ export class PrismaWorkOrderServicesRepository implements IWorkOrderServicesRepo
   private toDomain(prismaRow: PrismaWorkOrderService): WorkOrderService {
     return WorkOrderService.create(
       {
+        organizationId: prismaRow.organizationId,
         workOrderId: prismaRow.workOrderId,
         name: prismaRow.name,
         description: prismaRow.description,

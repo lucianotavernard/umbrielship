@@ -1,12 +1,19 @@
 import { Paginate } from '@/package/shared/lib/type/paginate';
 
-import { WorkOrderDetail } from '../work-order-detail.entity';
 import { WorkOrder } from '../work-order.entity';
 
 export abstract class IWorkOrdersRepository {
-  abstract findById(id: string): Promise<WorkOrderDetail | null>;
-  abstract findMany(take: number, skip: number): Promise<Paginate<WorkOrder>>;
+  abstract findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrder | null>;
+  abstract findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<WorkOrder>>;
   abstract findManyByVesselId(
+    organizationId: string,
     vesselId: string,
     take: number,
     skip: number,

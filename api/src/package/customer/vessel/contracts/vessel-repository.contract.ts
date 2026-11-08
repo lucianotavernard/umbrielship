@@ -4,10 +4,21 @@ import { Vessel } from '../vessel.entity';
 import { VesselDetail } from '../vessel-detail.entity';
 
 export abstract class IVesselsRepository {
-  abstract findById(id: string): Promise<VesselDetail | null>;
-  abstract findByImoNumber(imoNumber: string): Promise<Vessel | null>;
-  abstract findMany(take: number, skip: number): Promise<Paginate<Vessel>>;
+  abstract findById(
+    organizationId: string,
+    id: string,
+  ): Promise<VesselDetail | null>;
+  abstract findByImoNumber(
+    organizationId: string,
+    imoNumber: string,
+  ): Promise<Vessel | null>;
+  abstract findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<Vessel>>;
   abstract findManyByCustomerId(
+    organizationId: string,
     customerId: string,
     take: number,
     skip: number,

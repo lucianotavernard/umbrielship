@@ -7,6 +7,7 @@ import { Customer } from './customer.entity';
 import { ICustomersRepository } from './contracts/customer-repository.contract';
 
 type EditCustomerUseCaseRequest = {
+  organizationId: string;
   customerId: string;
   name: string;
   email: string;
@@ -27,19 +28,26 @@ export class EditCustomerUseCase {
   constructor(private customersRepository: ICustomersRepository) {}
 
   async handle({
+    organizationId,
     customerId,
     name,
     email,
     phone,
     address,
   }: EditCustomerUseCaseRequest): Promise<EditCustomerUseCaseResponse> {
-    const customer = await this.customersRepository.findById(customerId);
+    const customer = await this.customersRepository.findById(
+      organizationId,
+      customerId,
+    );
 
     if (!customer) {
       throw new NotFoundDomainException('Customer not found');
     }
 
-    const existingCustomer = await this.customersRepository.findByEmail(email);
+    const existingCustomer = await this.customersRepository.findByEmail(
+      organizationId,
+      email,
+    );
 
     if (existingCustomer && existingCustomer.id !== customerId) {
       throw new AlreadyExistsDomainException('Customer already exists');

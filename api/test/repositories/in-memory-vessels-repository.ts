@@ -11,8 +11,15 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
 
   constructor(private readonly customers: InMemoryCustomersRepository) {}
 
-  async findById(id: string): Promise<VesselDetail | null> {
-    const vessel = this.items.find((item) => item.id === id);
+  private of(organizationId: string) {
+    return this.items.filter((item) => item.organizationId === organizationId);
+  }
+
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<VesselDetail | null> {
+    const vessel = this.of(organizationId).find((item) => item.id === id);
 
     if (!vessel) return null;
 
@@ -26,6 +33,7 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
 
     return VesselDetail.create(
       {
+        organizationId: vessel.organizationId,
         name: vessel.name,
         type: vessel.type,
         length: vessel.length,
@@ -37,23 +45,34 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
     );
   }
 
-  async findByImoNumber(imoNumber: string): Promise<Vessel | null> {
-    return this.items.find((vessel) => vessel.imoNumber === imoNumber) ?? null;
+  async findByImoNumber(
+    organizationId: string,
+    imoNumber: string,
+  ): Promise<Vessel | null> {
+    return (
+      this.of(organizationId).find(
+        (vessel) => vessel.imoNumber.toLowerCase() === imoNumber.toLowerCase(),
+      ) ?? null
+    );
   }
 
-  async findMany(take: number, skip: number): Promise<Paginate<Vessel>> {
-    return {
-      data: this.items.slice(skip, skip + take),
-      total: this.items.length,
-    };
+  async findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<Vessel>> {
+    const owned = this.of(organizationId);
+
+    return { data: owned.slice(skip, skip + take), total: owned.length };
   }
 
   async findManyByCustomerId(
+    organizationId: string,
     customerId: string,
     take: number,
     skip: number,
   ): Promise<Paginate<Vessel>> {
-    const owned = this.items.filter(
+    const owned = this.of(organizationId).filter(
       (vessel) => vessel.customerId === customerId,
     );
 

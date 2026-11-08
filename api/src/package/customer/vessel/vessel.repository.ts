@@ -16,7 +16,10 @@ import { IVesselsRepository } from './contracts/vessel-repository.contract';
 export class PrismaVesselsRepository implements IVesselsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<VesselDetail | null> {
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<VesselDetail | null> {
     const vessel = await this.prisma.vessel.findUnique({
       include: {
         customer: {
@@ -28,16 +31,19 @@ export class PrismaVesselsRepository implements IVesselsRepository {
       where: { id },
     });
 
-    if (!vessel) {
+    if (!vessel || vessel.organizationId !== organizationId) {
       return null;
     }
 
     return this.toDetailDomain(vessel);
   }
 
-  async findByImoNumber(imoNumber: string): Promise<Vessel | null> {
+  async findByImoNumber(
+    organizationId: string,
+    imoNumber: string,
+  ): Promise<Vessel | null> {
     const vessel = await this.prisma.vessel.findUnique({
-      where: { imoNumber },
+      where: { organizationId_imoNumber: { organizationId, imoNumber } },
     });
 
     if (!vessel) {
@@ -47,9 +53,14 @@ export class PrismaVesselsRepository implements IVesselsRepository {
     return this.toDomain(vessel);
   }
 
-  async findMany(take: number, skip: number): Promise<Paginate<Vessel>> {
-    const total = await this.prisma.vessel.count();
-    const data = await this.prisma.vessel.findMany({ take, skip });
+  async findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<Vessel>> {
+    const where = { organizationId };
+    const total = await this.prisma.vessel.count({ where });
+    const data = await this.prisma.vessel.findMany({ where, take, skip });
 
     return {
       data: data.map((row) => this.toDomain(row)),
@@ -58,11 +69,12 @@ export class PrismaVesselsRepository implements IVesselsRepository {
   }
 
   async findManyByCustomerId(
+    organizationId: string,
     customerId: string,
     take: number,
     skip: number,
   ): Promise<Paginate<Vessel>> {
-    const where = { customerId };
+    const where = { organizationId, customerId };
 
     const total = await this.prisma.vessel.count({ where });
     const data = await this.prisma.vessel.findMany({
@@ -81,6 +93,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
     await this.prisma.vessel.create({
       data: {
         id: vessel.id,
+        organizationId: vessel.organizationId,
         imoNumber: vessel.imoNumber,
         name: vessel.name,
         type: vessel.type,
@@ -110,6 +123,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
   private toDomain(prismaVessel: PrismaVessel): Vessel {
     return Vessel.create(
       {
+        organizationId: prismaVessel.organizationId,
         imoNumber: prismaVessel.imoNumber,
         name: prismaVessel.name,
         type: prismaVessel.type,
@@ -126,6 +140,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
     },
   ): VesselDetail {
     return VesselDetail.create({
+      organizationId: prismaVessel.organizationId,
       imoNumber: prismaVessel.imoNumber,
       name: prismaVessel.name,
       type: prismaVessel.type,
@@ -133,6 +148,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
       customerId: prismaVessel.customerId,
       customer: {
         id: prismaVessel.customer.id,
+        organizationId: prismaVessel.customer.organizationId,
         name: prismaVessel.customer.name,
         email: prismaVessel.customer.email,
         phone: prismaVessel.customer.phone,

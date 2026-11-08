@@ -14,6 +14,8 @@ import { z } from 'zod';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
 import { CreateWorkOrderUseCase } from './create-work-order.use-case';
 import { DeleteWorkOrderUseCase } from './delete-work-order.use-case';
@@ -71,6 +73,7 @@ export class WorkOrderController {
 
   @Get()
   async get(
+    @CurrentUser() user: UserPayload,
     @Query('vesselId', new ZodValidationPipe(vesselIdQueryParamSchema))
     vesselId: VesselIdQueryParamSchema,
     @Query('take', new ZodValidationPipe(takeQueryParamSchema))
@@ -78,7 +81,12 @@ export class WorkOrderController {
     @Query('skip', new ZodValidationPipe(skipQueryParamSchema))
     skip: SkipQueryParamSchema,
   ) {
-    const result = await this.fetchWorkOrders.handle({ vesselId, take, skip });
+    const result = await this.fetchWorkOrders.handle({
+      organizationId: user.organizationId,
+      vesselId,
+      take,
+      skip,
+    });
 
     return {
       workOrders: result.workOrders,
@@ -87,9 +95,13 @@ export class WorkOrderController {
   }
 
   @Get(':id')
-  async getById(@Param('id') workOrderId: string) {
+  async getById(
+    @CurrentUser() user: UserPayload,
+    @Param('id') workOrderId: string,
+  ) {
     try {
       const { workOrder } = await this.getWorkOrderById.handle({
+        organizationId: user.organizationId,
         id: workOrderId,
       });
 
@@ -105,6 +117,7 @@ export class WorkOrderController {
 
   @Post()
   async create(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(createWorkOrderBodySchema))
     body: CreateWorkOrderBodySchema,
   ) {
@@ -112,6 +125,7 @@ export class WorkOrderController {
       const { vesselId, startDate, endDate, status } = body;
 
       const result = await this.createWorkOrder.handle({
+        organizationId: user.organizationId,
         vesselId,
         startDate,
         endDate,
@@ -130,6 +144,7 @@ export class WorkOrderController {
 
   @Put(':id')
   async edit(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(editWorkOrderBodySchema))
     body: EditWorkOrderBodySchema,
     @Param('id') workOrderId: string,
@@ -138,6 +153,7 @@ export class WorkOrderController {
       const { startDate, endDate, status } = body;
 
       const result = await this.editWorkOrder.handle({
+        organizationId: user.organizationId,
         workOrderId,
         startDate,
         endDate,
@@ -156,9 +172,15 @@ export class WorkOrderController {
 
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') workOrderId: string) {
+  async delete(
+    @CurrentUser() user: UserPayload,
+    @Param('id') workOrderId: string,
+  ) {
     try {
-      await this.deleteWorkOrder.handle({ id: workOrderId });
+      await this.deleteWorkOrder.handle({
+        organizationId: user.organizationId,
+        id: workOrderId,
+      });
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);

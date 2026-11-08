@@ -5,6 +5,7 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
 
 type DeleteWorkOrderServiceUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   serviceId: string;
 };
@@ -17,6 +18,7 @@ export class DeleteWorkOrderServiceUseCase {
 
   async handle(input: DeleteWorkOrderServiceUseCaseRequest): Promise<void> {
     const service = await this.workOrderServicesRepository.findById(
+      input.organizationId,
       input.serviceId,
     );
 

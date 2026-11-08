@@ -9,6 +9,7 @@ import {
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
 
 type EditWorkOrderServiceUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   serviceId: string;
   name: string;
@@ -32,6 +33,7 @@ export class EditWorkOrderServiceUseCase {
     input: EditWorkOrderServiceUseCaseRequest,
   ): Promise<EditWorkOrderServiceUseCaseResponse> {
     const existing = await this.workOrderServicesRepository.findById(
+      input.organizationId,
       input.serviceId,
     );
 

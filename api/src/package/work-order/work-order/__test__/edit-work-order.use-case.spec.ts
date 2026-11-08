@@ -21,14 +21,18 @@ describe('EditWorkOrderUseCase', () => {
   beforeEach(() => {
     const customers = new InMemoryCustomersRepository();
     const vessels = new InMemoryVesselsRepository(customers);
-    workOrders = new InMemoryWorkOrdersRepository(vessels);
+    workOrders = new InMemoryWorkOrdersRepository();
     sut = new EditWorkOrderUseCase(workOrders);
     customers.items.push(makeCustomer({}, 'customer-1'));
     vessels.items.push(makeVessel({ customerId: 'customer-1' }, 'vessel-1'));
   });
 
   it('[C21] throws NotFoundDomainException for an unknown id', async () => {
-    const promise = sut.handle({ workOrderId: 'missing', ...input });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'missing',
+      ...input,
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order not found');
@@ -39,7 +43,7 @@ describe('EditWorkOrderUseCase', () => {
       makeWorkOrder({ vesselId: 'vessel-1', status: 'PENDING' }, 'wo1'),
     );
 
-    await sut.handle({ workOrderId: 'wo1', ...input });
+    await sut.handle({ organizationId: 'org-1', workOrderId: 'wo1', ...input });
 
     expect(workOrders.items).toHaveLength(1);
     expect(workOrders.items[0]).toMatchObject({

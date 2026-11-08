@@ -21,7 +21,12 @@ describe('FetchVesselsUseCase', () => {
   });
 
   it("[C13] returns only the customer's vessels and their count as total", async () => {
-    const result = await sut.handle({ customerId: 'c1', take: 10, skip: 0 });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      customerId: 'c1',
+      take: 10,
+      skip: 0,
+    });
 
     expect(result.vessels.map((vessel) => vessel.id)).toEqual([
       'v1',
@@ -32,21 +37,34 @@ describe('FetchVesselsUseCase', () => {
   });
 
   it('[C13] applies take and skip within the customer', async () => {
-    const result = await sut.handle({ customerId: 'c1', take: 1, skip: 1 });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      customerId: 'c1',
+      take: 1,
+      skip: 1,
+    });
 
     expect(result.vessels.map((vessel) => vessel.id)).toEqual(['v3']);
     expect(result.total).toBe(3);
   });
 
   it('[C13] returns every vessel without a customerId', async () => {
-    const result = await sut.handle({ take: 10, skip: 0 });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      take: 10,
+      skip: 0,
+    });
 
     expect(result.vessels).toHaveLength(4);
     expect(result.total).toBe(4);
   });
 
   it('[C13] applies take and skip over every vessel', async () => {
-    const result = await sut.handle({ take: 2, skip: 2 });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      take: 2,
+      skip: 2,
+    });
 
     expect(result.vessels.map((vessel) => vessel.id)).toEqual(['v3', 'v4']);
     expect(result.total).toBe(4);

@@ -1,12 +1,18 @@
 import { randomUUID } from 'crypto';
 
-export type UserRole = 'USER' | 'MANAGER' | 'DEVELOPER';
+export type Role = 'administrator' | 'operator';
+
+export type Membership = {
+  organizationId: string;
+  role: Role;
+};
 
 export type UserProps = {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  activeOrganizationId: string | null;
+  memberships: Membership[];
 };
 
 export class User {
@@ -14,14 +20,16 @@ export class User {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  activeOrganizationId: string | null;
+  memberships: Membership[];
 
   private constructor(props: UserProps, id?: string) {
     this.id = id ?? randomUUID();
     this.name = props.name;
     this.email = props.email;
     this.password = props.password;
-    this.role = props.role;
+    this.activeOrganizationId = props.activeOrganizationId;
+    this.memberships = props.memberships;
   }
 
   static create(props: UserProps, id?: string) {

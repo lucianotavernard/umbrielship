@@ -20,7 +20,7 @@ describe('FetchWorkOrderServicesUseCase', () => {
   beforeEach(() => {
     const customers = new InMemoryCustomersRepository();
     const vessels = new InMemoryVesselsRepository(customers);
-    const workOrders = new InMemoryWorkOrdersRepository(vessels);
+    const workOrders = new InMemoryWorkOrdersRepository();
     const services = new InMemoryWorkOrderServicesRepository();
     sut = new FetchWorkOrderServicesUseCase(workOrders, services);
     customers.items.push(makeCustomer({}, 'customer-1'));
@@ -34,14 +34,20 @@ describe('FetchWorkOrderServicesUseCase', () => {
   });
 
   it('[C24] throws NotFoundDomainException for an unknown work order', async () => {
-    const promise = sut.handle({ workOrderId: 'missing' });
+    const promise = sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'missing',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Work order not found');
   });
 
   it('[C24] returns only the services of that work order', async () => {
-    const result = await sut.handle({ workOrderId: 'wo1' });
+    const result = await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+    });
 
     expect(result.services.map((service) => service.id)).toEqual(['s1', 's3']);
   });

@@ -10,6 +10,7 @@ export const WORK_ORDER_STATUSES = [
 export type WorkOrderStatus = (typeof WORK_ORDER_STATUSES)[number];
 
 export type WorkOrderProps = {
+  organizationId: string;
   vesselId: string;
   startDate: Date;
   endDate: Date;
@@ -18,6 +19,7 @@ export type WorkOrderProps = {
 
 export class WorkOrder {
   id: string;
+  organizationId: string;
   vesselId: string;
   startDate: Date;
   endDate: Date;
@@ -25,6 +27,7 @@ export class WorkOrder {
 
   private constructor(props: WorkOrderProps, id?: string) {
     this.id = id ?? randomUUID();
+    this.organizationId = props.organizationId;
     this.vesselId = props.vesselId;
     this.startDate = props.startDate;
     this.endDate = props.endDate;

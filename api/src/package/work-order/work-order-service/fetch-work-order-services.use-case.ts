@@ -7,6 +7,7 @@ import { IWorkOrdersRepository } from '../work-order/contracts/work-order-reposi
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
 
 type FetchWorkOrderServicesUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
 };
 
@@ -25,6 +26,7 @@ export class FetchWorkOrderServicesUseCase {
     input: FetchWorkOrderServicesUseCaseRequest,
   ): Promise<FetchWorkOrderServicesUseCaseResponse> {
     const workOrder = await this.workOrdersRepository.findById(
+      input.organizationId,
       input.workOrderId,
     );
 
@@ -34,6 +36,7 @@ export class FetchWorkOrderServicesUseCase {
 
     const services =
       await this.workOrderServicesRepository.findManyByWorkOrderId(
+        input.organizationId,
         input.workOrderId,
       );
 

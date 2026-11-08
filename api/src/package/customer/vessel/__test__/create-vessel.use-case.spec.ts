@@ -13,6 +13,7 @@ let vessels: InMemoryVesselsRepository;
 let sut: CreateVesselUseCase;
 
 const input = {
+  organizationId: 'org-1',
   imoNumber: '9074729',
   name: 'Aurora',
   type: 'TANKER' as const,

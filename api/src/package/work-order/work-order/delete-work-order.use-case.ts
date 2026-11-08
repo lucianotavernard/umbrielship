@@ -5,6 +5,7 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
 
 type DeleteWorkOrderUseCaseRequest = {
+  organizationId: string;
   id: string;
 };
 
@@ -12,8 +13,14 @@ type DeleteWorkOrderUseCaseRequest = {
 export class DeleteWorkOrderUseCase {
   constructor(private readonly workOrdersRepository: IWorkOrdersRepository) {}
 
-  async handle({ id }: DeleteWorkOrderUseCaseRequest): Promise<void> {
-    const workOrder = await this.workOrdersRepository.findById(id);
+  async handle({
+    organizationId,
+    id,
+  }: DeleteWorkOrderUseCaseRequest): Promise<void> {
+    const workOrder = await this.workOrdersRepository.findById(
+      organizationId,
+      id,
+    );
 
     if (!workOrder) {
       throw new NotFoundDomainException('Work order not found');

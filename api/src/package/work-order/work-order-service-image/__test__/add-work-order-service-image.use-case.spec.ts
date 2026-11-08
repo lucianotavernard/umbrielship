@@ -21,6 +21,7 @@ describe('AddWorkOrderServiceImageUseCase', () => {
 
   it('[C29] throws NotFoundDomainException for an unknown service and stores nothing', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 'missing',
       url: '/u/a.png',
@@ -33,6 +34,7 @@ describe('AddWorkOrderServiceImageUseCase', () => {
 
   it('[C29] throws NotFoundDomainException for a service of another work order and stores nothing', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo2',
       serviceId: 's1',
       url: '/u/a.png',
@@ -45,6 +47,7 @@ describe('AddWorkOrderServiceImageUseCase', () => {
 
   it('[C29] stores the image with that serviceId and url', async () => {
     const { image } = await sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 's1',
       url: '/u/a.png',

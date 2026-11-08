@@ -4,6 +4,7 @@ import { Customer } from './customer.entity';
 import { ICustomersRepository } from './contracts/customer-repository.contract';
 
 type FetchCustomersUseCaseRequest = {
+  organizationId: string;
   skip: number;
   take: number;
 };
@@ -18,10 +19,12 @@ export class FetchCustomersUseCase {
   constructor(private customersRepository: ICustomersRepository) {}
 
   async handle({
+    organizationId,
     take,
     skip,
   }: FetchCustomersUseCaseRequest): Promise<FetchCustomersUseCaseResponse> {
     const { data: customers, total } = await this.customersRepository.findMany(
+      organizationId,
       take,
       skip,
     );

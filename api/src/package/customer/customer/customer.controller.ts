@@ -14,6 +14,8 @@ import { z } from 'zod';
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
 import { CreateCustomerUseCase } from './create-customer.use-case';
 import { EditCustomerUseCase } from './edit-customer.use-case';
@@ -53,13 +55,18 @@ export class CustomerController {
 
   @Get()
   async get(
+    @CurrentUser() user: UserPayload,
     @Query('page', new ZodValidationPipe(pageQueryParamSchema))
     page: PageQueryParamSchema,
   ) {
     const take = page * 10;
     const skip = (page - 1) * 10;
 
-    const result = await this.fetchCustomers.handle({ take, skip });
+    const result = await this.fetchCustomers.handle({
+      organizationId: user.organizationId,
+      take,
+      skip,
+    });
 
     return {
       customers: result.customers,
@@ -68,9 +75,13 @@ export class CustomerController {
   }
 
   @Get(':id')
-  async getById(@Param('id') customerId: string) {
+  async getById(
+    @CurrentUser() user: UserPayload,
+    @Param('id') customerId: string,
+  ) {
     try {
       const { customer } = await this.getCustomerById.handle({
+        organizationId: user.organizationId,
         id: customerId,
       });
 
@@ -86,12 +97,14 @@ export class CustomerController {
 
   @Post()
   async create(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(customerBodySchema)) body: CustomerBodySchema,
   ) {
     try {
       const { name, email, phone, address } = body;
 
       const result = await this.createCustomer.handle({
+        organizationId: user.organizationId,
         name,
         email,
         phone,
@@ -110,6 +123,7 @@ export class CustomerController {
 
   @Put(':id')
   async edit(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(customerBodySchema)) body: CustomerBodySchema,
     @Param('id') customerId: string,
   ) {
@@ -117,6 +131,7 @@ export class CustomerController {
       const { name, email, phone, address } = body;
 
       const result = await this.editCustomer.handle({
+        organizationId: user.organizationId,
         customerId,
         name,
         email,

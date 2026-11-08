@@ -5,6 +5,7 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
 
 type GetWorkOrderServiceByIdUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   serviceId: string;
 };
@@ -25,6 +26,7 @@ export class GetWorkOrderServiceByIdUseCase {
     input: GetWorkOrderServiceByIdUseCaseRequest,
   ): Promise<GetWorkOrderServiceByIdUseCaseResponse> {
     const service = await this.workOrderServicesRepository.findById(
+      input.organizationId,
       input.serviceId,
     );
 

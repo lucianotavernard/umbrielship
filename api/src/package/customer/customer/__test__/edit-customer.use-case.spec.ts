@@ -18,6 +18,7 @@ describe('EditCustomerUseCase', () => {
 
   it('[C7] throws NotFoundDomainException for an unknown id', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       customerId: 'missing',
       name: 'A',
       email: 'a@a.test',
@@ -34,6 +35,7 @@ describe('EditCustomerUseCase', () => {
     );
 
     const promise = sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'One',
       email: 'two@a.test',
@@ -48,6 +50,7 @@ describe('EditCustomerUseCase', () => {
     customers.items.push(makeCustomer({ email: 'one@a.test' }, 'c1'));
 
     const { customer } = await sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'Renamed',
       email: 'one@a.test',
@@ -61,6 +64,7 @@ describe('EditCustomerUseCase', () => {
     customers.items.push(makeCustomer({ phone: '111' }, 'c1'));
 
     const { customer } = await sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'A',
       email: 'new@a.test',
@@ -73,6 +77,7 @@ describe('EditCustomerUseCase', () => {
     customers.items.push(makeCustomer({ phone: '111' }, 'c1'));
 
     const { customer } = await sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'A',
       email: 'new@a.test',
@@ -86,6 +91,7 @@ describe('EditCustomerUseCase', () => {
     customers.items.push(makeCustomer({ phone: '111' }, 'c1'));
 
     const { customer } = await sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'A',
       email: 'new@a.test',
@@ -104,6 +110,7 @@ describe('EditCustomerUseCase', () => {
     );
 
     await sut.handle({
+      organizationId: 'org-1',
       customerId: 'c1',
       name: 'A',
       email: 'new@a.test',

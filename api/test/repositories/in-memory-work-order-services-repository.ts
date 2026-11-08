@@ -4,14 +4,26 @@ import { IWorkOrderServicesRepository } from '@/package/work-order/work-order-se
 export class InMemoryWorkOrderServicesRepository implements IWorkOrderServicesRepository {
   public items: WorkOrderService[] = [];
 
-  async findById(id: string): Promise<WorkOrderService | null> {
-    return this.items.find((item) => item.id === id) ?? null;
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderService | null> {
+    return (
+      this.items.find(
+        (item) => item.id === id && item.organizationId === organizationId,
+      ) ?? null
+    );
   }
 
   async findManyByWorkOrderId(
+    organizationId: string,
     workOrderId: string,
   ): Promise<WorkOrderService[]> {
-    return this.items.filter((item) => item.workOrderId === workOrderId);
+    return this.items.filter(
+      (item) =>
+        item.workOrderId === workOrderId &&
+        item.organizationId === organizationId,
+    );
   }
 
   async create(service: WorkOrderService): Promise<void> {

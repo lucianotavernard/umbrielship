@@ -6,6 +6,7 @@ import { WorkOrder, WorkOrderStatus } from './work-order.entity';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
 
 type EditWorkOrderUseCaseRequest = {
+  organizationId: string;
   workOrderId: string;
   startDate: Date;
   endDate: Date;
@@ -21,12 +22,16 @@ export class EditWorkOrderUseCase {
   constructor(private readonly workOrdersRepository: IWorkOrdersRepository) {}
 
   async handle({
+    organizationId,
     workOrderId,
     startDate,
     endDate,
     status,
   }: EditWorkOrderUseCaseRequest): Promise<EditWorkOrderUseCaseResponse> {
-    const existing = await this.workOrdersRepository.findById(workOrderId);
+    const existing = await this.workOrdersRepository.findById(
+      organizationId,
+      workOrderId,
+    );
 
     if (!existing) {
       throw new NotFoundDomainException('Work order not found');
@@ -34,6 +39,7 @@ export class EditWorkOrderUseCase {
 
     const workOrder = WorkOrder.create(
       {
+        organizationId,
         vesselId: existing.vesselId,
         startDate,
         endDate,

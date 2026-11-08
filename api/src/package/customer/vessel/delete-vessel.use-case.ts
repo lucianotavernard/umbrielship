@@ -5,6 +5,7 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 import { IVesselsRepository } from './contracts/vessel-repository.contract';
 
 type DeleteVesselUseCaseRequest = {
+  organizationId: string;
   id: string;
 };
 
@@ -12,8 +13,11 @@ type DeleteVesselUseCaseRequest = {
 export class DeleteVesselUseCase {
   constructor(private vesselsRepository: IVesselsRepository) {}
 
-  async handle({ id }: DeleteVesselUseCaseRequest): Promise<void> {
-    const vessel = await this.vesselsRepository.findById(id);
+  async handle({
+    organizationId,
+    id,
+  }: DeleteVesselUseCaseRequest): Promise<void> {
+    const vessel = await this.vesselsRepository.findById(organizationId, id);
 
     if (!vessel) {
       throw new NotFoundDomainException('Vessel not found');

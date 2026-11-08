@@ -1,8 +1,12 @@
 import { WorkOrderServiceImage } from '../work-order-service-image.entity';
 
 export abstract class IWorkOrderServiceImagesRepository {
-  abstract findById(id: string): Promise<WorkOrderServiceImage | null>;
+  abstract findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderServiceImage | null>;
   abstract findManyByServiceId(
+    organizationId: string,
     serviceId: string,
   ): Promise<WorkOrderServiceImage[]>;
   abstract create(image: WorkOrderServiceImage): Promise<void>;

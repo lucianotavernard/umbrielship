@@ -6,6 +6,7 @@ import { Vessel, VesselType } from './vessel.entity';
 import { IVesselsRepository } from './contracts/vessel-repository.contract';
 
 type EditVesselUseCaseRequest = {
+  organizationId: string;
   vesselId: string;
   customerId: string;
   name: string;
@@ -22,13 +23,17 @@ export class EditVesselUseCase {
   constructor(private vesselsRepository: IVesselsRepository) {}
 
   async handle({
+    organizationId,
     vesselId,
     customerId,
     name,
     type,
     length,
   }: EditVesselUseCaseRequest): Promise<EditVesselUseCaseResponse> {
-    const vessel = await this.vesselsRepository.findById(vesselId);
+    const vessel = await this.vesselsRepository.findById(
+      organizationId,
+      vesselId,
+    );
 
     if (!vessel || vessel.customerId !== customerId) {
       throw new NotFoundDomainException('Vessel not found');

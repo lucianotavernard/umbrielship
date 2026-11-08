@@ -13,6 +13,8 @@ import { z } from 'zod';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
 import { CreateWorkOrderServiceUseCase } from './create-work-order-service.use-case';
 import { DeleteWorkOrderServiceUseCase } from './delete-work-order-service.use-case';
@@ -42,9 +44,13 @@ export class WorkOrderServiceController {
   ) {}
 
   @Get()
-  async get(@Param('workOrderId') workOrderId: string) {
+  async get(
+    @CurrentUser() user: UserPayload,
+    @Param('workOrderId') workOrderId: string,
+  ) {
     try {
       const { services } = await this.fetchWorkOrderServices.handle({
+        organizationId: user.organizationId,
         workOrderId,
       });
 
@@ -60,11 +66,13 @@ export class WorkOrderServiceController {
 
   @Get(':id')
   async getById(
+    @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
     @Param('id') serviceId: string,
   ) {
     try {
       const { service } = await this.getWorkOrderServiceById.handle({
+        organizationId: user.organizationId,
         workOrderId,
         serviceId,
       });
@@ -81,12 +89,14 @@ export class WorkOrderServiceController {
 
   @Post()
   async create(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(workOrderServiceBodySchema))
     body: WorkOrderServiceBodySchema,
     @Param('workOrderId') workOrderId: string,
   ) {
     try {
       const { service } = await this.createWorkOrderService.handle({
+        organizationId: user.organizationId,
         workOrderId,
         ...body,
       });
@@ -103,6 +113,7 @@ export class WorkOrderServiceController {
 
   @Put(':id')
   async edit(
+    @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(workOrderServiceBodySchema))
     body: WorkOrderServiceBodySchema,
     @Param('workOrderId') workOrderId: string,
@@ -110,6 +121,7 @@ export class WorkOrderServiceController {
   ) {
     try {
       const { service } = await this.editWorkOrderService.handle({
+        organizationId: user.organizationId,
         workOrderId,
         serviceId,
         ...body,
@@ -128,11 +140,16 @@ export class WorkOrderServiceController {
   @Delete(':id')
   @HttpCode(204)
   async delete(
+    @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
     @Param('id') serviceId: string,
   ) {
     try {
-      await this.deleteWorkOrderService.handle({ workOrderId, serviceId });
+      await this.deleteWorkOrderService.handle({
+        organizationId: user.organizationId,
+        workOrderId,
+        serviceId,
+      });
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);

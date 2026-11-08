@@ -4,6 +4,7 @@ import { Vessel } from './vessel.entity';
 import { IVesselsRepository } from './contracts/vessel-repository.contract';
 
 type FetchVesselsUseCaseRequest = {
+  organizationId: string;
   customerId?: string;
   skip: number;
   take: number;
@@ -19,6 +20,7 @@ export class FetchVesselsUseCase {
   constructor(private vesselsRepository: IVesselsRepository) {}
 
   async handle({
+    organizationId,
     customerId,
     take,
     skip,
@@ -26,6 +28,7 @@ export class FetchVesselsUseCase {
     if (customerId) {
       const { data: vessels, total } =
         await this.vesselsRepository.findManyByCustomerId(
+          organizationId,
           customerId,
           take,
           skip,
@@ -38,6 +41,7 @@ export class FetchVesselsUseCase {
     }
 
     const { data: vessels, total } = await this.vesselsRepository.findMany(
+      organizationId,
       take,
       skip,
     );

@@ -13,6 +13,7 @@ export const VESSEL_TYPES = [
 export type VesselType = (typeof VESSEL_TYPES)[number];
 
 export type VesselProps = {
+  organizationId: string;
   name: string;
   type: VesselType;
   length: number;
@@ -22,6 +23,7 @@ export type VesselProps = {
 
 export class Vessel {
   id: string;
+  organizationId: string;
   name: string;
   type: VesselType;
   length: number;
@@ -30,6 +32,7 @@ export class Vessel {
 
   private constructor(props: VesselProps, id?: string) {
     this.id = id ?? randomUUID();
+    this.organizationId = props.organizationId;
     this.name = props.name;
     this.type = props.type;
     this.length = props.length;

@@ -5,6 +5,7 @@ import { ICustomersRepository } from './contracts/customer-repository.contract';
 import { Customer } from './customer.entity';
 
 type GetCustomerByIdUseCaseRequest = {
+  organizationId: string;
   id: string;
 };
 
@@ -17,9 +18,13 @@ export class GetCustomerByIdUseCase {
   constructor(private customersRepository: ICustomersRepository) {}
 
   async handle({
+    organizationId,
     id,
   }: GetCustomerByIdUseCaseRequest): Promise<GetCustomerByIdUseCaseResponse> {
-    const customer = await this.customersRepository.findById(id);
+    const customer = await this.customersRepository.findById(
+      organizationId,
+      id,
+    );
 
     if (!customer) {
       throw new NotFoundDomainException('Customer not found');

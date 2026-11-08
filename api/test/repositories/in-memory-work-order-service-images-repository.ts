@@ -4,14 +4,25 @@ import { IWorkOrderServiceImagesRepository } from '@/package/work-order/work-ord
 export class InMemoryWorkOrderServiceImagesRepository implements IWorkOrderServiceImagesRepository {
   public items: WorkOrderServiceImage[] = [];
 
-  async findById(id: string): Promise<WorkOrderServiceImage | null> {
-    return this.items.find((item) => item.id === id) ?? null;
+  async findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderServiceImage | null> {
+    return (
+      this.items.find(
+        (item) => item.id === id && item.organizationId === organizationId,
+      ) ?? null
+    );
   }
 
   async findManyByServiceId(
+    organizationId: string,
     serviceId: string,
   ): Promise<WorkOrderServiceImage[]> {
-    return this.items.filter((item) => item.serviceId === serviceId);
+    return this.items.filter(
+      (item) =>
+        item.serviceId === serviceId && item.organizationId === organizationId,
+    );
   }
 
   async create(image: WorkOrderServiceImage): Promise<void> {

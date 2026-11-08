@@ -20,7 +20,7 @@ describe('DeleteVesselUseCase', () => {
   });
 
   it('[C11] throws NotFoundDomainException for an unknown id', async () => {
-    const promise = sut.handle({ id: 'missing' });
+    const promise = sut.handle({ organizationId: 'org-1', id: 'missing' });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Vessel not found');
@@ -32,7 +32,7 @@ describe('DeleteVesselUseCase', () => {
       makeVessel({ imoNumber: '2' }, 'v2'),
     );
 
-    await sut.handle({ id: 'v1' });
+    await sut.handle({ organizationId: 'org-1', id: 'v1' });
 
     expect(vessels.items.map((vessel) => vessel.id)).toEqual(['v2']);
   });

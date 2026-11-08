@@ -26,6 +26,7 @@ describe('EditVesselUseCase', () => {
   });
 
   const input = {
+    organizationId: 'org-1',
     vesselId: 'v1',
     customerId: 'c1',
     name: 'Nova',
@@ -34,14 +35,20 @@ describe('EditVesselUseCase', () => {
   };
 
   it('[C12] throws NotFoundDomainException for an unknown vessel', async () => {
-    const promise = sut.handle({ ...input, vesselId: 'missing' });
+    const promise = sut.handle({
+      ...input,
+      vesselId: 'missing',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Vessel not found');
   });
 
   it('[C12] throws NotFoundDomainException when the customer does not own the vessel', async () => {
-    const promise = sut.handle({ ...input, customerId: 'c2' });
+    const promise = sut.handle({
+      ...input,
+      customerId: 'c2',
+    });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Vessel not found');

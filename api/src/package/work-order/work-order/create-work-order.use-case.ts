@@ -4,9 +4,10 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 
 import { WorkOrder, WorkOrderStatus } from './work-order.entity';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
-import { IVesselsRepository } from '@/package/customer/vessel/contracts/vessel-repository.contract';
+import { CustomerFacade } from '@/package/customer/customer.facade';
 
 type CreateWorkOrderUseCaseRequest = {
+  organizationId: string;
   vesselId: string;
   startDate: Date;
   endDate: Date;
@@ -21,22 +22,27 @@ type CreateWorkOrderUseCaseResponse = {
 export class CreateWorkOrderUseCase {
   constructor(
     private readonly workOrdersRepository: IWorkOrdersRepository,
-    private readonly vesselsRepository: IVesselsRepository,
+    private readonly customerFacade: CustomerFacade,
   ) {}
 
   async handle({
+    organizationId,
     vesselId,
     startDate,
     endDate,
     status,
   }: CreateWorkOrderUseCaseRequest): Promise<CreateWorkOrderUseCaseResponse> {
-    const vessel = await this.vesselsRepository.findById(vesselId);
+    const vessel = await this.customerFacade.findVesselById(
+      organizationId,
+      vesselId,
+    );
 
     if (!vessel) {
       throw new NotFoundDomainException('Vessel not found');
     }
 
     const workOrder = WorkOrder.create({
+      organizationId,
       vesselId,
       startDate,
       endDate,

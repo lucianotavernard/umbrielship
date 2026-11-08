@@ -35,7 +35,7 @@ const S1_USE_CASES = {
     'vessel/fetch-vessels',
     'vessel/get-vessel-by-id',
   ],
-  identity: ['auth/authenticate-user', 'user/get-user-by-id'],
+  identity: ['auth/authenticate-user', 'auth/get-profile'],
   'work-order': [
     'work-order/create-work-order',
     'work-order/delete-work-order',

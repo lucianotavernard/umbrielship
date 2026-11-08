@@ -1,8 +1,12 @@
 import { WorkOrderService } from '../work-order-service.entity';
 
 export abstract class IWorkOrderServicesRepository {
-  abstract findById(id: string): Promise<WorkOrderService | null>;
+  abstract findById(
+    organizationId: string,
+    id: string,
+  ): Promise<WorkOrderService | null>;
   abstract findManyByWorkOrderId(
+    organizationId: string,
     workOrderId: string,
   ): Promise<WorkOrderService[]>;
   abstract create(service: WorkOrderService): Promise<void>;

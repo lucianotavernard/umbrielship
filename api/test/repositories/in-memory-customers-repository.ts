@@ -5,19 +5,35 @@ import { Paginate } from '@/package/shared/lib/type/paginate';
 export class InMemoryCustomersRepository implements ICustomersRepository {
   public items: Customer[] = [];
 
-  async findById(id: string): Promise<Customer | null> {
-    return this.items.find((customer) => customer.id === id) ?? null;
+  private of(organizationId: string) {
+    return this.items.filter((item) => item.organizationId === organizationId);
   }
 
-  async findByEmail(email: string): Promise<Customer | null> {
-    return this.items.find((customer) => customer.email === email) ?? null;
+  async findById(organizationId: string, id: string): Promise<Customer | null> {
+    return (
+      this.of(organizationId).find((customer) => customer.id === id) ?? null
+    );
   }
 
-  async findMany(take: number, skip: number): Promise<Paginate<Customer>> {
-    return {
-      data: this.items.slice(skip, skip + take),
-      total: this.items.length,
-    };
+  async findByEmail(
+    organizationId: string,
+    email: string,
+  ): Promise<Customer | null> {
+    return (
+      this.of(organizationId).find(
+        (customer) => customer.email.toLowerCase() === email.toLowerCase(),
+      ) ?? null
+    );
+  }
+
+  async findMany(
+    organizationId: string,
+    take: number,
+    skip: number,
+  ): Promise<Paginate<Customer>> {
+    const owned = this.of(organizationId);
+
+    return { data: owned.slice(skip, skip + take), total: owned.length };
   }
 
   async create(customer: Customer): Promise<void> {

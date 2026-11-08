@@ -18,13 +18,16 @@ describe('GetCustomerByIdUseCase', () => {
   it('[C9] returns the customer of a known id', async () => {
     customers.items.push(makeCustomer({}, 'c1'));
 
-    const { customer } = await sut.handle({ id: 'c1' });
+    const { customer } = await sut.handle({
+      organizationId: 'org-1',
+      id: 'c1',
+    });
 
     expect(customer.id).toBe('c1');
   });
 
   it('[C9] throws NotFoundDomainException for an unknown id', async () => {
-    const promise = sut.handle({ id: 'missing' });
+    const promise = sut.handle({ organizationId: 'org-1', id: 'missing' });
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Customer not found');

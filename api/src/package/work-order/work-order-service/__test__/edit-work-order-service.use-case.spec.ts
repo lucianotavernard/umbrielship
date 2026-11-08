@@ -26,6 +26,7 @@ describe('EditWorkOrderServiceUseCase', () => {
 
   it('[C22] throws NotFoundDomainException for an unknown service', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo1',
       serviceId: 'missing',
       ...input,
@@ -37,6 +38,7 @@ describe('EditWorkOrderServiceUseCase', () => {
 
   it('[C22] throws NotFoundDomainException for a service of another work order and changes nothing', async () => {
     const promise = sut.handle({
+      organizationId: 'org-1',
       workOrderId: 'wo2',
       serviceId: 's1',
       ...input,
@@ -48,7 +50,12 @@ describe('EditWorkOrderServiceUseCase', () => {
   });
 
   it('[C22] saves the new fields and keeps workOrderId', async () => {
-    await sut.handle({ workOrderId: 'wo1', serviceId: 's1', ...input });
+    await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo1',
+      serviceId: 's1',
+      ...input,
+    });
 
     expect(services.items[0]).toMatchObject({
       id: 's1',

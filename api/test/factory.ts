@@ -3,6 +3,10 @@ import {
   CustomerProps,
 } from '@/package/customer/customer/customer.entity';
 import { Vessel, VesselProps } from '@/package/customer/vessel/vessel.entity';
+import {
+  Organization,
+  OrganizationProps,
+} from '@/package/identity/organization/organization.entity';
 import { User, UserProps } from '@/package/identity/user/user.entity';
 import {
   WorkOrderServiceImage,
@@ -23,6 +27,7 @@ export const makeCustomer = (
 ) =>
   Customer.create(
     {
+      organizationId: 'org-1',
       name: 'Atlantic Shipping',
       email: 'ops@atlantic.test',
       phone: '+55 13 99999-0000',
@@ -35,6 +40,7 @@ export const makeCustomer = (
 export const makeVessel = (override: Partial<VesselProps> = {}, id?: string) =>
   Vessel.create(
     {
+      organizationId: 'org-1',
       name: 'Aurora',
       type: 'CARGO',
       length: 120,
@@ -51,6 +57,7 @@ export const makeWorkOrder = (
 ) =>
   WorkOrder.create(
     {
+      organizationId: 'org-1',
       vesselId: 'vessel-1',
       startDate: new Date('2026-01-10T00:00:00.000Z'),
       endDate: new Date('2026-01-20T00:00:00.000Z'),
@@ -66,6 +73,7 @@ export const makeService = (
 ) =>
   WorkOrderService.create(
     {
+      organizationId: 'org-1',
       workOrderId: 'work-order-1',
       name: 'Hull cleaning',
       description: 'Pressure wash of the hull',
@@ -83,6 +91,7 @@ export const makeImage = (
 ) =>
   WorkOrderServiceImage.create(
     {
+      organizationId: 'org-1',
       serviceId: 'service-1',
       url: '/uploads/work-order-service-images/photo.png',
       ...override,
@@ -100,9 +109,24 @@ export const makeUser = (
       name: 'Maria Souza',
       email: 'maria@umbrielship.test',
       password: 'secret123-hashed',
-      role: 'USER',
+      activeOrganizationId: 'org-1',
+      memberships: [{ organizationId: 'org-1', role: 'operator' }],
       ...props,
     },
     id,
   );
 };
+
+export const makeOrganization = (
+  override: Partial<OrganizationProps> = {},
+  id = 'org-1',
+) =>
+  Organization.create(
+    {
+      name: 'Atlantic Marine',
+      email: 'contact@atlantic-marine.test',
+      isInternal: false,
+      ...override,
+    },
+    id,
+  );

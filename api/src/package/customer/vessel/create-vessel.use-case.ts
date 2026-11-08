@@ -8,6 +8,7 @@ import { ICustomersRepository } from '../customer/contracts/customer-repository.
 import { IVesselsRepository } from './contracts/vessel-repository.contract';
 
 type CreateVesselUseCaseRequest = {
+  organizationId: string;
   imoNumber: string;
   name: string;
   type: VesselType;
@@ -27,25 +28,33 @@ export class CreateVesselUseCase {
   ) {}
 
   async handle({
+    organizationId,
     imoNumber,
     name,
     type,
     length,
     customerId,
   }: CreateVesselUseCaseRequest): Promise<CreateVesselUseCaseResponse> {
-    const existing = await this.vesselsRepository.findByImoNumber(imoNumber);
+    const existing = await this.vesselsRepository.findByImoNumber(
+      organizationId,
+      imoNumber,
+    );
 
     if (existing) {
       throw new AlreadyExistsDomainException('Vessel already exists');
     }
 
-    const customer = await this.customersRepository.findById(customerId);
+    const customer = await this.customersRepository.findById(
+      organizationId,
+      customerId,
+    );
 
     if (!customer) {
       throw new NotFoundDomainException('Customer not found');
     }
 
     const vessel = Vessel.create({
+      organizationId,
       imoNumber,
       name,
       type,
