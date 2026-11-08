@@ -1,10 +1,12 @@
 # Acme architecture migration checks
 
 Mutations: 3
-Build: `cd api && npm run build`; `cd api && npm run lint`
+Build: `cd api && npm run build`; `cd api && npm run lint`; `cd web && npm run build`
 Plan: `.specs/features/acme-architecture-migration/plan.md`
 
-76 checks in 3 slices (S1 C1-C29, S2 C30-C65, S3 C66-C76; S4 is frozen in its own turn, see Handoff) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · door 4 (runtime) in S3, proofs C66-C71 · 0 open
+96 checks in 4 slices (S1 C1-C29, S2 C30-C65, S3 C66-C76, S4 C77-C96) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · door 4 (runtime) in S3, proofs C66-C71 · 0 open
+
+The web has no lint script (`AGENTS.md`), so the Build line names `npm run build` in `web/` and does not invent one.
 
 ## Checks
 
@@ -249,6 +251,70 @@ Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C75\]"`
 **C76** - `ROADMAP.md` item 5 (tests foundation) and item 6 (error mapping) read `Status: built`, item 7 stays a proposal, and no item mentions `whoami` (any case) or "by hand" (AC 24a; items 5 and 6 are absorbed by AD-007)
 Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"`
 
+### S4 - The web follows the acme layout
+
+Context7 is not available in this session. The reference for Angular 22, `@Service()`, Signal Forms and the module shape is `acme/apps/web` and `acme/docs/frontend-standards.md`, plus the Angular packages installed in `web/`. The folder is `web/src/package/` as criterion 26 writes it (acme's `src/package/`), not `web/src/app/package/`. The table primitive is the attribute `table[tTable]`, acme's `table[acmeTable]` with the `t` attribute prefix (AD-012); it is not an element named `t-table`.
+
+**C77** - `web/package.json` declares `@angular/core`, `@angular/common`, `@angular/compiler`, `@angular/forms`, `@angular/platform-browser`, `@angular/router`, `@angular/build`, `@angular/cli` and `@angular/compiler-cli` each on a `^22` range, and the installed `@angular/core` version starts with `22.` (AC 26)
+Proof: `node --test --test-name-pattern '\[C77\]' web/test/layout.spec.mjs`
+
+**C78** - These 9 modules exist under `web/src/package/`, and each has a page directory, a `components/` directory and exactly one `*.service.ts` whose source contains `@Service()`: `customer/customer`, `customer/vessel`, `work-order/work-order`, `work-order/work-order-service`, `work-order/work-order-service-image`, `identity/authentication`, `identity/organization`, `identity/user`, `identity/invitation`. No directory `web/src/app/customer`, `web/src/app/work-order`, `web/src/app/identity` or `web/src/app/analytics` remains (AC 26)
+Proof: `node --test --test-name-pattern '\[C78\]' web/test/layout.spec.mjs`
+
+**C79** - `web/angular.json` sets `"prefix": "t"`. The shared UI declares selectors `t-sheet`, `t-pagination`, `t-confirmation`, `t-skeleton`, `t-toaster`, `table[tTable]`, `button[tButton]` and `a[tButton]`. No selector under `web/src` contains `acme` (AC 26, AD-012)
+Proof: `node --test --test-name-pattern '\[C79\]' web/test/layout.spec.mjs`
+
+**C80** - No file under `web/src` sets `styleUrl` or `styleUrls`, and `web/src` contains no `*.css` other than `styles.css` (AC 26)
+Proof: `node --test --test-name-pattern '\[C80\]' web/test/layout.spec.mjs`
+
+**C81** - The 8 forms (authentication, customer, vessel, work order, work order service, organization, user, invitation) each call `form(` imported from `@angular/forms/signals`. No file under `web/src` imports `FormBuilder` or `NgModel` or contains `[(ngModel)]` (AC 26)
+Proof: `node --test --test-name-pattern '\[C81\]' web/test/layout.spec.mjs`
+
+**C82** - No file under `web/src` contains `whoami`. `authentication.service.ts` reads `GET /api/me` (AD-015)
+Proof: `node --test --test-name-pattern '\[C82\]' web/test/layout.spec.mjs`
+
+**C83** - The customer, vessel, work-order and work-order-service list components use `tTable` and the empty copy `Nenhum cliente encontrado`, `Nenhuma embarcação encontrada`, `Nenhuma ordem de serviço` and `Nenhum serviço executado`, and none of those four files contains a `<card` tag (AC 27, AC 32)
+Proof: `node --test --test-name-pattern '\[C83\]' web/test/layout.spec.mjs`
+
+**C84** - Submitting email `ops@atlantic.test` and password `secret-pass` on the sign-in page posts `{ email: 'ops@atlantic.test', password: 'secret-pass' }` to `POST /api/sessions`. A 201 body `{ access_token: 'tok-84' }` stores `tok-84` in localStorage at `@umbriel:access-token`. A 401 shows the text `E-mail ou senha incorretos.` (AC 27)
+Proof: `cd web && npx ng test --watch=false --filter='\[C84\]'`
+
+**C85** - The layout reads `GET /api/me`. With organizations `Umbrielship` (`org-a`, active) and `Atlantic` (`org-b`), picking `Atlantic` posts `{ organizationId: 'org-b' }` to `POST /api/organizations/switch` and then reloads the page. One membership renders `Umbrielship` and posts nothing (AC 29)
+Proof: `cd web && npx ng test --watch=false --filter='\[C85\]'`
+
+**C86** - A user with `role` `administrator` and `organization.isInternal` true may open `/organizations`. An `operator` of the internal Organization, and an `administrator` whose `isInternal` is false, are routed to `/forbidden`, whose heading is `Acesso negado` (AC 30)
+Proof: `cd web && npx ng test --watch=false --filter='\[C86\]'`
+
+**C87** - The Organizations page renders `Atlantic` and `ops@atlantic.test` in `table[tTable]`, and zero organizations render `Nenhuma organização encontrada`. Submitting name `Atlantic` and email `ops@atlantic.test` from the `t-sheet` posts that body to `POST /api/organizations` (AC 30)
+Proof: `cd web && npx ng test --watch=false --filter='\[C87\]'`
+
+**C88** - Organization `org-1` shows user `Ana`, `ana@atlantic.test`, `Operador`, and invitation `ana@atlantic.test` with a `Reenviar` control. The user sheet posts `{ name: 'Ana', email: 'ana@atlantic.test', password: 'secret-pass', role: 'operator', organizationId: 'org-1' }` to `POST /api/users`. The invitation sheet posts `{ userId: 'user-1', organizationId: 'org-1', role: 'operator' }` to `POST /api/invitations`. `Reenviar` posts to `POST /api/invitations/inv-1/resend` (AC 30)
+Proof: `cd web && npx ng test --watch=false --filter='\[C88\]'`
+
+**C89** - `/invitations/accept?secret=abc` shows the accept form. Confirming posts `{ secret: 'abc' }` to `POST /api/invitations/accept`. A 200 `{ organizationName: 'Atlantic' }` shows `Atlantic`. A 404 shows `Convite não encontrado.`. A 409 shows `Este convite já foi aceito.` (AC 31)
+Proof: `cd web && npx ng test --watch=false --filter='\[C89\]'`
+
+**C90** - The Customers page requests `GET /api/customers?page=1` and, after the page-2 control, `GET /api/customers?page=2`. Neither URL contains `organizationId`. Zero rows render `Nenhum cliente encontrado` (AC 28)
+Proof: `cd web && npx ng test --watch=false --filter='\[C90\]'`
+
+**C91** - The Vessels page requests `GET /api/vessels?page=1` with no `organizationId`, renders `Aurora` for that vessel and `Nenhuma embarcação encontrada` when the list is empty. The work-order list for `vessel-1` requests `GET /api/work-orders?vesselId=vessel-1&take=10&skip=0`. Uploading a file on service `svc-1` of work order `wo-1` posts to `POST /api/work-orders/wo-1/services/svc-1/images` (AC 27, AC 32)
+Proof: `cd web && npx ng test --watch=false --filter='\[C91\]'`
+
+**C92** - The customer sheet posts `{ name: 'Atlantic', email: 'ops@atlantic.test', phone: '11999999999', address: { address: 'Rua 1', city: 'Santos', state: 'SP' } }` to `POST /api/customers` and then requests `GET /api/customers` again (AC 27)
+Proof: `cd web && npx ng test --watch=false --filter='\[C92\]'`
+
+**C93** - Confirming deletion of vessel `vessel-1` calls `DELETE /api/vessels/vessel-1` and does not call `GET /api/work-orders`. The confirmation description is `Tem certeza que deseja deletar esta embarcação? Essa ação não pode ser desfeita.` and does not contain `ordem de serviço` (AC 32)
+Proof: `cd web && npx ng test --watch=false --filter='\[C93\]'`
+
+**C94** - A signed-in user opens Clientes, sees the table (rows or `Nenhum cliente encontrado`), moves the pagination control, and opens the `t-sheet` to create a customer (AC 27, AC 28)
+Proof: walk - sign in, open Clientes, read the table or the empty copy, use pagination, open the sheet
+
+**C95** - The layout shows the Organization switcher, and `/invitations/accept?secret=abc` renders the accept form before any submit (AC 29, AC 31)
+Proof: walk - read the switcher in the layout and open the invitation accept route until the form is on screen
+
+**C96** - `AGENTS.md` names Angular 22, `web/src/package/<context>/<module>/`, `@Service()`, Signal Forms, the element prefix `t-` and the attribute prefix `t`, and `GET /me`. It does not describe the web as `feature/ui/data-access` and it does not say the web calls `whoami` (AC 26, AD-015)
+Proof: `node --test --test-name-pattern '\[C96\]' web/test/layout.spec.mjs`
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -295,6 +361,18 @@ Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"`
 | `CONTEXT.md` terms kept (7) | User · Customer · Vessel · IMO number · WorkOrder · WorkOrderService · WorkOrderServiceImage: C74 | - |
 | stale statements removed from `AGENTS.md` (9) | `core/interface` · `core/entity` · `http/rest` · `persistence.module` · `CommonJS` · `tsc-alias` · `dist/src/main.js` · `Jest` · `whoami`: C73 (the list also holds `core/use-case`, `core/exception`, `persistence/`, `PersistenceModule`, `ts-loader`, `NestJS 11`, `create the first User by hand`) | - |
 | criteria of S3 (3: AC 24, 24a, 25) | AC 24 C66-C68, C71, C72 · AC 24a C73-C76 · AC 25 C69, C70 | - |
+| `@angular/*` packages on `^22` (9) | `core` C77 · `common` C77 · `compiler` C77 · `forms` C77 · `platform-browser` C77 · `router` C77 · `build` C77 · `cli` C77 · `compiler-cli` C77 | - |
+| web modules with a page, `components/` and `@Service()` (9) | `customer/customer` C78 · `customer/vessel` C78 · `work-order/work-order` C78 · `work-order/work-order-service` C78 · `work-order/work-order-service-image` C78 · `identity/authentication` C78 · `identity/organization` C78 · `identity/user` C78 · `identity/invitation` C78 | - |
+| shared selectors (8) | `t-sheet` C79 · `t-pagination` C79 · `t-confirmation` C79 · `t-skeleton` C79 · `t-toaster` C79 · `table[tTable]` C79 · `button[tButton]` C79 · `a[tButton]` C79 | - |
+| Signal Forms (8) | authentication C81 · customer C81 · vessel C81 · work order C81 · work order service C81 · organization C81 · user C81 · invitation C81 | - |
+| list empty copy (4) | `Nenhum cliente encontrado` C83, C90 · `Nenhuma embarcação encontrada` C83, C91 · `Nenhuma ordem de serviço` C83 · `Nenhum serviço executado` C83 | - |
+| `POST /sessions` on the web (2) | 201 C84 · 401 C84 | - |
+| `GET /me` on the web (1) | 200 C85 | - |
+| `POST /organizations/switch` on the web (1) | 204 C85 | - |
+| Organizations screen for a non-administrator (2) | internal `operator` C86 · non-internal `administrator` C86 | - |
+| `POST /invitations/accept` on the web (3) | 200 C89 · 404 C89 · 409 C89 | - |
+| web routes of S4 (8) | `/auth` C84, C94 · `/customers` C90, C92, C94 · `/vessels` C91 · `/work-orders/:id` C91 · `/organizations` C86, C87 · `/organizations/:id` C88 · `/invitations/accept` C89, C95 · `/forbidden` C86 | - |
+| criteria of S4 (7: AC 26-32) | AC 26 C77-C82, C96, Build · AC 27 C83, C84, C91, C92, C94 · AC 28 C90, C94 · AC 29 C85, C95 · AC 30 C86, C87, C88 · AC 31 C89, C95 · AC 32 C83, C91, C93 | - |
 
 ## Swept
 
@@ -332,6 +410,18 @@ S3 sweep (C66-C76):
 - state transitions: n/a - none added
 - observability: n/a - no logging requirement in the plan
 
+S4 sweep (C77-C96):
+
+- validation: C81 (Signal Forms required and email), C84 (the posted body), C92 (the customer body)
+- failure modes: C84 (401), C89 (404 and 409), C86 (forbidden)
+- idempotency: n/a - the web does not retry a write; a second accept is the API 409 the page shows (C89)
+- authorization: C86 (internal Administrator), C82 (session from `GET /me`, no Organization in the query)
+- concurrency: n/a - a switch reloads the page (C85); the web keeps no second copy of another Organization's rows
+- data lifecycle: C92 (the created customer is requested again), C93 (deleting a vessel is not refused in the web because of work orders)
+- dependency failure: C84 and C89 (the API's English message is shown in Portuguese)
+- state transitions: n/a - S4 adds no WorkOrder status guard; the web posts the status the form holds
+- observability: n/a - no logging requirement in the plan
+
 ## Handoff
 
 - **Settled mid-build:** none
@@ -342,3 +432,4 @@ S3 sweep (C66-C76):
 - **Boundary (S3):** C66-C76 built in commits 414d36c (NestJS 12, ESM), 394de41 (strict), 5029aae (documents); lint, test and build green at each; `boot-smoke.sh` and `api-smoke.sh` green on ESM
 - **Dispatched (S3):** Verifier (independent sub-agent) at `HEAD` after this commit, diff range 7669127..HEAD - not returned yet
 - **Abandoned:** none; C21 was reworded before the build closed: it first claimed `vesselId` is kept, but `EditWorkOrderUseCase` reads it from a detail entity that never carries it (see the plan, criterion 13); the claim now says "under the same `id`"
+- **Boundary (S4 checks):** C77-C96 frozen before the web build. Context7 tools are not in this session. The table selector is `table[tTable]`, not an element `t-table`. The folder is `web/src/package/`, as criterion 26 writes it.
