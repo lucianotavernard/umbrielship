@@ -44,6 +44,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: C7 edit-customer.use-case.ts (use-case)
 - last seen: 2026-11-08T04:36:44Z
 
+### L-006 - An in-memory fake that enforces the same rule as the use case hides a dropped use-case guard; spy on the repository write and assert it is not called.
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `api/test` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C54 (api/test)
+- last seen: 2026-11-08T12:56:13Z
+
+### L-007 - A route behind a global auth guard needs a real-stack request to prove @Public(); unit specs on use cases do not see a missing decorator, so assert the public routes list in a layout spec.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `api/identity` · harmful: 0
+- features: acme-architecture-migration
+- evidence: C64 (api/identity)
+- last seen: 2026-11-08T12:56:13Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

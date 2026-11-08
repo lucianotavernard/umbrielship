@@ -1,7 +1,7 @@
 # acme-architecture-migration proofs
 
-**HEAD**: 60b5156
-**Tree**: dirty - .cursor/skills/, CONTEXT.md, ROADMAP.md
+**HEAD**: 3a8eb60
+**Tree**: clean
 **Result**: 67 pass, 0 fail; mutations 6 killed, 0 not
 
 | Check | Proof | Ran | Passed | Result |

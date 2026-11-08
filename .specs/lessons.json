@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 8,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,42 @@
       ],
       "created": "2026-11-08T04:36:44Z",
       "last_seen": "2026-11-08T04:36:44Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::an in memory fake that enforces the same rule as the use case hides a dropped use case guard spy on the repository write and assert it is not called",
+      "text": "An in-memory fake that enforces the same rule as the use case hides a dropped use-case guard; spy on the repository write and assert it is not called.",
+      "signal": "surviving_mutant",
+      "scope": "api/test",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C54 (api/test)"
+      ],
+      "created": "2026-11-08T12:56:13Z",
+      "last_seen": "2026-11-08T12:56:13Z"
+    },
+    {
+      "id": "L-007",
+      "key": "ac_gap::a route behind a global auth guard needs a real stack request to prove public unit specs on use cases do not see a missing decorator so assert the public routes list in a layout spec",
+      "text": "A route behind a global auth guard needs a real-stack request to prove @Public(); unit specs on use cases do not see a missing decorator, so assert the public routes list in a layout spec.",
+      "signal": "ac_gap",
+      "scope": "api/identity",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C64 (api/identity)"
+      ],
+      "created": "2026-11-08T12:56:13Z",
+      "last_seen": "2026-11-08T12:56:13Z"
     }
   ]
 }

@@ -4,7 +4,7 @@ Mutations: 3
 Build: `cd api && npm run build`; `cd api && npm run lint`
 Plan: `.specs/features/acme-architecture-migration/plan.md`
 
-65 checks in 2 slices (S1 C1-C29, S2 C30-C65; S3-S4 are frozen in their own turns, see Handoff) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · 0 open
+76 checks in 3 slices (S1 C1-C29, S2 C30-C65, S3 C66-C76; S4 is frozen in its own turn, see Handoff) · 5 one-way doors in S2 (doors 1, 2, 5, 6, 7 and 8 of the plan, proofs C42-C46, C63, C64) · door 4 (runtime) in S3, proofs C66-C71 · 0 open
 
 ## Checks
 
@@ -213,6 +213,42 @@ Proof: `bash api/test/smoke/api-smoke.sh`
 **C65** - `npm run test` in `api/` exits 0 with the S2 suite (AC 23)
 Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
 
+### S3 - The API runs on the acme platform
+
+**C66** - `api/package.json` has `"type": "module"`, and `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`, `@nestjs/jwt`, `@nestjs/passport`, `@nestjs/bullmq`, `@nestjs/config`, `@nestjs/testing`, `@nestjs/cli` and `@nestjs/schematics` all declare a `^12` range; `typescript` is `^6`; `tsc-alias` and `ts-loader` are gone (AC 24)
+Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C66\]"`
+
+**C67** - `api/tsconfig.json` sets `"strict": true` and none of `strictNullChecks`, `noImplicitAny` or `strictBindCallApply` is set to `false`; `npx tsc --noEmit -p tsconfig.json` over `src/` and `test/` exits 0 (AC 24)
+Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C67\]"`
+Proof: `cd api && npx tsc --noEmit -p tsconfig.json`
+
+**C68** - Every relative and `@/` import or export specifier in `api/src` and `api/test` that points at a project file ends in `.js`; no file there (outside the generated client) uses `require(`, `module.exports`, `__dirname` or `__filename`; `schema.prisma` declares `moduleFormat = "esm"` and the generated client has no `require(` (AC 24)
+Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C68\]"`
+
+**C69** - `npm run build` in `api/` exits 0 and writes `dist/main.js` as an ES module; no `.js` under `dist/` still contains an `@/` specifier; the generated Prisma client is under `dist/package/shared/module/prisma/generated/prisma/` as ES modules (AC 25)
+Proof: `cd api && npm run build && node test/smoke/check-dist.mjs`
+
+**C70** - Against real PostgreSQL, Redis and Mailpit (Docker), `npm run start:prod` boots from `dist/` on `PORT`: `GET /me` without a token answers 401, and an image uploaded through `POST /work-orders/:id/services/:id/images` (the bytes `PNG-S3`) is served by `GET /uploads/work-order-service-images/<file>` with 200 and the same bytes (AC 25, AC 24)
+Proof: `bash api/test/smoke/boot-smoke.sh`
+
+**C71** - In the same stack, `npm run start:dev` boots on `PORT` as ESM: `GET /me` without a token answers 401 and the image stored by C70 is served at `/uploads/...` with 200 and the same bytes (AC 24)
+Proof: `bash api/test/smoke/boot-smoke.sh`
+
+**C72** - `npm run test` in `api/` exits 0 with `DATABASE_URL`, `JWT_SECRET` and `REDIS_URL` unset, on the ESM and strict build (AC 24)
+Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
+
+**C73** - `AGENTS.md` lists Redis, SMTP with Mailpit, the 7 variables `REDIS_URL`, `WEB_ORIGIN`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM`, `MAIL_USER` and `MAIL_PASS`, `npx prisma db seed`, Vitest, oxlint, ESM, the `package/<context>/<aggregate>` layout, `organizationId` taken from the session, `CustomerFacade` and `GET /me`; it keeps the Context7 rule; and it contains none of `core/interface`, `core/entity`, `http/rest`, `persistence.module`, `CommonJS`, `tsc-alias`, `dist/src/main.js`, `Jest`, `/whoami` or `create the first User by hand` (AC 24a)
+Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C73\]"`
+
+**C74** - `CONTEXT.md` defines **Organization**, **Membership**, **Role** and **Invitation** as glossary entries, keeps the 7 terms it had (User, Customer, Vessel, IMO number, WorkOrder, WorkOrderService, WorkOrderServiceImage), no longer lists `MANAGER` or `DEVELOPER` as a User role, says the IMO number is unique within its Organization and the Customer email is unique within its Organization (AC 24a)
+Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C74\]"`
+
+**C75** - `.cursor/skills/modular-architecture/SKILL.md` describes the flat-by-aggregate layout (`package/<context>/<aggregate>/`, `contracts/`, `I<Plural>Repository`, `__test__/`), the facade, `organizationId` tenancy, ESM `.js` specifiers, Vitest and oxlint, and contains none of `core/entity`, `core/interface`, `core/use-case`, `http/rest/controller`, `persistence/repository`, `persistence.module`, `Jest`, `CommonJS` or `tsc-alias`; the `roadmap-execution` skill names no `core/` or `persistence/` path either (AC 24a)
+Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C75\]"`
+
+**C76** - `ROADMAP.md` item 5 (tests foundation) and item 6 (error mapping) read `Status: built`, item 7 stays a proposal, and no item mentions `/whoami` as a live route or Users "inserted by hand" (AC 24a; items 5 and 6 are absorbed by AD-007)
+Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"`
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -250,6 +286,15 @@ Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
 | the 22 existing routes' statuses (404 for another Organization, 409, 404, 500 on unexpected) | 404 C35-C39, C64 · 409 C35, C36, C64 · 500 C33, C64 | - |
 | startup config: Redis, mail, web origin (assemblies that read `process.env`: 1 - the Nest `ConfigModule`; the seed and `prisma.config.ts` read `DATABASE_URL` themselves) | `sharedConfigFactory` C63 | - |
 | criteria of S2 (18: AC 6-23) | AC 6 C30, C32 · AC 7 C31 · AC 8 C35-C39, C64 · AC 9 C35, C36, C44, C64 · AC 10 C33, C34, C64 · AC 11 C37, C40, C41 · AC 12 C42, C44, C45 · AC 13 C32, C64, C6-C29 · AC 14 C43, C45 · AC 15 C46 · AC 16 C49, C50, C64 · AC 17 C51, C64 · AC 18 C52, C53, C64 · AC 19 C55, C56, C58, C64 · AC 20 C57, C64 · AC 21 C54, C64 · AC 22 C47, C48, C64 · AC 23 C65, Build | - |
+| `@nestjs/*` packages on `^12` (10) | `common` · `core` · `platform-express` · `jwt` · `passport` · `bullmq` · `config` · `testing` · `cli` · `schematics`: C66 (table-driven over all 10) | - |
+| entry points that boot the API (2) | `npm run start:prod` C70 · `npm run start:dev` C71 | - |
+| assemblies that read the TS config (3: Nest build, `tsc --noEmit` over `src/` and `test/`, Vitest through `resolve.tsconfigPaths`) | build C69 · `tsc --noEmit` C67 · Vitest C72 | - |
+| `AGENTS.md` items owed by AC 24a (6: Redis, SMTP and Mailpit, env vars, `prisma db seed`, Vitest, oxlint; plus the layout) | Redis, Mailpit, 7 env vars, seed, Vitest, oxlint, layout: C73 (each its own assertion) | - |
+| env vars `AGENTS.md` lists (7) | `REDIS_URL` · `WEB_ORIGIN` · `MAIL_HOST` · `MAIL_PORT` · `MAIL_FROM` · `MAIL_USER` · `MAIL_PASS`: C73 | - |
+| `CONTEXT.md` terms added (4) | Organization · Membership · Role · Invitation: C74 | - |
+| `CONTEXT.md` terms kept (7) | User · Customer · Vessel · IMO number · WorkOrder · WorkOrderService · WorkOrderServiceImage: C74 | - |
+| stale statements removed from `AGENTS.md` (9) | `core/interface` · `core/entity` · `http/rest` · `persistence.module` · `CommonJS` · `tsc-alias` · `dist/src/main.js` · `Jest` · `/whoami`: C73 | - |
+| criteria of S3 (3: AC 24, 24a, 25) | AC 24 C66-C68, C71, C72 · AC 24a C73-C76 · AC 25 C69, C70 | - |
 
 ## Swept
 
@@ -273,6 +318,18 @@ S2 sweep (C30-C65):
 - data lifecycle: C42, C43 (backfill), C45 (no drift), C54 (accept keeps earlier Memberships)
 - dependency failure: C52, C57, C64
 - state transitions: C52, C53, C54, C55 (pending/accepted, queued/delivered/failed)
+- observability: n/a - no logging requirement in the plan
+
+S3 sweep (C66-C76):
+
+- validation: n/a - S3 adds no input; the config schema is unchanged (C63)
+- failure modes: C70 (the image read back is the one that was written, same bytes)
+- idempotency: n/a - a build and a boot change no stored data
+- authorization: existing - C64 walks 401 and 403; C70 and C71 assert 401 on `/me` without a token
+- concurrency: n/a - no shared state is added
+- data lifecycle: C70 (an image uploaded under `start:prod` is still served by `start:dev` after a restart)
+- dependency failure: existing - C64 stops Redis and PostgreSQL; C70 boots against the real three
+- state transitions: n/a - none added
 - observability: n/a - no logging requirement in the plan
 
 ## Handoff
