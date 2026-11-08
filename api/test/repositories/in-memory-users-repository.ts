@@ -30,10 +30,13 @@ export class InMemoryUsersRepository implements IUsersRepository {
 
   async findManyByOrganization(
     organizationId: string,
-    take: number,
-    skip: number,
+    page: number,
+    perPage: number,
   ) {
-    return this.members(organizationId).slice(skip, skip + take);
+    return this.members(organizationId).slice(
+      (page - 1) * perPage,
+      page * perPage,
+    );
   }
 
   async countByOrganization(organizationId: string) {
@@ -50,10 +53,13 @@ export class InMemoryUsersRepository implements IUsersRepository {
 
   async findManyOutsideOrganization(
     organizationId: string,
-    take: number,
-    skip: number,
+    page: number,
+    perPage: number,
   ) {
-    return this.outside(organizationId).slice(skip, skip + take);
+    return this.outside(organizationId).slice(
+      (page - 1) * perPage,
+      page * perPage,
+    );
   }
 
   async countOutsideOrganization(organizationId: string) {

@@ -39,15 +39,15 @@ export class PrismaUsersRepository implements IUsersRepository {
 
   async findManyByOrganization(
     organizationId: string,
-    take: number,
-    skip: number,
+    page: number,
+    perPage: number,
   ): Promise<User[]> {
     const rows = await this.prisma.user.findMany({
       include: { memberships: true },
       where: { memberships: { some: { organizationId } } },
       orderBy: { name: 'asc' },
-      take,
-      skip,
+      take: perPage,
+      skip: (page - 1) * perPage,
     });
 
     return rows.map((row) => this.toDomain(row));
@@ -68,15 +68,15 @@ export class PrismaUsersRepository implements IUsersRepository {
 
   async findManyOutsideOrganization(
     organizationId: string,
-    take: number,
-    skip: number,
+    page: number,
+    perPage: number,
   ): Promise<User[]> {
     const rows = await this.prisma.user.findMany({
       include: { memberships: true },
       where: { memberships: { none: { organizationId } } },
       orderBy: { name: 'asc' },
-      take,
-      skip,
+      take: perPage,
+      skip: (page - 1) * perPage,
     });
 
     return rows.map((row) => this.toDomain(row));

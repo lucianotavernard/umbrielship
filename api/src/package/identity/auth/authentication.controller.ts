@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   NotFoundException,
   Post,
   UnauthorizedException,
@@ -15,6 +16,7 @@ import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator
 import { Public } from '@/package/shared/module/auth/public';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload';
 
+import { SwitchOrganizationUseCase } from './switch-organization.use-case';
 import { AuthenticateUserUseCase } from './authenticate-user.use-case';
 import { GetProfileUseCase } from './get-profile.use-case';
 import { WrongCredentialsException } from './wrong-credentials.exception';
@@ -26,11 +28,20 @@ const authenticateUserBodySchema = z.object({
 
 type AuthenticateUserBodySchema = z.infer<typeof authenticateUserBodySchema>;
 
+const switchOrganizationBodySchema = z.object({
+  organizationId: z.uuid(),
+});
+
+type SwitchOrganizationBodySchema = z.infer<
+  typeof switchOrganizationBodySchema
+>;
+
 @Controller()
 export class AuthenticationController {
   constructor(
     private authenticateUser: AuthenticateUserUseCase,
     private getProfile: GetProfileUseCase,
+    private switchOrganization: SwitchOrganizationUseCase,
   ) {}
 
   @Public()
@@ -60,6 +71,27 @@ export class AuthenticationController {
       const { user } = await this.getProfile.handle(currentUser.sub);
 
       return { user };
+    } catch (error) {
+      if (error instanceof NotFoundDomainException) {
+        throw new NotFoundException(error.message);
+      }
+
+      throw error;
+    }
+  }
+
+  @Post('/organizations/switch')
+  @HttpCode(204)
+  async switch(
+    @CurrentUser() currentUser: UserPayload,
+    @Body(new ZodValidationPipe(switchOrganizationBodySchema))
+    body: SwitchOrganizationBodySchema,
+  ) {
+    try {
+      await this.switchOrganization.handle({
+        userId: currentUser.sub,
+        organizationId: body.organizationId,
+      });
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);

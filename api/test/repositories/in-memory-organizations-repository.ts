@@ -11,8 +11,8 @@ export class InMemoryOrganizationsRepository implements IOrganizationsRepository
     return [...this.items].sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async findAll(take: number, skip: number) {
-    return this.sorted().slice(skip, skip + take);
+  async findAll(page: number, perPage: number) {
+    return this.sorted().slice((page - 1) * perPage, page * perPage);
   }
 
   async count() {

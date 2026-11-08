@@ -17,11 +17,11 @@ type OrganizationRow = {
 export class PrismaOrganizationsRepository implements IOrganizationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(take: number, skip: number): Promise<Organization[]> {
+  async findAll(page: number, perPage: number): Promise<Organization[]> {
     const rows = await this.prisma.organization.findMany({
       orderBy: { name: 'asc' },
-      take,
-      skip,
+      take: perPage,
+      skip: (page - 1) * perPage,
     });
 
     return rows.map((row) => this.toDomain(row));
