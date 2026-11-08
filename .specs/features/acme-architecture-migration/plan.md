@@ -220,6 +220,16 @@ Acme's own domain (Item, Stock, Purchase, Staff...) is not umbrielship's and is 
 - `ROADMAP.md` items 5 and 6 read `built` and item 1's Status names `GET /me`, because AD-007 absorbed them and `roadmap-execution` would otherwise build them again; item 7 is untouched
 - Until S4 the web calls `GET /whoami`, which S2 renamed `GET /me` (AD-015): the shipped web cannot load the signed-in User against this API
 
+**Found while building S4 (plan changed in the same commit as the web):**
+
+- The web lives at `web/src/package/<context>/<module>/`, with `app.ts` beside it, as criterion 26 and acme write it
+- The table primitive is `table[tTable]` (acme's `table[acmeTable]` with the attribute prefix `t`), not an element `t-table`
+- The web does not send `X-Organization-Id`: this API does not read that header; the Organization stays the one on the session, and a switch reloads the page
+- A non-internal Administrator, and an internal Operator, opening Organizations is sent to `/forbidden` (`Acesso negado`), which is the page this app already had
+- The previous vessel confirmation was titled "Deletar cliente"; the vessel screen now says "Deletar embarcação" and calls `DELETE /api/vessels/:id` without asking whether work orders exist
+- Customers have no delete route, so the list no longer shows a delete control
+- The work-order detail uploads a service image with `POST /work-orders/:id/services/:id/images` field `file`; the previous web had the DTO and no control
+
 ## Sources
 
 - Request "migrar toda a arquitetura baseada no acme" - binding - scope

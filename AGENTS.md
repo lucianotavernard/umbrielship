@@ -19,14 +19,14 @@ There is no root `package.json`: `api/` and `web/` are independent npm projects.
 **Web** (`web/`):
 
 - `npm start` runs `ng serve` with `proxy.conf.json`: `/api` goes to `http://localhost:3333` without the prefix, and `/uploads` goes there unchanged. Start the API first.
-- `npm run build` builds; `npm run watch` builds in development mode on change; `npm test` runs `ng test`. There is no web lint script and no web spec yet.
+- `npm run build` builds; `npm run watch` builds in development mode on change; `npm test` runs `ng test`. There is no web lint script.
 
 ## Stack
 
 - API: NestJS 12 as ESM (`"type": "module"`, `nodenext`), TypeScript with `strict` on, in `api/src`, alias `@/` = `api/src`. Every relative or `@/` import ends in `.js` (`import { X } from './x.use-case.js'`), as ESM requires; the Prisma client is generated as ES modules (`moduleFormat = "esm"`). Validation with Zod (`ZodValidationPipe`), auth with Passport JWT and a global `JwtAuthGuard` (`@Public()` opts a route out), passwords with bcryptjs, Invitation email through Nodemailer and BullMQ.
 - Persistence: Prisma 7 with `@prisma/adapter-pg` on PostgreSQL; one schema, `api/src/package/shared/module/prisma/schema.prisma`.
 - Tests and lint: Vitest and oxlint, the only test runner and linter.
-- Web: Angular 21 with Tailwind, in `web/src/app`, alias `@/` = `web/src/app`. Standalone components, signals, `httpResource`, lazy `loadComponent` routes in `app.routes.ts`, shared primitives in `shared/ui`. It moves to the acme layout in a later slice (`.specs/features/acme-architecture-migration/plan.md`, S4).
+- Web: Angular 22 with Tailwind, in `web/src/package/<context>/<module>/`. A module has a page, `components/` and a `*.service.ts` decorated with `@Service()`. Forms use Signal Forms. Shared elements use the prefix `t-` (`t-sheet`) and attributes use the prefix `t` (`button[tButton]`, `table[tTable]`). The session is `GET /me`. Standalone components, signals, `httpResource`, lazy `loadComponent` routes in `app.routes.ts`.
 - Screen copy in `web` is Portuguese. Identifiers, API fields and documents are English.
 
 ## Architecture principles
@@ -50,7 +50,7 @@ Flat by aggregate: one business concept is one folder, `api/src/package/<context
 - State isolation: no foreign key across contexts (`work_orders.vesselId` is a plain id column); names and emails that must be unique are `citext` and unique per Organization (the IMO number and the Customer email included).
 - `GET /me` returns the authenticated User with the active Organization and its Memberships.
 
-**Web** (`web/src/app/<domain>/{feature,ui,data-access,util}`): `feature` holds routed, stateful components (they own the `httpResource` and signals); `ui` holds presentational components named `*Ui`; `data-access` holds DTO types (and services); `util` holds guards, interceptors and providers. `shared/` holds `ui` primitives, `feature` layouts and exception pages, `util` and `config`. `analytics` holds the dashboard.
+**Web** (`web/src/package/<context>/<module>/`): a page owns the `httpResource` and the signals, `components/` holds presentational components, and `*.service.ts` uses `@Service()` for writes. Forms are Signal Forms. Shared UI lives in `package/shared/components/ui` with the element prefix `t-` and the attribute prefix `t`. The layout reads `GET /me` and holds the Organization switcher. `analytics/dashboard` is the dashboard.
 
 ## Progressive documentation loading
 

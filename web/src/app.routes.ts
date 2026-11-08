@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './package/shared/components/lib/auth.guard';
+import { internalAdministratorGuard } from './package/shared/components/lib/internal-administrator.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -8,7 +9,17 @@ export const routes: Routes = [
     path: 'auth',
     title: 'Autenticação',
     loadComponent: () =>
-      import('./package/identity/authentication/authenticate-user').then((m) => m.AuthenticateUser),
+      import('./package/identity/authentication/authenticate-user/authenticate-user').then(
+        (m) => m.AuthenticateUser,
+      ),
+  },
+  {
+    path: 'invitations/accept',
+    title: 'Aceitar convite',
+    loadComponent: () =>
+      import('./package/identity/invitation/invitation-accept/invitation-accept').then(
+        (m) => m.InvitationAccept,
+      ),
   },
   {
     path: '',
@@ -52,6 +63,24 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./package/work-order/work-order/work-order-detail/work-order-detail').then(
             (m) => m.WorkOrderDetail,
+          ),
+      },
+      {
+        path: 'organizations',
+        title: 'Organizações',
+        canActivate: [internalAdministratorGuard],
+        loadComponent: () =>
+          import('./package/identity/organization/organization-list/organization-list').then(
+            (m) => m.OrganizationList,
+          ),
+      },
+      {
+        path: 'organizations/:id',
+        title: 'Organização',
+        canActivate: [internalAdministratorGuard],
+        loadComponent: () =>
+          import('./package/identity/organization/organization-detail/organization-detail').then(
+            (m) => m.OrganizationDetail,
           ),
       },
     ],

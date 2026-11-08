@@ -1,0 +1,45 @@
+<div class="flex min-h-svh w-full items-center justify-center p-6">
+  <div class="w-full max-w-sm">
+    <t-card>
+      <t-card-header>
+        <t-card-title>Aceitar convite</t-card-title>
+        <t-card-description>
+          @if (organizationName(); as organizationName) {
+            Você agora faz parte de {{ organizationName }}.
+          } @else if (secret()) {
+            Ao aceitar, você passa a fazer parte também da organização que enviou o convite. Suas outras organizações não mudam.
+          } @else {
+            Este link de convite está incompleto.
+          }
+        </t-card-description>
+      </t-card-header>
+      <t-card-content>
+        @if (errorMessage()) {
+          <p class="mb-4 text-sm text-destructive">{{ errorMessage() }}</p>
+        }
+        @if (organizationName()) {
+          <p>{{ organizationName() }}</p>
+          <a tButton class="mt-4 w-full" routerLink="/">Continuar</a>
+        } @else {
+          <button
+            tButton
+            type="button"
+            class="w-full"
+            [disabled]="!secret() || submitting()"
+            (click)="openDialog()"
+          >
+            Aceitar convite
+          </button>
+        }
+      </t-card-content>
+    </t-card>
+  </div>
+</div>
+
+<t-confirmation
+  title="Aceitar convite"
+  description="Tem certeza que deseja aceitar este convite? Você continua nas organizações de que já faz parte."
+  [isActive]="isDialogActive()"
+  (closed)="closeDialog()"
+  (confirmed)="acceptInvitation()"
+/>

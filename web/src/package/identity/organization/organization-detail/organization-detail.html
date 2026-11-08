@@ -1,0 +1,72 @@
+<div class="border-b border-border">
+  <div class="mx-auto max-w-7xl px-6 py-4">
+    <a tButton variant="ghost" routerLink="/organizations">Voltar para Organizações</a>
+  </div>
+</div>
+
+<section class="mx-auto max-w-7xl space-y-8 px-6 py-8">
+  @if (organization(); as organization) {
+    <div>
+      <h1 class="text-3xl font-bold">{{ organization.name }}</h1>
+      <p class="mt-2 text-sm text-muted-foreground">{{ organization.email }}</p>
+    </div>
+  }
+
+  <div>
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-sm font-semibold">Usuários</h2>
+      <button tButton type="button" (click)="openUserSheet()">Novo usuário</button>
+    </div>
+    <user-list-ui [loading]="loadingUsers()" [users]="users()" />
+    <t-pagination
+      class="mt-4"
+      [page]="usersPage()"
+      [total]="usersTotal()"
+      [perPage]="perPage"
+      (changed)="usersPage.set($event)"
+    />
+  </div>
+
+  @if (acceptsInvitations()) {
+    <div>
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-sm font-semibold">Convites</h2>
+        <button tButton type="button" (click)="openInvitationSheet()">Novo convite</button>
+      </div>
+      <invitation-list-ui
+        [loading]="loadingInvitations()"
+        [invitations]="invitations()"
+        (resent)="resendInvitation($event)"
+      />
+      <t-pagination
+        class="mt-4"
+        [page]="invitationsPage()"
+        [total]="invitationsTotal()"
+        [perPage]="perPage"
+        (changed)="invitationsPage.set($event)"
+      />
+    </div>
+  }
+</section>
+
+<t-sheet
+  title="Novo usuário"
+  description="Crie um usuário nesta organização"
+  [isActive]="isUserSheetActive()"
+  (closed)="closeUserSheet()"
+>
+  <user-form-ui (closed)="closeUserSheet()" (submitted)="createUser($event)" />
+</t-sheet>
+
+<t-sheet
+  title="Novo convite"
+  description="Convide um usuário que já existe para esta organização"
+  [isActive]="isInvitationSheetActive()"
+  (closed)="closeInvitationSheet()"
+>
+  <invitation-form-ui
+    [users]="candidates()"
+    (closed)="closeInvitationSheet()"
+    (submitted)="sendInvitation($event)"
+  />
+</t-sheet>

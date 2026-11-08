@@ -1,0 +1,24 @@
+<header class="border-b border-border">
+  <div class="mx-auto flex max-w-7xl items-start justify-between gap-4 px-6 py-8">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Organizações</h1>
+      <p class="mt-2 text-sm text-muted-foreground">Lista de todas as organizações do sistema.</p>
+    </div>
+    <button tButton type="button" (click)="openSheet()">Nova Organização</button>
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-6 py-8">
+  <organization-list-ui [loading]="loading()" [organizations]="organizations()">
+    <t-pagination [page]="page()" [total]="total()" [perPage]="perPage" (changed)="changePage($event)" />
+  </organization-list-ui>
+</section>
+
+<t-sheet
+  title="Nova organização"
+  description="Preencha os campos abaixo para criar uma nova organização"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <organization-form-ui (closed)="closeSheet()" (submitted)="createOrganization($event)" />
+</t-sheet>

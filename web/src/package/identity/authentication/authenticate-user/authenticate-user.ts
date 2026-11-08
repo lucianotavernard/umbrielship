@@ -1,10 +1,10 @@
 import { Component, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { apiErrorMessage } from '../../shared/components/lib/api-error-message';
-import { toast } from '../../shared/components/ui/toaster';
-import { AuthenticationForm } from './components/authentication-form';
-import { AuthenticationService } from './authentication.service';
+import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
+import { toast } from '../../../shared/components/ui/toaster';
+import { AuthenticationForm } from '../components/authentication-form';
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'authenticate-user',
