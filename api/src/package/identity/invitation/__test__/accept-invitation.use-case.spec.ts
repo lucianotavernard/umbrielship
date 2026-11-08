@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
@@ -64,11 +64,13 @@ describe('AcceptInvitationUseCase', () => {
 
   it('[C54] throws ConflictDomainException on a second accept and adds no second Membership', async () => {
     await sut.handle({ secret: 'secret-1' });
+    const accept = vi.spyOn(invitations, 'accept');
 
     const promise = sut.handle({ secret: 'secret-1' });
 
     await expect(promise).rejects.toBeInstanceOf(ConflictDomainException);
     await expect(promise).rejects.toThrow('Invitation already accepted');
+    expect(accept).not.toHaveBeenCalled();
     expect(users.items[0].memberships).toHaveLength(2);
   });
 });
