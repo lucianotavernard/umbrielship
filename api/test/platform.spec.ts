@@ -51,6 +51,23 @@ describe('api platform', () => {
     expect(pkg.scripts['start:prod']).toBe('node dist/main');
   });
 
+  it('[C67] turns TypeScript strict on and no strict flag back off, apart from property initialization', () => {
+    const options = tsconfig.compilerOptions;
+
+    expect(options.strict).toBe(true);
+    for (const flag of [
+      'strictNullChecks',
+      'noImplicitAny',
+      'strictBindCallApply',
+      'strictFunctionTypes',
+      'noImplicitThis',
+      'alwaysStrict',
+      'useUnknownInCatchVariables',
+    ]) {
+      expect(options[flag], flag).not.toBe(false);
+    }
+  });
+
   it('[C68] uses .js specifiers for project files and no CommonJS in src and test', () => {
     const specifier =
       /(?:\bfrom\s+|\bimport\s*\(\s*|\bimport\s+|\bvi\.mock\(\s*)['"]((?:\.{1,2}\/|@\/|@test\/)[^'"]*)['"]/g;
