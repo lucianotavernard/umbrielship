@@ -1,15 +1,31 @@
 # Umbrielship
 
-Umbrielship supports a naval service company: it records its Customers, their Vessels, and the WorkOrders performed on those Vessels, with the services done and photos of them. Identifiers and documents are English; screen copy in `web` is Portuguese.
+Umbrielship supports naval service companies: each one is an Organization that records its Customers, their Vessels, and the WorkOrders performed on those Vessels, with the services done and photos of them. Identifiers and documents are English; screen copy in `web` is Portuguese.
 
 ## Language
 
+**Organization**:
+A naval service company that uses the app. It has a unique name and a unique email (compared without case) and owns every Customer, Vessel and WorkOrder, so one Organization never sees another's records. Exactly one Organization is internal (`isInternal`, named "Umbrielship"): its Administrators create the other Organizations, their Users and their Invitations.
+*Avoid*: company, tenant, account
+
 **User**:
-A person who signs in to the app, identified by a unique email, with a bcrypt-hashed password and a role (`USER`, `MANAGER` or `DEVELOPER`). A User is not a Customer.
+A person who signs in to the app, identified by a unique email (compared without case), with a bcrypt-hashed password. A User holds one Membership in each Organization it works for and has one active Organization, the one its requests act on. A User is not a Customer.
 *Avoid*: Customer (for the person who signs in), account
 
+**Membership**:
+The link between a User and an Organization, with a Role. A User has at most one Membership per Organization; deleting the Organization or the User deletes it.
+*Avoid*: member, seat
+
+**Role**:
+What a User may do in an Organization, set on its Membership: `administrator` or `operator`. Only an Administrator of the internal Organization may manage Organizations, Users and Invitations.
+*Avoid*: permission, privilege level
+
+**Invitation**:
+An offer, made by an internal Administrator, for an existing User to join a non-internal Organization with a Role. It carries a random secret sent in an email link; it is `pending` until accepted, and its email delivery is `queued`, `delivered` or `failed`. Accepting it adds the Membership.
+*Avoid*: invite, signup link
+
 **Customer**:
-A person or company that owns Vessels, with a unique email, a phone and one address (address, city, state).
+A person or company that owns Vessels, with an email unique within its Organization (compared without case), a phone and one address (address, city, state). It belongs to exactly one Organization.
 *Avoid*: client, owner (as a separate entity)
 
 **Vessel**:
@@ -17,7 +33,7 @@ A ship that belongs to exactly one Customer. It has a name, a type (`CARGO`, `TA
 *Avoid*: ship, boat
 
 **IMO number**:
-The Vessel's identification code, unique across all Vessels. It is stored as `imoNumber` text and is how the business recognizes a Vessel; other records name the Vessel by its id.
+The Vessel's identification code, unique within its Organization (compared without case): two Organizations may register the same code. It is stored as `imoNumber` text and is how the business recognizes a Vessel; other records name the Vessel by its id.
 *Avoid*: registration, the Vessel id as a business identifier
 
 **WorkOrder**:
