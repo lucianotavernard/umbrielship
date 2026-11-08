@@ -2,7 +2,7 @@
 
 | # | Principle | Rule in Umbrielship | Example |
 | --- | --- | --- | --- |
-| 1 | Flat by aggregate | One concept is one folder, `package/<context>/<aggregate>/`; no `core/`, `http/` or `persistence/` tree | `customer/vessel/` |
+| 1 | Flat by aggregate | One concept is one folder, `package/<context>/<aggregate>/`; no layered tree inside the context | `customer/vessel/` |
 | 2 | Ports and adapters | Repositories are abstract classes in `contracts/`, named `I<Plural>Repository`, bound in `<context>.module.ts` | `{ provide: IVesselsRepository, useClass: PrismaVesselsRepository }` |
 | 3 | One operation, one use case | `<verb>-<noun>.use-case.ts` with `handle()`; no `*.service.ts` | `fetch-vessels`, `get-vessel-by-id`, `edit-vessel` |
 | 4 | One aggregate, one controller | A controller class holds the handlers of its aggregate and injects use cases only | `vessel.controller.ts` |

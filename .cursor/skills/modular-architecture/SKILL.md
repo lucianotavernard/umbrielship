@@ -122,8 +122,6 @@ Verified in the code on 2026-11-08; none is a pattern to copy.
   item 7.
 - `WorkOrderServiceImageController` writes files in the controller (multer `diskStorage` under
   `uploads/`) and builds the stored `url` there.
-- `EditWorkOrderUseCase` copies `vesselId` from the detail entity, which never carries it, so the
-  edit answer has no `vesselId` (kept so the JSON stays the same).
 - `.cursor/skills/tlc-*` and the plan under `.specs/` describe the web migration (S4) that has not
   happened: `web/` still follows the old `feature/ui/data-access/util` layout and calls `/whoami`,
   which the API renamed `/me`.

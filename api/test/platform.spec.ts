@@ -51,26 +51,35 @@ describe('api platform', () => {
     expect(pkg.scripts['start:prod']).toBe('node dist/main');
   });
 
-  it('[C67] turns TypeScript strict on and no strict flag back off, apart from property initialization', () => {
-    const options = tsconfig.compilerOptions;
+  it('[C67] turns TypeScript strict on in every config the build reads, and no strict flag back off, apart from property initialization', () => {
+    const buildConfig = JSON.parse(read(join(apiRoot, 'tsconfig.build.json')));
 
-    expect(options.strict).toBe(true);
-    for (const flag of [
-      'strictNullChecks',
-      'noImplicitAny',
-      'strictBindCallApply',
-      'strictFunctionTypes',
-      'noImplicitThis',
-      'alwaysStrict',
-      'useUnknownInCatchVariables',
+    expect(tsconfig.compilerOptions.strict).toBe(true);
+    expect(buildConfig.extends).toBe('./tsconfig.json');
+
+    for (const options of [
+      tsconfig.compilerOptions,
+      buildConfig.compilerOptions,
     ]) {
-      expect(options[flag], flag).not.toBe(false);
+      for (const flag of [
+        'strict',
+        'strictNullChecks',
+        'noImplicitAny',
+        'strictBindCallApply',
+        'strictFunctionTypes',
+        'noImplicitThis',
+        'alwaysStrict',
+        'useUnknownInCatchVariables',
+      ]) {
+        expect(options[flag], flag).not.toBe(false);
+      }
     }
   });
 
   it('[C68] uses .js specifiers for project files and no CommonJS in src and test', () => {
+    // The quoted string after `from`, `import`, `import(` or a vi helper.
     const specifier =
-      /(?:\bfrom\s+|\bimport\s*\(\s*|\bimport\s+|\bvi\.mock\(\s*)['"]((?:\.{1,2}\/|@\/|@test\/)[^'"]*)['"]/g;
+      /(?:\bfrom\s+|\bimport\s*\(\s*|\bimport\s+|\bvi\.(?:mock|doMock|importActual|importMock)\(\s*)['"](\.{1,2}|\.{1,2}\/[^'"]*|@\/[^'"]*|@test\/[^'"]*)['"]/g;
 
     for (const file of files) {
       const code = read(file);

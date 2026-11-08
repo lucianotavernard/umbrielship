@@ -20,9 +20,13 @@ const expectAll = (text: string, tokens: string[], where: string) => {
   }
 };
 
+// Case does not matter: `commonjs` and `CommonJS` are the same stale statement.
 const expectNone = (text: string, tokens: string[], where: string) => {
   for (const token of tokens) {
-    expect(text.includes(token), `${where} still names ${token}`).toBe(false);
+    expect(
+      text.toLowerCase().includes(token.toLowerCase()),
+      `${where} still names ${token}`,
+    ).toBe(false);
   }
 };
 
@@ -74,13 +78,19 @@ describe('documents follow the acme platform', () => {
       [
         'core/interface',
         'core/entity',
+        'core/use-case',
+        'core/exception',
         'http/rest',
+        'persistence/',
         'persistence.module',
+        'PersistenceModule',
         'CommonJS',
         'tsc-alias',
+        'ts-loader',
+        'NestJS 11',
         'dist/src/main.js',
         'Jest',
-        '/whoami',
+        'whoami',
         'create the first User by hand',
       ],
       'AGENTS.md',
@@ -141,11 +151,14 @@ describe('documents follow the acme platform', () => {
         'core/use-case',
         'http/rest/controller',
         'persistence/repository',
+        'core/exception',
+        'persistence/',
         'persistence.module',
         'PersistenceModule',
         'Jest',
         'CommonJS',
         'tsc-alias',
+        'ts-loader',
         'NestJS 11',
       ],
       'the modular-architecture skill',
@@ -165,6 +178,6 @@ describe('documents follow the acme platform', () => {
     expect(roadmapItem(roadmap, 6)).toMatch(/\*\*Status:\*\* built/);
     expect(roadmapItem(roadmap, 7)).not.toMatch(/\*\*Status:\*\*/);
     expect(roadmapItem(roadmap, 7)).toContain('(proposal)');
-    expectNone(roadmap, ['/whoami', 'inserted by hand'], 'ROADMAP.md');
+    expectNone(roadmap, ['whoami', 'by hand'], 'ROADMAP.md');
   });
 });
