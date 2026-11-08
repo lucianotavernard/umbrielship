@@ -8,7 +8,7 @@ Each item ends with a **Status** line that records what the code in `api` and `w
 
 A User signs in with email and password and works with a token. Every route except sign-in needs it.
 
-**Status:** built in `identity`. `POST /sessions` returns an access token, and `GET /me` returns the authenticated User with its active Organization and Memberships; `JwtAuthGuard` is global and `@Public()` opens a route. Users belong to Organizations through Memberships with a Role (`administrator`, `operator`); an internal Administrator creates Organizations, Users and Invitations, and `npx prisma db seed` creates the first Administrator. Web: the authentication page, `authGuard`, and the token interceptor (the web still calls the old route that `/me` replaced, and slice S4 of `.specs/features/acme-architecture-migration/plan.md` moves it).
+**Status:** built in `identity`. `POST /sessions` returns an access token, and `GET /me` returns the authenticated User with its active Organization and Memberships; `JwtAuthGuard` is global and `@Public()` opens a route. Users belong to Organizations through Memberships with a Role (`administrator`, `operator`); an internal Administrator creates Organizations, Users and Invitations, and `npx prisma db seed` creates the first Administrator. Web: the authentication page, `authGuard`, and the token interceptor call `GET /me`.
 
 ## 2. Customers
 

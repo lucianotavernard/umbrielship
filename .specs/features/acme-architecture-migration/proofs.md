@@ -1,13 +1,13 @@
 # acme-architecture-migration proofs
 
-**HEAD**: 3a8eb60
+**HEAD**: 67bc265
 **Tree**: clean
-**Result**: 67 pass, 0 fail; mutations 6 killed, 0 not
+**Result**: 101 pass, 0 fail; mutations 3 killed, 0 not
 
 | Check | Proof | Ran | Passed | Result |
 | --- | --- | --- | --- | --- |
 | C1 | `cd api && npx vitest run test/use-case-specs.spec.ts -t "\[C1\]"` | 1 | 1 | pass |
-| C2 | `cd api && env -u DATABASE_URL -u JWT_SECRET npm run test` | 54 | - | pass |
+| C2 | `cd api && env -u DATABASE_URL -u JWT_SECRET npm run test` | 56 | - | pass |
 | C3 | `cd api && npx vitest run test/tooling.spec.ts -t "\[C3\]"` | 1 | 1 | pass |
 | C4 | `cd api && npx vitest run test/tooling.spec.ts -t "\[C4\]"` | 1 | 1 | pass |
 | C5 | `cd api && npm run lint` | count unknown | - | pass |
@@ -70,17 +70,48 @@
 | C62 | `cd api && npx vitest run src/package/identity/invitation/__test__/fetch-invitations.use-case.spec.ts -t "\[C62` | 2 | 2 | pass |
 | C63 | `cd api && npx vitest run src/package/shared/module/config/__test__/shared-config.spec.ts -t "\[C63\]"` | 7 | 7 | pass |
 | C64 | `bash api/test/smoke/api-smoke.sh` | count unknown | - | pass |
-| C65 | `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test` | 54 | - | pass |
+| C65 | `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test` | 56 | - | pass |
+| C66 | `cd api && npx vitest run test/platform.spec.ts -t "\[C66\]"` | 1 | 1 | pass |
+| C67 | `cd api && npx vitest run test/platform.spec.ts -t "\[C67\]"` | 1 | 1 | pass |
+| C67 | `cd api && npx tsc --noEmit -p tsconfig.json` | count unknown | - | pass |
+| C68 | `cd api && npx vitest run test/platform.spec.ts -t "\[C68\]"` | 1 | 1 | pass |
+| C69 | `cd api && npm run build && node test/smoke/check-dist.mjs` | count unknown | - | pass |
+| C70 | `bash api/test/smoke/boot-smoke.sh` | count unknown | - | pass |
+| C71 | `bash api/test/smoke/boot-smoke.sh` | count unknown | - | pass |
+| C72 | `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test` | 56 | - | pass |
+| C73 | `cd api && npx vitest run test/docs.spec.ts -t "\[C73\]"` | 1 | 1 | pass |
+| C74 | `cd api && npx vitest run test/docs.spec.ts -t "\[C74\]"` | 1 | 1 | pass |
+| C75 | `cd api && npx vitest run test/docs.spec.ts -t "\[C75\]"` | 1 | 1 | pass |
+| C76 | `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"` | 1 | 1 | pass |
+| C77 | `node --test --test-name-pattern '\[C77\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C78 | `node --test --test-name-pattern '\[C78\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C79 | `node --test --test-name-pattern '\[C79\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C80 | `node --test --test-name-pattern '\[C80\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C81 | `node --test --test-name-pattern '\[C81\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C82 | `node --test --test-name-pattern '\[C82\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C83 | `node --test --test-name-pattern '\[C83\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C84 | `cd web && npx ng test --watch=false --filter='\[C84\]'` | 1 | - | pass |
+| C85 | `cd web && npx ng test --watch=false --filter='\[C85\]'` | 1 | - | pass |
+| C86 | `cd web && npx ng test --watch=false --filter='\[C86\]'` | 1 | - | pass |
+| C87 | `cd web && npx ng test --watch=false --filter='\[C87\]'` | 2 | - | pass |
+| C88 | `cd web && npx ng test --watch=false --filter='\[C88\]'` | 1 | - | pass |
+| C89 | `cd web && npx ng test --watch=false --filter='\[C89\]'` | 1 | - | pass |
+| C90 | `cd web && npx ng test --watch=false --filter='\[C90\]'` | 1 | - | pass |
+| C91 | `cd web && npx ng test --watch=false --filter='\[C91\]'` | 2 | - | pass |
+| C92 | `cd web && npx ng test --watch=false --filter='\[C92\]'` | 1 | - | pass |
+| C93 | `cd web && npx ng test --watch=false --filter='\[C93\]'` | 1 | - | pass |
+| C94 | `walk - sign in, open Clientes, read the table or the empty copy, use pagination, open the sheet` | - | - | pass (Walked) |
+| C95 | `walk - read the switcher in the layout and open the invitation accept route until the form is on screen` | - | - | pass (Walked) |
+| C96 | `node --test --test-name-pattern '\[C96\]' web/test/layout.spec.mjs` | count unknown | - | pass |
+| C97 | `cd web && npx ng test --watch=false --filter='\[C97\]'` | 1 | - | pass |
 | Build | `cd api && npm run build` | - | - | pass |
 | Build | `cd api && npm run lint` | - | - | pass |
+| Build | `cd web && npm run build` | - | - | pass |
 
 ## Mutations
 
 | Mutation | Location | Killed |
 | --- | --- | --- |
-| switch organization: membership check dropped | `api/src/package/identity/auth/switch-organization.use-case.ts:25` | yes |
-| internal guard: administrator role check dropped | `api/src/package/identity/organization/internal-administrator.guard.ts:17` | yes |
-| delivery: third failure no longer records failed (bound shifted by one) | `api/src/package/identity/invitation/deliver-invitation.use-case.ts:92` | yes |
-| send invitation: internal Organization accepted | `api/src/package/identity/invitation/send-invitation.use-case.ts:59` | yes |
-| accept invitation: already-accepted 409 guard dropped | `api/src/package/identity/invitation/accept-invitation.use-case.ts:30` | yes |
-| backoff: first retry waits 10 s instead of 5 s | `api/src/package/identity/invitation/invitation-delivery.queue.ts:25` | yes |
+| organizations table drops the tTable attribute | `web/src/package/identity/organization/components/organization-list.ts:20` | yes |
+| session read GET /api/me becomes POST | `web/src/package/identity/authentication/authentication.service.ts:48` | yes |
+| organization switch reloads before the 204 | `web/src/package/shared/components/internal-layout.ts:138` | yes |
