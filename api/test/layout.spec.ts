@@ -159,11 +159,13 @@ describe('acme layout', () => {
         'POST /invitations',
         'POST /invitations/:id/resend',
         'POST /invitations/accept',
-      ].sort(),
+      ].sort((a, b) => a.localeCompare(b)),
     );
 
     const names = controllers.map((file) => file.split('/').pop());
-    expect(names.sort()).toEqual(
+    expect(
+      [...names].sort((a, b) => String(a).localeCompare(String(b))),
+    ).toEqual(
       [
         'customer.controller.ts',
         'vessel.controller.ts',
@@ -174,7 +176,7 @@ describe('acme layout', () => {
         'organization.controller.ts',
         'user.controller.ts',
         'invitation.controller.ts',
-      ].sort(),
+      ].sort((a, b) => a.localeCompare(b)),
     );
   });
 
@@ -219,5 +221,24 @@ describe('acme layout', () => {
     expect(read(join(packageRoot, 'customer/customer.module.ts'))).toMatch(
       /exports: \[CustomerFacade\]/,
     );
+  });
+
+  it('[C32] opts only POST /sessions and POST /invitations/accept out of the global guard', () => {
+    const publics: string[] = [];
+
+    for (const file of files.filter((path) =>
+      path.endsWith('.controller.ts'),
+    )) {
+      for (const match of read(file).matchAll(
+        /@Public\(\)\s+@(Get|Post|Put|Delete)\((?:'([^']*)')?\)/g,
+      )) {
+        publics.push(`${match[1].toUpperCase()} ${match[2] ?? ''}`);
+      }
+    }
+
+    expect(publics.sort((a, b) => a.localeCompare(b))).toEqual([
+      'POST /accept',
+      'POST /sessions',
+    ]);
   });
 });

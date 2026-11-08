@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { Public } from '@/package/shared/module/auth/public';
 
 import { InternalAdministratorGuard } from '../organization/internal-administrator.guard';
 import { AcceptInvitationUseCase } from './accept-invitation.use-case';
@@ -92,6 +93,7 @@ export class InvitationController {
     }
   }
 
+  @Public()
   @Post('/accept')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(acceptInvitationBodySchema))

@@ -21,6 +21,19 @@ export const sharedConfigSchema = z.object({
   port: z.coerce.number().positive().int(),
   jwt: jwtSchema,
   database: databaseSchema,
+  redis: z.object({
+    url: z.string().regex(/^rediss?:\/\//),
+  }),
+  web: z.object({
+    origin: z.url({ protocol: /^https?$/ }),
+  }),
+  mail: z.object({
+    host: z.string().min(1),
+    port: z.coerce.number().int().positive(),
+    user: z.string().min(1).optional(),
+    pass: z.string().min(1).optional(),
+    from: z.string().min(1),
+  }),
 });
 
 export type Environment = z.infer<typeof environmentSchema>;
@@ -37,6 +50,19 @@ export const sharedConfigFactory = (): SharedConfig => {
     },
     database: {
       url: process.env.DATABASE_URL,
+    },
+    redis: {
+      url: process.env.REDIS_URL,
+    },
+    web: {
+      origin: process.env.WEB_ORIGIN,
+    },
+    mail: {
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
+      user: process.env.MAIL_USER || undefined,
+      pass: process.env.MAIL_PASS || undefined,
+      from: process.env.MAIL_FROM,
     },
   });
 
