@@ -218,11 +218,11 @@ Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
 **C66** - `api/package.json` has `"type": "module"`, and `@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`, `@nestjs/jwt`, `@nestjs/passport`, `@nestjs/bullmq`, `@nestjs/config`, `@nestjs/testing`, `@nestjs/cli` and `@nestjs/schematics` all declare a `^12` range; `typescript` is `^6`; `tsc-alias` and `ts-loader` are gone (AC 24)
 Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C66\]"`
 
-**C67** - `api/tsconfig.json` sets `"strict": true` and none of `strictNullChecks`, `noImplicitAny` or `strictBindCallApply` is set to `false`; `npx tsc --noEmit -p tsconfig.json` over `src/` and `test/` exits 0 (AC 24)
+**C67** - `api/tsconfig.json` sets `"strict": true`; neither it nor `api/tsconfig.build.json` (the config `nest build` reads, which extends it) sets `strict`, `strictNullChecks`, `noImplicitAny`, `strictBindCallApply`, `strictFunctionTypes`, `noImplicitThis`, `alwaysStrict` or `useUnknownInCatchVariables` to `false`; `npx tsc --noEmit -p tsconfig.json` over `src/` and `test/` exits 0 (AC 24)
 Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C67\]"`
 Proof: `cd api && npx tsc --noEmit -p tsconfig.json`
 
-**C68** - Every relative and `@/` import or export specifier in `api/src` and `api/test` that points at a project file ends in `.js`; no file there (outside the generated client) uses `require(`, `module.exports`, `__dirname` or `__filename`; `schema.prisma` declares `moduleFormat = "esm"` and the generated client has no `require(` (AC 24)
+**C68** - Every relative (`.`, `..`, `./x`) and `@/` or `@test/` specifier after `from`, `import`, `import(` or `vi.mock`, `vi.doMock`, `vi.importActual`, `vi.importMock` in `api/src` and `api/test` ends in `.js` (not `.json`); no file there (outside the generated client) uses `require(`, `module.exports`, `__dirname` or `__filename`; `schema.prisma` declares `moduleFormat = "esm"` and the generated client has no `require(` (AC 24)
 Proof: `cd api && npx vitest run test/platform.spec.ts -t "\[C68\]"`
 
 **C69** - `npm run build` in `api/` exits 0 and writes `dist/main.js` as an ES module; no `.js` under `dist/` still contains an `@/` specifier; the generated Prisma client is under `dist/package/shared/module/prisma/generated/prisma/` as ES modules (AC 25)
@@ -237,16 +237,16 @@ Proof: `bash api/test/smoke/boot-smoke.sh`
 **C72** - `npm run test` in `api/` exits 0 with `DATABASE_URL`, `JWT_SECRET` and `REDIS_URL` unset, on the ESM and strict build (AC 24)
 Proof: `cd api && env -u DATABASE_URL -u JWT_SECRET -u REDIS_URL npm run test`
 
-**C73** - `AGENTS.md` lists Redis, SMTP with Mailpit, the 7 variables `REDIS_URL`, `WEB_ORIGIN`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM`, `MAIL_USER` and `MAIL_PASS`, `npx prisma db seed`, Vitest, oxlint, ESM, the `package/<context>/<aggregate>` layout, `organizationId` taken from the session, `CustomerFacade` and `GET /me`; it keeps the Context7 rule; and it contains none of `core/interface`, `core/entity`, `http/rest`, `persistence.module`, `CommonJS`, `tsc-alias`, `dist/src/main.js`, `Jest`, `/whoami` or `create the first User by hand` (AC 24a)
+**C73** - `AGENTS.md` lists Redis, SMTP with Mailpit, the 7 variables `REDIS_URL`, `WEB_ORIGIN`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM`, `MAIL_USER` and `MAIL_PASS`, `npx prisma db seed`, Vitest, oxlint, ESM, the `package/<context>/<aggregate>` layout, `organizationId` taken from the session, `CustomerFacade` and `GET /me`; it keeps the Context7 rule; and it contains none, in any letter case, of `core/interface`, `core/entity`, `core/use-case`, `core/exception`, `http/rest`, `persistence/`, `persistence.module`, `PersistenceModule`, `CommonJS`, `tsc-alias`, `ts-loader`, `NestJS 11`, `dist/src/main.js`, `Jest`, `whoami` or `create the first User by hand` (AC 24a)
 Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C73\]"`
 
-**C74** - `CONTEXT.md` defines **Organization**, **Membership**, **Role** and **Invitation** as glossary entries, keeps the 7 terms it had (User, Customer, Vessel, IMO number, WorkOrder, WorkOrderService, WorkOrderServiceImage), no longer lists `MANAGER` or `DEVELOPER` as a User role, says the IMO number is unique within its Organization and the Customer email is unique within its Organization (AC 24a)
+**C74** - `CONTEXT.md` defines **Organization**, **Membership**, **Role** and **Invitation** as glossary entries, keeps the 7 terms it had (User, Customer, Vessel, IMO number, WorkOrder, WorkOrderService, WorkOrderServiceImage), no longer lists `MANAGER` or `DEVELOPER` as a User role, says the IMO number is unique within its Organization and the Customer email is unique within its Organization (AC 24a); it does not claim a database rule that does not exist (one internal Organization is created by the seed, not enforced by an index)
 Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C74\]"`
 
-**C75** - `.cursor/skills/modular-architecture/SKILL.md` describes the flat-by-aggregate layout (`package/<context>/<aggregate>/`, `contracts/`, `I<Plural>Repository`, `__test__/`), the facade, `organizationId` tenancy, ESM `.js` specifiers, Vitest and oxlint, and contains none of `core/entity`, `core/interface`, `core/use-case`, `http/rest/controller`, `persistence/repository`, `persistence.module`, `Jest`, `CommonJS` or `tsc-alias`; the `roadmap-execution` skill names no `core/` or `persistence/` path either (AC 24a)
+**C75** - `.cursor/skills/modular-architecture/SKILL.md` describes the flat-by-aggregate layout (`package/<context>/<aggregate>/`, `contracts/`, `I<Plural>Repository`, `__test__/`), the facade, `organizationId` tenancy, ESM `.js` specifiers, Vitest and oxlint, and contains none, in any letter case, of `core/entity`, `core/interface`, `core/use-case`, `core/exception`, `http/rest/controller`, `persistence/`, `persistence.module`, `PersistenceModule`, `Jest`, `CommonJS`, `tsc-alias`, `ts-loader` or `NestJS 11`; the `roadmap-execution` skill names no `core/` or `persistence/` path either (AC 24a)
 Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C75\]"`
 
-**C76** - `ROADMAP.md` item 5 (tests foundation) and item 6 (error mapping) read `Status: built`, item 7 stays a proposal, and no item mentions `/whoami` as a live route or Users "inserted by hand" (AC 24a; items 5 and 6 are absorbed by AD-007)
+**C76** - `ROADMAP.md` item 5 (tests foundation) and item 6 (error mapping) read `Status: built`, item 7 stays a proposal, and no item mentions `whoami` (any case) or "by hand" (AC 24a; items 5 and 6 are absorbed by AD-007)
 Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"`
 
 ## Coverage
@@ -293,7 +293,7 @@ Proof: `cd api && npx vitest run test/docs.spec.ts -t "\[C76\]"`
 | env vars `AGENTS.md` lists (7) | `REDIS_URL` · `WEB_ORIGIN` · `MAIL_HOST` · `MAIL_PORT` · `MAIL_FROM` · `MAIL_USER` · `MAIL_PASS`: C73 | - |
 | `CONTEXT.md` terms added (4) | Organization · Membership · Role · Invitation: C74 | - |
 | `CONTEXT.md` terms kept (7) | User · Customer · Vessel · IMO number · WorkOrder · WorkOrderService · WorkOrderServiceImage: C74 | - |
-| stale statements removed from `AGENTS.md` (9) | `core/interface` · `core/entity` · `http/rest` · `persistence.module` · `CommonJS` · `tsc-alias` · `dist/src/main.js` · `Jest` · `/whoami`: C73 | - |
+| stale statements removed from `AGENTS.md` (9) | `core/interface` · `core/entity` · `http/rest` · `persistence.module` · `CommonJS` · `tsc-alias` · `dist/src/main.js` · `Jest` · `whoami`: C73 (the list also holds `core/use-case`, `core/exception`, `persistence/`, `PersistenceModule`, `ts-loader`, `NestJS 11`, `create the first User by hand`) | - |
 | criteria of S3 (3: AC 24, 24a, 25) | AC 24 C66-C68, C71, C72 · AC 24a C73-C76 · AC 25 C69, C70 | - |
 
 ## Swept
