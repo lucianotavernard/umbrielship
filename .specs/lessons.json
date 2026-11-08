@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 6,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::make a file system failure deterministic with a spy rejecting each error code and assert the exact error not an os dependent code set",
+      "text": "Make a file-system failure deterministic with a spy rejecting each error code, and assert the exact error, not an OS-dependent code set",
+      "signal": "surviving_mutant",
+      "scope": "use-case",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C28 remove-work-order-service-image.use-case.spec.ts (use-case)"
+      ],
+      "created": "2026-11-08T04:36:44Z",
+      "last_seen": "2026-11-08T04:36:44Z"
+    },
+    {
+      "id": "L-002",
+      "key": "spec_precision_gap::make an in memory fake mirror the real repository s behaviour or record the divergence so a test cannot pass on a fake only result",
+      "text": "Make an in-memory fake mirror the real repository's behaviour, or record the divergence, so a test cannot pass on a fake-only result",
+      "signal": "spec_precision_gap",
+      "scope": "repo-layer",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C8 in-memory-customers-repository.ts (repo-layer)"
+      ],
+      "created": "2026-11-08T04:36:44Z",
+      "last_seen": "2026-11-08T04:36:44Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_precision_gap::make a fake save write only the fields the real repository writes so a keeps this field claim can fail",
+      "text": "Make a fake save write only the fields the real repository writes, so a keeps-this-field claim can fail",
+      "signal": "spec_precision_gap",
+      "scope": "repo-layer",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C12 in-memory-vessels-repository.ts (repo-layer)"
+      ],
+      "created": "2026-11-08T04:36:44Z",
+      "last_seen": "2026-11-08T04:36:44Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_precision_gap::prove a spec exists by its content at least one tagged test not by the file existing",
+      "text": "Prove a spec exists by its content (at least one tagged test), not by the file existing",
+      "signal": "spec_precision_gap",
+      "scope": "use-case",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C1 use-case-specs.spec.ts (use-case)"
+      ],
+      "created": "2026-11-08T04:36:44Z",
+      "last_seen": "2026-11-08T04:36:44Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::state in the claim what a null input does when the request type allows null and assert it",
+      "text": "State in the claim what a null input does when the request type allows null, and assert it",
+      "signal": "ac_gap",
+      "scope": "use-case",
+      "status": "candidate",
+      "features": [
+        "acme-architecture-migration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "C7 edit-customer.use-case.ts (use-case)"
+      ],
+      "created": "2026-11-08T04:36:44Z",
+      "last_seen": "2026-11-08T04:36:44Z"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 # acme-architecture-migration proofs
 
-**HEAD**: 3a4e826
-**Tree**: dirty - api/eslint.config.mjs, api/package-lock.json, api/package.json, api/src/customer/core/use-case/edit-customer.use-case.ts, api/test/app.e2e-spec.ts
+**HEAD**: acf4b70
+**Tree**: clean
 **Result**: 31 pass, 0 fail; mutations 6 killed, 0 not
 
 | Check | Proof | Ran | Passed | Result |

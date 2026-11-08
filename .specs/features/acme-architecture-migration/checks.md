@@ -126,5 +126,5 @@ Proof: `cd api && npx vitest run src/work-order/core/use-case/add-work-order-ser
 
 - **Settled mid-build:** none
 - **Dispatched:** Verifier (independent sub-agent) for S1 at `HEAD` 3a4e826 plus the uncommitted working tree (the user forbade commits this turn) - returned: 5 findings, all fixed in the working tree
-- **Boundary:** C1-C29 green in `proofs.md` against the working tree, 6 of 6 mutations killed; nothing committed, so `validate_verification.py` stays red until the S1 commit exists (it needs `Closed` to name a commit and a clean tree)
+- **Boundary:** C1-C29 closed at `acf4b70`; `proofs.md` green at that `HEAD`, 6 of 6 mutations killed, gate green; S2-S4 not started
 - **Abandoned:** none; C21 was reworded before the build closed: it first claimed `vesselId` is kept, but `EditWorkOrderUseCase` reads it from a detail entity that never carries it (see the plan, criterion 13); the claim now says "under the same `id`"
