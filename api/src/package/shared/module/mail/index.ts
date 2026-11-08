@@ -1,2 +1,2 @@
-export * from './mail.module';
-export * from './contracts/email-sender';
+export * from './mail.module.js';
+export * from './contracts/email-sender.js';

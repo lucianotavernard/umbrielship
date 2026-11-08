@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeCustomer } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { FetchCustomersUseCase } from '../fetch-customers.use-case';
+import { makeCustomer } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { FetchCustomersUseCase } from '../fetch-customers.use-case.js';
 
 describe('FetchCustomersUseCase', () => {
   it('[C8] returns the 2nd and 3rd customers for take 2 skip 1 and total 3', async () => {

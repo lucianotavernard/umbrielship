@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { Customer } from './customer.entity';
-import { ICustomersRepository } from './contracts/customer-repository.contract';
+import { Customer } from './customer.entity.js';
+import { ICustomersRepository } from './contracts/customer-repository.contract.js';
 
 type EditCustomerUseCaseRequest = {
   organizationId: string;

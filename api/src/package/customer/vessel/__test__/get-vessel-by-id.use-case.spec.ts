@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer, makeVessel } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { GetVesselByIdUseCase } from '../get-vessel-by-id.use-case';
+import { makeCustomer, makeVessel } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { GetVesselByIdUseCase } from '../get-vessel-by-id.use-case.js';
 
 let customers: InMemoryCustomersRepository;
 let vessels: InMemoryVesselsRepository;

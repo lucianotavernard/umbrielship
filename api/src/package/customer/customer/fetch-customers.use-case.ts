@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { Customer } from './customer.entity';
-import { ICustomersRepository } from './contracts/customer-repository.contract';
+import { Customer } from './customer.entity.js';
+import { ICustomersRepository } from './contracts/customer-repository.contract.js';
 
 type FetchCustomersUseCaseRequest = {
   organizationId: string;

@@ -6,19 +6,19 @@ import {
 } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 
-import { CustomerController } from '@/package/customer/customer/customer.controller';
-import { VesselController } from '@/package/customer/vessel/vessel.controller';
-import { AuthenticationController } from '@/package/identity/auth/authentication.controller';
-import { WrongCredentialsException } from '@/package/identity/auth/wrong-credentials.exception';
-import { InvitationController } from '@/package/identity/invitation/invitation.controller';
-import { OrganizationController } from '@/package/identity/organization/organization.controller';
-import { UserController } from '@/package/identity/user/user.controller';
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { WorkOrderServiceImageController } from '@/package/work-order/work-order-service-image/work-order-service-image.controller';
-import { WorkOrderServiceController } from '@/package/work-order/work-order-service/work-order-service.controller';
-import { WorkOrderController } from '@/package/work-order/work-order/work-order.controller';
+import { CustomerController } from '@/package/customer/customer/customer.controller.js';
+import { VesselController } from '@/package/customer/vessel/vessel.controller.js';
+import { AuthenticationController } from '@/package/identity/auth/authentication.controller.js';
+import { WrongCredentialsException } from '@/package/identity/auth/wrong-credentials.exception.js';
+import { InvitationController } from '@/package/identity/invitation/invitation.controller.js';
+import { OrganizationController } from '@/package/identity/organization/organization.controller.js';
+import { UserController } from '@/package/identity/user/user.controller.js';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { WorkOrderServiceImageController } from '@/package/work-order/work-order-service-image/work-order-service-image.controller.js';
+import { WorkOrderServiceController } from '@/package/work-order/work-order-service/work-order-service.controller.js';
+import { WorkOrderController } from '@/package/work-order/work-order/work-order.controller.js';
 
 // An argument that survives destructuring, arithmetic and property reads.
 const anything: unknown = new Proxy(function () {} as object, {

@@ -17,13 +17,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express } from 'express';
 import { diskStorage } from 'multer';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { AddWorkOrderServiceImageUseCase } from './add-work-order-service-image.use-case';
-import { FetchWorkOrderServiceImagesUseCase } from './fetch-work-order-service-images.use-case';
-import { RemoveWorkOrderServiceImageUseCase } from './remove-work-order-service-image.use-case';
+import { AddWorkOrderServiceImageUseCase } from './add-work-order-service-image.use-case.js';
+import { FetchWorkOrderServiceImagesUseCase } from './fetch-work-order-service-images.use-case.js';
+import { RemoveWorkOrderServiceImageUseCase } from './remove-work-order-service-image.use-case.js';
 
 const WORK_ORDER_SERVICE_IMAGES_DIR = 'work-order-service-images';
 

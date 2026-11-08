@@ -1,18 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
 import {
   makeCustomer,
   makeService,
   makeVessel,
   makeWorkOrder,
-} from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { FetchWorkOrderServicesUseCase } from '../fetch-work-order-services.use-case';
+} from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { FetchWorkOrderServicesUseCase } from '../fetch-work-order-services.use-case.js';
 
 let sut: FetchWorkOrderServicesUseCase;
 

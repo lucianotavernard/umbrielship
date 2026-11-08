@@ -4,13 +4,13 @@ import {
   Vessel as PrismaVessel,
   Customer as PrismaCustomer,
   CustomerAddress as PrismaCustomerAddress,
-} from '@/package/shared/module/prisma/generated/prisma/client';
-import { PrismaService } from '@/package/shared/module/prisma/prisma.service';
-import { Paginate } from '@/package/shared/lib/type/paginate';
+} from '@/package/shared/module/prisma/generated/prisma/client.js';
+import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
-import { Vessel } from './vessel.entity';
-import { VesselDetail } from './vessel-detail.entity';
-import { IVesselsRepository } from './contracts/vessel-repository.contract';
+import { Vessel } from './vessel.entity.js';
+import { VesselDetail } from './vessel-detail.entity.js';
+import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 @Injectable()
 export class PrismaVesselsRepository implements IVesselsRepository {

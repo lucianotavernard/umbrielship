@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IInvitationsRepository } from './contracts/invitation-repository.contract';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IInvitationsRepository } from './contracts/invitation-repository.contract.js';
 
 type AcceptInvitationUseCaseRequest = {
   secret: string;

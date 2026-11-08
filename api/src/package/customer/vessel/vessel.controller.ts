@@ -13,18 +13,18 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
-import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { CreateVesselUseCase } from './create-vessel.use-case';
-import { DeleteVesselUseCase } from './delete-vessel.use-case';
-import { EditVesselUseCase } from './edit-vessel.use-case';
-import { FetchVesselsUseCase } from './fetch-vessels.use-case';
-import { GetVesselByIdUseCase } from './get-vessel-by-id.use-case';
-import { VESSEL_TYPES } from './vessel.entity';
+import { CreateVesselUseCase } from './create-vessel.use-case.js';
+import { DeleteVesselUseCase } from './delete-vessel.use-case.js';
+import { EditVesselUseCase } from './edit-vessel.use-case.js';
+import { FetchVesselsUseCase } from './fetch-vessels.use-case.js';
+import { GetVesselByIdUseCase } from './get-vessel-by-id.use-case.js';
+import { VESSEL_TYPES } from './vessel.entity.js';
 
 const createVesselBodySchema = z.object({
   customerId: z.uuid(),

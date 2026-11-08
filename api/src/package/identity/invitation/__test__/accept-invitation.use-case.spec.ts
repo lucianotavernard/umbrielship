@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeOrganization, makeUser } from '@test/factory';
-import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { AcceptInvitationUseCase } from '../accept-invitation.use-case';
-import { Invitation } from '../invitation.entity';
+import { makeOrganization, makeUser } from '@test/factory.js';
+import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { AcceptInvitationUseCase } from '../accept-invitation.use-case.js';
+import { Invitation } from '../invitation.entity.js';
 
 let users: InMemoryUsersRepository;
 let invitations: InMemoryInvitationsRepository;

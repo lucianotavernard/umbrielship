@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer, makeVessel } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { CreateVesselUseCase } from '../create-vessel.use-case';
+import { makeCustomer, makeVessel } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { CreateVesselUseCase } from '../create-vessel.use-case.js';
 
 let customers: InMemoryCustomersRepository;
 let vessels: InMemoryVesselsRepository;

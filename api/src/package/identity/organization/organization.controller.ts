@@ -12,19 +12,19 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query';
-import type { PageQueryParamSchema } from '@/package/shared/lib/http/page-query';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
+import type { PageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 
-import { FetchInvitationsUseCase } from '../invitation/fetch-invitations.use-case';
-import { CountOrganizationRolesUseCase } from '../user/count-organization-roles.use-case';
-import { FetchOrganizationUsersUseCase } from '../user/fetch-organization-users.use-case';
-import { FetchOrganizationsUseCase } from './fetch-organizations.use-case';
-import { CreateOrganizationUseCase } from './create-organization.use-case';
-import { GetOrganizationByIdUseCase } from './get-organization-by-id.use-case';
-import { InternalAdministratorGuard } from './internal-administrator.guard';
+import { FetchInvitationsUseCase } from '../invitation/fetch-invitations.use-case.js';
+import { CountOrganizationRolesUseCase } from '../user/count-organization-roles.use-case.js';
+import { FetchOrganizationUsersUseCase } from '../user/fetch-organization-users.use-case.js';
+import { FetchOrganizationsUseCase } from './fetch-organizations.use-case.js';
+import { CreateOrganizationUseCase } from './create-organization.use-case.js';
+import { GetOrganizationByIdUseCase } from './get-organization-by-id.use-case.js';
+import { InternalAdministratorGuard } from './internal-administrator.guard.js';
 
 const createOrganizationBodySchema = z.object({
   name: z.string().trim().min(1).max(80),

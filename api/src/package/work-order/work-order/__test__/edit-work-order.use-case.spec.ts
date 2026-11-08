@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { EditWorkOrderUseCase } from '../edit-work-order.use-case';
+import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { EditWorkOrderUseCase } from '../edit-work-order.use-case.js';
 
 let workOrders: InMemoryWorkOrdersRepository;
 let sut: EditWorkOrderUseCase;

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IOrganizationsRepository } from './contracts/organization-repository.contract';
+import { IOrganizationsRepository } from './contracts/organization-repository.contract.js';
 
 type GetOrganizationByIdUseCaseResponse = {
   organization: {

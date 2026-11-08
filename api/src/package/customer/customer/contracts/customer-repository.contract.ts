@@ -1,5 +1,5 @@
-import { Paginate } from '@/package/shared/lib/type/paginate';
-import { Customer } from '../customer.entity';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
+import { Customer } from '../customer.entity.js';
 
 export abstract class ICustomersRepository {
   abstract findById(

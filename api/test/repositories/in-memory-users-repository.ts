@@ -1,6 +1,6 @@
-import { IUsersRepository } from '@/package/identity/user/contracts/user-repository.contract';
-import { Role, User } from '@/package/identity/user/user.entity';
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
+import { IUsersRepository } from '@/package/identity/user/contracts/user-repository.contract.js';
+import { Role, User } from '@/package/identity/user/user.entity.js';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 

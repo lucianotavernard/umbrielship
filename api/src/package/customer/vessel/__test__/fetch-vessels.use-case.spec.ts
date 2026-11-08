@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { makeVessel } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { FetchVesselsUseCase } from '../fetch-vessels.use-case';
+import { makeVessel } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { FetchVesselsUseCase } from '../fetch-vessels.use-case.js';
 
 let vessels: InMemoryVesselsRepository;
 let sut: FetchVesselsUseCase;

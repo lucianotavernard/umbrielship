@@ -1,7 +1,7 @@
 import {
   InvitationDelivery,
   InvitationDeliveryInput,
-} from '@/package/identity/invitation/contracts/invitation-delivery.contract';
+} from '@/package/identity/invitation/contracts/invitation-delivery.contract.js';
 
 export class FakeInvitationDelivery implements InvitationDelivery {
   public delivered: InvitationDeliveryInput[] = [];

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createTransport } from 'nodemailer';
 
-import { ConfigService } from '../../config/config.service';
-import { NodemailerEmailSender } from '../nodemailer-email-sender';
+import { ConfigService } from '../../config/config.service.js';
+import { NodemailerEmailSender } from '../nodemailer-email-sender.js';
 
 const sendMail = vi.fn(async () => ({}));
 

@@ -1,13 +1,13 @@
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import {
   IInvitationsRepository,
   InvitationDeliveryRecord,
-} from '@/package/identity/invitation/contracts/invitation-repository.contract';
+} from '@/package/identity/invitation/contracts/invitation-repository.contract.js';
 import {
   Invitation,
   InvitationDeliveryStatus,
-} from '@/package/identity/invitation/invitation.entity';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
+} from '@/package/identity/invitation/invitation.entity.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
 
 export class InMemoryInvitationsRepository implements IInvitationsRepository {
   public items: Invitation[] = [];

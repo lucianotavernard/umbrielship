@@ -1,6 +1,6 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 export const CurrentUser = createParamDecorator(
   (_: never, context: ExecutionContext): UserPayload => {

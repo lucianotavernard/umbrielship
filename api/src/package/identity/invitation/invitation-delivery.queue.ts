@@ -1,6 +1,6 @@
 import type { JobsOptions } from 'bullmq';
 
-import { MAX_DELIVERY_ATTEMPTS } from './deliver-invitation.use-case';
+import { MAX_DELIVERY_ATTEMPTS } from './deliver-invitation.use-case.js';
 
 export const INVITATION_DELIVERY_QUEUE = 'invitation-delivery';
 

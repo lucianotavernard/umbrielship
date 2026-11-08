@@ -11,15 +11,15 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
-import { Public } from '@/package/shared/module/auth/public';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { Public } from '@/package/shared/module/auth/public.js';
 
-import { InternalAdministratorGuard } from '../organization/internal-administrator.guard';
-import { AcceptInvitationUseCase } from './accept-invitation.use-case';
-import { ResendInvitationUseCase } from './resend-invitation.use-case';
-import { SendInvitationUseCase } from './send-invitation.use-case';
+import { InternalAdministratorGuard } from '../organization/internal-administrator.guard.js';
+import { AcceptInvitationUseCase } from './accept-invitation.use-case.js';
+import { ResendInvitationUseCase } from './resend-invitation.use-case.js';
+import { SendInvitationUseCase } from './send-invitation.use-case.js';
 
 const sendInvitationBodySchema = z.object({
   userId: z.uuid(),

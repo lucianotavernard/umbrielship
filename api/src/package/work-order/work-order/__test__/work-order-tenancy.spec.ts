@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { CustomerFacade } from '@/package/customer/customer.facade';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { CustomerFacade } from '@/package/customer/customer.facade.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { CreateWorkOrderUseCase } from '../create-work-order.use-case';
-import { DeleteWorkOrderUseCase } from '../delete-work-order.use-case';
-import { EditWorkOrderUseCase } from '../edit-work-order.use-case';
-import { FetchWorkOrdersUseCase } from '../fetch-work-orders.use-case';
-import { GetWorkOrderByIdUseCase } from '../get-work-order-by-id.use-case';
+import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { CreateWorkOrderUseCase } from '../create-work-order.use-case.js';
+import { DeleteWorkOrderUseCase } from '../delete-work-order.use-case.js';
+import { EditWorkOrderUseCase } from '../edit-work-order.use-case.js';
+import { FetchWorkOrdersUseCase } from '../fetch-work-orders.use-case.js';
+import { GetWorkOrderByIdUseCase } from '../get-work-order-by-id.use-case.js';
 
 let workOrders: InMemoryWorkOrdersRepository;
 let vessels: InMemoryVesselsRepository;

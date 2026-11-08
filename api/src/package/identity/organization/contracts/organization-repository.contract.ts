@@ -1,4 +1,4 @@
-import { Organization } from '../organization.entity';
+import { Organization } from '../organization.entity.js';
 
 export abstract class IOrganizationsRepository {
   abstract findAll(page: number, perPage: number): Promise<Organization[]>;

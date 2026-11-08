@@ -1,7 +1,7 @@
-import { Paginate } from '@/package/shared/lib/type/paginate';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
-import { Vessel } from '../vessel.entity';
-import { VesselDetail } from '../vessel-detail.entity';
+import { Vessel } from '../vessel.entity.js';
+import { VesselDetail } from '../vessel-detail.entity.js';
 
 export abstract class IVesselsRepository {
   abstract findById(

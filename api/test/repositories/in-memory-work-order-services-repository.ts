@@ -1,5 +1,5 @@
-import { WorkOrderService } from '@/package/work-order/work-order-service/work-order-service.entity';
-import { IWorkOrderServicesRepository } from '@/package/work-order/work-order-service/contracts/work-order-service-repository.contract';
+import { WorkOrderService } from '@/package/work-order/work-order-service/work-order-service.entity.js';
+import { IWorkOrderServicesRepository } from '@/package/work-order/work-order-service/contracts/work-order-service-repository.contract.js';
 
 export class InMemoryWorkOrderServicesRepository implements IWorkOrderServicesRepository {
   public items: WorkOrderService[] = [];

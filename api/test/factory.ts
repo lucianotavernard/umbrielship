@@ -1,25 +1,28 @@
 import {
   Customer,
   CustomerProps,
-} from '@/package/customer/customer/customer.entity';
-import { Vessel, VesselProps } from '@/package/customer/vessel/vessel.entity';
+} from '@/package/customer/customer/customer.entity.js';
+import {
+  Vessel,
+  VesselProps,
+} from '@/package/customer/vessel/vessel.entity.js';
 import {
   Organization,
   OrganizationProps,
-} from '@/package/identity/organization/organization.entity';
-import { User, UserProps } from '@/package/identity/user/user.entity';
+} from '@/package/identity/organization/organization.entity.js';
+import { User, UserProps } from '@/package/identity/user/user.entity.js';
 import {
   WorkOrderServiceImage,
   WorkOrderServiceImageProps,
-} from '@/package/work-order/work-order-service-image/work-order-service-image.entity';
+} from '@/package/work-order/work-order-service-image/work-order-service-image.entity.js';
 import {
   WorkOrderService,
   WorkOrderServiceProps,
-} from '@/package/work-order/work-order-service/work-order-service.entity';
+} from '@/package/work-order/work-order-service/work-order-service.entity.js';
 import {
   WorkOrder,
   WorkOrderProps,
-} from '@/package/work-order/work-order/work-order.entity';
+} from '@/package/work-order/work-order/work-order.entity.js';
 
 export const makeCustomer = (
   override: Partial<CustomerProps> = {},

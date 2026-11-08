@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 
-import { RecoverInvitationDeliveriesUseCase } from './recover-invitation-deliveries.use-case';
+import { RecoverInvitationDeliveriesUseCase } from './recover-invitation-deliveries.use-case.js';
 
 @Injectable()
 export class InvitationDeliveryRecovery implements OnApplicationBootstrap {

@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import type { WorkOrderStatus } from './work-order.entity';
+import type { WorkOrderStatus } from './work-order.entity.js';
 
 type VesselValueObject = {
   vesselId: string;

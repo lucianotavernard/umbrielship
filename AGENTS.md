@@ -8,7 +8,7 @@ There is no root `package.json`: `api/` and `web/` are independent npm projects.
 
 **API** (`api/`):
 
-- `npm run start:dev` starts Nest in watch mode on `PORT` (3333 in `.env.example`). `npm run build` runs `nest build && tsc-alias -p tsconfig.build.json`; `npm run start:prod` runs `node dist/src/main.js`.
+- `npm run start:dev` starts Nest in watch mode on `PORT` (3333 in `.env.example`). `npm run build` runs `nest build`, which also rewrites the `@/` alias; `npm run start:prod` runs `node dist/main`.
 - `npm run lint` runs oxlint (type-aware) on `src/` and `test/`; `npm run format` runs Prettier.
 - `npm run test` runs every `src/**/*.spec.ts` and `test/**/*.spec.ts` with Vitest (`vitest.config.mts`), with no database. There is one spec per use case, beside it as `<use-case>.spec.ts`, on in-memory repositories and fakes kept in `api/test/` (`repositories/`, `cryptography/`, `factory.ts`); `test:watch` and `test:cov` also exist. `test/use-case-specs.spec.ts` fails when a use case has no spec.
 - `npx prisma migrate dev` applies and creates migrations in `src/shared/module/prisma/migrations/`; `npx prisma generate` rewrites the client in `src/shared/module/prisma/generated/prisma/`. There is no seed: create the first User by hand in the database (`users.password` is a bcrypt hash).

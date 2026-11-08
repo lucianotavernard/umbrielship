@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from './contracts/user-repository.contract';
-import { Role, User } from './user.entity';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from './contracts/user-repository.contract.js';
+import { Role, User } from './user.entity.js';
 
 type CreateUserUseCaseRequest = {
   name: string;

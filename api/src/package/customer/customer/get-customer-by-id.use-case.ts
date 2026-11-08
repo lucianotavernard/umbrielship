@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ICustomersRepository } from './contracts/customer-repository.contract';
-import { Customer } from './customer.entity';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ICustomersRepository } from './contracts/customer-repository.contract.js';
+import { Customer } from './customer.entity.js';
 
 type GetCustomerByIdUseCaseRequest = {
   organizationId: string;

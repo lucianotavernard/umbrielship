@@ -1,5 +1,5 @@
-import { WorkOrderServiceImage } from '@/package/work-order/work-order-service-image/work-order-service-image.entity';
-import { IWorkOrderServiceImagesRepository } from '@/package/work-order/work-order-service-image/contracts/work-order-service-image-repository.contract';
+import { WorkOrderServiceImage } from '@/package/work-order/work-order-service-image/work-order-service-image.entity.js';
+import { IWorkOrderServiceImagesRepository } from '@/package/work-order/work-order-service-image/contracts/work-order-service-image-repository.contract.js';
 
 export class InMemoryWorkOrderServiceImagesRepository implements IWorkOrderServiceImagesRepository {
   public items: WorkOrderServiceImage[] = [];

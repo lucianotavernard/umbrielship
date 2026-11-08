@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { compare, hash } from 'bcryptjs';
 
-import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher';
+import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher.js';
 
 @Injectable()
 export class BcryptHasher implements Hasher {

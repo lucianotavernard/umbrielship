@@ -1,6 +1,6 @@
-import { Paginate } from '@/package/shared/lib/type/paginate';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
-import { WorkOrder } from '../work-order.entity';
+import { WorkOrder } from '../work-order.entity.js';
 
 export abstract class IWorkOrdersRepository {
   abstract findById(

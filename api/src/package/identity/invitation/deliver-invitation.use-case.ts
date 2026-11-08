@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { ConfigService } from '@/package/shared/module/config/config.service';
+import { ConfigService } from '@/package/shared/module/config/config.service.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
-import { InvitationDelivery } from './contracts/invitation-delivery.contract';
-import { IInvitationsRepository } from './contracts/invitation-repository.contract';
-import { Invitation } from './invitation.entity';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
+import { InvitationDelivery } from './contracts/invitation-delivery.contract.js';
+import { IInvitationsRepository } from './contracts/invitation-repository.contract.js';
+import { Invitation } from './invitation.entity.js';
 
 export const MAX_DELIVERY_ATTEMPTS = 3;
 export const DELIVERY_TIMEOUT_MS = 5_000;

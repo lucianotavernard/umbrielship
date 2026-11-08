@@ -4,14 +4,14 @@ import { Job, Queue } from 'bullmq';
 import {
   DeliverInvitationOutcome,
   DeliverInvitationUseCase,
-} from '../deliver-invitation.use-case';
-import { InvitationDeliveryQueueConsumer } from '../invitation-delivery.queue-consumer';
+} from '../deliver-invitation.use-case.js';
+import { InvitationDeliveryQueueConsumer } from '../invitation-delivery.queue-consumer.js';
 
-import { InvitationDeliveryQueueProducer } from '../invitation-delivery.queue-producer';
+import { InvitationDeliveryQueueProducer } from '../invitation-delivery.queue-producer.js';
 import {
   invitationDeliveryBackoff,
   invitationDeliveryJobOptions,
-} from '../invitation-delivery.queue';
+} from '../invitation-delivery.queue.js';
 
 describe('Invitation delivery queue', () => {
   it('[C56] retries after 5 seconds and then 10 seconds, three attempts in all', () => {

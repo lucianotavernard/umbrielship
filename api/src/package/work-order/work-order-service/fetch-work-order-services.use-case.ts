@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { WorkOrderService } from './work-order-service.entity';
-import { IWorkOrdersRepository } from '../work-order/contracts/work-order-repository.contract';
-import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
+import { WorkOrderService } from './work-order-service.entity.js';
+import { IWorkOrdersRepository } from '../work-order/contracts/work-order-repository.contract.js';
+import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract.js';
 
 type FetchWorkOrderServicesUseCaseRequest = {
   organizationId: string;

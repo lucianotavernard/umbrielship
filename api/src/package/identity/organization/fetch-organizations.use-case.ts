@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { IOrganizationsRepository } from './contracts/organization-repository.contract';
+import { IOrganizationsRepository } from './contracts/organization-repository.contract.js';
 
 type FetchOrganizationsUseCaseRequest = {
   page: number;

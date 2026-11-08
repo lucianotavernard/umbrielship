@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { InvitationDeliveryQueue } from './contracts/invitation-delivery-queue.contract';
-import { IInvitationsRepository } from './contracts/invitation-repository.contract';
+import { InvitationDeliveryQueue } from './contracts/invitation-delivery-queue.contract.js';
+import { IInvitationsRepository } from './contracts/invitation-repository.contract.js';
 
 type RecoverInvitationDeliveriesUseCaseResponse = {
   enqueued: number;

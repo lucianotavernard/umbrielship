@@ -11,16 +11,16 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
-import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { CreateCustomerUseCase } from './create-customer.use-case';
-import { EditCustomerUseCase } from './edit-customer.use-case';
-import { FetchCustomersUseCase } from './fetch-customers.use-case';
-import { GetCustomerByIdUseCase } from './get-customer-by-id.use-case';
+import { CreateCustomerUseCase } from './create-customer.use-case.js';
+import { EditCustomerUseCase } from './edit-customer.use-case.js';
+import { FetchCustomersUseCase } from './fetch-customers.use-case.js';
+import { GetCustomerByIdUseCase } from './get-customer-by-id.use-case.js';
 
 const customerBodySchema = z.object({
   name: z.string(),

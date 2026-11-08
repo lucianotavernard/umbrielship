@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
 
 type ResolveSessionUseCaseRequest = {
   userId: string;

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeOrganization } from '@test/factory';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { GetOrganizationByIdUseCase } from '../get-organization-by-id.use-case';
+import { makeOrganization } from '@test/factory.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { GetOrganizationByIdUseCase } from '../get-organization-by-id.use-case.js';
 
 describe('GetOrganizationByIdUseCase', () => {
   const setup = () => {

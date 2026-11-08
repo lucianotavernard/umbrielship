@@ -3,9 +3,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { ConfigModule } from '@/package/shared/module/config/config.module';
-import { ConfigService } from '@/package/shared/module/config/config.service';
-import { JwtAuthGuard } from '@/package/shared/module/auth/jwt-auth.guard';
+import { ConfigModule } from '@/package/shared/module/config/config.module.js';
+import { ConfigService } from '@/package/shared/module/config/config.service.js';
+import { JwtAuthGuard } from '@/package/shared/module/auth/jwt-auth.guard.js';
 
 @Module({
   imports: [

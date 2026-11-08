@@ -1,4 +1,4 @@
-import { Role } from '../../user/user.entity';
+import { Role } from '../../user/user.entity.js';
 
 export type InvitationDeliveryInput = {
   organizationId: string;

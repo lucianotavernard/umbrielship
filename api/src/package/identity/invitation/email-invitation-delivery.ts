@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { EmailSender } from '@/package/shared/module/mail/contracts/email-sender';
+import { EmailSender } from '@/package/shared/module/mail/contracts/email-sender.js';
 
-import { Role } from '../user/user.entity';
+import { Role } from '../user/user.entity.js';
 import {
   InvitationDelivery,
   InvitationDeliveryInput,
-} from './contracts/invitation-delivery.contract';
+} from './contracts/invitation-delivery.contract.js';
 
 const roleLabels: Record<Role, string> = {
   administrator: 'Administrador',

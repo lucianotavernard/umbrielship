@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 
-import { Vessel, VesselType } from './vessel.entity';
-import { ICustomersRepository } from '../customer/contracts/customer-repository.contract';
-import { IVesselsRepository } from './contracts/vessel-repository.contract';
+import { Vessel, VesselType } from './vessel.entity.js';
+import { ICustomersRepository } from '../customer/contracts/customer-repository.contract.js';
+import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 type CreateVesselUseCaseRequest = {
   organizationId: string;

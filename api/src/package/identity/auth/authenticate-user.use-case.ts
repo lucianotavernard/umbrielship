@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { Encrypter } from '@/package/shared/module/cryptography/contracts/encrypter';
-import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher';
+import { Encrypter } from '@/package/shared/module/cryptography/contracts/encrypter.js';
+import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher.js';
 
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
-import { WrongCredentialsException } from './wrong-credentials.exception';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
+import { WrongCredentialsException } from './wrong-credentials.exception.js';
 
 type AuthenticateUserUseCaseRequest = {
   email: string;

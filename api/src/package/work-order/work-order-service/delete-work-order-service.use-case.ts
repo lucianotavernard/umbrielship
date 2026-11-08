@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract';
+import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract.js';
 
 type DeleteWorkOrderServiceUseCaseRequest = {
   organizationId: string;

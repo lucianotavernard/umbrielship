@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { FakeInvitationDeliveryQueue } from '@test/invitation/fake-invitation-delivery-queue';
-import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
+import { FakeInvitationDeliveryQueue } from '@test/invitation/fake-invitation-delivery-queue.js';
+import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
 
-import { InvitationDeliveryRecovery } from '../invitation-delivery.recovery';
+import { InvitationDeliveryRecovery } from '../invitation-delivery.recovery.js';
 import {
   Invitation,
   InvitationDeliveryStatus,
   InvitationStatus,
-} from '../invitation.entity';
-import { RecoverInvitationDeliveriesUseCase } from '../recover-invitation-deliveries.use-case';
+} from '../invitation.entity.js';
+import { RecoverInvitationDeliveriesUseCase } from '../recover-invitation-deliveries.use-case.js';
 
 let invitationsRepository: InMemoryInvitationsRepository;
 let invitationDeliveryQueue: FakeInvitationDeliveryQueue;

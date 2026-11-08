@@ -1,19 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Logger } from '@nestjs/common';
-import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
+import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
 
-import { ConfigService } from '@/package/shared/module/config/config.service';
+import { ConfigService } from '@/package/shared/module/config/config.service.js';
 
-import { Organization } from '../../organization/organization.entity';
-import { User } from '../../user/user.entity';
+import { Organization } from '../../organization/organization.entity.js';
+import { User } from '../../user/user.entity.js';
 import {
   InvitationDelivery,
   InvitationDeliveryInput,
-} from '../contracts/invitation-delivery.contract';
-import { DeliverInvitationUseCase } from '../deliver-invitation.use-case';
-import { Invitation } from '../invitation.entity';
+} from '../contracts/invitation-delivery.contract.js';
+import { DeliverInvitationUseCase } from '../deliver-invitation.use-case.js';
+import { Invitation } from '../invitation.entity.js';
 
 class ScriptedInvitationDelivery implements InvitationDelivery {
   public calls: InvitationDeliveryInput[] = [];

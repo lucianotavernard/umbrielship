@@ -1,10 +1,10 @@
-import { Customer } from '@/package/customer/customer/customer.entity';
-import { VesselDetail } from '@/package/customer/vessel/vessel-detail.entity';
-import { Vessel } from '@/package/customer/vessel/vessel.entity';
-import { IVesselsRepository } from '@/package/customer/vessel/contracts/vessel-repository.contract';
-import { Paginate } from '@/package/shared/lib/type/paginate';
+import { Customer } from '@/package/customer/customer/customer.entity.js';
+import { VesselDetail } from '@/package/customer/vessel/vessel-detail.entity.js';
+import { Vessel } from '@/package/customer/vessel/vessel.entity.js';
+import { IVesselsRepository } from '@/package/customer/vessel/contracts/vessel-repository.contract.js';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
 
 export class InMemoryVesselsRepository implements IVesselsRepository {
   public items: Vessel[] = [];

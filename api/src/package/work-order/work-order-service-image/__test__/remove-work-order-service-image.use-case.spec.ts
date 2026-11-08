@@ -5,12 +5,12 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeImage, makeService } from '@test/factory';
-import { InMemoryWorkOrderServiceImagesRepository } from '@test/repositories/in-memory-work-order-service-images-repository';
-import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository';
-import { RemoveWorkOrderServiceImageUseCase } from '../remove-work-order-service-image.use-case';
+import { makeImage, makeService } from '@test/factory.js';
+import { InMemoryWorkOrderServiceImagesRepository } from '@test/repositories/in-memory-work-order-service-images-repository.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { RemoveWorkOrderServiceImageUseCase } from '../remove-work-order-service-image.use-case.js';
 
 let services: InMemoryWorkOrderServicesRepository;
 let images: InMemoryWorkOrderServiceImagesRepository;

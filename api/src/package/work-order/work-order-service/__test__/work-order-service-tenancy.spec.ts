@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeService, makeWorkOrder } from '@test/factory';
-import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { CreateWorkOrderServiceUseCase } from '../create-work-order-service.use-case';
-import { DeleteWorkOrderServiceUseCase } from '../delete-work-order-service.use-case';
-import { EditWorkOrderServiceUseCase } from '../edit-work-order-service.use-case';
-import { FetchWorkOrderServicesUseCase } from '../fetch-work-order-services.use-case';
-import { GetWorkOrderServiceByIdUseCase } from '../get-work-order-service-by-id.use-case';
+import { makeService, makeWorkOrder } from '@test/factory.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { CreateWorkOrderServiceUseCase } from '../create-work-order-service.use-case.js';
+import { DeleteWorkOrderServiceUseCase } from '../delete-work-order-service.use-case.js';
+import { EditWorkOrderServiceUseCase } from '../edit-work-order-service.use-case.js';
+import { FetchWorkOrderServicesUseCase } from '../fetch-work-order-services.use-case.js';
+import { GetWorkOrderServiceByIdUseCase } from '../get-work-order-service-by-id.use-case.js';
 
 let workOrders: InMemoryWorkOrdersRepository;
 let services: InMemoryWorkOrderServicesRepository;

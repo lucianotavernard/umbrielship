@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { WorkOrder } from './work-order.entity';
-import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
+import { WorkOrder } from './work-order.entity.js';
+import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
 
 type FetchWorkOrdersUseCaseRequest = {
   organizationId: string;

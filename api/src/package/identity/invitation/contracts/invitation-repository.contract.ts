@@ -1,4 +1,4 @@
-import { Invitation, InvitationDeliveryStatus } from '../invitation.entity';
+import { Invitation, InvitationDeliveryStatus } from '../invitation.entity.js';
 
 export type InvitationDeliveryRecord = {
   deliveryStatus: InvitationDeliveryStatus;

@@ -3,7 +3,7 @@ import { basename, dirname, join, relative } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const srcRoot = join(__dirname, '../src');
+const srcRoot = join(import.meta.dirname, '../src');
 
 function find(dir: string, suffix: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

@@ -3,14 +3,14 @@ import { join } from 'path';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeImage, makeService } from '@test/factory';
-import { InMemoryWorkOrderServiceImagesRepository } from '@test/repositories/in-memory-work-order-service-images-repository';
-import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository';
-import { AddWorkOrderServiceImageUseCase } from '../add-work-order-service-image.use-case';
-import { FetchWorkOrderServiceImagesUseCase } from '../fetch-work-order-service-images.use-case';
-import { RemoveWorkOrderServiceImageUseCase } from '../remove-work-order-service-image.use-case';
+import { makeImage, makeService } from '@test/factory.js';
+import { InMemoryWorkOrderServiceImagesRepository } from '@test/repositories/in-memory-work-order-service-images-repository.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { AddWorkOrderServiceImageUseCase } from '../add-work-order-service-image.use-case.js';
+import { FetchWorkOrderServiceImagesUseCase } from '../fetch-work-order-service-images.use-case.js';
+import { RemoveWorkOrderServiceImageUseCase } from '../remove-work-order-service-image.use-case.js';
 
 let services: InMemoryWorkOrderServicesRepository;
 let images: InMemoryWorkOrderServiceImagesRepository;

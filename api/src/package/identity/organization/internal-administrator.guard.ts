@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 @Injectable()
 export class InternalAdministratorGuard implements CanActivate {

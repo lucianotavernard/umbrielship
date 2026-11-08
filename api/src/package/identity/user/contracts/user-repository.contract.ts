@@ -1,4 +1,4 @@
-import { Role, User } from '../user.entity';
+import { Role, User } from '../user.entity.js';
 
 export abstract class IUsersRepository {
   abstract findByEmail(email: string): Promise<User | null>;

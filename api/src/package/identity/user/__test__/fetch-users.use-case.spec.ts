@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeUser } from '@test/factory';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { FetchUsersUseCase } from '../fetch-users.use-case';
+import { makeUser } from '@test/factory.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { FetchUsersUseCase } from '../fetch-users.use-case.js';
 
 describe('FetchUsersUseCase', () => {
   it('[C61] returns only the Users with no Membership in the Organization, paged, with the total', async () => {

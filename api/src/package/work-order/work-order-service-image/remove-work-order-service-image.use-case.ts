@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IWorkOrderServiceImagesRepository } from './contracts/work-order-service-image-repository.contract';
-import { IWorkOrderServicesRepository } from '../work-order-service/contracts/work-order-service-repository.contract';
+import { IWorkOrderServiceImagesRepository } from './contracts/work-order-service-image-repository.contract.js';
+import { IWorkOrderServicesRepository } from '../work-order-service/contracts/work-order-service-repository.contract.js';
 
 type RemoveWorkOrderServiceImageUseCaseRequest = {
   organizationId: string;

@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 
-import { Customer } from '../customer/customer.entity';
-import type { VesselProps } from './vessel.entity';
+import { Customer } from '../customer/customer.entity.js';
+import type { VesselProps } from './vessel.entity.js';
 
 export type VesselDetailProps = VesselProps & {
   customer: Customer;

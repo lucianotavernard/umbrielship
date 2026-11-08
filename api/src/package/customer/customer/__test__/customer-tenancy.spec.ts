@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { CreateCustomerUseCase } from '../create-customer.use-case';
-import { EditCustomerUseCase } from '../edit-customer.use-case';
-import { FetchCustomersUseCase } from '../fetch-customers.use-case';
-import { GetCustomerByIdUseCase } from '../get-customer-by-id.use-case';
+import { makeCustomer } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { CreateCustomerUseCase } from '../create-customer.use-case.js';
+import { EditCustomerUseCase } from '../edit-customer.use-case.js';
+import { FetchCustomersUseCase } from '../fetch-customers.use-case.js';
+import { GetCustomerByIdUseCase } from '../get-customer-by-id.use-case.js';
 
 const address = { address: 'Rua 1', city: 'Santos', state: 'SP' };
 

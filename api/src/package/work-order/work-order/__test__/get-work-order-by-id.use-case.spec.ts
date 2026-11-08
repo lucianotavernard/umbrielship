@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { CustomerFacade } from '@/package/customer/customer.facade';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { CustomerFacade } from '@/package/customer/customer.facade.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { GetWorkOrderByIdUseCase } from '../get-work-order-by-id.use-case';
+import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { GetWorkOrderByIdUseCase } from '../get-work-order-by-id.use-case.js';
 
 let workOrders: InMemoryWorkOrdersRepository;
 let sut: GetWorkOrderByIdUseCase;

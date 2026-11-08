@@ -1,12 +1,12 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 
-import { DeliverInvitationUseCase } from './deliver-invitation.use-case';
+import { DeliverInvitationUseCase } from './deliver-invitation.use-case.js';
 import {
   INVITATION_DELIVERY_QUEUE,
   InvitationDeliveryJobData,
   invitationDeliveryBackoff,
-} from './invitation-delivery.queue';
+} from './invitation-delivery.queue.js';
 
 // Like a controller: it calls the use case, and turns a failed attempt into a retry the queue schedules.
 @Processor(INVITATION_DELIVERY_QUEUE, {

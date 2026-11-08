@@ -1,6 +1,6 @@
-import { Customer } from '@/package/customer/customer/customer.entity';
-import { ICustomersRepository } from '@/package/customer/customer/contracts/customer-repository.contract';
-import { Paginate } from '@/package/shared/lib/type/paginate';
+import { Customer } from '@/package/customer/customer/customer.entity.js';
+import { ICustomersRepository } from '@/package/customer/customer/contracts/customer-repository.contract.js';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
 export class InMemoryCustomersRepository implements ICustomersRepository {
   public items: Customer[] = [];

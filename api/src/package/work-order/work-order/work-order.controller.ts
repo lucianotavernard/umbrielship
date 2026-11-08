@@ -12,17 +12,17 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
-import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { CreateWorkOrderUseCase } from './create-work-order.use-case';
-import { DeleteWorkOrderUseCase } from './delete-work-order.use-case';
-import { EditWorkOrderUseCase } from './edit-work-order.use-case';
-import { FetchWorkOrdersUseCase } from './fetch-work-orders.use-case';
-import { GetWorkOrderByIdUseCase } from './get-work-order-by-id.use-case';
-import { WORK_ORDER_STATUSES } from './work-order.entity';
+import { CreateWorkOrderUseCase } from './create-work-order.use-case.js';
+import { DeleteWorkOrderUseCase } from './delete-work-order.use-case.js';
+import { EditWorkOrderUseCase } from './edit-work-order.use-case.js';
+import { FetchWorkOrdersUseCase } from './fetch-work-orders.use-case.js';
+import { GetWorkOrderByIdUseCase } from './get-work-order-by-id.use-case.js';
+import { WORK_ORDER_STATUSES } from './work-order.entity.js';
 
 const createWorkOrderBodySchema = z.object({
   vesselId: z.uuid(),

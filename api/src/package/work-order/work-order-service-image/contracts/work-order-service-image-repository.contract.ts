@@ -1,4 +1,4 @@
-import { WorkOrderServiceImage } from '../work-order-service-image.entity';
+import { WorkOrderServiceImage } from '../work-order-service-image.entity.js';
 
 export abstract class IWorkOrderServiceImagesRepository {
   abstract findById(

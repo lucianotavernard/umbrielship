@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
-import { Role } from '../user/user.entity';
-import { InvitationDeliveryQueue } from './contracts/invitation-delivery-queue.contract';
-import { IInvitationsRepository } from './contracts/invitation-repository.contract';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
+import { Role } from '../user/user.entity.js';
+import { InvitationDeliveryQueue } from './contracts/invitation-delivery-queue.contract.js';
+import { IInvitationsRepository } from './contracts/invitation-repository.contract.js';
 import {
   InvitationDeliveryStatus,
   InvitationStatus,
-} from './invitation.entity';
+} from './invitation.entity.js';
 
 type ResendInvitationUseCaseRequest = {
   invitationId: string;

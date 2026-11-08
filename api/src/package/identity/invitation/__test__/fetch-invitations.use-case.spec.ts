@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeOrganization, makeUser } from '@test/factory';
-import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { FetchInvitationsUseCase } from '../fetch-invitations.use-case';
-import { Invitation } from '../invitation.entity';
+import { makeOrganization, makeUser } from '@test/factory.js';
+import { InMemoryInvitationsRepository } from '@test/repositories/in-memory-invitations-repository.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { FetchInvitationsUseCase } from '../fetch-invitations.use-case.js';
+import { Invitation } from '../invitation.entity.js';
 
 let invitations: InMemoryInvitationsRepository;
 let sut: FetchInvitationsUseCase;

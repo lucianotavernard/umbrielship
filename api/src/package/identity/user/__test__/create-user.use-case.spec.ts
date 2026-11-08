@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { FakeHasher } from '@test/cryptography/fake-hasher';
-import { makeOrganization, makeUser } from '@test/factory';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { CreateUserUseCase } from '../create-user.use-case';
+import { FakeHasher } from '@test/cryptography/fake-hasher.js';
+import { makeOrganization, makeUser } from '@test/factory.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { CreateUserUseCase } from '../create-user.use-case.js';
 
 let users: InMemoryUsersRepository;
 let organizations: InMemoryOrganizationsRepository;

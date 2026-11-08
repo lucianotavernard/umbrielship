@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { hash } from 'bcryptjs';
 
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from './generated/prisma/client.js';
 
 // Creates the internal Organization and its first Administrator. Safe to run twice, and on a
 // database the tenancy migration already backfilled (it reuses the internal Organization).

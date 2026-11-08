@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
-import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception';
-import { Prisma } from '@/package/shared/module/prisma/generated/prisma/client';
-import { PrismaService } from '@/package/shared/module/prisma/prisma.service';
-import { Invitation, InvitationDeliveryStatus } from './invitation.entity';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { Prisma } from '@/package/shared/module/prisma/generated/prisma/client.js';
+import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
+import { Invitation, InvitationDeliveryStatus } from './invitation.entity.js';
 
 import {
   IInvitationsRepository,
   InvitationDeliveryRecord,
-} from './contracts/invitation-repository.contract';
+} from './contracts/invitation-repository.contract.js';
 
 @Injectable()
 export class PrismaInvitationsRepository implements IInvitationsRepository {

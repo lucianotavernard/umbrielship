@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { Vessel } from './vessel.entity';
-import { IVesselsRepository } from './contracts/vessel-repository.contract';
+import { Vessel } from './vessel.entity.js';
+import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 type FetchVesselsUseCaseRequest = {
   organizationId: string;

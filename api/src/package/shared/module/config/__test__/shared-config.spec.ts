@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { ConfigException } from '../config.exception';
-import { sharedConfigFactory } from '../shared.config';
+import { ConfigException } from '../config.exception.js';
+import { sharedConfigFactory } from '../shared.config.js';
 
 const valid = {
   NODE_ENV: 'test',

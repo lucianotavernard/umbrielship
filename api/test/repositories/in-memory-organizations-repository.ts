@@ -1,6 +1,6 @@
-import { IOrganizationsRepository } from '@/package/identity/organization/contracts/organization-repository.contract';
-import { Organization } from '@/package/identity/organization/organization.entity';
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
+import { IOrganizationsRepository } from '@/package/identity/organization/contracts/organization-repository.contract.js';
+import { Organization } from '@/package/identity/organization/organization.entity.js';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 

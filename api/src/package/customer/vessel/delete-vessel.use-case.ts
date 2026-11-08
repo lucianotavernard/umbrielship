@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IVesselsRepository } from './contracts/vessel-repository.contract';
+import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 type DeleteVesselUseCaseRequest = {
   organizationId: string;

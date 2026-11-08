@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const apiRoot = join(__dirname, '..');
+const apiRoot = join(import.meta.dirname, '..');
 
 describe('test tooling', () => {
   it('[C3] has no Jest e2e scaffold and keeps the 6 in-memory repositories in test/repositories', () => {

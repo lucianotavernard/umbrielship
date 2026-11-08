@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { PrismaService } from '@/package/shared/module/prisma/prisma.service';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
-import { IOrganizationsRepository } from './contracts/organization-repository.contract';
-import { Organization } from './organization.entity';
+import { IOrganizationsRepository } from './contracts/organization-repository.contract.js';
+import { Organization } from './organization.entity.js';
 
 type OrganizationRow = {
   id: string;

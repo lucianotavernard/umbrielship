@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
-import { Role } from '../user/user.entity';
-import { IInvitationsRepository } from './contracts/invitation-repository.contract';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
+import { Role } from '../user/user.entity.js';
+import { IInvitationsRepository } from './contracts/invitation-repository.contract.js';
 import {
   InvitationDeliveryStatus,
   InvitationStatus,
-} from './invitation.entity';
+} from './invitation.entity.js';
 
 type FetchInvitationsUseCaseRequest = {
   organizationId: string;

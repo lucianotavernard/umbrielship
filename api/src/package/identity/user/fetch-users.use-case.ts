@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { IUsersRepository } from './contracts/user-repository.contract';
+import { IUsersRepository } from './contracts/user-repository.contract.js';
 
 type FetchUsersUseCaseRequest = {
   notInOrganizationId: string;

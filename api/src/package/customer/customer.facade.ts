@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { IVesselsRepository } from './vessel/contracts/vessel-repository.contract';
+import { IVesselsRepository } from './vessel/contracts/vessel-repository.contract.js';
 
 export type VesselSummary = {
   id: string;

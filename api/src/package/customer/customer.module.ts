@@ -1,23 +1,23 @@
 import { Module } from '@nestjs/common';
 
-import { PrismaModule } from '@/package/shared/module/prisma/prisma.module';
+import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 
-import { CustomerFacade } from './customer.facade';
-import { ICustomersRepository } from './customer/contracts/customer-repository.contract';
-import { CreateCustomerUseCase } from './customer/create-customer.use-case';
-import { CustomerController } from './customer/customer.controller';
-import { PrismaCustomersRepository } from './customer/customer.repository';
-import { EditCustomerUseCase } from './customer/edit-customer.use-case';
-import { FetchCustomersUseCase } from './customer/fetch-customers.use-case';
-import { GetCustomerByIdUseCase } from './customer/get-customer-by-id.use-case';
-import { IVesselsRepository } from './vessel/contracts/vessel-repository.contract';
-import { CreateVesselUseCase } from './vessel/create-vessel.use-case';
-import { DeleteVesselUseCase } from './vessel/delete-vessel.use-case';
-import { EditVesselUseCase } from './vessel/edit-vessel.use-case';
-import { FetchVesselsUseCase } from './vessel/fetch-vessels.use-case';
-import { GetVesselByIdUseCase } from './vessel/get-vessel-by-id.use-case';
-import { VesselController } from './vessel/vessel.controller';
-import { PrismaVesselsRepository } from './vessel/vessel.repository';
+import { CustomerFacade } from './customer.facade.js';
+import { ICustomersRepository } from './customer/contracts/customer-repository.contract.js';
+import { CreateCustomerUseCase } from './customer/create-customer.use-case.js';
+import { CustomerController } from './customer/customer.controller.js';
+import { PrismaCustomersRepository } from './customer/customer.repository.js';
+import { EditCustomerUseCase } from './customer/edit-customer.use-case.js';
+import { FetchCustomersUseCase } from './customer/fetch-customers.use-case.js';
+import { GetCustomerByIdUseCase } from './customer/get-customer-by-id.use-case.js';
+import { IVesselsRepository } from './vessel/contracts/vessel-repository.contract.js';
+import { CreateVesselUseCase } from './vessel/create-vessel.use-case.js';
+import { DeleteVesselUseCase } from './vessel/delete-vessel.use-case.js';
+import { EditVesselUseCase } from './vessel/edit-vessel.use-case.js';
+import { FetchVesselsUseCase } from './vessel/fetch-vessels.use-case.js';
+import { GetVesselByIdUseCase } from './vessel/get-vessel-by-id.use-case.js';
+import { VesselController } from './vessel/vessel.controller.js';
+import { PrismaVesselsRepository } from './vessel/vessel.repository.js';
 
 @Module({
   imports: [PrismaModule],

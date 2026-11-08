@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { makeOrganization } from '@test/factory';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { FetchOrganizationsUseCase } from '../fetch-organizations.use-case';
+import { makeOrganization } from '@test/factory.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { FetchOrganizationsUseCase } from '../fetch-organizations.use-case.js';
 
 let organizations: InMemoryOrganizationsRepository;
 

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { Paginate } from '@/package/shared/lib/type/paginate';
-import { WorkOrder as PrismaWorkOrder } from '@/package/shared/module/prisma/generated/prisma/client';
-import { PrismaService } from '@/package/shared/module/prisma/prisma.service';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
+import { WorkOrder as PrismaWorkOrder } from '@/package/shared/module/prisma/generated/prisma/client.js';
+import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
-import { WorkOrder } from './work-order.entity';
-import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
+import { WorkOrder } from './work-order.entity.js';
+import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
 
 @Injectable()
 export class PrismaWorkOrdersRepository implements IWorkOrdersRepository {

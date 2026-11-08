@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeService } from '@test/factory';
-import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository';
-import { GetWorkOrderServiceByIdUseCase } from '../get-work-order-service-by-id.use-case';
+import { makeService } from '@test/factory.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { GetWorkOrderServiceByIdUseCase } from '../get-work-order-service-by-id.use-case.js';
 
 let services: InMemoryWorkOrderServicesRepository;
 let sut: GetWorkOrderServiceByIdUseCase;

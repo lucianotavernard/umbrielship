@@ -2,9 +2,9 @@ import { ForbiddenException } from '@nestjs/common';
 import type { ExecutionContext } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { InternalAdministratorGuard } from '../internal-administrator.guard';
+import { InternalAdministratorGuard } from '../internal-administrator.guard.js';
 
 const contextOf = (user?: Partial<UserPayload>) =>
   ({

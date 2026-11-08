@@ -10,16 +10,16 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
-import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator';
-import { Public } from '@/package/shared/module/auth/public';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import { Public } from '@/package/shared/module/auth/public.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { SwitchOrganizationUseCase } from './switch-organization.use-case';
-import { AuthenticateUserUseCase } from './authenticate-user.use-case';
-import { GetProfileUseCase } from './get-profile.use-case';
-import { WrongCredentialsException } from './wrong-credentials.exception';
+import { SwitchOrganizationUseCase } from './switch-organization.use-case.js';
+import { AuthenticateUserUseCase } from './authenticate-user.use-case.js';
+import { GetProfileUseCase } from './get-profile.use-case.js';
+import { WrongCredentialsException } from './wrong-credentials.exception.js';
 
 const authenticateUserBodySchema = z.object({
   email: z.email(),

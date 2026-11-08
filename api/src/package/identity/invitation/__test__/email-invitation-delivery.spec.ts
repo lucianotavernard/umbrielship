@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { FakeEmailSender } from '@test/mail/fake-email-sender';
+import { FakeEmailSender } from '@test/mail/fake-email-sender.js';
 
-import { InvitationDeliveryInput } from '../contracts/invitation-delivery.contract';
-import { EmailInvitationDelivery } from '../email-invitation-delivery';
+import { InvitationDeliveryInput } from '../contracts/invitation-delivery.contract.js';
+import { EmailInvitationDelivery } from '../email-invitation-delivery.js';
 
 let emailSender: FakeEmailSender;
 let sut: EmailInvitationDelivery;

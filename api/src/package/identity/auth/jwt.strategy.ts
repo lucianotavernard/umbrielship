@@ -4,11 +4,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { z } from 'zod';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import type { UserPayload } from '@/package/shared/module/auth/user-payload';
-import { ConfigService } from '@/package/shared/module/config/config.service';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
+import { ConfigService } from '@/package/shared/module/config/config.service.js';
 
-import { ResolveSessionUseCase } from './resolve-session.use-case';
+import { ResolveSessionUseCase } from './resolve-session.use-case.js';
 
 const tokenPayloadSchema = z.object({
   sub: z.uuid(),

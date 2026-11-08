@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { EditCustomerUseCase } from '../edit-customer.use-case';
+import { makeCustomer } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { EditCustomerUseCase } from '../edit-customer.use-case.js';
 
 let customers: InMemoryCustomersRepository;
 let sut: EditCustomerUseCase;

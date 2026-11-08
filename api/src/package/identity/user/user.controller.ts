@@ -11,14 +11,14 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
-import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query';
-import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
+import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 
-import { InternalAdministratorGuard } from '../organization/internal-administrator.guard';
-import { CreateUserUseCase } from './create-user.use-case';
-import { FetchUsersUseCase } from './fetch-users.use-case';
+import { InternalAdministratorGuard } from '../organization/internal-administrator.guard.js';
+import { CreateUserUseCase } from './create-user.use-case.js';
+import { FetchUsersUseCase } from './fetch-users.use-case.js';
 
 const createUserBodySchema = z.object({
   name: z.string().trim().min(1).max(80),

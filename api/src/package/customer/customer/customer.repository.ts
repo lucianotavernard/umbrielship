@@ -3,12 +3,12 @@ import { Injectable } from '@nestjs/common';
 import {
   Customer as PrismaCustomer,
   CustomerAddress as PrismaCustomerAddress,
-} from '@/package/shared/module/prisma/generated/prisma/client';
-import { PrismaService } from '@/package/shared/module/prisma/prisma.service';
-import { Paginate } from '@/package/shared/lib/type/paginate';
+} from '@/package/shared/module/prisma/generated/prisma/client.js';
+import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
-import { ICustomersRepository } from './contracts/customer-repository.contract';
-import { Customer } from './customer.entity';
+import { ICustomersRepository } from './contracts/customer-repository.contract.js';
+import { Customer } from './customer.entity.js';
 
 @Injectable()
 export class PrismaCustomersRepository implements ICustomersRepository {

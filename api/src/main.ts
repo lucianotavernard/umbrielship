@@ -5,8 +5,8 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-import { ConfigService } from '@/package/shared/module/config/config.service';
-import { AppModule } from './app.module';
+import { ConfigService } from '@/package/shared/module/config/config.service.js';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const uploadsRoot = join(process.cwd(), 'uploads');

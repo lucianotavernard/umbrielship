@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { WrongCredentialsException } from '../wrong-credentials.exception';
+import { WrongCredentialsException } from '../wrong-credentials.exception.js';
 
-import { FakeEncrypter } from '@test/cryptography/fake-encrypter';
-import { FakeHasher } from '@test/cryptography/fake-hasher';
-import { makeUser } from '@test/factory';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { AuthenticateUserUseCase } from '../authenticate-user.use-case';
+import { FakeEncrypter } from '@test/cryptography/fake-encrypter.js';
+import { FakeHasher } from '@test/cryptography/fake-hasher.js';
+import { makeUser } from '@test/factory.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { AuthenticateUserUseCase } from '../authenticate-user.use-case.js';
 
 let users: InMemoryUsersRepository;
 let sut: AuthenticateUserUseCase;

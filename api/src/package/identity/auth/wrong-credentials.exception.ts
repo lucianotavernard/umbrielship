@@ -1,4 +1,4 @@
-import { DomainException } from '@/package/shared/lib/exception/domain.exception';
+import { DomainException } from '@/package/shared/lib/exception/domain.exception.js';
 
 export class WrongCredentialsException extends DomainException {
   constructor() {

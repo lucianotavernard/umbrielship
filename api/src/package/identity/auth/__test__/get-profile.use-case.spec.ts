@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeOrganization, makeUser } from '@test/factory';
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository';
-import { GetProfileUseCase } from '../get-profile.use-case';
+import { makeOrganization, makeUser } from '@test/factory.js';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { InMemoryUsersRepository } from '@test/repositories/in-memory-users-repository.js';
+import { GetProfileUseCase } from '../get-profile.use-case.js';
 
 let users: InMemoryUsersRepository;
 let organizations: InMemoryOrganizationsRepository;

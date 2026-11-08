@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeCustomer, makeVessel } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository';
-import { CustomerFacade } from '../customer.facade';
+import { makeCustomer, makeVessel } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
+import { CustomerFacade } from '../customer.facade.js';
 
 describe('CustomerFacade', () => {
   const setup = () => {

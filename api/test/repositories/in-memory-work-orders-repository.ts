@@ -1,6 +1,6 @@
-import { Paginate } from '@/package/shared/lib/type/paginate';
-import { WorkOrder } from '@/package/work-order/work-order/work-order.entity';
-import { IWorkOrdersRepository } from '@/package/work-order/work-order/contracts/work-order-repository.contract';
+import { Paginate } from '@/package/shared/lib/type/paginate.js';
+import { WorkOrder } from '@/package/work-order/work-order/work-order.entity.js';
+import { IWorkOrdersRepository } from '@/package/work-order/work-order/contracts/work-order-repository.contract.js';
 
 export class InMemoryWorkOrdersRepository implements IWorkOrdersRepository {
   public items: WorkOrder[] = [];

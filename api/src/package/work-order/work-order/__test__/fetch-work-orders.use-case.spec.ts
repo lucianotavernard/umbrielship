@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { makeWorkOrder } from '@test/factory';
-import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository';
-import { FetchWorkOrdersUseCase } from '../fetch-work-orders.use-case';
+import { makeWorkOrder } from '@test/factory.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { FetchWorkOrdersUseCase } from '../fetch-work-orders.use-case.js';
 
 let workOrders: InMemoryWorkOrdersRepository;
 let sut: FetchWorkOrdersUseCase;

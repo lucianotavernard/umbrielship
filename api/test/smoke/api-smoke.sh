@@ -44,7 +44,7 @@ npx prisma migrate deploy >/dev/null 2>&1 || { echo "migrate failed"; exit 1; }
 npx prisma db seed >/dev/null 2>&1 || { echo "seed failed"; exit 1; }
 
 start_api() {
-  node dist/src/main.js >>"$API_LOG" 2>&1 &
+  node dist/main.js >>"$API_LOG" 2>&1 &
   API_PID=$!
   for _ in $(seq 1 40); do
     curl -s -o /dev/null "http://127.0.0.1:$API_PORT/me" && return 0

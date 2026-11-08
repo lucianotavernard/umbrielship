@@ -3,7 +3,7 @@ import { join, relative } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const srcRoot = join(__dirname, '..', 'src');
+const srcRoot = join(import.meta.dirname, '..', 'src');
 const packageRoot = join(srcRoot, 'package');
 
 const walk = (dir: string): string[] =>
@@ -200,7 +200,7 @@ describe('acme layout', () => {
   });
 
   it('[C41] keeps work-order away from customer internals; CustomerModule exports only CustomerFacade', () => {
-    const allowed = ['customer.module', 'customer.facade'];
+    const allowed = ['customer.module.js', 'customer.facade.js'];
 
     for (const file of files.filter(
       (path) =>

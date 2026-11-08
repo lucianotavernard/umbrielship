@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { WorkOrder, WorkOrderStatus } from './work-order.entity';
-import { IWorkOrdersRepository } from './contracts/work-order-repository.contract';
-import { CustomerFacade } from '@/package/customer/customer.facade';
+import { WorkOrder, WorkOrderStatus } from './work-order.entity.js';
+import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
+import { CustomerFacade } from '@/package/customer/customer.facade.js';
 
 type CreateWorkOrderUseCaseRequest = {
   organizationId: string;

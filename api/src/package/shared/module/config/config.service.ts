@@ -5,7 +5,7 @@ import {
   PathValue,
 } from '@nestjs/config';
 
-import type { SharedConfig } from '@/package/shared/module/config/shared.config';
+import type { SharedConfig } from '@/package/shared/module/config/shared.config.js';
 
 @Injectable()
 export class ConfigService<C = SharedConfig> {

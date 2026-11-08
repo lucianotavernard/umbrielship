@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { makeCustomer } from '@test/factory';
-import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository';
-import { GetCustomerByIdUseCase } from '../get-customer-by-id.use-case';
+import { makeCustomer } from '@test/factory.js';
+import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { GetCustomerByIdUseCase } from '../get-customer-by-id.use-case.js';
 
 let customers: InMemoryCustomersRepository;
 let sut: GetCustomerByIdUseCase;

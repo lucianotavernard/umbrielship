@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { BcryptHasher } from '@/package/shared/module/cryptography/bcrypt-hasher';
-import { Encrypter } from '@/package/shared/module/cryptography/contracts/encrypter';
-import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher';
-import { JwtEncrypter } from '@/package/shared/module/cryptography/jwt-encrypter';
+import { BcryptHasher } from '@/package/shared/module/cryptography/bcrypt-hasher.js';
+import { Encrypter } from '@/package/shared/module/cryptography/contracts/encrypter.js';
+import { Hasher } from '@/package/shared/module/cryptography/contracts/hasher.js';
+import { JwtEncrypter } from '@/package/shared/module/cryptography/jwt-encrypter.js';
 
 @Module({
   providers: [

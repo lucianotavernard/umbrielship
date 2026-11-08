@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception';
+import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 
-import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository';
-import { CreateOrganizationUseCase } from '../create-organization.use-case';
+import { InMemoryOrganizationsRepository } from '@test/repositories/in-memory-organizations-repository.js';
+import { CreateOrganizationUseCase } from '../create-organization.use-case.js';
 
 let organizations: InMemoryOrganizationsRepository;
 let sut: CreateOrganizationUseCase;

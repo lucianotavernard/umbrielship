@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IUsersRepository } from '../user/contracts/user-repository.contract';
+import { IUsersRepository } from '../user/contracts/user-repository.contract.js';
 
 type SwitchOrganizationUseCaseRequest = {
   userId: string;

@@ -1,4 +1,4 @@
-import { WorkOrderService } from '../work-order-service.entity';
+import { WorkOrderService } from '../work-order-service.entity.js';
 
 export abstract class IWorkOrderServicesRepository {
   abstract findById(

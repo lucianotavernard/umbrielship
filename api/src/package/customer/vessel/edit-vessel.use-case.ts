@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { Vessel, VesselType } from './vessel.entity';
-import { IVesselsRepository } from './contracts/vessel-repository.contract';
+import { Vessel, VesselType } from './vessel.entity.js';
+import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 type EditVesselUseCaseRequest = {
   organizationId: string;

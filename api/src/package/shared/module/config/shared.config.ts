@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ConfigException } from '@/package/shared/module/config/config.exception';
+import { ConfigException } from '@/package/shared/module/config/config.exception.js';
 
 export const environmentSchema = z
   .enum(['test', 'development', 'production'])

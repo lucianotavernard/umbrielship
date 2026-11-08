@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception';
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract';
-import { IUsersRepository } from './contracts/user-repository.contract';
-import { Role } from './user.entity';
+import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
+import { IUsersRepository } from './contracts/user-repository.contract.js';
+import { Role } from './user.entity.js';
 
 type FetchOrganizationUsersUseCaseRequest = {
   organizationId: string;

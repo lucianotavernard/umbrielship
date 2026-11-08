@@ -1,4 +1,4 @@
-import { InvitationDeliveryQueue } from '@/package/identity/invitation/contracts/invitation-delivery-queue.contract';
+import { InvitationDeliveryQueue } from '@/package/identity/invitation/contracts/invitation-delivery-queue.contract.js';
 
 export class FakeInvitationDeliveryQueue implements InvitationDeliveryQueue {
   public enqueued: string[] = [];
