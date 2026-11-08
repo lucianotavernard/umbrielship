@@ -279,6 +279,7 @@ S2 sweep (C30-C65):
 
 - **Settled mid-build:** none
 - **Dispatched:** Verifier (independent sub-agent) for S1 at `HEAD` 3a4e826 plus the uncommitted working tree (the user forbade commits this turn) - returned: 5 findings, all fixed in the working tree
+- **Dispatched (S2):** Verifier (independent sub-agent) for S2 at `HEAD` after this commit, diff range acf4b70..HEAD - not returned yet
 - **Boundary:** C1-C29 closed at `acf4b70`; `proofs.md` green at that `HEAD`, 6 of 6 mutations killed, gate green; S2 (C30-C65) built in commits 9f01b8a, 6adaaa6, c831cfa, 2c77df9
 - **Settled mid-build (S2):** `POST /invitations/accept` must carry `@Public()` (found by C64, not by any unit proof); `GET /work-orders/:id` answers 404 `Vessel not found` for a work order whose Vessel is gone; the migration creates Organization "Umbrielship" only when data exists (plan, Found while building S2)
 - **Abandoned:** none; C21 was reworded before the build closed: it first claimed `vesselId` is kept, but `EditWorkOrderUseCase` reads it from a detail entity that never carries it (see the plan, criterion 13); the claim now says "under the same `id`"
