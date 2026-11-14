@@ -68,6 +68,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'inspection-templates',
+        title: 'Modelos de inspeção',
+        loadComponent: () =>
+          import('./package/work-order/inspection-template/inspection-template-list/inspection-template-list').then(
+            (m) => m.InspectionTemplateList,
+          ),
+      },
+      {
+        path: 'inspection-templates/:id',
+        title: 'Modelo de inspeção',
+        loadComponent: () =>
+          import('./package/work-order/inspection-template/inspection-template-detail/inspection-template-detail').then(
+            (m) => m.InspectionTemplateDetail,
+          ),
+      },
+      {
         path: 'organizations',
         title: 'Organizações',
         canActivate: [internalAdministratorGuard],

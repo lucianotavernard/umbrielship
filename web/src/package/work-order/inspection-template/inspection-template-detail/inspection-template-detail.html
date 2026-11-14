@@ -1,0 +1,85 @@
+<header class="border-b border-border">
+  <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 sm:px-6">
+    <a
+      routerLink="/inspection-templates"
+      class="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+    >
+      <ng-icon name="lucideArrowLeft" class="size-4" />
+      Modelos de inspeção
+    </a>
+
+    @if (loading()) {
+      <div class="grid gap-2">
+        <t-skeleton class="h-9 w-64 max-w-full" />
+        <t-skeleton class="h-4 w-40 max-w-full" />
+      </div>
+    } @else if (inspectionTemplate(); as template) {
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="min-w-0">
+          <h1 class="text-3xl font-bold tracking-tight break-words">{{ template.name }}</h1>
+          <p class="mt-2 text-sm text-muted-foreground">
+            {{ items().length }} {{ items().length === 1 ? 'pergunta' : 'perguntas' }} · criado em
+            {{ template.createdAt | date: 'dd/MM/yyyy' }}
+          </p>
+        </div>
+        @if (isAdministrator()) {
+          <div class="flex flex-wrap gap-2">
+            <button tButton type="button" variant="outline" (click)="openSheet()">
+              <ng-icon name="lucidePencil" class="size-4" />
+              Editar
+            </button>
+            <button tButton type="button" variant="destructive" (click)="openDialog()">
+              <ng-icon name="lucideTrash" class="size-4" />
+              Excluir
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+  @if (notFound()) {
+    <p class="text-sm text-muted-foreground">Modelo de inspeção não encontrado</p>
+  } @else if (inspectionTemplate()) {
+    <ol class="flex flex-col divide-y rounded-lg border">
+      @for (item of items(); track item.id; let index = $index) {
+        <li class="flex gap-3 px-4 py-3 text-sm">
+          <span class="w-6 shrink-0 text-right font-medium tabular-nums text-muted-foreground">
+            {{ index + 1 }}.
+          </span>
+          <span class="min-w-0 break-words">{{ item.label }}</span>
+        </li>
+      }
+    </ol>
+  }
+</section>
+
+<t-sheet
+  title="Editar modelo de inspeção"
+  class="sm:max-w-md"
+  description="Altere o nome e as perguntas; atribuições já feitas mantêm as perguntas antigas"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  @if (isSheetActive()) {
+    <inspection-template-form-ui
+      [inspectionTemplate]="inspectionTemplate()"
+      [loading]="submitting()"
+      (closed)="closeSheet()"
+      (submitted)="editInspectionTemplate($event)"
+    />
+  }
+</t-sheet>
+
+<t-confirmation
+  title="Excluir modelo de inspeção"
+  description="Tem certeza que deseja excluir este modelo? Esta ação não pode ser desfeita."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="isDialogActive()"
+  [loading]="confirming()"
+  (closed)="closeDialog()"
+  (confirmed)="deleteInspectionTemplate()"
+/>

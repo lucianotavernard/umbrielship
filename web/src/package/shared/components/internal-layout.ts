@@ -37,6 +37,14 @@ import { toast } from './ui/toaster';
             <a tButton routerLink="/vessels" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">
               Embarcações
             </a>
+            <a
+              tButton
+              routerLink="/inspection-templates"
+              routerLinkActive="bg-accent text-accent-foreground"
+              variant="ghost"
+            >
+              Modelos de inspeção
+            </a>
             @if (isInternalAdministrator()) {
               <a
                 tButton
