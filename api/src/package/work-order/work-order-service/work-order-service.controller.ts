@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { z } from 'zod';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
@@ -157,6 +159,10 @@ export class WorkOrderServiceController {
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ConflictDomainException) {
+        throw new ConflictException(error.message);
       }
 
       throw error;

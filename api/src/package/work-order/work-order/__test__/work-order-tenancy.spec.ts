@@ -7,6 +7,7 @@ import { makeCustomer, makeVessel, makeWorkOrder } from '@test/factory.js';
 import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
 import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { CreateWorkOrderUseCase } from '../create-work-order.use-case.js';
 import { DeleteWorkOrderUseCase } from '../delete-work-order.use-case.js';
 import { EditWorkOrderUseCase } from '../edit-work-order.use-case.js';
@@ -72,7 +73,10 @@ describe('WorkOrder tenancy', () => {
       status: 'COMPLETED',
       ...dates,
     });
-    const remove = new DeleteWorkOrderUseCase(workOrders).handle({
+    const remove = new DeleteWorkOrderUseCase(
+      workOrders,
+      new InMemoryInspectionsRepository(),
+    ).handle({
       organizationId: 'A',
       id: 'wb',
     });
