@@ -179,6 +179,8 @@ export class VesselDetail {
         });
       },
       error: (response) => {
+        this.confirming.set(false);
+        this.closeDeleteWorkOrderDialog();
         toast.error('Erro ao excluir ordem de serviço', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao excluir a ordem de serviço.'),
         });
