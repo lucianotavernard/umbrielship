@@ -2,7 +2,7 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { toast } from '../../../shared/components/ui/toaster';
-import { buttons, configure, dialogs, render, rows, settle } from './testing';
+import { assignments, buttons, configure, dialogs, render, rows, settle } from './testing';
 
 describe('WorkOrder Inspeções section', () => {
   let controller: HttpTestingController;
@@ -131,5 +131,28 @@ describe('WorkOrder Inspeções section', () => {
     });
     controller.expectNone('/api/work-orders/wo-1/inspection-assignments');
     expect(rows(element)).toHaveLength(2);
+  });
+
+  it("inspection C5 shows each copied question's type label", async () => {
+    const element = await render(controller, 'inspector', [
+      {
+        ...assignments[1],
+        items: [
+          { id: 'q0', label: 'Notas', position: 0, type: 'TEXT' },
+          { id: 'q1', label: 'Limpo?', position: 1, type: 'YES_NO' },
+          { id: 'q2', label: 'Pintura', position: 2, type: 'CONFORMITY' },
+          { id: 'q3', label: 'Acabamento', position: 3, type: 'SCORE' },
+        ],
+      },
+    ]);
+
+    rows(element)[0].querySelector<HTMLButtonElement>('button[aria-expanded]')!.click();
+    await settle();
+
+    expect(
+      [...rows(element)[0].querySelectorAll('[data-slot="questions"] [data-slot="type"]')].map((node) =>
+        node.textContent?.trim(),
+      ),
+    ).toEqual(['Texto livre', 'Sim/Não', 'Conforme/Não conforme', 'Nota de 0 a 10']);
   });
 });

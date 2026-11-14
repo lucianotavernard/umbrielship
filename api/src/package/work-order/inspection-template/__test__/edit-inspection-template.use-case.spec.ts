@@ -4,6 +4,7 @@ import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/alr
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
 import { makeInspectionTemplate } from '@test/factory.js';
+import { conformity } from '@test/factory.js';
 import { InMemoryInspectionTemplatesRepository } from '@test/repositories/in-memory-inspection-templates-repository.js';
 import { EditInspectionTemplateUseCase } from '../edit-inspection-template.use-case.js';
 
@@ -33,7 +34,7 @@ describe('EditInspectionTemplateUseCase', () => {
       organizationId: 'org-1',
       id: 't1',
       name: 'Pintura nova',
-      labels: ['C', 'A'],
+      questions: conformity(['C', 'A']),
     });
 
     expect(templates.items[0].name).toBe('Pintura nova');
@@ -46,7 +47,7 @@ describe('EditInspectionTemplateUseCase', () => {
       organizationId: 'org-1',
       id: 't1',
       name: 'Pintura nova',
-      labels: ['A', 'C'],
+      questions: conformity(['A', 'C']),
     });
 
     expect(questions('t1')).toEqual([
@@ -65,7 +66,7 @@ describe('EditInspectionTemplateUseCase', () => {
       organizationId: 'org-1',
       id: 't1',
       name: 'PINTURA',
-      labels: ['x'],
+      questions: conformity(['x']),
     });
     expect(templates.items[0].name).toBe('PINTURA');
 
@@ -74,7 +75,7 @@ describe('EditInspectionTemplateUseCase', () => {
         organizationId: 'org-1',
         id: 't2',
         name: 'pintura',
-        labels: ['y'],
+        questions: conformity(['y']),
       }),
     ).rejects.toBeInstanceOf(AlreadyExistsDomainException);
     expect(templates.items[1].name).toBe('Solda');
@@ -97,7 +98,7 @@ describe('EditInspectionTemplateUseCase', () => {
         organizationId: 'org-1',
         id: 't1',
         name: 'Outro',
-        labels: ['x'],
+        questions: conformity(['x']),
       }),
     ).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(
@@ -105,7 +106,7 @@ describe('EditInspectionTemplateUseCase', () => {
         organizationId: 'org-1',
         id: 'unknown',
         name: 'Outro',
-        labels: ['x'],
+        questions: conformity(['x']),
       }),
     ).rejects.toBeInstanceOf(NotFoundDomainException);
 

@@ -74,7 +74,7 @@ export class AssignInspectionTemplateUseCase {
       workOrderId: workOrder.id,
       service,
       templateName: template.name,
-      labels: template.items.map((item) => item.label),
+      questions: template.items.map(({ label, type }) => ({ label, type })),
       assignedBy,
     });
 

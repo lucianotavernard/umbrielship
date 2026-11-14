@@ -142,22 +142,32 @@ export const makeOrganization = (
     id,
   );
 
+// `labels` is a shorthand for conforming/non-conforming questions.
+export const conformity = (labels: string[]) =>
+  labels.map((label) => ({ label, type: 'CONFORMITY' as const }));
+
 export const makeInspectionTemplate = (
-  override: Partial<InspectionTemplateProps> = {},
+  {
+    labels = ['Casco limpo', 'Pintura sem bolhas'],
+    ...override
+  }: Partial<InspectionTemplateProps> & { labels?: string[] } = {},
   id?: string,
 ) =>
   InspectionTemplate.create(
     {
       organizationId: 'org-1',
       name: 'Pintura do casco',
-      labels: ['Casco limpo', 'Pintura sem bolhas'],
+      questions: conformity(labels),
       ...override,
     },
     id,
   );
 
 export const makeInspectionAssignment = (
-  override: Partial<InspectionAssignmentProps> = {},
+  {
+    labels = ['Casco limpo', 'Pintura sem bolhas'],
+    ...override
+  }: Partial<InspectionAssignmentProps> & { labels?: string[] } = {},
   id?: string,
 ) =>
   InspectionAssignment.create(
@@ -166,7 +176,7 @@ export const makeInspectionAssignment = (
       workOrderId: 'work-order-1',
       service: null,
       templateName: 'Pintura do casco',
-      labels: ['Casco limpo', 'Pintura sem bolhas'],
+      questions: conformity(labels),
       assignedBy: 'user-1',
       ...override,
     },

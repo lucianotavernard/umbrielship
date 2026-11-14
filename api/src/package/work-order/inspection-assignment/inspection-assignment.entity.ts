@@ -1,9 +1,15 @@
 import { randomUUID } from 'crypto';
 
+import type {
+  Question,
+  QuestionType,
+} from '../inspection-template/inspection-template.entity.js';
+
 export type InspectionAssignmentItem = {
   id: string;
   label: string;
   position: number;
+  type: QuestionType;
 };
 
 // The WorkOrderService the assignment inspects; null means the WorkOrder as a whole.
@@ -14,14 +20,14 @@ export type InspectionAssignmentProps = {
   workOrderId: string;
   service: InspectionAssignmentService;
   templateName: string;
-  labels: string[];
+  questions: Question[];
   assignedBy: string;
   createdAt?: Date;
 };
 
 export type RestoredInspectionAssignmentProps = Omit<
   InspectionAssignmentProps,
-  'labels' | 'createdAt'
+  'questions' | 'createdAt'
 > & {
   items: InspectionAssignmentItem[];
   createdAt: Date;
@@ -50,16 +56,17 @@ export class InspectionAssignment {
 
   // The questions are a copy (D3): numbered from 0 in the template's order, owned by the assignment.
   static create(props: InspectionAssignmentProps, id?: string) {
-    const { labels, createdAt, ...rest } = props;
+    const { questions, createdAt, ...rest } = props;
 
     return new InspectionAssignment(
       {
         ...rest,
         createdAt: createdAt ?? new Date(),
-        items: labels.map((label, position) => ({
+        items: questions.map(({ label, type }, position) => ({
           id: randomUUID(),
           label,
           position,
+          type,
         })),
       },
       id,

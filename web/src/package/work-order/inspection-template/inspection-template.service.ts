@@ -12,10 +12,22 @@ export const NAME_TAKEN = 'Já existe um modelo de inspeção com este nome';
 export const isNameTaken = (response: unknown) =>
   response instanceof HttpErrorResponse && response.status === HttpStatusCode.Conflict;
 
+export type QuestionType = 'TEXT' | 'YES_NO' | 'CONFORMITY' | 'SCORE';
+
+export const QUESTION_TYPES: QuestionType[] = ['TEXT', 'YES_NO', 'CONFORMITY', 'SCORE'];
+
+export const questionTypeLabels: Record<QuestionType, string> = {
+  TEXT: 'Texto livre',
+  YES_NO: 'Sim/Não',
+  CONFORMITY: 'Conforme/Não conforme',
+  SCORE: 'Nota de 0 a 10',
+};
+
 export type InspectionTemplateItem = {
   id: string;
   label: string;
   position: number;
+  type: QuestionType;
 };
 
 export type InspectionTemplate = {
@@ -34,7 +46,7 @@ export type InspectionTemplateSummary = {
 
 export type InspectionTemplateRequest = {
   name: string;
-  items: { label: string }[];
+  items: { label: string; type: QuestionType }[];
 };
 
 export type GetInspectionTemplatesResponse = {

@@ -48,5 +48,5 @@ export const template = (labels: string[], name = 'Pintura do casco') => ({
   id: 't1',
   name,
   createdAt: '2026-11-14T10:00:00.000Z',
-  items: labels.map((label, position) => ({ id: `i${position}`, label, position })),
+  items: labels.map((label, position) => ({ id: `i${position}`, label, position, type: 'CONFORMITY' })),
 });

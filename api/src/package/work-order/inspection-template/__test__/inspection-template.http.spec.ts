@@ -18,6 +18,7 @@ import type {
 } from '@/package/shared/module/auth/user-payload.js';
 
 import { makeInspectionTemplate } from '@test/factory.js';
+import { conformity } from '@test/factory.js';
 import { bootHttp } from '@test/http.js';
 import { CreateInspectionTemplateUseCase } from '../create-inspection-template.use-case.js';
 import { DeleteInspectionTemplateUseCase } from '../delete-inspection-template.use-case.js';
@@ -82,7 +83,7 @@ const calls = () =>
 
 const body = (items: number, label = 'Casco limpo', name = 'Pintura') => ({
   name,
-  items: Array.from({ length: items }, () => ({ label })),
+  items: Array.from({ length: items }, () => ({ label, type: 'CONFORMITY' })),
 });
 
 type Write = { method: 'post' | 'put' | 'delete'; path: string };
@@ -135,24 +136,24 @@ describe('InspectionTemplate routes over HTTP', () => {
     for (const route of writes.slice(0, 2)) {
       const response = await send(route, 'administrator', {
         name: '  Pintura  ',
-        items: [{ label: '  Casco limpo ' }],
+        items: [{ label: '  Casco limpo ', type: 'CONFORMITY' }],
       });
       expect(response.status, route.method).not.toBe(400);
     }
 
     expect(fakes.create.handle.mock.calls[0][0]).toMatchObject({
       name: 'Pintura',
-      labels: ['Casco limpo'],
+      questions: conformity(['Casco limpo']),
     });
     expect(fakes.edit.handle.mock.calls[0][0]).toMatchObject({
       id: ID,
       name: 'Pintura',
-      labels: ['Casco limpo'],
+      questions: conformity(['Casco limpo']),
     });
 
     const spaces = await send(writes[0], 'administrator', {
       name: 'Pintura',
-      items: [{ label: '   ' }],
+      items: [{ label: '   ', type: 'CONFORMITY' }],
     });
     expect(spaces.status).toBe(400);
   });
@@ -250,8 +251,8 @@ describe('InspectionTemplate routes over HTTP', () => {
       name: 'Pintura',
       createdAt: '2026-01-01T00:00:00.000Z',
       items: [
-        { id: expect.any(String), label: 'A', position: 0 },
-        { id: expect.any(String), label: 'B', position: 1 },
+        { id: expect.any(String), label: 'A', position: 0, type: 'CONFORMITY' },
+        { id: expect.any(String), label: 'B', position: 1, type: 'CONFORMITY' },
       ],
     });
   });
@@ -341,5 +342,55 @@ describe('InspectionTemplate routes over HTTP', () => {
         expect(response.status, `${role} ${path}`).toBe(200);
       }
     }
+  });
+
+  it('inspection C1 requires a question type of the four and returns it', async () => {
+    for (const type of ['TEXT', 'YES_NO', 'CONFORMITY', 'SCORE']) {
+      const response = await send(writes[0], 'administrator', {
+        name: 'Pintura',
+        items: [{ label: 'Casco', type }],
+      });
+      expect(response.status, type).toBe(201);
+    }
+    expect(
+      fakes.create.handle.mock.calls.map(
+        ([input]) => (input as { questions: unknown[] }).questions,
+      ),
+    ).toEqual(
+      ['TEXT', 'YES_NO', 'CONFORMITY', 'SCORE'].map((type) => [
+        { label: 'Casco', type },
+      ]),
+    );
+
+    for (const items of [
+      [{ label: 'Casco' }],
+      [{ label: 'Casco', type: 'DATE' }],
+    ]) {
+      for (const route of writes.slice(0, 2)) {
+        const response = await send(route, 'administrator', {
+          name: 'Pintura',
+          items,
+        });
+        expect(response.status, JSON.stringify(items)).toBe(400);
+      }
+    }
+    expect(fakes.create.handle).toHaveBeenCalledTimes(4);
+    expect(fakes.edit.handle).not.toHaveBeenCalled();
+
+    respond.mockResolvedValueOnce({
+      inspectionTemplate: makeInspectionTemplate(
+        {
+          organizationId: ORGANIZATION,
+          questions: [{ label: 'Nota', type: 'SCORE' }],
+        },
+        ID,
+      ),
+    });
+    const detail = await request(app.getHttpServer())
+      .get(`/inspection-templates/${ID}`)
+      .set('Authorization', `Bearer ${tokens.operator}`);
+    expect(detail.body.inspectionTemplate.items).toEqual([
+      { id: expect.any(String), label: 'Nota', position: 0, type: 'SCORE' },
+    ]);
   });
 });

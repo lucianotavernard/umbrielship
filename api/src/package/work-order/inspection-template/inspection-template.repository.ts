@@ -135,6 +135,7 @@ export class PrismaInspectionTemplatesRepository implements IInspectionTemplates
       organizationId: template.organizationId,
       label: item.label,
       position: item.position,
+      type: item.type,
     }));
   }
 
@@ -148,10 +149,11 @@ export class PrismaInspectionTemplatesRepository implements IInspectionTemplates
         organizationId: template.organizationId,
         name: template.name,
         createdAt: template.createdAt,
-        items: template.items.map(({ id, label, position }) => ({
+        items: template.items.map(({ id, label, position, type }) => ({
           id,
           label,
           position,
+          type,
         })),
       },
       template.id,

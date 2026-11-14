@@ -40,6 +40,7 @@ export type InspectionTemplateItemMinAggregateOutputType = {
   templateId: string | null
   label: string | null
   position: number | null
+  type: $Enums.QuestionType | null
 }
 
 export type InspectionTemplateItemMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type InspectionTemplateItemMaxAggregateOutputType = {
   templateId: string | null
   label: string | null
   position: number | null
+  type: $Enums.QuestionType | null
 }
 
 export type InspectionTemplateItemCountAggregateOutputType = {
@@ -56,6 +58,7 @@ export type InspectionTemplateItemCountAggregateOutputType = {
   templateId: number
   label: number
   position: number
+  type: number
   _all: number
 }
 
@@ -74,6 +77,7 @@ export type InspectionTemplateItemMinAggregateInputType = {
   templateId?: true
   label?: true
   position?: true
+  type?: true
 }
 
 export type InspectionTemplateItemMaxAggregateInputType = {
@@ -82,6 +86,7 @@ export type InspectionTemplateItemMaxAggregateInputType = {
   templateId?: true
   label?: true
   position?: true
+  type?: true
 }
 
 export type InspectionTemplateItemCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type InspectionTemplateItemCountAggregateInputType = {
   templateId?: true
   label?: true
   position?: true
+  type?: true
   _all?: true
 }
 
@@ -185,6 +191,7 @@ export type InspectionTemplateItemGroupByOutputType = {
   templateId: string
   label: string
   position: number
+  type: $Enums.QuestionType
   _count: InspectionTemplateItemCountAggregateOutputType | null
   _avg: InspectionTemplateItemAvgAggregateOutputType | null
   _sum: InspectionTemplateItemSumAggregateOutputType | null
@@ -216,6 +223,7 @@ export type InspectionTemplateItemWhereInput = {
   templateId?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   label?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   position?: Prisma.IntFilter<"InspectionTemplateItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionTemplateItem"> | $Enums.QuestionType
   template?: Prisma.XOR<Prisma.InspectionTemplateScalarRelationFilter, Prisma.InspectionTemplateWhereInput>
 }
 
@@ -225,6 +233,7 @@ export type InspectionTemplateItemOrderByWithRelationInput = {
   templateId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   template?: Prisma.InspectionTemplateOrderByWithRelationInput
 }
 
@@ -238,6 +247,7 @@ export type InspectionTemplateItemWhereUniqueInput = Prisma.AtLeast<{
   templateId?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   label?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   position?: Prisma.IntFilter<"InspectionTemplateItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionTemplateItem"> | $Enums.QuestionType
   template?: Prisma.XOR<Prisma.InspectionTemplateScalarRelationFilter, Prisma.InspectionTemplateWhereInput>
 }, "id" | "templateId_position">
 
@@ -247,6 +257,7 @@ export type InspectionTemplateItemOrderByWithAggregationInput = {
   templateId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   _count?: Prisma.InspectionTemplateItemCountOrderByAggregateInput
   _avg?: Prisma.InspectionTemplateItemAvgOrderByAggregateInput
   _max?: Prisma.InspectionTemplateItemMaxOrderByAggregateInput
@@ -263,6 +274,7 @@ export type InspectionTemplateItemScalarWhereWithAggregatesInput = {
   templateId?: Prisma.StringWithAggregatesFilter<"InspectionTemplateItem"> | string
   label?: Prisma.StringWithAggregatesFilter<"InspectionTemplateItem"> | string
   position?: Prisma.IntWithAggregatesFilter<"InspectionTemplateItem"> | number
+  type?: Prisma.EnumQuestionTypeWithAggregatesFilter<"InspectionTemplateItem"> | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemCreateInput = {
@@ -270,6 +282,7 @@ export type InspectionTemplateItemCreateInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
   template: Prisma.InspectionTemplateCreateNestedOneWithoutItemsInput
 }
 
@@ -279,6 +292,7 @@ export type InspectionTemplateItemUncheckedCreateInput = {
   templateId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUpdateInput = {
@@ -286,6 +300,7 @@ export type InspectionTemplateItemUpdateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   template?: Prisma.InspectionTemplateUpdateOneRequiredWithoutItemsNestedInput
 }
 
@@ -295,6 +310,7 @@ export type InspectionTemplateItemUncheckedUpdateInput = {
   templateId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemCreateManyInput = {
@@ -303,6 +319,7 @@ export type InspectionTemplateItemCreateManyInput = {
   templateId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUpdateManyMutationInput = {
@@ -310,6 +327,7 @@ export type InspectionTemplateItemUpdateManyMutationInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUncheckedUpdateManyInput = {
@@ -318,6 +336,7 @@ export type InspectionTemplateItemUncheckedUpdateManyInput = {
   templateId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemListRelationFilter = {
@@ -341,6 +360,7 @@ export type InspectionTemplateItemCountOrderByAggregateInput = {
   templateId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionTemplateItemAvgOrderByAggregateInput = {
@@ -353,6 +373,7 @@ export type InspectionTemplateItemMaxOrderByAggregateInput = {
   templateId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionTemplateItemMinOrderByAggregateInput = {
@@ -361,6 +382,7 @@ export type InspectionTemplateItemMinOrderByAggregateInput = {
   templateId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionTemplateItemSumOrderByAggregateInput = {
@@ -409,11 +431,16 @@ export type InspectionTemplateItemUncheckedUpdateManyWithoutTemplateNestedInput 
   deleteMany?: Prisma.InspectionTemplateItemScalarWhereInput | Prisma.InspectionTemplateItemScalarWhereInput[]
 }
 
+export type EnumQuestionTypeFieldUpdateOperationsInput = {
+  set?: $Enums.QuestionType
+}
+
 export type InspectionTemplateItemCreateWithoutTemplateInput = {
   id?: string
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUncheckedCreateWithoutTemplateInput = {
@@ -421,6 +448,7 @@ export type InspectionTemplateItemUncheckedCreateWithoutTemplateInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionTemplateItemCreateOrConnectWithoutTemplateInput = {
@@ -458,6 +486,7 @@ export type InspectionTemplateItemScalarWhereInput = {
   templateId?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   label?: Prisma.StringFilter<"InspectionTemplateItem"> | string
   position?: Prisma.IntFilter<"InspectionTemplateItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionTemplateItem"> | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemCreateManyTemplateInput = {
@@ -465,6 +494,7 @@ export type InspectionTemplateItemCreateManyTemplateInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUpdateWithoutTemplateInput = {
@@ -472,6 +502,7 @@ export type InspectionTemplateItemUpdateWithoutTemplateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUncheckedUpdateWithoutTemplateInput = {
@@ -479,6 +510,7 @@ export type InspectionTemplateItemUncheckedUpdateWithoutTemplateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionTemplateItemUncheckedUpdateManyWithoutTemplateInput = {
@@ -486,6 +518,7 @@ export type InspectionTemplateItemUncheckedUpdateManyWithoutTemplateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 
@@ -496,6 +529,7 @@ export type InspectionTemplateItemSelect<ExtArgs extends runtime.Types.Extension
   templateId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   template?: boolean | Prisma.InspectionTemplateDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionTemplateItem"]>
 
@@ -505,6 +539,7 @@ export type InspectionTemplateItemSelectCreateManyAndReturn<ExtArgs extends runt
   templateId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   template?: boolean | Prisma.InspectionTemplateDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionTemplateItem"]>
 
@@ -514,6 +549,7 @@ export type InspectionTemplateItemSelectUpdateManyAndReturn<ExtArgs extends runt
   templateId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   template?: boolean | Prisma.InspectionTemplateDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionTemplateItem"]>
 
@@ -523,9 +559,10 @@ export type InspectionTemplateItemSelectScalar = {
   templateId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
 }
 
-export type InspectionTemplateItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "templateId" | "label" | "position", ExtArgs["result"]["inspectionTemplateItem"]>
+export type InspectionTemplateItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "templateId" | "label" | "position" | "type", ExtArgs["result"]["inspectionTemplateItem"]>
 export type InspectionTemplateItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   template?: boolean | Prisma.InspectionTemplateDefaultArgs<ExtArgs>
 }
@@ -547,6 +584,7 @@ export type $InspectionTemplateItemPayload<ExtArgs extends runtime.Types.Extensi
     templateId: string
     label: string
     position: number
+    type: $Enums.QuestionType
   }, ExtArgs["result"]["inspectionTemplateItem"]>
   composites: {}
 }
@@ -976,6 +1014,7 @@ export interface InspectionTemplateItemFieldRefs {
   readonly templateId: Prisma.FieldRef<"InspectionTemplateItem", 'String'>
   readonly label: Prisma.FieldRef<"InspectionTemplateItem", 'String'>
   readonly position: Prisma.FieldRef<"InspectionTemplateItem", 'Int'>
+  readonly type: Prisma.FieldRef<"InspectionTemplateItem", 'QuestionType'>
 }
     
 

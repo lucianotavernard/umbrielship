@@ -98,7 +98,7 @@ describe('InspectionTemplateList', () => {
     expect(created.request.method).toBe('POST');
     expect(created.request.body).toEqual({
       name: 'Pintura do casco',
-      items: [{ label: 'Pintura sem bolhas' }, { label: 'Casco limpo' }],
+      items: [{ label: 'Pintura sem bolhas', type: 'CONFORMITY' }, { label: 'Casco limpo', type: 'CONFORMITY' }],
     });
     created.flush({ inspectionTemplate: { id: 't3' } }, { status: 201, statusText: 'Created' });
     await settle();

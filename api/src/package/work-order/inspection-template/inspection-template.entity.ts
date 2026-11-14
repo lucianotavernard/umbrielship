@@ -1,15 +1,28 @@
 import { randomUUID } from 'crypto';
 
+export const QUESTION_TYPES = [
+  'TEXT',
+  'YES_NO',
+  'CONFORMITY',
+  'SCORE',
+] as const;
+
+export type QuestionType = (typeof QUESTION_TYPES)[number];
+
+// A question as written on a template, and as copied into an assignment.
+export type Question = { label: string; type: QuestionType };
+
 export type InspectionTemplateItem = {
   id: string;
   label: string;
   position: number;
+  type: QuestionType;
 };
 
 export type InspectionTemplateProps = {
   organizationId: string;
   name: string;
-  labels: string[];
+  questions: Question[];
   createdAt?: Date;
 };
 
@@ -21,8 +34,13 @@ export type RestoredInspectionTemplateProps = {
 };
 
 // Questions are numbered from 0 in the order given.
-const itemsOf = (labels: string[]): InspectionTemplateItem[] =>
-  labels.map((label, position) => ({ id: randomUUID(), label, position }));
+const itemsOf = (questions: Question[]): InspectionTemplateItem[] =>
+  questions.map(({ label, type }, position) => ({
+    id: randomUUID(),
+    label,
+    position,
+    type,
+  }));
 
 export class InspectionTemplate {
   id: string;
@@ -44,7 +62,7 @@ export class InspectionTemplate {
       {
         organizationId: props.organizationId,
         name: props.name,
-        items: itemsOf(props.labels),
+        items: itemsOf(props.questions),
         createdAt: props.createdAt ?? new Date(),
       },
       id,
@@ -56,8 +74,8 @@ export class InspectionTemplate {
   }
 
   // An edit replaces the name and every question; nothing references a question (D3).
-  replace(name: string, labels: string[]) {
+  replace(name: string, questions: Question[]) {
     this.name = name;
-    this.items = itemsOf(labels);
+    this.items = itemsOf(questions);
   }
 }

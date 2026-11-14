@@ -5,6 +5,7 @@ import { lucideChevronDown, lucideChevronRight, lucideClipboardCheck, lucideTras
 
 import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
+import { questionTypeLabels } from '../../inspection-template/inspection-template.service';
 import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment.service';
 
 @Component({
@@ -62,7 +63,10 @@ import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment
                 @for (item of ordered(assignment); track item.id; let index = $index) {
                   <li class="flex gap-3 px-4 py-2 text-sm">
                     <span class="w-6 shrink-0 text-right tabular-nums text-muted-foreground">{{ index + 1 }}.</span>
-                    <span class="min-w-0 break-words">{{ item.label }}</span>
+                    <span class="flex min-w-0 flex-col gap-0.5">
+                      <span class="break-words">{{ item.label }}</span>
+                      <span class="text-xs text-muted-foreground" data-slot="type">{{ typeLabels[item.type] }}</span>
+                    </span>
                   </li>
                 }
               </ol>
@@ -87,6 +91,7 @@ export class InspectionAssignmentList {
   removed = output<InspectionAssignment>();
 
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
+  protected readonly typeLabels = questionTypeLabels;
   private readonly open = signal<ReadonlySet<string>>(new Set());
 
   // Questions are asked in `position` order, whatever order the response lists them in.

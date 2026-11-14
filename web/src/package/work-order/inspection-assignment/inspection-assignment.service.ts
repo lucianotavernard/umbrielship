@@ -2,10 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import type { QuestionType } from '../inspection-template/inspection-template.service';
+
 export type InspectionAssignmentItem = {
   id: string;
   label: string;
   position: number;
+  type: QuestionType;
 };
 
 export type InspectionAssignment = {

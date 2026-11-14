@@ -62,6 +62,7 @@ export class PrismaInspectionAssignmentsRepository implements IInspectionAssignm
               organizationId: assignment.organizationId,
               label: item.label,
               position: item.position,
+              type: item.type,
             })),
           },
         },
@@ -94,10 +95,11 @@ export class PrismaInspectionAssignmentsRepository implements IInspectionAssignm
         templateName: assignment.templateName,
         assignedBy: assignment.assignedBy,
         createdAt: assignment.createdAt,
-        items: assignment.items.map(({ id, label, position }) => ({
+        items: assignment.items.map(({ id, label, position, type }) => ({
           id,
           label,
           position,
+          type,
         })),
       },
       assignment.id,

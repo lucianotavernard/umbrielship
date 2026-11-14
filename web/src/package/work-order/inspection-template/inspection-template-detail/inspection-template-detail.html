@@ -49,7 +49,10 @@
           <span class="w-6 shrink-0 text-right font-medium tabular-nums text-muted-foreground">
             {{ index + 1 }}.
           </span>
-          <span class="min-w-0 break-words">{{ item.label }}</span>
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="break-words">{{ item.label }}</span>
+            <span class="text-xs text-muted-foreground" data-slot="type">{{ typeLabels[item.type] }}</span>
+          </span>
         </li>
       }
     </ol>

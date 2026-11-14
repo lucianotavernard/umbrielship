@@ -25,12 +25,20 @@ import { DeleteInspectionTemplateUseCase } from './delete-inspection-template.us
 import { EditInspectionTemplateUseCase } from './edit-inspection-template.use-case.js';
 import { FetchInspectionTemplatesUseCase } from './fetch-inspection-templates.use-case.js';
 import { GetInspectionTemplateByIdUseCase } from './get-inspection-template-by-id.use-case.js';
-import { InspectionTemplate } from './inspection-template.entity.js';
+import {
+  InspectionTemplate,
+  QUESTION_TYPES,
+} from './inspection-template.entity.js';
 
 const inspectionTemplateBodySchema = z.object({
   name: z.string().trim().min(1).max(100),
   items: z
-    .array(z.object({ label: z.string().trim().min(1).max(200) }))
+    .array(
+      z.object({
+        label: z.string().trim().min(1).max(200),
+        type: z.enum(QUESTION_TYPES),
+      }),
+    )
     .min(1)
     .max(100),
 });
@@ -59,7 +67,12 @@ const present = ({ id, name, createdAt, items }: InspectionTemplate) => ({
   id,
   name,
   createdAt,
-  items: items.map(({ id, label, position }) => ({ id, label, position })),
+  items: items.map(({ id, label, position, type }) => ({
+    id,
+    label,
+    position,
+    type,
+  })),
 });
 
 @Controller('/inspection-templates')
@@ -129,7 +142,7 @@ export class InspectionTemplateController {
         {
           organizationId: user.organizationId,
           name: body.name,
-          labels: body.items.map((item) => item.label),
+          questions: body.items,
         },
       );
 
@@ -156,7 +169,7 @@ export class InspectionTemplateController {
         organizationId: user.organizationId,
         id,
         name: body.name,
-        labels: body.items.map((item) => item.label),
+        questions: body.items,
       });
 
       return { inspectionTemplate: present(inspectionTemplate) };

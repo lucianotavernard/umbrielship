@@ -39,7 +39,12 @@ const present = ({
   templateName,
   service,
   createdAt,
-  items: items.map(({ id, label, position }) => ({ id, label, position })),
+  items: items.map(({ id, label, position, type }) => ({
+    id,
+    label,
+    position,
+    type,
+  })),
 });
 
 @Controller('/work-orders/:workOrderId/inspection-assignments')

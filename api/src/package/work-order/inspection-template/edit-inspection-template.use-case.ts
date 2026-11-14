@@ -4,13 +4,13 @@ import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/alr
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
 import { IInspectionTemplatesRepository } from './contracts/inspection-template-repository.contract.js';
-import { InspectionTemplate } from './inspection-template.entity.js';
+import { InspectionTemplate, Question } from './inspection-template.entity.js';
 
 type EditInspectionTemplateUseCaseRequest = {
   organizationId: string;
   id: string;
   name: string;
-  labels: string[];
+  questions: Question[];
 };
 
 type EditInspectionTemplateUseCaseResponse = {
@@ -27,7 +27,7 @@ export class EditInspectionTemplateUseCase {
     organizationId,
     id,
     name,
-    labels,
+    questions,
   }: EditInspectionTemplateUseCaseRequest): Promise<EditInspectionTemplateUseCaseResponse> {
     const inspectionTemplate =
       await this.inspectionTemplatesRepository.findById(organizationId, id);
@@ -47,7 +47,7 @@ export class EditInspectionTemplateUseCase {
       );
     }
 
-    inspectionTemplate.replace(name, labels);
+    inspectionTemplate.replace(name, questions);
 
     await this.inspectionTemplatesRepository.save(inspectionTemplate);
 

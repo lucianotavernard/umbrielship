@@ -128,7 +128,42 @@ describe('InspectionTemplate form', () => {
     const created = controller.expectOne('/api/inspection-templates');
     expect(created.request.body).toEqual({
       name: 'n'.repeat(100),
-      items: [{ label: 'x'.repeat(200) }],
+      items: [{ label: 'x'.repeat(200), type: 'CONFORMITY' }],
+    });
+    created.flush({ inspectionTemplate: { id: 't1' } }, { status: 201, statusText: 'Created' });
+    await settle();
+    controller.expectOne('/api/inspection-templates?page=1').flush({ inspectionTemplates: [], total: 0 });
+  });
+
+  it('inspection C4 each question has a Tipo select and the form sends the types in order', async () => {
+    const typeSelect = (index: number) =>
+      sheet.querySelector<HTMLSelectElement>(`#question-type-${index}`)!;
+    const optionLabels = [...typeSelect(0).options].map((option) => option.textContent?.trim());
+    expect(optionLabels).toEqual(['Texto livre', 'Sim/Não', 'Conforme/Não conforme', 'Nota de 0 a 10']);
+    expect(typeSelect(0).value).toBe('CONFORMITY');
+
+    fill(name(), 'Misto');
+    fill(questionFields(sheet)[0], 'Observações');
+    await add('Limpo?', 'Acabamento');
+    for (const [index, type] of ['TEXT', 'YES_NO', 'SCORE'].entries()) {
+      typeSelect(index).value = type;
+      typeSelect(index).dispatchEvent(new Event('input', { bubbles: true }));
+      typeSelect(index).dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    await settle();
+    buttons(sheet, 'Subir')[2].click();
+    await settle();
+    sheet.querySelector('form')!.requestSubmit();
+    await settle();
+
+    const created = controller.expectOne('/api/inspection-templates');
+    expect(created.request.body).toEqual({
+      name: 'Misto',
+      items: [
+        { label: 'Observações', type: 'TEXT' },
+        { label: 'Acabamento', type: 'SCORE' },
+        { label: 'Limpo?', type: 'YES_NO' },
+      ],
     });
     created.flush({ inspectionTemplate: { id: 't1' } }, { status: 201, statusText: 'Created' });
     await settle();

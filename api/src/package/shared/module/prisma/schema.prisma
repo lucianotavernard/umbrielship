@@ -232,11 +232,12 @@ model InspectionTemplate {
 }
 
 model InspectionTemplateItem {
-  id             String @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
   templateId     String
   label          String
   position       Int
+  type           QuestionType @default(CONFORMITY)
 
   template InspectionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
@@ -257,6 +258,7 @@ model InspectionAssignment {
   workOrder        WorkOrder                  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
   workOrderService WorkOrderService?          @relation(fields: [workOrderServiceId], references: [id], onDelete: Cascade)
   items            InspectionAssignmentItem[]
+  inspections      Inspection[]
 
   @@index([organizationId])
   @@index([workOrderId])
@@ -264,15 +266,72 @@ model InspectionAssignment {
 }
 
 model InspectionAssignmentItem {
-  id             String @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
   assignmentId   String
   label          String
   position       Int
+  type           QuestionType @default(CONFORMITY)
 
   assignment InspectionAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  answers    InspectionAnswer[]
 
   @@unique([assignmentId, position])
   @@index([organizationId])
   @@map("inspection_assignment_items")
+}
+
+enum QuestionType {
+  TEXT
+  YES_NO
+  CONFORMITY
+  SCORE
+
+  @@map("question_type")
+}
+
+enum InspectionResult {
+  APPROVED
+  REPROVED
+
+  @@map("inspection_result")
+}
+
+model Inspection {
+  id             String           @id @default(uuid())
+  organizationId String
+  assignmentId   String
+  result         InspectionResult
+  inspectorId    String
+  inspectorName  String
+  completedAt    DateTime         @default(now())
+  discardedAt    DateTime?
+  discardedBy    String?
+
+  // Restrict: an inspected assignment, and so its WorkOrder or target service, is never deleted (D5).
+  assignment InspectionAssignment @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
+  answers    InspectionAnswer[]
+
+  @@index([organizationId])
+  @@index([assignmentId])
+  @@map("inspections")
+}
+
+model InspectionAnswer {
+  id             String   @id @default(uuid())
+  organizationId String
+  inspectionId   String
+  itemId         String
+  notApplicable  Boolean  @default(false)
+  textValue      String?
+  booleanValue   Boolean?
+  scoreValue     Int?
+  note           String?
+
+  inspection Inspection               @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  item       InspectionAssignmentItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+
+  @@unique([inspectionId, itemId])
+  @@index([organizationId])
+  @@map("inspection_answers")
 }
