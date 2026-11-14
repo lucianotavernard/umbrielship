@@ -1,6 +1,6 @@
 # inspector-role proofs
 
-**HEAD**: 7946a4c
+**HEAD**: ae0fef2
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 38 pass, 0 fail
@@ -61,11 +61,11 @@
 
  Test Files  58 passed (58)
       Tests  204 passed (204)
-   Start at  01:07:27
-   Duration  1.47s (transform 4.00s, setup 0ms, import 14.85s, tests 589ms, environment 6ms)
+   Start at  01:08:05
+   Duration  1.47s (transform 4.23s, setup 0ms, import 15.90s, tests 599ms, environment 6ms)
 
-[Nest] 1549764  - 14/11/2026, 01:07:28   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"790a1df1-eab2-4059-aefc-a33874968393","message":"redis down"}
-[Nest] 1549784  - 14/11/2026, 01:07:28   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"b404b78a-7226-4bd2-993f-a65f70ab43c4","message":"redis down"}
+[Nest] 1553122  - 14/11/2026, 01:08:05   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c71599c5-f21a-4e1e-8ff4-44aff57c1f3a","message":"redis down"}
+[Nest] 1553093  - 14/11/2026, 01:08:05   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"746ea2f8-e961-4bb0-8948-b29b455db125","message":"redis down"}
 ```
 
 `Run web` - exit 0
