@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 
-export type Role = 'administrator' | 'operator' | 'inspector';
+import type { Role } from '@/package/shared/module/auth/user-payload.js';
+
+export type { Role };
 
 export type Membership = {
   organizationId: string;

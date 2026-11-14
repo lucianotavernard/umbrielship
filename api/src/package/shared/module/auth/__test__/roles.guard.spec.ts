@@ -1,7 +1,7 @@
 import { readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { INestApplication } from '@nestjs/common';
+import type { INestApplication, Type } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
@@ -65,14 +65,16 @@ const useCases = [
   ...new Set(
     controllers.flatMap(
       (controller) =>
-        (Reflect.getMetadata('design:paramtypes', controller) ??
-          []) as object[],
+        (Reflect.getMetadata('design:paramtypes', controller) ?? []) as Type[],
     ),
   ),
 ];
 
 const fakes = new Map(
-  useCases.map((useCase) => [useCase, { handle: vi.fn(async () => ({})) }]),
+  useCases.map((useCase) => [
+    useCase,
+    { handle: vi.fn(async (_input?: unknown) => ({})) },
+  ]),
 );
 
 const calls = () =>

@@ -4,6 +4,8 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 
 import { IOrganizationsRepository } from '../organization/contracts/organization-repository.contract.js';
 import { IUsersRepository } from './contracts/user-repository.contract.js';
+import { ROLES } from '@/package/shared/module/auth/user-payload.js';
+
 import { Role } from './user.entity.js';
 
 type CountOrganizationRolesUseCaseRequest = {
@@ -18,7 +20,7 @@ type CountOrganizationRolesUseCaseResponse = {
 };
 
 // Every Role is listed, in this order, even when no Membership holds it.
-const roles: Role[] = ['administrator', 'operator', 'inspector'];
+const roles: readonly Role[] = ROLES;
 
 @Injectable()
 export class CountOrganizationRolesUseCase {

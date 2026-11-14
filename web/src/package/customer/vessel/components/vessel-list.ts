@@ -143,7 +143,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
   `,
 })
 export class VesselList {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   loading = input(true);
   vessels = input<Vessel[]>([]);
 

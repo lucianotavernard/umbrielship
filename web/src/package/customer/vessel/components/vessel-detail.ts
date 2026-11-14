@@ -71,7 +71,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
   `,
 })
 export class VesselDetail {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   vessel = input<Vessel | null>(null);
   edited = output<void>();
 

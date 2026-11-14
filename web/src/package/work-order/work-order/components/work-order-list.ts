@@ -146,7 +146,7 @@ import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
   `,
 })
 export class WorkOrderList {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   loading = input(true);
   workOrders = input<WorkOrder[]>([]);
   deleted = output<WorkOrder>();
