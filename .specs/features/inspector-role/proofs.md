@@ -1,9 +1,9 @@
 # inspector-role proofs
 
-**HEAD**: 6be756e
+**HEAD**: d61623e
 **Tree**: dirty - .agents/, .claude/
 **Shell**: /bin/sh
-**Result**: 36 pass, 0 fail
+**Result**: 38 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -30,6 +30,7 @@
 | C30 | `run api / ✓ roles.guard.spec.ts > inspector C30 keeps the statuses of /me, /invitations and /organizations/:id` | pass |
 | C19 | `run web / ✓ user-form.inspector.spec.ts > inspector C19 offers Administrador, Operador and Inspetor and sends ` | pass |
 | C19 | `run web / ✓ organization-detail.inspector.spec.ts > inspector C19 the Invitation form offers Inspetor and send` | pass |
+| C19 | `run web / ✓ organization-detail.inspector.spec.ts > inspector C19 the User form posts role inspector to POST /` | pass |
 | C20 | `run web / ✓ organization-detail.inspector.spec.ts > inspector C20 shows the Inspetor badge and no Role counts` | pass |
 | C21 | `run web / ✓ internal-layout.inspector.spec.ts > inspector C21 the switcher shows Inspetor under the Organizati` | pass |
 | C22 | `run web / ✓ customer-list.inspector.spec.ts > inspector C22 renders no write control for an inspector` | pass |
@@ -40,6 +41,7 @@
 | C27 | `run web / ✓ write-access.inspector.spec.ts > inspector C27 the five pages render their write controls for an o` | pass |
 | C28 | `run web / ✓ write-access.inspector.spec.ts > inspector C28 the five pages show the same content to an inspecto` | pass |
 | C29 | `run web / ✓ internal-layout.inspector.spec.ts > inspector C29 the session Role follows GET /me after an Organi` | pass |
+| C31 | `run web / ✓ write-access.inspector.spec.ts > inspector C31 the five pages render no write control while the Ro` | pass |
 | Build | `cd api && npm run lint` | pass |
 | Build | `cd api && npm run build` | pass |
 | Build | `cd web && npm run build` | pass |
@@ -49,8 +51,8 @@
 `Run api` - exit 0
 
 ```
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 31ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 7ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 33ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 8ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C12 lets an operator create a Customer 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C14 answers 403 with statusCode 403 and message Forbidden 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C1 POST /users accepts role inspector and refuses auditor 3ms
@@ -59,29 +61,29 @@
 
  Test Files  58 passed (58)
       Tests  204 passed (204)
-   Start at  01:01:47
-   Duration  1.50s (transform 4.31s, setup 0ms, import 15.21s, tests 577ms, environment 6ms)
+   Start at  01:06:02
+   Duration  1.61s (transform 5.25s, setup 0ms, import 17.10s, tests 605ms, environment 6ms)
 
-[Nest] 1540417  - 14/11/2026, 01:01:48   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"d85910dc-4a3e-4430-b631-ae347bfc599b","message":"redis down"}
-[Nest] 1540581  - 14/11/2026, 01:01:48   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"ba3819dc-f4d6-49ed-9c97-98413199eaf9","message":"redis down"}
+[Nest] 1546344  - 14/11/2026, 01:06:02   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c11bcfc3-5b6c-4854-b5ee-381889e04deb","message":"redis down"}
+[Nest] 1546276  - 14/11/2026, 01:06:02   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"2773430b-1a82-43a5-b00d-9d69cc65a70d","message":"redis down"}
 ```
 
 `Run web` - exit 0
 
 ```
-stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C27 the five pages render their write controls for an operator and an administrator
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-
-stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C27 the five pages render their write controls for an operator and an administrator
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-
 stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C28 the five pages show the same content to an inspector as to an operator
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 
 stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C28 the five pages show the same content to an inspector as to an operator
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+
+stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C31 the five pages render no write control while the Role is not loaded or is not a writer
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+
+stderr | src/package/shared/testing/write-access.inspector.spec.ts > write access by Role > inspector C31 the five pages render no write control while the Role is not loaded or is not a writer
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 ```
