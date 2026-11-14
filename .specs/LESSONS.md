@@ -164,6 +164,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 3, C19 (web)
 - last seen: 2026-11-14T04:08:04Z
 
+### L-026 - A rule the database enforces (citext, a unique index) needs a proof on the column or migration itself; an in-memory fake that imitates it proves only the fake.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: inspection-template
+- evidence: verification.md finding 1, C5 (api)
+- last seen: 2026-11-14T11:35:58Z
+
+### L-027 - A criterion that names several gestures (create or edit) gets one test per gesture when each page handles the response in its own handler.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspection-template
+- evidence: verification.md finding 2, C27 (web)
+- last seen: 2026-11-14T11:35:58Z
+
+### L-028 - Behaviour the build adds beyond the criteria, such as resetting the page after a create, gets its own check in the same commit.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspection-template
+- evidence: verification.md finding 3, inspection-template-list.ts (web)
+- last seen: 2026-11-14T11:35:58Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
