@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { Prisma } from '@/package/shared/module/prisma/generated/prisma/client.js';
 import type { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
 import { makeInspectionAssignment } from '@test/factory.js';
@@ -124,5 +126,30 @@ describe('PrismaInspectionAssignmentsRepository', () => {
     expect(deleteMany).toHaveBeenCalledWith({
       where: { organizationId: 'org-1', id: 'a1' },
     });
+  });
+
+  it('assignment C6 turns a target deleted mid-assign into NotFoundDomainException', async () => {
+    const create = vi
+      .fn(async (_args: unknown) => ({}))
+      .mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError(
+          'Foreign key constraint violated',
+          {
+            code: 'P2003',
+            clientVersion: '7',
+          },
+        ),
+      )
+      .mockRejectedValueOnce(new Error('down'));
+    const sut = new PrismaInspectionAssignmentsRepository({
+      inspectionAssignment: { create },
+    } as unknown as PrismaService);
+
+    await expect(sut.create(makeInspectionAssignment())).rejects.toBeInstanceOf(
+      NotFoundDomainException,
+    );
+    await expect(sut.create(makeInspectionAssignment())).rejects.toThrow(
+      'down',
+    );
   });
 });

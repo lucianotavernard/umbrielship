@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { Prisma } from '@/package/shared/module/prisma/generated/prisma/client.js';
 import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
@@ -45,25 +46,37 @@ export class PrismaInspectionAssignmentsRepository implements IInspectionAssignm
   }
 
   async create(assignment: InspectionAssignment): Promise<void> {
-    await this.prisma.inspectionAssignment.create({
-      data: {
-        id: assignment.id,
-        organizationId: assignment.organizationId,
-        workOrderId: assignment.workOrderId,
-        workOrderServiceId: assignment.service?.id ?? null,
-        templateName: assignment.templateName,
-        assignedBy: assignment.assignedBy,
-        createdAt: assignment.createdAt,
-        items: {
-          create: assignment.items.map((item) => ({
-            id: item.id,
-            organizationId: assignment.organizationId,
-            label: item.label,
-            position: item.position,
-          })),
+    try {
+      await this.prisma.inspectionAssignment.create({
+        data: {
+          id: assignment.id,
+          organizationId: assignment.organizationId,
+          workOrderId: assignment.workOrderId,
+          workOrderServiceId: assignment.service?.id ?? null,
+          templateName: assignment.templateName,
+          assignedBy: assignment.assignedBy,
+          createdAt: assignment.createdAt,
+          items: {
+            create: assignment.items.map((item) => ({
+              id: item.id,
+              organizationId: assignment.organizationId,
+              label: item.label,
+              position: item.position,
+            })),
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      // The WorkOrder or its service was deleted after the use case read it.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new NotFoundDomainException('Work order not found');
+      }
+
+      throw error;
+    }
   }
 
   async delete(organizationId: string, id: string): Promise<void> {
