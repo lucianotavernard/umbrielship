@@ -149,6 +149,6 @@ Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C3
 - **Settled mid-build:** none
 - **Changed existing specs:** the WorkOrder page now also requests `GET /api/work-orders/:id/inspection-assignments`, so `work-order-detail.spec.ts` and `shared/testing/write-access.ts` flush it with `[]`; their assertions are unchanged. `apiErrorMessage` gains the Portuguese for `Inspection template not found` and `Inspection assignment not found`
 - **Dispatched:** none
-- **Boundary:** none yet
+- **Boundary:** C1-C16, C28-C30 closed at `913f023`; C17-C26 closed at `ff3277c`; C27 waits on the walk
 - **Abandoned:** none
 - **Walked:** none yet
