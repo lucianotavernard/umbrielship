@@ -26,6 +26,13 @@ import {
   InspectionAssignmentService,
 } from '../../inspection-assignment/inspection-assignment.service';
 import { GetInspectionTemplatesResponse } from '../../inspection-template/inspection-template.service';
+import { InspectionChecklist } from '../../inspection/components/inspection-checklist';
+import { InspectionView } from '../../inspection/components/inspection-view';
+import {
+  CompleteInspectionRequest,
+  Inspection,
+  InspectionService,
+} from '../../inspection/inspection.service';
 import { WorkOrderForm } from '../components/work-order-form';
 import {
   GetWorkOrderResponse,
@@ -52,6 +59,8 @@ import { AuthenticationService } from '../../../identity/authentication/authenti
     WorkOrderDetailUI,
     InspectionAssignmentForm,
     InspectionAssignmentList,
+    InspectionChecklist,
+    InspectionView,
   ],
   viewProviders: [provideIcons({ lucideArrowLeft, lucideClipboardCheck, lucideWrench, lucidePlus })],
   templateUrl: './work-order-detail.html',
@@ -59,6 +68,9 @@ import { AuthenticationService } from '../../../identity/authentication/authenti
 export class WorkOrderDetail {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
   protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
+  private readonly role = inject(AuthenticationService).role;
+  protected readonly isInspector = computed(() => this.role() === 'inspector');
+  private readonly inspectionService = inject(InspectionService);
   private readonly inspectionAssignmentService = inject(InspectionAssignmentService);
   private readonly workOrderService = inject(WorkOrderService);
   private readonly workOrderServiceService = inject(WorkOrderServiceService);
@@ -82,6 +94,13 @@ export class WorkOrderDetail {
   removing = signal(false);
   isAssignSheetActive = signal(false);
   selectedAssignment = signal<InspectionAssignment | null>(null);
+  // The assignment being answered in the "Inspecionar" sheet.
+  inspecting = signal<InspectionAssignment | null>(null);
+  completing = signal(false);
+  // The Inspection open in the "Inspeção" sheet, and whether its discard is being confirmed.
+  viewing = signal<{ assignment: InspectionAssignment; inspection: Inspection } | null>(null);
+  isDiscardDialogActive = signal(false);
+  discarding = signal(false);
   isEditWorkOrderSheetActive = signal(false);
   isCreateServiceSheetActive = signal(false);
 
@@ -103,6 +122,76 @@ export class WorkOrderDetail {
   });
 
   protected readonly statusLabels = workOrderStatusLabels;
+
+  workOrderStatus = computed(() => this.workOrder()?.status ?? null);
+  serviceStatuses = computed(() =>
+    Object.fromEntries(this.services().map((service) => [service.id, service.status])),
+  );
+
+  openChecklist(assignment: InspectionAssignment) {
+    this.inspecting.set(assignment);
+  }
+
+  closeChecklist() {
+    this.inspecting.set(null);
+  }
+
+  completeInspection(request: CompleteInspectionRequest) {
+    const assignment = this.inspecting();
+    if (!assignment) return;
+
+    this.completing.set(true);
+    this.inspectionService.complete(this.id(), assignment.id, request).subscribe({
+      next: () => {
+        toast.success('Inspeção registrada com sucesso', {
+          description: 'A inspeção foi registrada no histórico da atribuição.',
+        });
+        this.completing.set(false);
+        this.closeChecklist();
+        this.assignmentsResource.reload();
+      },
+      error: (response) => {
+        // The sheet stays open with the answers as typed.
+        toast.error('Erro ao registrar inspeção', {
+          description: apiErrorMessage(response, 'Ocorreu um erro ao registrar a inspeção.'),
+        });
+        this.completing.set(false);
+      },
+    });
+  }
+
+  openInspection(selection: { assignment: InspectionAssignment; inspection: Inspection }) {
+    this.viewing.set(selection);
+  }
+
+  closeInspection() {
+    this.viewing.set(null);
+    this.isDiscardDialogActive.set(false);
+  }
+
+  discardInspection() {
+    const selection = this.viewing();
+    if (!selection) return;
+
+    this.discarding.set(true);
+    this.inspectionService.discard(this.id(), selection.assignment.id, selection.inspection.id).subscribe({
+      next: () => {
+        toast.success('Inspeção descartada com sucesso', {
+          description: 'A inspeção deixou de aparecer no app.',
+        });
+        this.discarding.set(false);
+        this.closeInspection();
+        this.assignmentsResource.reload();
+      },
+      error: (response) => {
+        toast.error('Erro ao descartar inspeção', {
+          description: apiErrorMessage(response, 'Ocorreu um erro ao descartar a inspeção.'),
+        });
+        this.discarding.set(false);
+        this.isDiscardDialogActive.set(false);
+      },
+    });
+  }
 
   openAssignSheet() {
     this.isAssignSheetActive.set(true);

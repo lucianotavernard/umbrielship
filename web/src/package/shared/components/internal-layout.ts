@@ -25,7 +25,8 @@ import { toast } from './ui/toaster';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Skeleton, OrganizationSwitcher],
   template: `
     <main class="min-h-screen bg-background">
-      <header class="sticky top-0 z-50 border-b border-border bg-background/95">
+      <!-- Sticky from sm only: on a phone the wrapped header would cover a third of the screen. -->
+      <header class="z-50 border-b border-border bg-background/95 sm:sticky sm:top-0">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6">
           <nav class="flex flex-wrap items-center gap-1">
             <a tButton routerLink="/dashboard" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">

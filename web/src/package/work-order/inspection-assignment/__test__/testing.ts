@@ -52,7 +52,14 @@ export const assignment = (
   templateName,
   service,
   createdAt: '2026-11-14T10:00:00.000Z',
-  items: labels.map((label, position) => ({ id: `${id}-i${position}`, label, position })),
+  items: labels.map((label, position) => ({
+    id: `${id}-i${position}`,
+    label,
+    position,
+    type: 'CONFORMITY' as const,
+  })),
+  removable: true,
+  inspections: [] as object[],
 });
 
 export const assignments = [

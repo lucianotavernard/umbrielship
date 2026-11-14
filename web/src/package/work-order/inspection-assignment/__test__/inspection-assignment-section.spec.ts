@@ -125,9 +125,8 @@ describe('WorkOrder Inspeções section', () => {
       .flush({ statusCode: 409, message: 'Inspection assignment has inspections' }, { status: 409, statusText: 'Conflict' });
     await settle();
 
-    // An unknown API message falls back to the page's own sentence.
     expect(error).toHaveBeenCalledWith('Erro ao remover atribuição', {
-      description: 'Ocorreu um erro ao remover a atribuição.',
+      description: 'Esta atribuição tem inspeções e não pode ser removida.',
     });
     controller.expectNone('/api/work-orders/wo-1/inspection-assignments');
     expect(rows(element)).toHaveLength(2);

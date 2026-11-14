@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, input, output, signal } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -6,11 +7,12 @@ import { lucideChevronDown, lucideChevronRight, lucideClipboardCheck, lucideTras
 import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { questionTypeLabels } from '../../inspection-template/inspection-template.service';
+import { Inspection, inspectionResultLabels } from '../../inspection/inspection.service';
 import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment.service';
 
 @Component({
   selector: 'inspection-assignment-list-ui',
-  imports: [NgIcon, Button, Skeleton],
+  imports: [DatePipe, NgIcon, Button, Skeleton],
   viewProviders: [provideIcons({ lucideChevronDown, lucideChevronRight, lucideClipboardCheck, lucideTrash })],
   template: `
     @if (loading()) {
@@ -41,9 +43,18 @@ import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment
                   <span class="text-xs text-muted-foreground" data-slot="count">
                     {{ assignment.items.length }} {{ assignment.items.length === 1 ? 'pergunta' : 'perguntas' }}
                   </span>
+                  <span class="text-xs text-muted-foreground" data-slot="history">
+                    @if (assignment.inspections.length === 0) {
+                      Nenhuma inspeção
+                    } @else {
+                      {{ assignment.inspections.length }}
+                      {{ assignment.inspections.length === 1 ? 'inspeção' : 'inspeções' }} · última:
+                      {{ resultLabels[assignment.inspections[0].result] }}
+                    }
+                  </span>
                 </span>
               </button>
-              @if (canAdminister()) {
+              @if (canAdminister() && assignment.removable) {
                 <button
                   tButton
                   type="button"
@@ -70,6 +81,42 @@ import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment
                   </li>
                 }
               </ol>
+              <div class="flex flex-col gap-3 border-t p-3" data-slot="inspections">
+                @if (canInspect()) {
+                  <div class="flex flex-col items-start gap-1">
+                    <button
+                      tButton
+                      type="button"
+                      size="lg"
+                      [disabled]="blockedReason(assignment) !== null"
+                      (click)="inspected.emit(assignment)"
+                    >
+                      Inspecionar
+                    </button>
+                    @if (blockedReason(assignment); as reason) {
+                      <p class="text-xs text-muted-foreground" data-slot="blocked">{{ reason }}</p>
+                    }
+                  </div>
+                }
+                @if (assignment.inspections.length > 0) {
+                  <ul class="flex flex-col gap-2">
+                    @for (inspection of assignment.inspections; track inspection.id) {
+                      <li>
+                        <button
+                          type="button"
+                          class="flex min-h-10 w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-md border px-3 py-2 text-left text-sm hover:bg-accent"
+                          data-slot="inspection"
+                          (click)="opened.emit({ assignment, inspection })"
+                        >
+                          <span class="font-medium">{{ resultLabels[inspection.result] }}</span>
+                          <span class="min-w-0 break-words text-muted-foreground">{{ inspection.inspectorName }}</span>
+                          <span class="tabular-nums text-muted-foreground">{{ inspection.completedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
             }
           </li>
         } @empty {
@@ -86,17 +133,33 @@ import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment
 })
 export class InspectionAssignmentList {
   canAdminister = input.required<boolean>();
+  canInspect = input(false);
+  // The statuses that decide whether an assignment can be inspected now (D6, AD-018).
+  workOrderStatus = input<string | null>(null);
+  serviceStatuses = input<Record<string, string>>({});
   loading = input(false);
   assignments = input<InspectionAssignment[]>([]);
   removed = output<InspectionAssignment>();
+  inspected = output<InspectionAssignment>();
+  opened = output<{ assignment: InspectionAssignment; inspection: Inspection }>();
 
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
   protected readonly typeLabels = questionTypeLabels;
+  protected readonly resultLabels = inspectionResultLabels;
   private readonly open = signal<ReadonlySet<string>>(new Set());
 
   // Questions are asked in `position` order, whatever order the response lists them in.
   protected ordered(assignment: InspectionAssignment) {
     return [...assignment.items].sort((a, b) => a.position - b.position);
+  }
+
+  // Why "Inspecionar" is off, or null when the work is in progress.
+  protected blockedReason(assignment: InspectionAssignment): string | null {
+    if (this.workOrderStatus() !== 'IN_PROGRESS') return 'Disponível com a ordem em andamento';
+    if (assignment.service && this.serviceStatuses()[assignment.service.id] !== 'IN_PROGRESS') {
+      return 'Disponível com o serviço em andamento';
+    }
+    return null;
   }
 
   protected isOpen(id: string) {

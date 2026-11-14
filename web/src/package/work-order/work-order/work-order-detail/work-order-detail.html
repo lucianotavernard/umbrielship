@@ -73,9 +73,14 @@
         <div class="p-4 sm:p-6">
           <inspection-assignment-list-ui
             [canAdminister]="isAdministrator()"
+            [canInspect]="isInspector()"
+            [workOrderStatus]="workOrderStatus()"
+            [serviceStatuses]="serviceStatuses()"
             [loading]="loadingAssignments()"
             [assignments]="assignments()"
             (removed)="openRemoveDialog($event)"
+            (inspected)="openChecklist($event)"
+            (opened)="openInspection($event)"
           />
         </div>
       </section>
@@ -173,4 +178,49 @@
   [loading]="removing()"
   (closed)="closeRemoveDialog()"
   (confirmed)="removeInspectionAssignment()"
+/>
+
+<t-sheet
+  title="Inspecionar"
+  [description]="inspecting()?.templateName ?? ''"
+  class="sm:max-w-lg"
+  [isActive]="inspecting() !== null"
+  (closed)="closeChecklist()"
+>
+  @if (inspecting(); as assignment) {
+    <inspection-checklist-ui
+      [items]="assignment.items"
+      [loading]="completing()"
+      (closed)="closeChecklist()"
+      (submitted)="completeInspection($event)"
+    />
+  }
+</t-sheet>
+
+<t-sheet
+  title="Inspeção"
+  [description]="viewing()?.assignment?.templateName ?? ''"
+  class="sm:max-w-lg"
+  [isActive]="viewing() !== null"
+  (closed)="closeInspection()"
+>
+  @if (viewing(); as selection) {
+    <inspection-view-ui
+      [inspection]="selection.inspection"
+      [items]="selection.assignment.items"
+      [canDiscard]="isInspector()"
+      (discarded)="isDiscardDialogActive.set(true)"
+    />
+  }
+</t-sheet>
+
+<t-confirmation
+  title="Descartar inspeção"
+  description="Tem certeza que deseja descartar esta inspeção? Ela deixará de aparecer no app."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="isDiscardDialogActive()"
+  [loading]="discarding()"
+  (closed)="isDiscardDialogActive.set(false)"
+  (confirmed)="discardInspection()"
 />
