@@ -1,9 +1,9 @@
 # inspection-assignment proofs
 
-**HEAD**: 9639368
+**HEAD**: 4994efa
 **Tree**: clean
 **Shell**: /bin/sh
-**Result**: 44 pass, 0 fail
+**Result**: 46 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -15,6 +15,7 @@
 | C5 | `run api / ✓ assign-inspection-template.use-case.spec.ts > assignment C5 keeps its copy after the template is e` | pass |
 | C6 | `run api / ✓ assign-inspection-template.use-case.spec.ts > assignment C6 throws NotFoundDomainException for a f` | pass |
 | C6 | `run api / ✓ inspection-assignment.http.spec.ts > assignment C6 answers 404 when the use case finds nothing` | pass |
+| C6 | `run api / ✓ inspection-assignment.repository.spec.ts > assignment C6 turns a target deleted mid-assign into No` | pass |
 | C7 | `run api / ✓ inspection-assignment.http.spec.ts > assignment C7 answers 400 for a missing or invalid templateId` | pass |
 | C8 | `run api / ✓ inspection-assignment.repository.spec.ts > assignment C8 asks for the WorkOrder's assignments newe` | pass |
 | C8 | `run api / ✓ fetch-inspection-assignments.use-case.spec.ts > assignment C8 lists only the WorkOrder's assignmen` | pass |
@@ -45,6 +46,7 @@
 | C26 | `run web / ✓ inspection-assignment-form.spec.ts > assignment C26 a failed assign shows the API message and keep` | pass |
 | C26 | `run web / ✓ inspection-assignment-section.spec.ts > assignment C26 a failed remove shows the API message and k` | pass |
 | C27 | `walk - open a WorkOrder with assignments at 375 px, expand one, open the sheet and the confirmation, and check` | pass (Walked) |
+| C31 | `run web / ✓ inspection-assignment-form.spec.ts > assignment C31 a failed template load shows the error instead` | pass |
 | C30 | `run api / ✓ assign-inspection-template.use-case.spec.ts > assignment C30 a stored assignment reads back with t` | pass |
 | C30 | `run api / ✓ inspection-assignment.repository.spec.ts > assignment C2 writes the target service, the copied ite` | pass |
 | C30 | `run api / ✓ inspection-assignment.repository.spec.ts > assignment C8 asks for the WorkOrder's assignments newe` | pass |
@@ -57,35 +59,35 @@
 `Run api` - exit 0
 
 ```
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 10ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C12 lets an operator create a Customer 1ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C14 answers 403 with statusCode 403 and message Forbidden 1ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C1 POST /users accepts role inspector and refuses auditor 3ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C1 POST /users accepts role inspector and refuses auditor 5ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C3 POST /invitations accepts role inspector 2ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C30 keeps the statuses of /me, /invitations and /organizations/:id/roles 3ms
- ✓ src/package/customer/customer/__test__/fetch-customers.use-case.spec.ts > FetchCustomersUseCase > [C8] returns the 2nd and 3rd customers for take 2 skip 1 and total 3 1ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C30 keeps the statuses of /me, /invitations and /organizations/:id/roles 5ms
+ ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns plain vessel data for a Vessel of the Organization 1ms
+ ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns null for an unknown id and for a Vessel of another Organization 0ms
+ ✓ src/package/identity/user/__test__/fetch-users.use-case.spec.ts > FetchUsersUseCase > [C61] returns only the Users with no Membership in the Organization, paged, with the total 2ms
+ ✓ src/package/customer/customer/__test__/fetch-customers.use-case.spec.ts > FetchCustomersUseCase > [C8] returns the 2nd and 3rd customers for take 2 skip 1 and total 3 2ms
 
  Test Files  70 passed (70)
-      Tests  252 passed (252)
-   Start at  09:50:01
-   Duration  1.80s (transform 5.43s, setup 0ms, import 20.05s, tests 1.26s, environment 8ms)
+      Tests  253 passed (253)
+   Start at  09:59:37
+   Duration  1.78s (transform 5.94s, setup 0ms, import 20.62s, tests 1.21s, environment 7ms)
 
-[Nest] 2020682  - 14/11/2026, 09:50:01   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"4db6f97f-91b1-485c-9aab-c40a914901f7","message":"redis down"}
-[Nest] 2020899  - 14/11/2026, 09:50:02   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"92450d36-56ba-474e-b3d9-f4f6b25c851a","message":"redis down"}
+[Nest] 2039094  - 14/11/2026, 09:59:38   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"96714fb6-b44e-4b06-9ea1-57dae38e240d","message":"redis down"}
+[Nest] 2039176  - 14/11/2026, 09:59:38   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"e93061b3-4504-4d12-952b-320c5d0ee22d","message":"redis down"}
 ```
 
 `Run web` - exit 0
 
 ```
-stderr | src/package/work-order/inspection-assignment/__test__/inspection-assignment-section.spec.ts > WorkOrder Inspeções section > assignment C20 renders Atribuir modelo and Remover only for administrator
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-No icon named lucideHistory was found. You may need to import it using the withIcons function.
-
-stderr | src/package/work-order/inspection-assignment/__test__/inspection-assignment-form.spec.ts > Atribuir modelo de inspeção > assignment C26 a failed assign shows the API message and keeps the list
+stderr | src/package/work-order/inspection-assignment/__test__/inspection-assignment-form.spec.ts > Atribuir modelo de inspeção > assignment C24 assigns to the whole WorkOrder and to a service and reloads
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 
 stderr | src/package/work-order/inspection-assignment/__test__/inspection-assignment-section.spec.ts > WorkOrder Inspeções section > assignment C25 confirms, removes and reloads; cancel sends nothing
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+No icon named lucideHistory was found. You may need to import it using the withIcons function.
+
+stderr | src/package/work-order/inspection-assignment/__test__/inspection-assignment-form.spec.ts > Atribuir modelo de inspeção > assignment C26 a failed assign shows the API message and keeps the list
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 No icon named lucideHistory was found. You may need to import it using the withIcons function.
 
