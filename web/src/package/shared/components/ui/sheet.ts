@@ -45,7 +45,7 @@ import { cn } from '../lib/cn';
         </header>
 
         <div
-          class="grid min-h-0 flex-1 auto-rows-min gap-6 overflow-y-auto px-4 pb-4"
+          class="grid min-h-0 flex-1 auto-rows-min grid-cols-1 gap-6 overflow-y-auto px-4 pb-4"
         >
           <ng-content />
         </div>
@@ -94,7 +94,8 @@ export class Sheet {
 
   protected readonly computedClass = computed(() =>
     cn(
-      'fixed inset-y-0 right-0 z-50 flex h-full w-3/4 flex-col gap-4 overflow-hidden border-l bg-background shadow-lg sm:max-w-sm',
+      // Full width on a phone, where a quarter of the screen beside the sheet is wasted.
+      'fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col gap-4 overflow-hidden border-l bg-background shadow-lg sm:w-3/4 sm:max-w-sm',
       this.class(),
     ),
   );
