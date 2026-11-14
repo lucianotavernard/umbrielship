@@ -91,20 +91,25 @@ export class PrismaInspectionTemplatesRepository implements IInspectionTemplates
   }
 
   async save(template: InspectionTemplate): Promise<void> {
+    const where = {
+      organizationId: template.organizationId,
+      templateId: template.id,
+    };
+
     try {
+      // The update takes the template's row lock first, so a concurrent edit waits and its
+      // deleteMany then sees these items instead of colliding on (templateId, position).
       await this.prisma.$transaction([
-        this.prisma.inspectionTemplateItem.deleteMany({
-          where: {
-            organizationId: template.organizationId,
-            templateId: template.id,
-          },
-        }),
         this.prisma.inspectionTemplate.update({
           where: { id: template.id, organizationId: template.organizationId },
-          data: {
-            name: template.name,
-            items: { create: this.itemsOf(template) },
-          },
+          data: { name: template.name },
+        }),
+        this.prisma.inspectionTemplateItem.deleteMany({ where }),
+        this.prisma.inspectionTemplateItem.createMany({
+          data: this.itemsOf(template).map((item) => ({
+            ...item,
+            templateId: template.id,
+          })),
         }),
       ]);
     } catch (error) {
