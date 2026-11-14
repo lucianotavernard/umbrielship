@@ -25,7 +25,7 @@ An offer, made by an internal Administrator, for an existing User to join a non-
 *Avoid*: invite, signup link
 
 **Customer**:
-A person or company that owns Vessels, with an email unique within its Organization (compared without case), a phone and one address (address, city, state). It belongs to exactly one Organization.
+A person or company that owns Vessels, with an email unique within its Organization (compared without case), a phone and one address (address, city, state). It belongs to exactly one Organization. Deleting it deletes its address. A Customer that still has a Vessel is not deleted.
 *Avoid*: client, owner (as a separate entity)
 
 **Vessel**:

@@ -44,6 +44,13 @@ export type CreateVesselRequest = {
   length: number;
 };
 
+export type UpdateVesselRequest = {
+  customerId: string;
+  name: string;
+  type: VesselType;
+  length: number;
+};
+
 export type GetVesselsResponse = {
   vessels: Vessel[];
   total: number;
@@ -59,6 +66,13 @@ export class VesselService {
 
   createVessel(request: CreateVesselRequest): Observable<GetVesselResponse> {
     return this.http.post<GetVesselResponse>('/api/vessels', request);
+  }
+
+  updateVessel(vesselId: string, request: UpdateVesselRequest): Observable<GetVesselResponse> {
+    return this.http.put<GetVesselResponse>(
+      `/api/customers/${request.customerId}/vessels/${vesselId}`,
+      request,
+    );
   }
 
   deleteVessel(id: string): Observable<void> {

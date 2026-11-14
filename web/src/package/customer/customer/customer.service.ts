@@ -15,6 +15,7 @@ export type Customer = {
 };
 
 export type CreateCustomerRequest = Omit<Customer, 'id'>;
+export type UpdateCustomerRequest = Omit<Customer, 'id'>;
 
 export type GetCustomersResponse = {
   customers: Customer[];
@@ -31,5 +32,13 @@ export class CustomerService {
 
   createCustomer(request: CreateCustomerRequest): Observable<GetCustomerResponse> {
     return this.http.post<GetCustomerResponse>('/api/customers', request);
+  }
+
+  updateCustomer(customerId: string, request: UpdateCustomerRequest): Observable<GetCustomerResponse> {
+    return this.http.put<GetCustomerResponse>(`/api/customers/${customerId}`, request);
+  }
+
+  deleteCustomer(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/customers/${id}`);
   }
 }

@@ -44,4 +44,11 @@ export class InMemoryCustomersRepository implements ICustomersRepository {
     const index = this.items.findIndex((item) => item.id === customer.id);
     if (index >= 0) this.items[index] = customer;
   }
+
+  async delete(organizationId: string, id: string): Promise<void> {
+    this.items = this.items.filter(
+      (customer) =>
+        !(customer.id === id && customer.organizationId === organizationId),
+    );
+  }
 }

@@ -2,7 +2,9 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -12,12 +14,14 @@ import {
 import { z } from 'zod';
 
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { CreateCustomerUseCase } from './create-customer.use-case.js';
+import { DeleteCustomerUseCase } from './delete-customer.use-case.js';
 import { EditCustomerUseCase } from './edit-customer.use-case.js';
 import { FetchCustomersUseCase } from './fetch-customers.use-case.js';
 import { GetCustomerByIdUseCase } from './get-customer-by-id.use-case.js';
@@ -48,6 +52,7 @@ type PageQueryParamSchema = z.infer<typeof pageQueryParamSchema>;
 export class CustomerController {
   constructor(
     private createCustomer: CreateCustomerUseCase,
+    private deleteCustomer: DeleteCustomerUseCase,
     private editCustomer: EditCustomerUseCase,
     private fetchCustomers: FetchCustomersUseCase,
     private getCustomerById: GetCustomerByIdUseCase,
@@ -146,6 +151,30 @@ export class CustomerController {
       }
 
       if (error instanceof AlreadyExistsDomainException) {
+        throw new ConflictException(error.message);
+      }
+
+      throw error;
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(
+    @CurrentUser() user: UserPayload,
+    @Param('id') customerId: string,
+  ) {
+    try {
+      await this.deleteCustomer.handle({
+        organizationId: user.organizationId,
+        id: customerId,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundDomainException) {
+        throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ConflictDomainException) {
         throw new ConflictException(error.message);
       }
 

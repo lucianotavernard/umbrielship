@@ -51,6 +51,7 @@
 
 <t-sheet
   title="Novo usuário"
+  class="sm:max-w-md"
   description="Crie um usuário nesta organização"
   [isActive]="isUserSheetActive()"
   (closed)="closeUserSheet()"
@@ -60,6 +61,7 @@
 
 <t-sheet
   title="Novo convite"
+  class="sm:max-w-md"
   description="Convide um usuário que já existe para esta organização"
   [isActive]="isInvitationSheetActive()"
   (closed)="closeInvitationSheet()"

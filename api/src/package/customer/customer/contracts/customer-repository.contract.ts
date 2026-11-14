@@ -17,4 +17,5 @@ export abstract class ICustomersRepository {
   ): Promise<Paginate<Customer>>;
   abstract create(customer: Customer): Promise<void>;
   abstract save(customer: Customer): Promise<void>;
+  abstract delete(organizationId: string, id: string): Promise<void>;
 }

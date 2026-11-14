@@ -127,6 +127,7 @@ describe('acme layout', () => {
         'GET /customers/:id',
         'POST /customers',
         'PUT /customers/:id',
+        'DELETE /customers/:id',
         'GET /vessels',
         'GET /vessels/:id',
         'POST /vessels',

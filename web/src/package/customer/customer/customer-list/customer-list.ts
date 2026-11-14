@@ -1,20 +1,30 @@
 import { httpResource } from '@angular/common/http';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucidePlus } from '@ng-icons/lucide';
+
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
+import { Confirmation } from '../../../shared/components/ui/confirmation';
 import { Pagination } from '../../../shared/components/ui/pagination';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
 import { CustomerForm } from '../components/customer-form';
 import { CustomerList as CustomerListUI } from '../components/customer-list';
-import { CreateCustomerRequest, CustomerService, GetCustomersResponse } from '../customer.service';
+import {
+  CreateCustomerRequest,
+  Customer,
+  CustomerService,
+  GetCustomersResponse,
+} from '../customer.service';
 
 @Component({
   selector: 'customer-list',
-  imports: [Button, Pagination, Sheet, Skeleton, CustomerForm, CustomerListUI],
+  imports: [NgIcon, Button, Confirmation, Pagination, Sheet, Skeleton, CustomerForm, CustomerListUI],
+  viewProviders: [provideIcons({ lucidePlus })],
   templateUrl: './customer-list.html',
 })
 export class CustomerList {
@@ -25,18 +35,17 @@ export class CustomerList {
     () => `/api/customers?page=${this.page()}`,
   );
 
-  readonly perPage = 10;
-
   page = signal(1);
+  submitting = signal(false);
+  confirming = signal(false);
   isSheetActive = signal(false);
+  isDialogActive = signal(false);
+
+  selectedCustomer = signal<Customer | null>(null);
 
   loading = computed(() => this.customerResource.isLoading());
   customers = computed(() => resourceValue(this.customerResource)?.customers ?? []);
-  total = computed(() => resourceValue(this.customerResource)?.total ?? 0);
-
-  changePage(page: number) {
-    this.page.set(page);
-  }
+  totalCustomers = computed(() => resourceValue(this.customerResource)?.total ?? 0);
 
   openSheet() {
     this.isSheetActive.set(true);
@@ -46,14 +55,24 @@ export class CustomerList {
     this.isSheetActive.set(false);
   }
 
+  openDialog(customer: Customer) {
+    this.selectedCustomer.set(customer);
+    this.isDialogActive.set(true);
+  }
+
+  closeDialog() {
+    this.selectedCustomer.set(null);
+    this.isDialogActive.set(false);
+  }
+
   createCustomer(customer: CreateCustomerRequest) {
-    this.customerForm()?.loading.set(true);
+    this.submitting.set(true);
     this.customerService.createCustomer(customer).subscribe({
       next: () => {
         toast.success('Cliente criado com sucesso', {
           description: 'O cliente foi criado com sucesso.',
         });
-        this.customerForm()?.loading.set(false);
+        this.submitting.set(false);
         this.customerForm()?.reset();
         this.closeSheet();
         this.customerResource.reload();
@@ -62,7 +81,28 @@ export class CustomerList {
         toast.error('Erro ao criar cliente', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar o cliente.'),
         });
-        this.customerForm()?.loading.set(false);
+        this.submitting.set(false);
+      },
+    });
+  }
+
+  deleteCustomer() {
+    this.confirming.set(true);
+
+    const customer = this.selectedCustomer();
+    this.customerService.deleteCustomer(customer!.id).subscribe({
+      next: () => {
+        this.customerResource.reload();
+        this.closeDialog();
+
+        toast.success('Cliente excluído com sucesso', {
+          description: 'O cliente foi excluído com sucesso.',
+        });
+      },
+      error: (response) => {
+        toast.error('Erro ao excluir cliente', {
+          description: apiErrorMessage(response, 'Ocorreu um erro ao excluir o cliente.'),
+        });
       },
     });
   }

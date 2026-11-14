@@ -158,6 +158,6 @@ export class PrismaVesselsRepository implements IVesselsRepository {
           state: prismaVessel.customer.address!.state,
         },
       },
-    });
+    }, prismaVessel.id);
   }
 }

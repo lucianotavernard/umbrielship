@@ -23,51 +23,62 @@ import {
   WorkOrderService,
   workOrderStatusLabels,
 } from '../work-order.service';
+import { lucideArrowLeft, lucidePlus, lucideWrench } from '@ng-icons/lucide';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { WorkOrderDetail as WorkOrderDetailUI } from '../components/work-order-detail';
 
 @Component({
   selector: 'work-order-detail',
-  imports: [DatePipe, Button, Sheet, WorkOrderForm, WorkOrderServiceList, WorkOrderServiceForm],
+  imports: [NgIcon, DatePipe, Button, Sheet, WorkOrderForm, WorkOrderServiceList, WorkOrderServiceForm, WorkOrderDetailUI],
+  viewProviders: [provideIcons({ lucideArrowLeft, lucideWrench, lucidePlus })],
   templateUrl: './work-order-detail.html',
 })
 export class WorkOrderDetail {
-  private readonly router = inject(Router);
   private readonly workOrderService = inject(WorkOrderService);
   private readonly workOrderServiceService = inject(WorkOrderServiceService);
   private readonly imageService = inject(WorkOrderServiceImageService);
 
   id = input.required<string>();
 
-  private readonly workOrderResource = httpResource<GetWorkOrderResponse>(
-    () => `/api/work-orders/${this.id()}`,
-  );
-  private readonly servicesResource = httpResource<GetWorkOrderServicesResponse>(
-    () => `/api/work-orders/${this.id()}/services`,
-  );
+  workOrderResource = httpResource<GetWorkOrderResponse>(() => `/api/work-orders/${this.id()}`);
+  servicesResource = httpResource<GetWorkOrderServicesResponse>(() => `/api/work-orders/${this.id()}/services`);
 
-  isSheetActive = signal(false);
-  isServiceSheetActive = signal(false);
+  submitting = signal(false);
+  isEditWorkOrderSheetActive = signal(false);
+  isCreateServiceSheetActive = signal(false);
 
-  workOrder = computed(() => resourceValue(this.workOrderResource)?.workOrder ?? null);
-  services = computed(() => resourceValue(this.servicesResource)?.services ?? []);
-  loading = computed(() => this.workOrderResource.isLoading());
-  loadingServices = computed(() => this.servicesResource.isLoading());
+  workOrder = computed(() => this.workOrderResource.hasValue() ? this.workOrderResource.value()?.workOrder ?? null : null);
+  loadingWorkOrder = computed(() => this.workOrderResource.isLoading());
+
+  loading = computed(() => this.servicesResource.isLoading());
+  services = computed(() => this.servicesResource.hasValue() ? this.servicesResource.value()?.services ?? [] : []);
 
   protected readonly statusLabels = workOrderStatusLabels;
 
-  goBack() {
-    const workOrder = this.workOrder();
-    void this.router.navigateByUrl(
-      workOrder ? `/vessels/${workOrder.vessel.vesselId}` : '/vessels',
-    );
+  openEditWorkOrderSheet() {
+    this.isEditWorkOrderSheetActive.set(true);
   }
 
-  save(workOrder: UpdateWorkOrderRequest) {
+  closeEditWorkOrderSheet() {
+    this.isEditWorkOrderSheetActive.set(false);
+  }
+
+  openCreateServiceSheet() {
+    this.isCreateServiceSheetActive.set(true);
+  }
+
+  closeCreateServiceSheet() {
+    this.isCreateServiceSheetActive.set(false);
+  }
+
+  editWorkOrder(workOrder: UpdateWorkOrderRequest) {
+    this.submitting.set(true);
     this.workOrderService.updateWorkOrder(this.id(), workOrder).subscribe({
       next: () => {
         toast.success('Ordem atualizada com sucesso', {
           description: 'A ordem de serviço foi atualizada com sucesso.',
         });
-        this.isSheetActive.set(false);
+        this.closeEditWorkOrderSheet();
         this.workOrderResource.reload();
       },
       error: (response) => {
@@ -78,11 +89,13 @@ export class WorkOrderDetail {
     });
   }
 
-  createService(service: CreateWorkOrderServiceRequest) {
+  createWorkOrderService(service: CreateWorkOrderServiceRequest) {
     this.workOrderServiceService.create(this.id(), service).subscribe({
       next: () => {
-        toast.success('Serviço criado com sucesso');
-        this.isServiceSheetActive.set(false);
+        toast.success('Serviço criado com sucesso', {
+          description: 'O serviço foi criado com sucesso.',
+        });
+        this.closeCreateServiceSheet();
         this.servicesResource.reload();
       },
       error: (response) => {
