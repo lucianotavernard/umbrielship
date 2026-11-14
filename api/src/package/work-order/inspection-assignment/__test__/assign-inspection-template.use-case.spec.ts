@@ -109,12 +109,19 @@ describe('AssignInspectionTemplateUseCase', () => {
     });
   });
 
-  it('assignment C3 accepts a WorkOrder in every status', async () => {
-    for (const status of WORK_ORDER_STATUSES) {
+  it('assignment C3 accepts a WorkOrder and a WorkOrderService in every status', async () => {
+    const serviceStatuses = [
+      'PENDING',
+      'IN_PROGRESS',
+      'COMPLETED',
+      'COMPLETED',
+    ] as const;
+
+    for (const [index, status] of WORK_ORDER_STATUSES.entries()) {
       workOrders.items.push(makeWorkOrder({ status }, `wo-${status}`));
       services.items.push(
         makeService(
-          { workOrderId: `wo-${status}`, status: 'COMPLETED' },
+          { workOrderId: `wo-${status}`, status: serviceStatuses[index] },
           `svc-${status}`,
         ),
       );
@@ -135,6 +142,9 @@ describe('AssignInspectionTemplateUseCase', () => {
       'CANCELLED',
     ]);
     expect(assignments.items).toHaveLength(4);
+    expect(
+      new Set(services.items.slice(3).map((service) => service.status)),
+    ).toEqual(new Set(['PENDING', 'IN_PROGRESS', 'COMPLETED']));
   });
 
   it('assignment C4 stores two assignments of the same template and target', async () => {
