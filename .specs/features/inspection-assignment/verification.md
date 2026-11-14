@@ -38,6 +38,7 @@
 | C28 | grep on `*_add_inspection_assignments/migration.sql` | partly - the unique index is held; "creates both tables" is not grepped, and `! grep 'REFERENCES "inspection_templates"'` passes with a plain `templateId` column (finding 2) |
 | C29 | `inspection-assignment.http.spec.ts` `assignment C29 answers 401 without a token and lets every Role read` | yes |
 | C30 | `assign-inspection-template.use-case.spec.ts` `assignment C30 a stored assignment reads back with the template's questions in order` | no at the persistence layer - it reads back from the in-memory fake, which returns the very object stored; `PrismaInspectionAssignmentsRepository.create` is never exercised (finding 1) |
+| C31 | `inspection-assignment-form.spec.ts` `assignment C31 a failed template load shows the error instead of Nenhum modelo` | added by the builder in `fda529a` to close the-judge finding F1 on PR #3, not judged by the Verifier |
 
 ## Findings
 
