@@ -193,6 +193,9 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       controller
         .expectOne('/api/work-orders/wo-1/services')
         .flush({ services: [service], total: 1 });
+      controller
+        .expectOne('/api/work-orders/wo-1/inspection-assignments')
+        .flush({ inspectionAssignments: [] });
       await settle();
       return fixture.nativeElement;
     }
