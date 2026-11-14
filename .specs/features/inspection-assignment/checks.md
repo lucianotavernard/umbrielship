@@ -16,9 +16,10 @@ Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C1
 
 **C2** - With a `serviceId` of that WorkOrder the assignment targets that service (AC 2)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C2 targets a service of the WorkOrder
+Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C2 writes the target service, the copied items and the Organization
 
-**C3** - A WorkOrder in `PENDING`, `IN_PROGRESS`, `COMPLETED` or `CANCELLED` accepts an assignment (AC 3)
-Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C3 accepts a WorkOrder in every status
+**C3** - A WorkOrder in `PENDING`, `IN_PROGRESS`, `COMPLETED` or `CANCELLED`, and a WorkOrderService in `PENDING`, `IN_PROGRESS` or `COMPLETED`, accept an assignment (AC 3)
+Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C3 accepts a WorkOrder and a WorkOrderService in every status
 
 **C4** - The same template assigned twice to the same target gives two assignments (AC 4)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C4 stores two assignments of the same template and target
@@ -47,6 +48,7 @@ Proof: run api | ✓ inspection-assignment.http.spec.ts > assignment C10 answers
 
 **C11** - Removing an unknown assignment, one of another WorkOrder, or one of another Organization throws `NotFoundDomainException` and deletes nothing (AC 11)
 Proof: run api | ✓ remove-inspection-assignment.use-case.spec.ts > assignment C11 throws NotFoundDomainException for another WorkOrder or Organization and deletes nothing
+Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C11 reads and deletes an assignment only inside its Organization
 
 **C12** - `operator` and `inspector` get 403 `{ statusCode: 403, message: "Forbidden" }` on `POST` and `DELETE`, before validation, with no use case called; `administrator` passes (AC 12)
 Proof: run api | ✓ inspection-assignment.http.spec.ts > assignment C12 refuses POST and DELETE to operator and inspector with 403 before validation
@@ -66,7 +68,7 @@ Proof: run api | ✓ layout.spec.ts > [C32] exposes the routes of today, /me and
 Proof: run api | ✓ docs.spec.ts > assignment C16 CONTEXT.md has the InspectionAssignment entry
 
 **C28** - The migration creates both tables with the unique item position and no column referencing `inspection_templates` (door 1)
-Proof: `f=$(ls api/src/package/shared/module/prisma/migrations/*_add_inspection_assignments/migration.sql) && grep -q 'CREATE UNIQUE INDEX "inspection_assignment_items_assignmentId_position_key"' $f && ! grep -q 'REFERENCES "inspection_templates"' $f`
+Proof: `f=$(ls api/src/package/shared/module/prisma/migrations/*_add_inspection_assignments/migration.sql) && grep -q 'CREATE TABLE "inspection_assignments"' $f && grep -q 'CREATE TABLE "inspection_assignment_items"' $f && grep -q 'CREATE UNIQUE INDEX "inspection_assignment_items_assignmentId_position_key"' $f && ! grep -qi 'templateId' $f && ! grep -q 'REFERENCES "inspection_templates"' $f`
 
 **C29** - Every assignment route answers 401 without a token, and every Role reads the list (Surface)
 Proof: run api | ✓ inspection-assignment.http.spec.ts > assignment C29 answers 401 without a token and lets every Role read
@@ -109,6 +111,8 @@ Proof: walk - open a WorkOrder with assignments at 375 px, expand one, open the 
 
 **C30** - An assignment created through the page comes back from `GET` with the template's questions in the order the template had them (data lifecycle)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C30 a stored assignment reads back with the template's questions in order
+Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C2 writes the target service, the copied items and the Organization
+Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C8 asks for the WorkOrder's assignments newest first with items by position and the service name
 
 ## Coverage
 
@@ -120,6 +124,7 @@ Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C3
 | `GET /inspection-templates` statuses (3) | 200 C14 · 400 C14 · 401 C29 | - |
 | one-way doors (2) | tables, cascade, unique position, no template reference C13, C28 · `per_page` C14 | - |
 | AC 3 WorkOrder statuses (4) | `PENDING` C3 · `IN_PROGRESS` C3 · `COMPLETED` C3 · `CANCELLED` C3 | - |
+| AC 3 WorkOrderService statuses (3) | `PENDING` C3 · `IN_PROGRESS` C3 · `COMPLETED` C3 | - |
 | AC 5 examples (2) | template edited C5 · template deleted C5 | - |
 | AC 6 not-found cases (4) | WorkOrder C6 · template C6 · service of another Organization C6 · service of another WorkOrder C6 | - |
 | AC 7 bad bodies (3) | missing `templateId` C7 · non-uuid `templateId` C7 · non-uuid `serviceId` C7 | - |
@@ -148,7 +153,7 @@ Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C3
 
 - **Settled mid-build:** none
 - **Changed existing specs:** the WorkOrder page now also requests `GET /api/work-orders/:id/inspection-assignments`, so `work-order-detail.spec.ts` and `shared/testing/write-access.ts` flush it with `[]`; their assertions are unchanged. `apiErrorMessage` gains the Portuguese for `Inspection template not found` and `Inspection assignment not found`
-- **Dispatched:** none
+- **Dispatched:** Verifier at `0ca5dd9` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 4 findings
 - **Boundary:** C1-C16, C28-C30 closed at `913f023`; C17-C26 closed at `ff3277c`; C27 waits on the walk
 - **Abandoned:** none
 - **Walked:** none yet
