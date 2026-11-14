@@ -5,7 +5,7 @@ Run api: `cd api && npx vitest run --reporter=verbose`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/inspection-assignment/**/*.spec.ts'`
 Plan: `.specs/features/inspection-assignment/plan.md`
 
-30 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
+31 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -30,6 +30,7 @@ Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C5
 **C6** - An unknown or foreign WorkOrder, template or service, or a service of another WorkOrder, throws `NotFoundDomainException` and stores nothing; the route answers 404 (AC 6)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C6 throws NotFoundDomainException for a foreign WorkOrder, template or service and stores nothing
 Proof: run api | ✓ inspection-assignment.http.spec.ts > assignment C6 answers 404 when the use case finds nothing
+Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C6 turns a target deleted mid-assign into NotFoundDomainException
 
 **C7** - A missing or non-uuid `templateId`, or a non-uuid `serviceId`, answers 400 and calls no use case (AC 7)
 Proof: run api | ✓ inspection-assignment.http.spec.ts > assignment C7 answers 400 for a missing or invalid templateId or serviceId
@@ -109,6 +110,9 @@ Proof: run web | ✓ inspection-assignment-section.spec.ts > assignment C26 a fa
 **C27** - At 375 px the WorkOrder page with an expanded assignment, the sheet and the confirmation show every control and question without horizontal page scroll (AC 27)
 Proof: walk - open a WorkOrder with assignments at 375 px, expand one, open the sheet and the confirmation, and check `document.documentElement.scrollWidth` equals 375
 
+**C31** - When the templates cannot be read, the sheet shows the API error message ("Não foi possível carregar os modelos de inspeção." by default) and no form, never "Nenhum modelo de inspeção cadastrado" (AC 22, added after review)
+Proof: run web | ✓ inspection-assignment-form.spec.ts > assignment C31 a failed template load shows the error instead of Nenhum modelo
+
 **C30** - An assignment created through the page comes back from `GET` with the template's questions in the order the template had them (data lifecycle)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > assignment C30 a stored assignment reads back with the template's questions in order
 Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C2 writes the target service, the copied items and the Organization
@@ -133,6 +137,7 @@ Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C8 as
 | AC 14 examples (4) | 100 then 1 of 101 C14 · default 10 C14 · `per_page=0` C14 · `per_page=101` C14 | - |
 | session Roles on the section (4) | `administrator` C20 · `operator` C20 · `inspector` C20 · not loaded C20 | - |
 | controls (6) | "Atribuir modelo" C21 · "Modelo" select C21, C24 · "Alvo" select C21, C24 · submit C23, C24 · summary toggle C19 · "Remover" C25 | - |
+| template load outcomes (3) | some C21 · none C22 · failed C31 | - |
 | copy (6) | "Nenhum modelo atribuído" C18 · "Nenhum modelo de inspeção cadastrado" C22 · "Modelo é obrigatório" C23 · atribuído C24 · removida C25 · confirmation C25 | - |
 | states at 375 px (3) | expanded assignment C27 · sheet C27 · confirmation C27 | - |
 | startup config: `InspectionAssignmentController` (2 assemblies) | `WorkOrderModule` in `AppModule` C15 route list and the build · HTTP spec harness C12 | - |
@@ -156,4 +161,5 @@ Proof: run api | ✓ inspection-assignment.repository.spec.ts > assignment C8 as
 - **Dispatched:** Verifier at `0ca5dd9` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 4 findings
 - **Boundary:** C1-C16, C28-C30 closed at `913f023`; C17-C26 closed at `ff3277c`; C27 closed by the walk after the sheet header fix
 - **Abandoned:** none
+- **Review (the-judge, PR #3 round 1):** F1 a failed template load read as "Nenhum modelo de inspeção cadastrado" - the sheet now shows the API error (C31). F2 a target deleted mid-assign answered 500 - `create` maps P2003 to `NotFoundDomainException` (C6)
 - **Walked:** headless Chrome over the DevTools protocol against the running dev servers (API 3333 restarted by the user, web 4200), signed in as the seed Administrator, viewport 375x812. Two test assignments were created through the API on the first WorkOrder (whole WorkOrder and its first service) and removed at the end (204). States: the WorkOrder page with an assignment expanded (4 numbered questions, long template name wrapping), the "Atribuir modelo de inspeção" sheet (Alvo lists "Ordem de serviço inteira" then the two services), and the "Remover atribuição" confirmation. `scrollWidth` 360 of 375 in all three; the only elements past the edge are the existing services table, which scrolls inside its own container. First run: the sheet title ran under the close button; fixed in the shared sheet header (`pe-10`), then rewalked. A user reaches these from a WorkOrder row, the section's chevron, "Atribuir modelo" and "Remover" (C27)
