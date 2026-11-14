@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { WorkOrderService as PrismaWorkOrderService } from '@/package/shared/module/prisma/generated/prisma/client.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import {
+  Prisma,
+  WorkOrderService as PrismaWorkOrderService,
+} from '@/package/shared/module/prisma/generated/prisma/client.js';
 import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
 import { WorkOrderService } from './work-order-service.entity.js';
@@ -65,9 +69,21 @@ export class PrismaWorkOrderServicesRepository implements IWorkOrderServicesRepo
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.workOrderService.delete({
-      where: { id },
-    });
+    try {
+      await this.prisma.workOrderService.delete({
+        where: { id },
+      });
+    } catch (error) {
+      // An Inspection completed after the use case checked: the database refuses (D5).
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new ConflictDomainException('Work order service has inspections');
+      }
+
+      throw error;
+    }
   }
 
   private toDomain(prismaRow: PrismaWorkOrderService): WorkOrderService {

@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
+import { IInspectionsRepository } from '../inspection/contracts/inspection-repository.contract.js';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
 
 type DeleteWorkOrderUseCaseRequest = {
@@ -11,7 +13,10 @@ type DeleteWorkOrderUseCaseRequest = {
 
 @Injectable()
 export class DeleteWorkOrderUseCase {
-  constructor(private readonly workOrdersRepository: IWorkOrdersRepository) {}
+  constructor(
+    private readonly workOrdersRepository: IWorkOrdersRepository,
+    private readonly inspectionsRepository: IInspectionsRepository,
+  ) {}
 
   async handle({
     organizationId,
@@ -24,6 +29,16 @@ export class DeleteWorkOrderUseCase {
 
     if (!workOrder) {
       throw new NotFoundDomainException('Work order not found');
+    }
+
+    // D5: inspected work stays, discarded Inspections included.
+    const inspections = await this.inspectionsRepository.countByWorkOrderId(
+      organizationId,
+      id,
+    );
+
+    if (inspections > 0) {
+      throw new ConflictDomainException('Work order has inspections');
     }
 
     await this.workOrdersRepository.delete(id);

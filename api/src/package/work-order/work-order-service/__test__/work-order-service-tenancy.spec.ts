@@ -5,6 +5,7 @@ import { NotFoundDomainException } from '@/package/shared/lib/exception/not-foun
 import { makeService, makeWorkOrder } from '@test/factory.js';
 import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { CreateWorkOrderServiceUseCase } from '../create-work-order-service.use-case.js';
 import { DeleteWorkOrderServiceUseCase } from '../delete-work-order-service.use-case.js';
 import { EditWorkOrderServiceUseCase } from '../edit-work-order-service.use-case.js';
@@ -62,7 +63,10 @@ describe('WorkOrderService tenancy', () => {
       serviceId: 'sb',
       ...body,
     });
-    const remove = new DeleteWorkOrderServiceUseCase(services).handle({
+    const remove = new DeleteWorkOrderServiceUseCase(
+      services,
+      new InMemoryInspectionsRepository(),
+    ).handle({
       organizationId: 'A',
       workOrderId: 'wb',
       serviceId: 'sb',
