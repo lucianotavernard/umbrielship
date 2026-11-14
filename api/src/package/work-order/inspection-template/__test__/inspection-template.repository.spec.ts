@@ -158,4 +158,33 @@ describe('PrismaInspectionTemplatesRepository', () => {
     prisma.inspectionTemplate.create.mockRejectedValueOnce(new Error('down'));
     await expect(sut.create(makeInspectionTemplate())).rejects.toThrow('down');
   });
+
+  it("inspection C1 writes each question's type on create and on edit", async () => {
+    const { prisma, sut } = fakePrisma();
+    const template = makeInspectionTemplate(
+      {
+        questions: [
+          { label: 'Notas', type: 'TEXT' },
+          { label: 'Nota', type: 'SCORE' },
+        ],
+      },
+      't1',
+    );
+
+    await sut.create(template);
+    await sut.save(template);
+
+    const created = prisma.inspectionTemplate.create.mock.calls[0][0] as {
+      data: { items: { create: { type: string }[] } };
+    };
+    expect(created.data.items.create.map((item) => item.type)).toEqual([
+      'TEXT',
+      'SCORE',
+    ]);
+    const replaced = prisma.inspectionTemplateItem.createMany.mock
+      .calls[0][0] as {
+      data: { type: string }[];
+    };
+    expect(replaced.data.map((item) => item.type)).toEqual(['TEXT', 'SCORE']);
+  });
 });

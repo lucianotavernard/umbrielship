@@ -23,6 +23,9 @@ import type {
   Role,
   UserPayload,
 } from '@/package/shared/module/auth/user-payload.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
+import { DeleteWorkOrderServiceUseCase } from '@/package/work-order/work-order-service/delete-work-order-service.use-case.js';
+import { DeleteWorkOrderUseCase } from '@/package/work-order/work-order/delete-work-order.use-case.js';
 import { WorkOrderServiceImageController } from '@/package/work-order/work-order-service-image/work-order-service-image.controller.js';
 import { WorkOrderServiceController } from '@/package/work-order/work-order-service/work-order-service.controller.js';
 import { WorkOrderController } from '@/package/work-order/work-order/work-order.controller.js';
@@ -385,5 +388,36 @@ describe('Roles guard over HTTP', () => {
       .get(`/organizations/${ORGANIZATION}/roles`)
       .set('Authorization', `Bearer ${tokens[subOf('administrator')]}`);
     expect(roles.status).toBe(403);
+  });
+
+  it('inspection C41 answers 409 when an inspected WorkOrder or service is deleted', async () => {
+    fakes
+      .get(DeleteWorkOrderUseCase)!
+      .handle.mockRejectedValueOnce(
+        new ConflictDomainException('Work order has inspections'),
+      );
+    fakes
+      .get(DeleteWorkOrderServiceUseCase)!
+      .handle.mockRejectedValueOnce(
+        new ConflictDomainException('Work order service has inspections'),
+      );
+
+    const workOrder = await send(
+      { method: 'delete', path: `/work-orders/${ID}` },
+      subOf('operator'),
+    );
+    const service = await send(
+      { method: 'delete', path: `/work-orders/${ID}/services/${ID}` },
+      subOf('operator'),
+    );
+
+    expect([workOrder.status, workOrder.body.message]).toEqual([
+      409,
+      'Work order has inspections',
+    ]);
+    expect([service.status, service.body.message]).toEqual([
+      409,
+      'Work order service has inspections',
+    ]);
   });
 });

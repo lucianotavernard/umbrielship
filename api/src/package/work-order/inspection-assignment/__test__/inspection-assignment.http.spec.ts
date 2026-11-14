@@ -10,6 +10,7 @@ import {
   vi,
 } from 'vitest';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import type {
   Role,
@@ -318,5 +319,16 @@ describe('InspectionAssignment routes over HTTP', () => {
         },
       ],
     });
+  });
+
+  it('inspection C41 answers 409 when an inspected assignment is removed', async () => {
+    fakes.remove.handle.mockRejectedValueOnce(
+      new ConflictDomainException('Inspection assignment has inspections'),
+    );
+
+    const response = await remove('administrator');
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toBe('Inspection assignment has inspections');
   });
 });
