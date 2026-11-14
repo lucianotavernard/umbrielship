@@ -3,13 +3,13 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 24,
+  "next_id": 26,
   "lessons": [
     {
       "id": "L-001",
-      "key": "surviving_mutant::make a file system failure deterministic with a spy rejecting each error code and assert the exact error not an os dependent code set",
+      "key": "weak_test::make a file system failure deterministic with a spy rejecting each error code and assert the exact error not an os dependent code set",
       "text": "Make a file-system failure deterministic with a spy rejecting each error code, and assert the exact error, not an OS-dependent code set",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "use-case",
       "status": "candidate",
       "features": [
@@ -97,9 +97,9 @@
     },
     {
       "id": "L-006",
-      "key": "surviving_mutant::an in memory fake that enforces the same rule as the use case hides a dropped use case guard spy on the repository write and assert it is not called",
+      "key": "weak_test::an in memory fake that enforces the same rule as the use case hides a dropped use case guard spy on the repository write and assert it is not called",
       "text": "An in-memory fake that enforces the same rule as the use case hides a dropped use-case guard; spy on the repository write and assert it is not called.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "api/test",
       "status": "candidate",
       "features": [
@@ -133,9 +133,9 @@
     },
     {
       "id": "L-008",
-      "key": "surviving_mutant::assert a compiler flag in every config the build reads not only the base tsconfig",
+      "key": "weak_test::assert a compiler flag in every config the build reads not only the base tsconfig",
       "text": "Assert a compiler flag in every config the build reads, not only the base tsconfig.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "api/platform",
       "status": "candidate",
       "features": [
@@ -151,9 +151,9 @@
     },
     {
       "id": "L-009",
-      "key": "surviving_mutant::a doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case",
+      "key": "weak_test::a doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case",
       "text": "A doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "docs",
       "status": "candidate",
       "features": [
@@ -223,9 +223,9 @@
     },
     {
       "id": "L-013",
-      "key": "surviving_mutant::assert the attribute selector the screen criterion names not a bare element",
+      "key": "weak_test::assert the attribute selector the screen criterion names not a bare element",
       "text": "Assert the attribute selector the screen criterion names, not a bare element.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "web",
       "status": "candidate",
       "features": [
@@ -241,9 +241,9 @@
     },
     {
       "id": "L-014",
-      "key": "surviving_mutant::assert the http method together with the path not only that the path string occurs",
+      "key": "weak_test::assert the http method together with the path not only that the path string occurs",
       "text": "Assert the HTTP method together with the path, not only that the path string occurs.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "web",
       "status": "candidate",
       "features": [
@@ -259,9 +259,9 @@
     },
     {
       "id": "L-015",
-      "key": "surviving_mutant::assert a reload is absent while the request is outstanding and present once after the success status",
+      "key": "weak_test::assert a reload is absent while the request is outstanding and present once after the success status",
       "text": "Assert a reload is absent while the request is outstanding and present once after the success status.",
-      "signal": "surviving_mutant",
+      "signal": "weak_test",
       "scope": "web",
       "status": "candidate",
       "features": [
@@ -419,6 +419,42 @@
       ],
       "created": "2026-11-08T20:07:42Z",
       "last_seen": "2026-11-08T20:07:42Z"
+    },
+    {
+      "id": "L-024",
+      "key": "ac_gap::when the web hides controls by role derive it from the same allow list the api enforces and hide while the session role is not loaded a deny list shows every control to an unknown or not yet loaded role",
+      "text": "When the web hides controls by Role, derive it from the same allow-list the API enforces and hide while the session Role is not loaded; a deny-list shows every control to an unknown or not-yet-loaded Role.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspector-role"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1-2, AC 25 (web)"
+      ],
+      "created": "2026-11-14T04:08:04Z",
+      "last_seen": "2026-11-14T04:08:04Z"
+    },
+    {
+      "id": "L-025",
+      "key": "weak_test::a criterion that says the web sends a value is proven by asserting the http request body not the value a form component emits",
+      "text": "A criterion that says the web sends a value is proven by asserting the HTTP request body, not the value a form component emits.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspector-role"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3, C19 (web)"
+      ],
+      "created": "2026-11-14T04:08:04Z",
+      "last_seen": "2026-11-14T04:08:04Z"
     }
   ]
 }
