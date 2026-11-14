@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 29,
+  "next_id": 32,
   "lessons": [
     {
       "id": "L-001",
@@ -509,6 +509,60 @@
       ],
       "created": "2026-11-14T11:35:58Z",
       "last_seen": "2026-11-14T11:35:58Z"
+    },
+    {
+      "id": "L-029",
+      "key": "weak_test::a claim about what is stored needs a test on the real repository s write call a use case spec on the in memory fake proves only the fake",
+      "text": "A claim about what is stored needs a test on the real repository's write call; a use-case spec on the in-memory fake proves only the fake.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "inspection-assignment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1, C2 C30 (api)"
+      ],
+      "created": "2026-11-14T12:45:09Z",
+      "last_seen": "2026-11-14T12:45:09Z"
+    },
+    {
+      "id": "L-030",
+      "key": "weak_test::a test of an order rule feeds the data out of order so the order the response already has cannot make it pass",
+      "text": "A test of an order rule feeds the data out of order, so the order the response already has cannot make it pass.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspection-assignment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 4, C19 (web)"
+      ],
+      "created": "2026-11-14T12:45:09Z",
+      "last_seen": "2026-11-14T12:45:09Z"
+    },
+    {
+      "id": "L-031",
+      "key": "ac_gap::a criterion that names two entities workorder and workorderservice gets a check over the values of each",
+      "text": "A criterion that names two entities (WorkOrder and WorkOrderService) gets a check over the values of each.",
+      "signal": "ac_gap",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "inspection-assignment"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3, AC 3 (api)"
+      ],
+      "created": "2026-11-14T12:45:09Z",
+      "last_seen": "2026-11-14T12:45:09Z"
     }
   ]
 }

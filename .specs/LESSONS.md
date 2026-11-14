@@ -182,6 +182,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 3, inspection-template-list.ts (web)
 - last seen: 2026-11-14T11:35:58Z
 
+### L-029 - A claim about what is stored needs a test on the real repository's write call; a use-case spec on the in-memory fake proves only the fake.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: inspection-assignment
+- evidence: verification.md finding 1, C2 C30 (api)
+- last seen: 2026-11-14T12:45:09Z
+
+### L-030 - A test of an order rule feeds the data out of order, so the order the response already has cannot make it pass.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspection-assignment
+- evidence: verification.md finding 4, C19 (web)
+- last seen: 2026-11-14T12:45:09Z
+
+### L-031 - A criterion that names two entities (WorkOrder and WorkOrderService) gets a check over the values of each.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: inspection-assignment
+- evidence: verification.md finding 3, AC 3 (api)
+- last seen: 2026-11-14T12:45:09Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
