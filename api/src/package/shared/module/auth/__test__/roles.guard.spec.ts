@@ -73,24 +73,28 @@ const ID = '33333333-3333-4333-8333-333333333333';
 const users: Record<string, UserPayload> = {
   'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa': {
     sub: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    name: 'User',
     organizationId: ORGANIZATION,
     role: 'administrator',
     internal: false,
   },
   'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb': {
     sub: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    name: 'User',
     organizationId: ORGANIZATION,
     role: 'operator',
     internal: false,
   },
   'cccccccc-cccc-4ccc-8ccc-cccccccccccc': {
     sub: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+    name: 'User',
     organizationId: ORGANIZATION,
     role: 'inspector',
     internal: false,
   },
   'dddddddd-dddd-4ddd-8ddd-dddddddddddd': {
     sub: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+    name: 'User',
     organizationId: ORGANIZATION,
     role: 'administrator',
     internal: true,

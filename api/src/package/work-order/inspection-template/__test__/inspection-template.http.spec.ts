@@ -41,7 +41,13 @@ const subs: Record<Role, string> = {
 const users: Record<string, UserPayload> = Object.fromEntries(
   ROLES.map((role) => [
     subs[role],
-    { sub: subs[role], organizationId: ORGANIZATION, role, internal: false },
+    {
+      sub: subs[role],
+      name: `User ${role}`,
+      organizationId: ORGANIZATION,
+      role,
+      internal: false,
+    },
   ]),
 );
 

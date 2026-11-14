@@ -16,6 +16,8 @@ import type {
   UserPayload,
 } from '@/package/shared/module/auth/user-payload.js';
 
+import { Inspection } from '@/package/work-order/inspection/inspection.entity.js';
+
 import { makeInspectionAssignment } from '@test/factory.js';
 import { bootHttp } from '@test/http.js';
 import { AssignInspectionTemplateUseCase } from '../assign-inspection-template.use-case.js';
@@ -39,7 +41,13 @@ const subs: Record<Role, string> = {
 const users: Record<string, UserPayload> = Object.fromEntries(
   ROLES.map((role) => [
     subs[role],
-    { sub: subs[role], organizationId: ORGANIZATION, role, internal: false },
+    {
+      sub: subs[role],
+      name: `User ${role}`,
+      organizationId: ORGANIZATION,
+      role,
+      internal: false,
+    },
   ]),
 );
 
@@ -180,6 +188,8 @@ describe('InspectionAssignment routes over HTTP', () => {
           templateName: 'Pintura do casco',
           service: { id: SERVICE, name: 'Pintura' },
           createdAt: '2026-01-01T00:00:00.000Z',
+          removable: true,
+          inspections: [],
           items: [
             {
               id: expect.any(String),
@@ -252,5 +262,61 @@ describe('InspectionAssignment routes over HTTP', () => {
         .set('Authorization', `Bearer ${tokens[role]}`);
       expect(response.status, role).toBe(200);
     }
+  });
+
+  it('inspection C14 answers each assignment with removable and its Inspections', async () => {
+    const inspected = assignment();
+    inspected.inspectionCount = 2;
+    inspected.inspections = [
+      Inspection.restore(
+        {
+          organizationId: ORGANIZATION,
+          assignmentId: ASSIGNMENT,
+          result: 'REPROVED',
+          inspectorId: 'user-9',
+          inspectorName: 'Inês Prado',
+          completedAt: new Date('2026-11-14T10:00:00.000Z'),
+          discardedAt: null,
+          discardedBy: null,
+          answers: [
+            {
+              id: 'ans-1',
+              itemId: inspected.items[0].id,
+              notApplicable: true,
+              value: null,
+              note: null,
+            },
+          ],
+        },
+        'i1',
+      ),
+    ];
+    fakes.fetch.handle.mockResolvedValueOnce({
+      inspectionAssignments: [inspected],
+    });
+
+    const response = await agent()
+      .get(path)
+      .set('Authorization', `Bearer ${tokens.operator}`);
+
+    expect(response.body.inspectionAssignments[0]).toMatchObject({
+      removable: false,
+      inspections: [
+        {
+          id: 'i1',
+          result: 'REPROVED',
+          inspectorName: 'Inês Prado',
+          completedAt: '2026-11-14T10:00:00.000Z',
+          answers: [
+            {
+              itemId: inspected.items[0].id,
+              notApplicable: true,
+              value: null,
+              note: null,
+            },
+          ],
+        },
+      ],
+    });
   });
 });

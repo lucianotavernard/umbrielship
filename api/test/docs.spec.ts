@@ -216,4 +216,19 @@ describe('documents follow the acme platform', () => {
       'deleted with its WorkOrder or its WorkOrderService',
     );
   });
+
+  it('inspection C6 CONTEXT.md describes the question types and the Inspection', () => {
+    const context = read('CONTEXT.md');
+    const template = glossaryEntry(context, 'InspectionTemplate');
+    for (const type of ['`TEXT`', '`YES_NO`', '`CONFORMITY`', '`SCORE`']) {
+      expect(template).toContain(type);
+    }
+
+    const inspection = glossaryEntry(context, 'Inspection');
+    expect(inspection).toContain('`inspector`');
+    expect(inspection).toContain('`APPROVED` or `REPROVED`');
+    expect(inspection).toContain('never edited');
+    expect(inspection).toContain('discard');
+    expect(inspection).toContain('cannot be deleted');
+  });
 });

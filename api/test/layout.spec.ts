@@ -26,6 +26,7 @@ const aggregates = [
   'work-order/work-order-service-image',
   'work-order/inspection-template',
   'work-order/inspection-assignment',
+  'work-order/inspection',
   'identity/auth',
   'identity/user',
   'identity/organization',
@@ -88,6 +89,7 @@ describe('acme layout', () => {
       'IWorkOrderServiceImagesRepository',
       'IInspectionTemplatesRepository',
       'IInspectionAssignmentsRepository',
+      'IInspectionsRepository',
       'IUsersRepository',
       'IOrganizationsRepository',
       'IInvitationsRepository',
@@ -113,7 +115,9 @@ describe('acme layout', () => {
       const source = read(file);
       expect(source.match(/@Controller\(/g) ?? [], rel(file)).toHaveLength(1);
 
-      const prefix = source.match(/@Controller\((?:'([^']*)')?\)/)![1] ?? '';
+      // The path may sit on its own line when it is long.
+      const prefix =
+        source.match(/@Controller\(\s*(?:'([^']*)')?,?\s*\)/)![1] ?? '';
       for (const match of source.matchAll(
         /@(Get|Post|Put|Delete|Patch)\((?:'([^']*)')?\)/g,
       )) {
@@ -158,6 +162,8 @@ describe('acme layout', () => {
         'GET /work-orders/:workOrderId/inspection-assignments',
         'POST /work-orders/:workOrderId/inspection-assignments',
         'DELETE /work-orders/:workOrderId/inspection-assignments/:id',
+        'POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections',
+        'POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections/:id/discard',
         'POST /sessions',
         'GET /me',
         'POST /organizations/switch',
@@ -187,6 +193,7 @@ describe('acme layout', () => {
         'work-order-service-image.controller.ts',
         'inspection-template.controller.ts',
         'inspection-assignment.controller.ts',
+        'inspection.controller.ts',
         'authentication.controller.ts',
         'organization.controller.ts',
         'user.controller.ts',
@@ -258,11 +265,14 @@ describe('acme layout', () => {
   });
 
   it('template C12 every POST, PUT and DELETE handler under customer and work-order declares its Roles', () => {
-    // Only an administrator writes InspectionTemplates and InspectionAssignments; the rest write as administrator or operator.
-    const administratorOnly = [
-      'work-order/inspection-template/',
-      'work-order/inspection-assignment/',
-    ];
+    // An administrator writes InspectionTemplates and InspectionAssignments, an inspector writes
+    // Inspections, and the rest are written by administrator or operator.
+    const rolesOf = (file: string) =>
+      /work-order\/inspection\//.test(rel(file))
+        ? "@Roles('inspector')"
+        : /work-order\/inspection-(template|assignment)\//.test(rel(file))
+          ? "@Roles('administrator')"
+          : '@Roles(...WRITERS)';
     const writers: string[] = [];
 
     for (const file of files.filter(
@@ -270,9 +280,7 @@ describe('acme layout', () => {
         path.endsWith('.controller.ts') &&
         /package\/(customer|work-order)\//.test(path),
     )) {
-      const roles = administratorOnly.some((dir) => rel(file).includes(dir))
-        ? "@Roles('administrator')"
-        : '@Roles(...WRITERS)';
+      const roles = rolesOf(file);
 
       // Each chunk ends with the decorators of the next handler.
       for (const chunk of read(file).split('\n  async ').slice(0, -1)) {
@@ -291,5 +299,8 @@ describe('acme layout', () => {
     expect(
       writers.filter((line) => line.endsWith("('administrator')")),
     ).toHaveLength(5);
+    expect(
+      writers.filter((line) => line.endsWith("('inspector')")),
+    ).toHaveLength(2);
   });
 });
