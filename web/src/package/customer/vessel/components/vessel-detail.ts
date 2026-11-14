@@ -48,6 +48,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
             </div>
           </div>
 
+          @if (canWrite()) {
           <div class="flex gap-2">
             <button tButton type="button" size="sm" class="gap-2" (click)="edited.emit()">
               <ng-icon name="lucidePencil" />
@@ -58,6 +59,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
               Deletar
             </button>
           </div>
+          }
         } @else {
           <div class="grid gap-2">
             <t-skeleton class="h-7 w-56 rounded" />
@@ -69,6 +71,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
   `,
 })
 export class VesselDetail {
+  canWrite = input(true);
   vessel = input<Vessel | null>(null);
   edited = output<void>();
 

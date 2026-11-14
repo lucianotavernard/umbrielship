@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Service, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+
+import type { Role } from '../user/user.service';
 
 export type AuthenticateUserRequest = {
   email: string;
@@ -15,7 +17,7 @@ export type MeOrganization = {
   id: string;
   name: string;
   isInternal: boolean;
-  role: 'administrator' | 'operator';
+  role: Role;
 };
 
 export type MeResponse = {
@@ -23,7 +25,7 @@ export type MeResponse = {
     id: string;
     name: string;
     email: string;
-    role: 'administrator' | 'operator';
+    role: Role;
     organization: {
       id: string;
       name: string;
@@ -43,6 +45,11 @@ export class AuthenticationService {
 
   isAuthenticated = signal(localStorage.getItem(TOKEN_KEY) !== null);
   activeOrganizationId = signal<string | null>(null);
+
+  // The Role of the active Membership, set by the layout from GET /me.
+  role = signal<Role | null>(null);
+  // An inspector reads and writes nothing it reads; the API refuses it with 403.
+  canWrite = computed(() => this.role() !== 'inspector');
 
   me() {
     return this.http.get<MeResponse>('/api/me');
@@ -82,5 +89,6 @@ export class AuthenticationService {
     localStorage.removeItem(TOKEN_KEY);
     this.isAuthenticated.set(false);
     this.activeOrganizationId.set(null);
+    this.role.set(null);
   }
 }

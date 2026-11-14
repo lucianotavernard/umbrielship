@@ -37,6 +37,7 @@ import {
   UpdateVesselRequest,
   VesselService,
 } from '../vessel.service';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'vessel-detail',
@@ -66,6 +67,7 @@ import {
   templateUrl: './vessel-detail.html',
 })
 export class VesselDetail {
+  protected readonly canWrite = inject(AuthenticationService).canWrite;
   vesselService = inject(VesselService);
   workOrderService = inject(WorkOrderService);
 

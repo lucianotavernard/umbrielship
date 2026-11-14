@@ -101,6 +101,7 @@ import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
                     <div
                       class="flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
                     >
+                      @if (canWrite()) {
                       <button
                         tButton
                         type="button"
@@ -113,6 +114,7 @@ import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
                       >
                         <ng-icon name="lucideTrash" class="size-3.5" />
                       </button>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -144,6 +146,7 @@ import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
   `,
 })
 export class WorkOrderList {
+  canWrite = input(true);
   loading = input(true);
   workOrders = input<WorkOrder[]>([]);
   deleted = output<WorkOrder>();

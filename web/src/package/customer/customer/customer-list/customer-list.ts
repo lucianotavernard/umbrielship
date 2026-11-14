@@ -20,6 +20,7 @@ import {
   CustomerService,
   GetCustomersResponse,
 } from '../customer.service';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'customer-list',
@@ -28,6 +29,7 @@ import {
   templateUrl: './customer-list.html',
 })
 export class CustomerList {
+  protected readonly canWrite = inject(AuthenticationService).canWrite;
   private readonly customerService = inject(CustomerService);
   private readonly customerForm = viewChild(CustomerForm);
 

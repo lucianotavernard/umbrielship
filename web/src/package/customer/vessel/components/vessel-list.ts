@@ -98,6 +98,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
                     <div
                       class="flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
                     >
+                      @if (canWrite()) {
                       <button
                         tButton
                         type="button"
@@ -110,6 +111,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
                       >
                         <ng-icon name="lucideTrash" class="size-3.5" />
                       </button>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -141,6 +143,7 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
   `,
 })
 export class VesselList {
+  canWrite = input(true);
   loading = input(true);
   vessels = input<Vessel[]>([]);
 

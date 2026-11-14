@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export type Role = 'administrator' | 'operator';
+export type Role = 'administrator' | 'operator' | 'inspector';
 
 export type User = {
   id: string;
@@ -47,6 +47,7 @@ export type GetOrganizationRolesResponse = {
 export const roleLabels: Record<Role, string> = {
   administrator: 'Administrador',
   operator: 'Operador',
+  inspector: 'Inspetor',
 };
 
 @Service()

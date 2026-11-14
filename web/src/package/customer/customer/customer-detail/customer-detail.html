@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-7xl px-6 py-8">
   <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
     <div class="grid gap-6 lg:col-span-2">
-      <customer-detail-ui [customer]="customer()" (edited)="openEditCustomerSheet()" />
+      <customer-detail-ui [canWrite]="canWrite()" [customer]="customer()" (edited)="openEditCustomerSheet()" />
 
       <section class="rounded-lg border border-border p-6">
         <div class="mb-6 flex items-center justify-between gap-4">
@@ -19,15 +19,17 @@
             <p class="text-sm text-muted-foreground">Embarcações registradas para este cliente.</p>
           </div>
 
-          <div class="shrink-0">
-            <button tButton type="button" size="sm" class="gap-2" (click)="openCreateVesselSheet()">
-              <ng-icon name="lucidePlus" class="size-4" />
-              Nova Embarcação
-            </button>
-          </div>
+          @if (canWrite()) {
+            <div class="shrink-0">
+              <button tButton type="button" size="sm" class="gap-2" (click)="openCreateVesselSheet()">
+                <ng-icon name="lucidePlus" class="size-4" />
+                Nova Embarcação
+              </button>
+            </div>
+          }
         </div>
 
-        <vessel-list-ui [loading]="loading()" [vessels]="vessels()" (deleted)="openDeleteVesselDialog($event)">
+        <vessel-list-ui [canWrite]="canWrite()" [loading]="loading()" [vessels]="vessels()" (deleted)="openDeleteVesselDialog($event)">
           <t-pagination [page]="page()" [total]="totalVessels()" (changed)="page.set($event)" />
         </vessel-list-ui>
       </section>

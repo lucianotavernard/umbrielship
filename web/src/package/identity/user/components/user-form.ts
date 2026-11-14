@@ -59,8 +59,9 @@ export type UserFormValue = Omit<CreateUserRequest, 'organizationId'>;
           <t-form-group class="sm:col-span-full">
             <label tLabel for="user-role">Papel</label>
             <select tSelect id="user-role" [formField]="userForm.role">
-              <option value="operator">Operador</option>
               <option value="administrator">Administrador</option>
+              <option value="operator">Operador</option>
+              <option value="inspector">Inspetor</option>
             </select>
           </t-form-group>
         </div>

@@ -103,6 +103,11 @@ export class InternalLayout {
   constructor() {
     effect(() => {
       const user = this.user();
+      if (user) this.authenticationService.role.set(user.role);
+    });
+
+    effect(() => {
+      const user = this.user();
       if (!user || !this.authenticationService.takeOrganizationChanged()) return;
       toast.info(`A organização ativa mudou para ${user.organization.name}.`);
     });
