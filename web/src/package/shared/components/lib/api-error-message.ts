@@ -7,6 +7,8 @@ const MESSAGES: Record<string, string> = {
   'Work order not found': 'Ordem de serviço não encontrada.',
   'Work order service not found': 'Serviço não encontrado.',
   'Work order service image not found': 'Foto não encontrada.',
+  'Inspection template not found': 'Modelo de inspeção não encontrado.',
+  'Inspection assignment not found': 'Atribuição não encontrada.',
   'Organization already exists': 'Já existe uma organização com este nome ou e-mail.',
   'Organization not found': 'Organização não encontrada.',
   'User already exists': 'Já existe um usuário com este e-mail.',

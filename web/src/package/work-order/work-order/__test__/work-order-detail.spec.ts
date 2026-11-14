@@ -52,6 +52,8 @@ describe('WorkOrderDetail', () => {
       ],
       total: 1,
     });
+    // The page also reads the WorkOrder's inspection assignments.
+    controller.expectOne('/api/work-orders/wo-1/inspection-assignments').flush({ inspectionAssignments: [] });
     await settle();
 
     const input = fixture.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;

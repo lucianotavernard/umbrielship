@@ -48,6 +48,37 @@
           />
         </div>
       </section>
+
+      <section class="rounded-2xl shadow-xs border overflow-hidden">
+        <header class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 border-b bg-popover sm:px-6">
+          <div class="flex items-center gap-3">
+            <div class="flex p-3 bg-background rounded-lg shadow-xs">
+              <ng-icon name="lucideClipboardCheck" class="!size-4" />
+            </div>
+
+            <div>
+              <h3 class="text-sm font-semibold">Inspeções</h3>
+              <p class="text-xs text-muted-foreground">Modelos de inspeção atribuídos a esta ordem</p>
+            </div>
+          </div>
+
+          @if (isAdministrator()) {
+            <button tButton type="button" (click)="openAssignSheet()">
+              <ng-icon name="lucidePlus" class="size-4 mr-1" />
+              Atribuir modelo
+            </button>
+          }
+        </header>
+
+        <div class="p-4 sm:p-6">
+          <inspection-assignment-list-ui
+            [canAdminister]="isAdministrator()"
+            [loading]="loadingAssignments()"
+            [assignments]="assignments()"
+            (removed)="openRemoveDialog($event)"
+          />
+        </div>
+      </section>
     </div>
 
     <!-- Sidebar Column -->
@@ -112,3 +143,33 @@
 >
   <work-order-service-form-ui [loading]="submitting()" (closed)="closeCreateServiceSheet()" (submitted)="createWorkOrderService($event)" />
 </t-sheet>
+
+<t-sheet
+  title="Atribuir modelo de inspeção"
+  description="Escolha o modelo e o alvo; as perguntas do modelo são copiadas para esta ordem"
+  class="sm:max-w-md"
+  [isActive]="isAssignSheetActive()"
+  (closed)="closeAssignSheet()"
+>
+  @if (isAssignSheetActive()) {
+    <inspection-assignment-form-ui
+      [templates]="templates()"
+      [loadingTemplates]="loadingTemplates()"
+      [services]="services()"
+      [loading]="assigning()"
+      (closed)="closeAssignSheet()"
+      (submitted)="assignInspectionTemplate($event)"
+    />
+  }
+</t-sheet>
+
+<t-confirmation
+  title="Remover atribuição"
+  description="Tem certeza que deseja remover esta atribuição? As perguntas copiadas serão excluídas."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="selectedAssignment() !== null"
+  [loading]="removing()"
+  (closed)="closeRemoveDialog()"
+  (confirmed)="removeInspectionAssignment()"
+/>
