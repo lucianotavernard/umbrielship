@@ -1,0 +1,51 @@
+# InspectionAssignment verification
+
+**Verdict**: FAIL
+**Proofs**: `proofs.md` at 0ca5dd9
+**Verifier**: independent sub-agent (author != verifier)
+
+## Checks
+
+| Check | Test | Holds |
+| --- | --- | --- |
+| C1 | `assign-inspection-template.use-case.spec.ts` `assignment C1 copies the template's name and questions and records who assigned it` | yes - name, `service: null`, `assignedBy`, `createdAt` and labels at 0, 1 asserted; item ids differ from the template's |
+| C2 | `assign-inspection-template.use-case.spec.ts` `assignment C2 targets a service of the WorkOrder` | yes at the use case - `service` equals `{ id: 'svc-1', name: 'Pintura' }`; the Prisma `create` that persists `workOrderServiceId` has no test (finding 1) |
+| C3 | `assign-inspection-template.use-case.spec.ts` `assignment C3 accepts a WorkOrder in every status` | yes for the four WorkOrder statuses; the WorkOrderService half of AC 3 is tried only with `COMPLETED` (finding 3) |
+| C4 | `assign-inspection-template.use-case.spec.ts` `assignment C4 stores two assignments of the same template and target` | yes |
+| C5 | `assign-inspection-template.use-case.spec.ts` `assignment C5 keeps its copy after the template is edited or deleted` | yes - edit to `['C']` and delete both run through the real template use cases |
+| C6 | `assign-inspection-template.use-case.spec.ts` `assignment C6 throws NotFoundDomainException for a foreign WorkOrder, template or service and stores nothing`; `inspection-assignment.http.spec.ts` `assignment C6 answers 404 when the use case finds nothing` | yes - seven cases including a service of another WorkOrder and an unknown service; store asserted empty |
+| C7 | `inspection-assignment.http.spec.ts` `assignment C7 answers 400 for a missing or invalid templateId or serviceId` | yes - three bodies, zero use-case calls |
+| C8 | `inspection-assignment.repository.spec.ts` `assignment C8 asks for the WorkOrder's assignments newest first with items by position and the service name`; `fetch-inspection-assignments.use-case.spec.ts` `assignment C8 lists only the WorkOrder's assignments, newest first`; `inspection-assignment.http.spec.ts` `assignment C8 answers each assignment with templateName, service, createdAt and items` | yes - the exact `where`/`orderBy`/`include` is asserted at the repository, another WorkOrder excluded, `[]` for none, `assignedBy` absent from the body |
+| C9 | `fetch-inspection-assignments.use-case.spec.ts` `assignment C9 throws NotFoundDomainException for a foreign WorkOrder` | yes - foreign and unknown |
+| C10 | `remove-inspection-assignment.use-case.spec.ts` `assignment C10 deletes the assignment and its items`; `inspection-assignment.http.spec.ts` `assignment C10 answers 204 to a remove` | yes - the other assignment survives; items go by the cascade C13 holds |
+| C11 | `remove-inspection-assignment.use-case.spec.ts` `assignment C11 throws NotFoundDomainException for another WorkOrder or Organization and deletes nothing` | yes - three cases, both rows remain |
+| C12 | `inspection-assignment.http.spec.ts` `assignment C12 refuses POST and DELETE to operator and inspector with 403 before validation` | yes - an invalid body still gets 403, exact body, zero calls; administrator 201 and 204 |
+| C13 | grep on `*_add_inspection_assignments/migration.sql` | yes - each constraint name and `ON DELETE CASCADE` sit on one `ALTER TABLE` line in the file |
+| C14 | `fetch-inspection-templates.use-case.spec.ts` `assignment C14 returns 100 then 1 of 101 templates with perPage 100`; `inspection-template.http.spec.ts` `assignment C14 passes per_page from 1 to 100 and defaults to 10` | yes - 100 then `Modelo 0`, default 10, 0/101/abc 400 |
+| C15 | `layout.spec.ts` `template C12 every POST, PUT and DELETE handler under customer and work-order declares its Roles`; `layout.spec.ts` `[C32] exposes the routes of today, /me and the identity routes, one controller class per file` | yes - `inspection-assignment/` is administrator-only and the count moved 3 to 5; the three routes are listed |
+| C16 | `docs.spec.ts` `assignment C16 CONTEXT.md has the InspectionAssignment entry` | yes |
+| C17 | `inspection-assignment-section.spec.ts` `assignment C17 lists template, target and question count` | yes - order received (a2 before a1, not alphabetical), both target kinds, singular and plural count |
+| C18 | `inspection-assignment-section.spec.ts` `assignment C18 an empty WorkOrder says Nenhum modelo atribuído` | yes |
+| C19 | `inspection-assignment-section.spec.ts` `assignment C19 expands and collapses the numbered questions` | partly - the fixture's items are already in `position` order, so numbering by array index passes (finding 4) |
+| C20 | `inspection-assignment-section.spec.ts` `assignment C20 renders Atribuir modelo and Remover only for administrator` | yes - administrator, operator, inspector and `null` |
+| C21 | `inspection-assignment-form.spec.ts` `assignment C21 opens the sheet with the templates and the targets` | yes - `per_page=100` request, template order received, "Ordem de serviço inteira" first and selected |
+| C22 | `inspection-assignment-form.spec.ts` `assignment C22 says Nenhum modelo de inspeção cadastrado and sends nothing` | yes |
+| C23 | `inspection-assignment-form.spec.ts` `assignment C23 requires a template` | yes |
+| C24 | `inspection-assignment-form.spec.ts` `assignment C24 assigns to the whole WorkOrder and to a service and reloads` | yes - bodies `{ templateId }` and `{ templateId, serviceId }`, toast, sheet closed, reload, new one first |
+| C25 | `inspection-assignment-section.spec.ts` `assignment C25 confirms, removes and reloads; cancel sends nothing` | yes |
+| C26 | `inspection-assignment-form.spec.ts` `assignment C26 a failed assign shows the API message and keeps the list`; `inspection-assignment-section.spec.ts` `assignment C26 a failed remove shows the API message and keeps the list` | yes - mapped message on assign, fallback on remove, no reload, two rows kept |
+| C27 | `walk` | plausible - the new header wraps (`flex-wrap`), the rows use `min-w-0` and `break-words`, the sheet is `sm:max-w-md` and the section clips with `overflow-hidden`; not run in a browser by the Verifier |
+| C28 | grep on `*_add_inspection_assignments/migration.sql` | partly - the unique index is held; "creates both tables" is not grepped, and `! grep 'REFERENCES "inspection_templates"'` passes with a plain `templateId` column (finding 2) |
+| C29 | `inspection-assignment.http.spec.ts` `assignment C29 answers 401 without a token and lets every Role read` | yes |
+| C30 | `assign-inspection-template.use-case.spec.ts` `assignment C30 a stored assignment reads back with the template's questions in order` | no at the persistence layer - it reads back from the in-memory fake, which returns the very object stored; `PrismaInspectionAssignmentsRepository.create` is never exercised (finding 1) |
+
+## Findings
+
+| Finding | Evidence | Fix | Closed |
+| --- | --- | --- | --- |
+| The Prisma write path of an assignment has no test: dropping `workOrderServiceId`, the items' `position` or their `organizationId` in `create`, or the `organizationId` filter in `findById`/`delete`, leaves every proof green | `inspection-assignment.repository.spec.ts` covers only `findManyByWorkOrderId`; C2 and C30 run on `InMemoryInspectionAssignmentsRepository`, whose `create` pushes the entity and whose read returns the same object (`inspection-assignment.repository.ts:47-73`) | add repository cases on a mocked `PrismaService` asserting the `create` data (`workOrderServiceId`, `items.create` with `organizationId`, `label`, `position` 0..n) and the `where: { id, organizationId }` of `findById` and `delete`, and point C30 (and C2) at them | `42c61f9` - repository specs `assignment C2 writes the target service, the copied items and the Organization` and `assignment C11 reads and deletes an assignment only inside its Organization`; C2, C11 and C30 name them |
+| C28's grep is looser than its claim | the proof checks only the unique index and the absence of `REFERENCES "inspection_templates"`; it passes with a missing `CREATE TABLE "inspection_assignment_items"` or with a `templateId` column that has no foreign key | add `grep -q 'CREATE TABLE "inspection_assignments"'`, `grep -q 'CREATE TABLE "inspection_assignment_items"'` and `! grep -qi 'templateId'` to the proof | `2bc3530` - C28 also greps both `CREATE TABLE` lines and refuses any `templateId` |
+| AC 3's WorkOrderService half ("whatever the status ... of the WorkOrderService") is named by no check and tried with one status | `assign-inspection-template.use-case.spec.ts:115-119` gives every service `status: 'COMPLETED'`; C3's claim names only the WorkOrder statuses | vary the service status across `PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` in C3 and name it in the claim | `42c61f9` - C3 now assigns to services in `PENDING`, `IN_PROGRESS` and `COMPLETED` and its claim names them |
+| The web numbers questions by array index, not by `position`; C19 cannot tell the two apart | own example: items `[{ label: 'Second', position: 1 }, { label: 'First', position: 0 }]` render `1. Second`, `2. First` (`inspection-assignment-list.ts:62-64`); the C19 fixture is already ordered. The API sorts today (repository `orderBy position`, entity constructor), so users are not affected | number by `position + 1` (or sort by `position`) in the list, and give the C19 fixture out-of-order items | `e7d62f5` - the list sorts by `position`; the C19 fixture lists the questions out of order |
+
+Probed beyond the checks, all holding: a 100-question template copies positions 0..99 and keeps them after the template is edited to one question; `per_page=50` page 3 of 101 gives 1 and page 2 starts at the 51st; `per_page` 1.5, -1, 100.01 and `page=0` answer 400 while 99 and 100 pass; a WorkOrder with no service offers only "Ordem de serviço inteira" and sends `{ templateId }` alone. The WorkOrder and WorkOrderService deletes are plain Prisma `delete` calls, so the DB cascade covers AC 13's "answers as today". Observation, not a finding: `proofs.md` marks C27 `pass (Walked)` while the working-tree `checks.md` Handoff still reads "Walked: none yet".
