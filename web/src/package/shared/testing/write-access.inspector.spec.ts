@@ -1,6 +1,8 @@
 import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import type { Role } from '../../identity/user/user.service';
+
 import {
   configureWriteAccess,
   content,
@@ -42,6 +44,17 @@ describe('write access by Role', () => {
 
       expect(inspector, page).toBe(operator);
       expect(inspector.length, page).toBeGreaterThan(0);
+    }
+  });
+
+  it('inspector C31 the five pages render no write control while the Role is not loaded or is not a writer', async () => {
+    for (const page of pages) {
+      for (const role of [null, 'auditor' as Role]) {
+        TestBed.resetTestingModule();
+        configureWriteAccess();
+        const element = await render(page, role);
+        expect(writeControls(element), `${role} on ${page}`).toEqual([]);
+      }
     }
   });
 });
