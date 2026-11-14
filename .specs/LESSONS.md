@@ -15,7 +15,7 @@ _none_
 Seen once or not yet corroborated. Tracked, not trusted.
 
 ### L-001 - Make a file-system failure deterministic with a spy rejecting each error code, and assert the exact error, not an OS-dependent code set
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `use-case` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `use-case` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C28 remove-work-order-service-image.use-case.spec.ts (use-case)
 - last seen: 2026-11-08T04:36:44Z
@@ -45,7 +45,7 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - last seen: 2026-11-08T04:36:44Z
 
 ### L-006 - An in-memory fake that enforces the same rule as the use case hides a dropped use-case guard; spy on the repository write and assert it is not called.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `api/test` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api/test` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C54 (api/test)
 - last seen: 2026-11-08T12:56:13Z
@@ -57,13 +57,13 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - last seen: 2026-11-08T12:56:13Z
 
 ### L-008 - Assert a compiler flag in every config the build reads, not only the base tsconfig.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `api/platform` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api/platform` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C67 (api/tsconfig.build.json) (api/platform)
 - last seen: 2026-11-08T13:28:15Z
 
 ### L-009 - A doc ban list must cover every stale path and phrase of the old layout and match without regard to letter case.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `docs` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `docs` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C73 (AGENTS.md) (docs)
 - last seen: 2026-11-08T13:28:15Z
@@ -87,19 +87,19 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - last seen: 2026-11-08T13:28:16Z
 
 ### L-013 - Assert the attribute selector the screen criterion names, not a bare element.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C87 organization-list.spec.ts (web)
 - last seen: 2026-11-08T20:07:41Z
 
 ### L-014 - Assert the HTTP method together with the path, not only that the path string occurs.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C82 authentication.service.ts (web)
 - last seen: 2026-11-08T20:07:41Z
 
 ### L-015 - Assert a reload is absent while the request is outstanding and present once after the success status.
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
 - features: acme-architecture-migration
 - evidence: C85 internal-layout.spec.ts (web)
 - last seen: 2026-11-08T20:07:41Z
@@ -151,6 +151,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - features: acme-architecture-migration
 - evidence: C87 organization-form.ts (web)
 - last seen: 2026-11-08T20:07:42Z
+
+### L-024 - When the web hides controls by Role, derive it from the same allow-list the API enforces and hide while the session Role is not loaded; a deny-list shows every control to an unknown or not-yet-loaded Role.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspector-role
+- evidence: verification.md finding 1-2, AC 25 (web)
+- last seen: 2026-11-14T04:08:04Z
+
+### L-025 - A criterion that says the web sends a value is proven by asserting the HTTP request body, not the value a form component emits.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspector-role
+- evidence: verification.md finding 3, C19 (web)
+- last seen: 2026-11-14T04:08:04Z
 
 ## Quarantined (failed when applied - ignore)
 
