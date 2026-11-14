@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 26,
+  "next_id": 29,
   "lessons": [
     {
       "id": "L-001",
@@ -455,6 +455,60 @@
       ],
       "created": "2026-11-14T04:08:04Z",
       "last_seen": "2026-11-14T04:08:04Z"
+    },
+    {
+      "id": "L-026",
+      "key": "weak_test::a rule the database enforces citext a unique index needs a proof on the column or migration itself an in memory fake that imitates it proves only the fake",
+      "text": "A rule the database enforces (citext, a unique index) needs a proof on the column or migration itself; an in-memory fake that imitates it proves only the fake.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "inspection-template"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1, C5 (api)"
+      ],
+      "created": "2026-11-14T11:35:58Z",
+      "last_seen": "2026-11-14T11:35:58Z"
+    },
+    {
+      "id": "L-027",
+      "key": "weak_test::a criterion that names several gestures create or edit gets one test per gesture when each page handles the response in its own handler",
+      "text": "A criterion that names several gestures (create or edit) gets one test per gesture when each page handles the response in its own handler.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspection-template"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2, C27 (web)"
+      ],
+      "created": "2026-11-14T11:35:58Z",
+      "last_seen": "2026-11-14T11:35:58Z"
+    },
+    {
+      "id": "L-028",
+      "key": "ac_gap::behaviour the build adds beyond the criteria such as resetting the page after a create gets its own check in the same commit",
+      "text": "Behaviour the build adds beyond the criteria, such as resetting the page after a create, gets its own check in the same commit.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspection-template"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3, inspection-template-list.ts (web)"
+      ],
+      "created": "2026-11-14T11:35:58Z",
+      "last_seen": "2026-11-14T11:35:58Z"
     }
   ]
 }
