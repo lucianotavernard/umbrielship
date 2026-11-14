@@ -116,4 +116,22 @@ describe('InspectionTemplate form', () => {
 
     controller.expectNone('/api/inspection-templates');
   });
+
+  it('template C24 measures the name and the questions after trimming them', async () => {
+    fill(name(), ` ${'n'.repeat(100)} `);
+    fill(questionFields(sheet)[0], ` ${'x'.repeat(200)} `);
+    await settle();
+    sheet.querySelector('form')!.requestSubmit();
+    await settle();
+
+    expect(sheet.textContent).not.toContain('deve ter no máximo');
+    const created = controller.expectOne('/api/inspection-templates');
+    expect(created.request.body).toEqual({
+      name: 'n'.repeat(100),
+      items: [{ label: 'x'.repeat(200) }],
+    });
+    created.flush({ inspectionTemplate: { id: 't1' } }, { status: 201, statusText: 'Created' });
+    await settle();
+    controller.expectOne('/api/inspection-templates?page=1').flush({ inspectionTemplates: [], total: 0 });
+  });
 });

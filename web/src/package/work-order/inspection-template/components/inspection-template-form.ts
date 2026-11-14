@@ -1,5 +1,5 @@
 import { Component, effect, input, output, signal } from '@angular/core';
-import { applyEach, form, FormField, maxLength, validate } from '@angular/forms/signals';
+import { applyEach, form, FormField, validate } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -27,9 +27,12 @@ type Model = { name: string; items: { label: string }[] };
 
 const empty = (): Model => ({ name: '', items: [{ label: '' }] });
 
-// Spaces alone do not fill a field: the API trims them away.
+// The API trims every text before checking it, so the form checks the trimmed text too.
 const blank = (message: string) => ({ value }: { value: () => string }) =>
   value().trim() === '' ? { kind: 'required', message } : undefined;
+
+const longerThan = (limit: number, message: string) => ({ value }: { value: () => string }) =>
+  value().trim().length > limit ? { kind: 'maxLength', message } : undefined;
 
 @Component({
   selector: 'inspection-template-form-ui',
@@ -168,14 +171,16 @@ export class InspectionTemplateForm {
 
   templateForm = form(this.model, (path) => {
     validate(path.name, blank('Nome é obrigatório'));
-    maxLength(path.name, MAX_NAME_LENGTH, {
-      message: `Nome deve ter no máximo ${MAX_NAME_LENGTH} caracteres`,
-    });
+    validate(
+      path.name,
+      longerThan(MAX_NAME_LENGTH, `Nome deve ter no máximo ${MAX_NAME_LENGTH} caracteres`),
+    );
     applyEach(path.items, (item) => {
       validate(item.label, blank('Pergunta é obrigatória'));
-      maxLength(item.label, MAX_QUESTION_LENGTH, {
-        message: `Pergunta deve ter no máximo ${MAX_QUESTION_LENGTH} caracteres`,
-      });
+      validate(
+        item.label,
+        longerThan(MAX_QUESTION_LENGTH, `Pergunta deve ter no máximo ${MAX_QUESTION_LENGTH} caracteres`),
+      );
     });
   });
 
