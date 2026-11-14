@@ -57,7 +57,15 @@ export const assignment = (
 
 export const assignments = [
   assignment('a2', 'Solda', { id: 'svc-2', name: 'Solda do leme' }, ['Cordão contínuo']),
-  assignment('a1', 'Pintura do casco', null, ['Casco limpo', 'Sem bolhas', 'Calado visível']),
+  {
+    // Listed out of order on purpose: the page numbers questions by `position`.
+    ...assignment('a1', 'Pintura do casco', null, ['Casco limpo', 'Sem bolhas', 'Calado visível']),
+    items: [
+      { id: 'a1-i2', label: 'Calado visível', position: 2 },
+      { id: 'a1-i0', label: 'Casco limpo', position: 0 },
+      { id: 'a1-i1', label: 'Sem bolhas', position: 1 },
+    ],
+  },
 ];
 
 export async function render(

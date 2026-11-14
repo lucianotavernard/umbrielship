@@ -59,7 +59,7 @@ import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment
             </div>
             @if (isOpen(assignment.id)) {
               <ol class="flex flex-col divide-y border-t bg-muted/30" data-slot="questions">
-                @for (item of assignment.items; track item.id; let index = $index) {
+                @for (item of ordered(assignment); track item.id; let index = $index) {
                   <li class="flex gap-3 px-4 py-2 text-sm">
                     <span class="w-6 shrink-0 text-right tabular-nums text-muted-foreground">{{ index + 1 }}.</span>
                     <span class="min-w-0 break-words">{{ item.label }}</span>
@@ -88,6 +88,11 @@ export class InspectionAssignmentList {
 
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
   private readonly open = signal<ReadonlySet<string>>(new Set());
+
+  // Questions are asked in `position` order, whatever order the response lists them in.
+  protected ordered(assignment: InspectionAssignment) {
+    return [...assignment.items].sort((a, b) => a.position - b.position);
+  }
 
   protected isOpen(id: string) {
     return this.open().has(id);
