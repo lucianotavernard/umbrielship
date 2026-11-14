@@ -40,6 +40,7 @@ export type InspectionAssignmentItemMinAggregateOutputType = {
   assignmentId: string | null
   label: string | null
   position: number | null
+  type: $Enums.QuestionType | null
 }
 
 export type InspectionAssignmentItemMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type InspectionAssignmentItemMaxAggregateOutputType = {
   assignmentId: string | null
   label: string | null
   position: number | null
+  type: $Enums.QuestionType | null
 }
 
 export type InspectionAssignmentItemCountAggregateOutputType = {
@@ -56,6 +58,7 @@ export type InspectionAssignmentItemCountAggregateOutputType = {
   assignmentId: number
   label: number
   position: number
+  type: number
   _all: number
 }
 
@@ -74,6 +77,7 @@ export type InspectionAssignmentItemMinAggregateInputType = {
   assignmentId?: true
   label?: true
   position?: true
+  type?: true
 }
 
 export type InspectionAssignmentItemMaxAggregateInputType = {
@@ -82,6 +86,7 @@ export type InspectionAssignmentItemMaxAggregateInputType = {
   assignmentId?: true
   label?: true
   position?: true
+  type?: true
 }
 
 export type InspectionAssignmentItemCountAggregateInputType = {
@@ -90,6 +95,7 @@ export type InspectionAssignmentItemCountAggregateInputType = {
   assignmentId?: true
   label?: true
   position?: true
+  type?: true
   _all?: true
 }
 
@@ -185,6 +191,7 @@ export type InspectionAssignmentItemGroupByOutputType = {
   assignmentId: string
   label: string
   position: number
+  type: $Enums.QuestionType
   _count: InspectionAssignmentItemCountAggregateOutputType | null
   _avg: InspectionAssignmentItemAvgAggregateOutputType | null
   _sum: InspectionAssignmentItemSumAggregateOutputType | null
@@ -216,7 +223,9 @@ export type InspectionAssignmentItemWhereInput = {
   assignmentId?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   label?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   position?: Prisma.IntFilter<"InspectionAssignmentItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionAssignmentItem"> | $Enums.QuestionType
   assignment?: Prisma.XOR<Prisma.InspectionAssignmentScalarRelationFilter, Prisma.InspectionAssignmentWhereInput>
+  answers?: Prisma.InspectionAnswerListRelationFilter
 }
 
 export type InspectionAssignmentItemOrderByWithRelationInput = {
@@ -225,7 +234,9 @@ export type InspectionAssignmentItemOrderByWithRelationInput = {
   assignmentId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   assignment?: Prisma.InspectionAssignmentOrderByWithRelationInput
+  answers?: Prisma.InspectionAnswerOrderByRelationAggregateInput
 }
 
 export type InspectionAssignmentItemWhereUniqueInput = Prisma.AtLeast<{
@@ -238,7 +249,9 @@ export type InspectionAssignmentItemWhereUniqueInput = Prisma.AtLeast<{
   assignmentId?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   label?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   position?: Prisma.IntFilter<"InspectionAssignmentItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionAssignmentItem"> | $Enums.QuestionType
   assignment?: Prisma.XOR<Prisma.InspectionAssignmentScalarRelationFilter, Prisma.InspectionAssignmentWhereInput>
+  answers?: Prisma.InspectionAnswerListRelationFilter
 }, "id" | "assignmentId_position">
 
 export type InspectionAssignmentItemOrderByWithAggregationInput = {
@@ -247,6 +260,7 @@ export type InspectionAssignmentItemOrderByWithAggregationInput = {
   assignmentId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   _count?: Prisma.InspectionAssignmentItemCountOrderByAggregateInput
   _avg?: Prisma.InspectionAssignmentItemAvgOrderByAggregateInput
   _max?: Prisma.InspectionAssignmentItemMaxOrderByAggregateInput
@@ -263,6 +277,7 @@ export type InspectionAssignmentItemScalarWhereWithAggregatesInput = {
   assignmentId?: Prisma.StringWithAggregatesFilter<"InspectionAssignmentItem"> | string
   label?: Prisma.StringWithAggregatesFilter<"InspectionAssignmentItem"> | string
   position?: Prisma.IntWithAggregatesFilter<"InspectionAssignmentItem"> | number
+  type?: Prisma.EnumQuestionTypeWithAggregatesFilter<"InspectionAssignmentItem"> | $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemCreateInput = {
@@ -270,7 +285,9 @@ export type InspectionAssignmentItemCreateInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
   assignment: Prisma.InspectionAssignmentCreateNestedOneWithoutItemsInput
+  answers?: Prisma.InspectionAnswerCreateNestedManyWithoutItemInput
 }
 
 export type InspectionAssignmentItemUncheckedCreateInput = {
@@ -279,6 +296,8 @@ export type InspectionAssignmentItemUncheckedCreateInput = {
   assignmentId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InspectionAssignmentItemUpdateInput = {
@@ -286,7 +305,9 @@ export type InspectionAssignmentItemUpdateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
   assignment?: Prisma.InspectionAssignmentUpdateOneRequiredWithoutItemsNestedInput
+  answers?: Prisma.InspectionAnswerUpdateManyWithoutItemNestedInput
 }
 
 export type InspectionAssignmentItemUncheckedUpdateInput = {
@@ -295,6 +316,8 @@ export type InspectionAssignmentItemUncheckedUpdateInput = {
   assignmentId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InspectionAssignmentItemCreateManyInput = {
@@ -303,6 +326,7 @@ export type InspectionAssignmentItemCreateManyInput = {
   assignmentId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemUpdateManyMutationInput = {
@@ -310,6 +334,7 @@ export type InspectionAssignmentItemUpdateManyMutationInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemUncheckedUpdateManyInput = {
@@ -318,6 +343,7 @@ export type InspectionAssignmentItemUncheckedUpdateManyInput = {
   assignmentId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemListRelationFilter = {
@@ -341,6 +367,7 @@ export type InspectionAssignmentItemCountOrderByAggregateInput = {
   assignmentId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionAssignmentItemAvgOrderByAggregateInput = {
@@ -353,6 +380,7 @@ export type InspectionAssignmentItemMaxOrderByAggregateInput = {
   assignmentId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionAssignmentItemMinOrderByAggregateInput = {
@@ -361,10 +389,16 @@ export type InspectionAssignmentItemMinOrderByAggregateInput = {
   assignmentId?: Prisma.SortOrder
   label?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type InspectionAssignmentItemSumOrderByAggregateInput = {
   position?: Prisma.SortOrder
+}
+
+export type InspectionAssignmentItemScalarRelationFilter = {
+  is?: Prisma.InspectionAssignmentItemWhereInput
+  isNot?: Prisma.InspectionAssignmentItemWhereInput
 }
 
 export type InspectionAssignmentItemCreateNestedManyWithoutAssignmentInput = {
@@ -409,11 +443,27 @@ export type InspectionAssignmentItemUncheckedUpdateManyWithoutAssignmentNestedIn
   deleteMany?: Prisma.InspectionAssignmentItemScalarWhereInput | Prisma.InspectionAssignmentItemScalarWhereInput[]
 }
 
+export type InspectionAssignmentItemCreateNestedOneWithoutAnswersInput = {
+  create?: Prisma.XOR<Prisma.InspectionAssignmentItemCreateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedCreateWithoutAnswersInput>
+  connectOrCreate?: Prisma.InspectionAssignmentItemCreateOrConnectWithoutAnswersInput
+  connect?: Prisma.InspectionAssignmentItemWhereUniqueInput
+}
+
+export type InspectionAssignmentItemUpdateOneRequiredWithoutAnswersNestedInput = {
+  create?: Prisma.XOR<Prisma.InspectionAssignmentItemCreateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedCreateWithoutAnswersInput>
+  connectOrCreate?: Prisma.InspectionAssignmentItemCreateOrConnectWithoutAnswersInput
+  upsert?: Prisma.InspectionAssignmentItemUpsertWithoutAnswersInput
+  connect?: Prisma.InspectionAssignmentItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InspectionAssignmentItemUpdateToOneWithWhereWithoutAnswersInput, Prisma.InspectionAssignmentItemUpdateWithoutAnswersInput>, Prisma.InspectionAssignmentItemUncheckedUpdateWithoutAnswersInput>
+}
+
 export type InspectionAssignmentItemCreateWithoutAssignmentInput = {
   id?: string
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerCreateNestedManyWithoutItemInput
 }
 
 export type InspectionAssignmentItemUncheckedCreateWithoutAssignmentInput = {
@@ -421,6 +471,8 @@ export type InspectionAssignmentItemUncheckedCreateWithoutAssignmentInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type InspectionAssignmentItemCreateOrConnectWithoutAssignmentInput = {
@@ -458,6 +510,59 @@ export type InspectionAssignmentItemScalarWhereInput = {
   assignmentId?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   label?: Prisma.StringFilter<"InspectionAssignmentItem"> | string
   position?: Prisma.IntFilter<"InspectionAssignmentItem"> | number
+  type?: Prisma.EnumQuestionTypeFilter<"InspectionAssignmentItem"> | $Enums.QuestionType
+}
+
+export type InspectionAssignmentItemCreateWithoutAnswersInput = {
+  id?: string
+  organizationId: string
+  label: string
+  position: number
+  type?: $Enums.QuestionType
+  assignment: Prisma.InspectionAssignmentCreateNestedOneWithoutItemsInput
+}
+
+export type InspectionAssignmentItemUncheckedCreateWithoutAnswersInput = {
+  id?: string
+  organizationId: string
+  assignmentId: string
+  label: string
+  position: number
+  type?: $Enums.QuestionType
+}
+
+export type InspectionAssignmentItemCreateOrConnectWithoutAnswersInput = {
+  where: Prisma.InspectionAssignmentItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.InspectionAssignmentItemCreateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedCreateWithoutAnswersInput>
+}
+
+export type InspectionAssignmentItemUpsertWithoutAnswersInput = {
+  update: Prisma.XOR<Prisma.InspectionAssignmentItemUpdateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedUpdateWithoutAnswersInput>
+  create: Prisma.XOR<Prisma.InspectionAssignmentItemCreateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedCreateWithoutAnswersInput>
+  where?: Prisma.InspectionAssignmentItemWhereInput
+}
+
+export type InspectionAssignmentItemUpdateToOneWithWhereWithoutAnswersInput = {
+  where?: Prisma.InspectionAssignmentItemWhereInput
+  data: Prisma.XOR<Prisma.InspectionAssignmentItemUpdateWithoutAnswersInput, Prisma.InspectionAssignmentItemUncheckedUpdateWithoutAnswersInput>
+}
+
+export type InspectionAssignmentItemUpdateWithoutAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  assignment?: Prisma.InspectionAssignmentUpdateOneRequiredWithoutItemsNestedInput
+}
+
+export type InspectionAssignmentItemUncheckedUpdateWithoutAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemCreateManyAssignmentInput = {
@@ -465,6 +570,7 @@ export type InspectionAssignmentItemCreateManyAssignmentInput = {
   organizationId: string
   label: string
   position: number
+  type?: $Enums.QuestionType
 }
 
 export type InspectionAssignmentItemUpdateWithoutAssignmentInput = {
@@ -472,6 +578,8 @@ export type InspectionAssignmentItemUpdateWithoutAssignmentInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerUpdateManyWithoutItemNestedInput
 }
 
 export type InspectionAssignmentItemUncheckedUpdateWithoutAssignmentInput = {
@@ -479,6 +587,8 @@ export type InspectionAssignmentItemUncheckedUpdateWithoutAssignmentInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  answers?: Prisma.InspectionAnswerUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type InspectionAssignmentItemUncheckedUpdateManyWithoutAssignmentInput = {
@@ -486,8 +596,38 @@ export type InspectionAssignmentItemUncheckedUpdateManyWithoutAssignmentInput = 
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
 }
 
+
+/**
+ * Count Type InspectionAssignmentItemCountOutputType
+ */
+
+export type InspectionAssignmentItemCountOutputType = {
+  answers: number
+}
+
+export type InspectionAssignmentItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  answers?: boolean | InspectionAssignmentItemCountOutputTypeCountAnswersArgs
+}
+
+/**
+ * InspectionAssignmentItemCountOutputType without action
+ */
+export type InspectionAssignmentItemCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InspectionAssignmentItemCountOutputType
+   */
+  select?: Prisma.InspectionAssignmentItemCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * InspectionAssignmentItemCountOutputType without action
+ */
+export type InspectionAssignmentItemCountOutputTypeCountAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InspectionAnswerWhereInput
+}
 
 
 export type InspectionAssignmentItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -496,7 +636,10 @@ export type InspectionAssignmentItemSelect<ExtArgs extends runtime.Types.Extensi
   assignmentId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   assignment?: boolean | Prisma.InspectionAssignmentDefaultArgs<ExtArgs>
+  answers?: boolean | Prisma.InspectionAssignmentItem$answersArgs<ExtArgs>
+  _count?: boolean | Prisma.InspectionAssignmentItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionAssignmentItem"]>
 
 export type InspectionAssignmentItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -505,6 +648,7 @@ export type InspectionAssignmentItemSelectCreateManyAndReturn<ExtArgs extends ru
   assignmentId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   assignment?: boolean | Prisma.InspectionAssignmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionAssignmentItem"]>
 
@@ -514,6 +658,7 @@ export type InspectionAssignmentItemSelectUpdateManyAndReturn<ExtArgs extends ru
   assignmentId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
   assignment?: boolean | Prisma.InspectionAssignmentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inspectionAssignmentItem"]>
 
@@ -523,11 +668,14 @@ export type InspectionAssignmentItemSelectScalar = {
   assignmentId?: boolean
   label?: boolean
   position?: boolean
+  type?: boolean
 }
 
-export type InspectionAssignmentItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "assignmentId" | "label" | "position", ExtArgs["result"]["inspectionAssignmentItem"]>
+export type InspectionAssignmentItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "assignmentId" | "label" | "position" | "type", ExtArgs["result"]["inspectionAssignmentItem"]>
 export type InspectionAssignmentItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignment?: boolean | Prisma.InspectionAssignmentDefaultArgs<ExtArgs>
+  answers?: boolean | Prisma.InspectionAssignmentItem$answersArgs<ExtArgs>
+  _count?: boolean | Prisma.InspectionAssignmentItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InspectionAssignmentItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignment?: boolean | Prisma.InspectionAssignmentDefaultArgs<ExtArgs>
@@ -540,6 +688,7 @@ export type $InspectionAssignmentItemPayload<ExtArgs extends runtime.Types.Exten
   name: "InspectionAssignmentItem"
   objects: {
     assignment: Prisma.$InspectionAssignmentPayload<ExtArgs>
+    answers: Prisma.$InspectionAnswerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -547,6 +696,7 @@ export type $InspectionAssignmentItemPayload<ExtArgs extends runtime.Types.Exten
     assignmentId: string
     label: string
     position: number
+    type: $Enums.QuestionType
   }, ExtArgs["result"]["inspectionAssignmentItem"]>
   composites: {}
 }
@@ -942,6 +1092,7 @@ readonly fields: InspectionAssignmentItemFieldRefs;
 export interface Prisma__InspectionAssignmentItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   assignment<T extends Prisma.InspectionAssignmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InspectionAssignmentDefaultArgs<ExtArgs>>): Prisma.Prisma__InspectionAssignmentClient<runtime.Types.Result.GetResult<Prisma.$InspectionAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  answers<T extends Prisma.InspectionAssignmentItem$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InspectionAssignmentItem$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InspectionAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -976,6 +1127,7 @@ export interface InspectionAssignmentItemFieldRefs {
   readonly assignmentId: Prisma.FieldRef<"InspectionAssignmentItem", 'String'>
   readonly label: Prisma.FieldRef<"InspectionAssignmentItem", 'String'>
   readonly position: Prisma.FieldRef<"InspectionAssignmentItem", 'Int'>
+  readonly type: Prisma.FieldRef<"InspectionAssignmentItem", 'QuestionType'>
 }
     
 
@@ -1374,6 +1526,30 @@ export type InspectionAssignmentItemDeleteManyArgs<ExtArgs extends runtime.Types
    * Limit how many InspectionAssignmentItems to delete.
    */
   limit?: number
+}
+
+/**
+ * InspectionAssignmentItem.answers
+ */
+export type InspectionAssignmentItem$answersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InspectionAnswer
+   */
+  select?: Prisma.InspectionAnswerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InspectionAnswer
+   */
+  omit?: Prisma.InspectionAnswerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InspectionAnswerInclude<ExtArgs> | null
+  where?: Prisma.InspectionAnswerWhereInput
+  orderBy?: Prisma.InspectionAnswerOrderByWithRelationInput | Prisma.InspectionAnswerOrderByWithRelationInput[]
+  cursor?: Prisma.InspectionAnswerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InspectionAnswerScalarFieldEnum | Prisma.InspectionAnswerScalarFieldEnum[]
 }
 
 /**

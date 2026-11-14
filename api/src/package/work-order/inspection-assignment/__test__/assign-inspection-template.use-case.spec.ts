@@ -8,6 +8,7 @@ import {
   makeService,
   makeWorkOrder,
 } from '@test/factory.js';
+import { conformity } from '@test/factory.js';
 import { InMemoryInspectionAssignmentsRepository } from '@test/repositories/in-memory-inspection-assignments-repository.js';
 import { InMemoryInspectionTemplatesRepository } from '@test/repositories/in-memory-inspection-templates-repository.js';
 import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
@@ -177,7 +178,7 @@ describe('AssignInspectionTemplateUseCase', () => {
       organizationId: 'org-1',
       id: 'tpl-1',
       name: 'Outro nome',
-      labels: ['C'],
+      questions: conformity(['C']),
     });
     const stored = () => assignments.items[0];
     expect(stored().templateName).toBe('Pintura do casco');
@@ -240,6 +241,48 @@ describe('AssignInspectionTemplateUseCase', () => {
       'Q2',
       'Q3',
       'Q1',
+    ]);
+  });
+
+  it("inspection C2 copies each question's type and keeps it after the template changes", async () => {
+    templates.items.push(
+      makeInspectionTemplate(
+        {
+          name: 'Misto',
+          questions: [
+            { label: 'Notas', type: 'TEXT' },
+            { label: 'Limpo?', type: 'YES_NO' },
+            { label: 'Acabamento', type: 'SCORE' },
+          ],
+        },
+        'tpl-mixed',
+      ),
+    );
+
+    const { inspectionAssignment } = await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo-1',
+      templateId: 'tpl-mixed',
+      assignedBy: 'user-9',
+    });
+
+    await new EditInspectionTemplateUseCase(templates).handle({
+      organizationId: 'org-1',
+      id: 'tpl-mixed',
+      name: 'Misto',
+      questions: [
+        { label: 'Notas', type: 'SCORE' },
+        { label: 'Limpo?', type: 'TEXT' },
+        { label: 'Acabamento', type: 'YES_NO' },
+      ],
+    });
+
+    expect(
+      inspectionAssignment.items.map(({ label, type }) => [label, type]),
+    ).toEqual([
+      ['Notas', 'TEXT'],
+      ['Limpo?', 'YES_NO'],
+      ['Acabamento', 'SCORE'],
     ]);
   });
 });

@@ -14,18 +14,23 @@ import {
 } from '@ng-icons/lucide';
 
 import { Button } from '../../../shared/components/ui/button';
-import { FormGroup, Input, Label } from '../../../shared/components/ui/form';
+import { FormGroup, Input, Label, Select } from '../../../shared/components/ui/form';
 import {
   InspectionTemplate,
   InspectionTemplateRequest,
   MAX_NAME_LENGTH,
   MAX_QUESTION_LENGTH,
   MAX_QUESTIONS,
+  QUESTION_TYPES,
+  QuestionType,
+  questionTypeLabels,
 } from '../inspection-template.service';
 
-type Model = { name: string; items: { label: string }[] };
+type Model = { name: string; items: { label: string; type: QuestionType }[] };
 
-const empty = (): Model => ({ name: '', items: [{ label: '' }] });
+const blankQuestion = () => ({ label: '', type: 'CONFORMITY' as QuestionType });
+
+const empty = (): Model => ({ name: '', items: [blankQuestion()] });
 
 // The API trims every text before checking it, so the form checks the trimmed text too.
 const blank = (message: string) => ({ value }: { value: () => string }) =>
@@ -36,7 +41,7 @@ const longerThan = (limit: number, message: string) => ({ value }: { value: () =
 
 @Component({
   selector: 'inspection-template-form-ui',
-  imports: [NgIcon, FormField, FormGroup, Label, Input, Button],
+  imports: [NgIcon, FormField, FormGroup, Label, Input, Select, Button],
   viewProviders: [
     provideIcons({
       lucideArrowDown,
@@ -85,6 +90,14 @@ const longerThan = (limit: number, message: string) => ({ value }: { value: () =
                     placeholder="O casco está limpo?"
                     [formField]="templateForm.items[index].label"
                   />
+                </t-form-group>
+                <t-form-group>
+                  <label tLabel [for]="'question-type-' + index">Tipo</label>
+                  <select tSelect [id]="'question-type-' + index" [formField]="templateForm.items[index].type">
+                    @for (type of questionTypes; track type) {
+                      <option [value]="type">{{ questionTypeLabels[type] }}</option>
+                    }
+                  </select>
                 </t-form-group>
                 <div class="flex items-center justify-end gap-1">
                   <button
@@ -166,6 +179,8 @@ export class InspectionTemplateForm {
   closed = output<void>();
 
   protected readonly maxQuestions = MAX_QUESTIONS;
+  protected readonly questionTypes = QUESTION_TYPES;
+  protected readonly questionTypeLabels = questionTypeLabels;
 
   model = signal<Model>(empty());
 
@@ -193,7 +208,7 @@ export class InspectionTemplateForm {
           name: template.name,
           items: [...template.items]
             .sort((a, b) => a.position - b.position)
-            .map((item) => ({ label: item.label })),
+            .map((item) => ({ label: item.label, type: item.type })),
         });
       }
     });
@@ -203,7 +218,7 @@ export class InspectionTemplateForm {
     this.model.update((model) =>
       model.items.length >= MAX_QUESTIONS
         ? model
-        : { ...model, items: [...model.items, { label: '' }] },
+        : { ...model, items: [...model.items, blankQuestion()] },
     );
   }
 
@@ -241,7 +256,7 @@ export class InspectionTemplateForm {
     const { name, items } = this.templateForm().value();
     this.submitted.emit({
       name: name.trim(),
-      items: items.map((item) => ({ label: item.label.trim() })),
+      items: items.map((item) => ({ label: item.label.trim(), type: item.type })),
     });
   }
 }

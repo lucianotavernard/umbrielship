@@ -181,8 +181,18 @@ describe('InspectionAssignment routes over HTTP', () => {
           service: { id: SERVICE, name: 'Pintura' },
           createdAt: '2026-01-01T00:00:00.000Z',
           items: [
-            { id: expect.any(String), label: 'A', position: 0 },
-            { id: expect.any(String), label: 'B', position: 1 },
+            {
+              id: expect.any(String),
+              label: 'A',
+              position: 0,
+              type: 'CONFORMITY',
+            },
+            {
+              id: expect.any(String),
+              label: 'B',
+              position: 1,
+              type: 'CONFORMITY',
+            },
           ],
         },
       ],

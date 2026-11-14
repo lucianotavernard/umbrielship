@@ -65,3 +65,21 @@ export const WorkOrderServiceStatus = {
 } as const
 
 export type WorkOrderServiceStatus = (typeof WorkOrderServiceStatus)[keyof typeof WorkOrderServiceStatus]
+
+
+export const QuestionType = {
+  TEXT: 'TEXT',
+  YES_NO: 'YES_NO',
+  CONFORMITY: 'CONFORMITY',
+  SCORE: 'SCORE'
+} as const
+
+export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType]
+
+
+export const InspectionResult = {
+  APPROVED: 'APPROVED',
+  REPROVED: 'REPROVED'
+} as const
+
+export type InspectionResult = (typeof InspectionResult)[keyof typeof InspectionResult]

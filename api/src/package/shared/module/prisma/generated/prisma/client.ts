@@ -111,3 +111,13 @@ export type InspectionAssignment = Prisma.InspectionAssignmentModel
  * 
  */
 export type InspectionAssignmentItem = Prisma.InspectionAssignmentItemModel
+/**
+ * Model Inspection
+ * 
+ */
+export type Inspection = Prisma.InspectionModel
+/**
+ * Model InspectionAnswer
+ * 
+ */
+export type InspectionAnswer = Prisma.InspectionAnswerModel

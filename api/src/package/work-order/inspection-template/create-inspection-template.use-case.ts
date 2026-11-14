@@ -3,12 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 
 import { IInspectionTemplatesRepository } from './contracts/inspection-template-repository.contract.js';
-import { InspectionTemplate } from './inspection-template.entity.js';
+import { InspectionTemplate, Question } from './inspection-template.entity.js';
 
 type CreateInspectionTemplateUseCaseRequest = {
   organizationId: string;
   name: string;
-  labels: string[];
+  questions: Question[];
 };
 
 type CreateInspectionTemplateUseCaseResponse = {
@@ -24,7 +24,7 @@ export class CreateInspectionTemplateUseCase {
   async handle({
     organizationId,
     name,
-    labels,
+    questions,
   }: CreateInspectionTemplateUseCaseRequest): Promise<CreateInspectionTemplateUseCaseResponse> {
     const existing = await this.inspectionTemplatesRepository.findByName(
       organizationId,
@@ -40,7 +40,7 @@ export class CreateInspectionTemplateUseCase {
     const inspectionTemplate = InspectionTemplate.create({
       organizationId,
       name,
-      labels,
+      questions,
     });
 
     await this.inspectionTemplatesRepository.create(inspectionTemplate);

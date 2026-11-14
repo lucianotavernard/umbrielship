@@ -20,6 +20,7 @@ import {
   InspectionTemplateService,
   isNameTaken,
   NAME_TAKEN,
+  questionTypeLabels,
 } from '../inspection-template.service';
 
 @Component({
@@ -32,6 +33,8 @@ export class InspectionTemplateDetail {
   protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
   private readonly inspectionTemplateService = inject(InspectionTemplateService);
   private readonly router = inject(Router);
+
+  protected readonly typeLabels = questionTypeLabels;
 
   id = input.required<string>();
 

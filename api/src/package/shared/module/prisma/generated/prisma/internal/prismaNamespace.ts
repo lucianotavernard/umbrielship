@@ -410,7 +410,9 @@ export const ModelName = {
   InspectionTemplate: 'InspectionTemplate',
   InspectionTemplateItem: 'InspectionTemplateItem',
   InspectionAssignment: 'InspectionAssignment',
-  InspectionAssignmentItem: 'InspectionAssignmentItem'
+  InspectionAssignmentItem: 'InspectionAssignmentItem',
+  Inspection: 'Inspection',
+  InspectionAnswer: 'InspectionAnswer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "membership" | "invitation" | "customer" | "workOrder" | "workOrderService" | "workOrderServiceImage" | "vessel" | "customerAddress" | "inspectionTemplate" | "inspectionTemplateItem" | "inspectionAssignment" | "inspectionAssignmentItem"
+    modelProps: "organization" | "user" | "membership" | "invitation" | "customer" | "workOrder" | "workOrderService" | "workOrderServiceImage" | "vessel" | "customerAddress" | "inspectionTemplate" | "inspectionTemplateItem" | "inspectionAssignment" | "inspectionAssignmentItem" | "inspection" | "inspectionAnswer"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1466,6 +1468,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Inspection: {
+      payload: Prisma.$InspectionPayload<ExtArgs>
+      fields: Prisma.InspectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InspectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InspectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        findFirst: {
+          args: Prisma.InspectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InspectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        findMany: {
+          args: Prisma.InspectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>[]
+        }
+        create: {
+          args: Prisma.InspectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        createMany: {
+          args: Prisma.InspectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InspectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>[]
+        }
+        delete: {
+          args: Prisma.InspectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        update: {
+          args: Prisma.InspectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.InspectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InspectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InspectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.InspectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionPayload>
+        }
+        aggregate: {
+          args: Prisma.InspectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspection>
+        }
+        groupBy: {
+          args: Prisma.InspectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InspectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionCountAggregateOutputType> | number
+        }
+      }
+    }
+    InspectionAnswer: {
+      payload: Prisma.$InspectionAnswerPayload<ExtArgs>
+      fields: Prisma.InspectionAnswerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InspectionAnswerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InspectionAnswerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        findFirst: {
+          args: Prisma.InspectionAnswerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InspectionAnswerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        findMany: {
+          args: Prisma.InspectionAnswerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>[]
+        }
+        create: {
+          args: Prisma.InspectionAnswerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        createMany: {
+          args: Prisma.InspectionAnswerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InspectionAnswerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>[]
+        }
+        delete: {
+          args: Prisma.InspectionAnswerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        update: {
+          args: Prisma.InspectionAnswerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        deleteMany: {
+          args: Prisma.InspectionAnswerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InspectionAnswerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InspectionAnswerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>[]
+        }
+        upsert: {
+          args: Prisma.InspectionAnswerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAnswerPayload>
+        }
+        aggregate: {
+          args: Prisma.InspectionAnswerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspectionAnswer>
+        }
+        groupBy: {
+          args: Prisma.InspectionAnswerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAnswerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InspectionAnswerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAnswerCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1640,7 +1790,8 @@ export const InspectionTemplateItemScalarFieldEnum = {
   organizationId: 'organizationId',
   templateId: 'templateId',
   label: 'label',
-  position: 'position'
+  position: 'position',
+  type: 'type'
 } as const
 
 export type InspectionTemplateItemScalarFieldEnum = (typeof InspectionTemplateItemScalarFieldEnum)[keyof typeof InspectionTemplateItemScalarFieldEnum]
@@ -1664,10 +1815,41 @@ export const InspectionAssignmentItemScalarFieldEnum = {
   organizationId: 'organizationId',
   assignmentId: 'assignmentId',
   label: 'label',
-  position: 'position'
+  position: 'position',
+  type: 'type'
 } as const
 
 export type InspectionAssignmentItemScalarFieldEnum = (typeof InspectionAssignmentItemScalarFieldEnum)[keyof typeof InspectionAssignmentItemScalarFieldEnum]
+
+
+export const InspectionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  assignmentId: 'assignmentId',
+  result: 'result',
+  inspectorId: 'inspectorId',
+  inspectorName: 'inspectorName',
+  completedAt: 'completedAt',
+  discardedAt: 'discardedAt',
+  discardedBy: 'discardedBy'
+} as const
+
+export type InspectionScalarFieldEnum = (typeof InspectionScalarFieldEnum)[keyof typeof InspectionScalarFieldEnum]
+
+
+export const InspectionAnswerScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  inspectionId: 'inspectionId',
+  itemId: 'itemId',
+  notApplicable: 'notApplicable',
+  textValue: 'textValue',
+  booleanValue: 'booleanValue',
+  scoreValue: 'scoreValue',
+  note: 'note'
+} as const
+
+export type InspectionAnswerScalarFieldEnum = (typeof InspectionAnswerScalarFieldEnum)[keyof typeof InspectionAnswerScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1846,6 +2028,34 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
+
+/**
+ * Reference to a field of type 'QuestionType'
+ */
+export type EnumQuestionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionType'>
+    
+
+
+/**
+ * Reference to a field of type 'QuestionType[]'
+ */
+export type ListEnumQuestionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'InspectionResult'
+ */
+export type EnumInspectionResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionResult'>
+    
+
+
+/**
+ * Reference to a field of type 'InspectionResult[]'
+ */
+export type ListEnumInspectionResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionResult[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2011,6 +2221,8 @@ export type GlobalOmitConfig = {
   inspectionTemplateItem?: Prisma.InspectionTemplateItemOmit
   inspectionAssignment?: Prisma.InspectionAssignmentOmit
   inspectionAssignmentItem?: Prisma.InspectionAssignmentItemOmit
+  inspection?: Prisma.InspectionOmit
+  inspectionAnswer?: Prisma.InspectionAnswerOmit
 }
 
 /* Types for Logging */

@@ -36,8 +36,13 @@ describe('InspectionTemplateDetail', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
+  // The question and its number; the type's label is checked on its own (C5).
   const listed = (element: HTMLElement) =>
-    [...element.querySelectorAll('ol li')].map((item) => item.textContent?.replace(/\s+/g, ' ').trim());
+    [...element.querySelectorAll('ol li')].map((item) => {
+      const copy = item.cloneNode(true) as HTMLElement;
+      copy.querySelector('[data-slot="type"]')?.remove();
+      return copy.textContent?.replace(/\s+/g, ' ').trim();
+    });
 
   it('template C17 shows the name and the questions numbered from 1', async () => {
     const element = await render('operator', {
@@ -106,7 +111,7 @@ describe('InspectionTemplateDetail', () => {
     expect(updated.request.method).toBe('PUT');
     expect(updated.request.body).toEqual({
       name: 'Pintura do casco',
-      items: [{ label: 'Pintura sem bolhas' }, { label: 'Casco limpo e seco' }],
+      items: [{ label: 'Pintura sem bolhas', type: 'CONFORMITY' }, { label: 'Casco limpo e seco', type: 'CONFORMITY' }],
     });
     updated.flush({ inspectionTemplate: template(['Pintura sem bolhas', 'Casco limpo e seco']) });
     await settle();
@@ -192,10 +197,28 @@ describe('InspectionTemplateDetail', () => {
     const updated = controller.expectOne('/api/inspection-templates/t1');
     expect(updated.request.body).toEqual({
       name: 'Pintura',
-      items: labels.map((label) => ({ label })),
+      items: labels.map((label) => ({ label, type: 'CONFORMITY' })),
     });
     updated.flush({ inspectionTemplate: template(labels, 'Pintura') });
     await settle();
     controller.expectOne('/api/inspection-templates/t1').flush({ inspectionTemplate: template(labels, 'Pintura') });
+  });
+
+  it("inspection C5 shows each question's type label", async () => {
+    const element = await render('operator', {
+      inspectionTemplate: {
+        ...template([]),
+        items: [
+          { id: 'i0', label: 'Observações', position: 0, type: 'TEXT' },
+          { id: 'i1', label: 'Limpo?', position: 1, type: 'YES_NO' },
+          { id: 'i2', label: 'Pintura', position: 2, type: 'CONFORMITY' },
+          { id: 'i3', label: 'Acabamento', position: 3, type: 'SCORE' },
+        ],
+      },
+    });
+
+    expect(
+      [...element.querySelectorAll('ol li [data-slot="type"]')].map((node) => node.textContent?.trim()),
+    ).toEqual(['Texto livre', 'Sim/Não', 'Conforme/Não conforme', 'Nota de 0 a 10']);
   });
 });

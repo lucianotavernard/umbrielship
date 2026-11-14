@@ -64,7 +64,9 @@ export const ModelName = {
   InspectionTemplate: 'InspectionTemplate',
   InspectionTemplateItem: 'InspectionTemplateItem',
   InspectionAssignment: 'InspectionAssignment',
-  InspectionAssignmentItem: 'InspectionAssignmentItem'
+  InspectionAssignmentItem: 'InspectionAssignmentItem',
+  Inspection: 'Inspection',
+  InspectionAnswer: 'InspectionAnswer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -218,7 +220,8 @@ export const InspectionTemplateItemScalarFieldEnum = {
   organizationId: 'organizationId',
   templateId: 'templateId',
   label: 'label',
-  position: 'position'
+  position: 'position',
+  type: 'type'
 } as const
 
 export type InspectionTemplateItemScalarFieldEnum = (typeof InspectionTemplateItemScalarFieldEnum)[keyof typeof InspectionTemplateItemScalarFieldEnum]
@@ -242,10 +245,41 @@ export const InspectionAssignmentItemScalarFieldEnum = {
   organizationId: 'organizationId',
   assignmentId: 'assignmentId',
   label: 'label',
-  position: 'position'
+  position: 'position',
+  type: 'type'
 } as const
 
 export type InspectionAssignmentItemScalarFieldEnum = (typeof InspectionAssignmentItemScalarFieldEnum)[keyof typeof InspectionAssignmentItemScalarFieldEnum]
+
+
+export const InspectionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  assignmentId: 'assignmentId',
+  result: 'result',
+  inspectorId: 'inspectorId',
+  inspectorName: 'inspectorName',
+  completedAt: 'completedAt',
+  discardedAt: 'discardedAt',
+  discardedBy: 'discardedBy'
+} as const
+
+export type InspectionScalarFieldEnum = (typeof InspectionScalarFieldEnum)[keyof typeof InspectionScalarFieldEnum]
+
+
+export const InspectionAnswerScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  inspectionId: 'inspectionId',
+  itemId: 'itemId',
+  notApplicable: 'notApplicable',
+  textValue: 'textValue',
+  booleanValue: 'booleanValue',
+  scoreValue: 'scoreValue',
+  note: 'note'
+} as const
+
+export type InspectionAnswerScalarFieldEnum = (typeof InspectionAnswerScalarFieldEnum)[keyof typeof InspectionAnswerScalarFieldEnum]
 
 
 export const SortOrder = {
