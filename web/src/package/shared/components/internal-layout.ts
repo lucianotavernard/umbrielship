@@ -26,7 +26,7 @@ import { toast } from './ui/toaster';
   template: `
     <main class="min-h-screen bg-background">
       <header class="sticky top-0 z-50 border-b border-border bg-background/95">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6">
           <nav class="flex flex-wrap items-center gap-1">
             <a tButton routerLink="/dashboard" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">
               Dashboard
@@ -57,7 +57,7 @@ import { toast } from './ui/toaster';
             }
           </nav>
 
-          <div class="flex items-center gap-2">
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
             <button tButton variant="ghost" size="icon-sm" type="button" (click)="toggleDarkMode()">
               {{ isDarkMode() ? 'Claro' : 'Escuro' }}
             </button>

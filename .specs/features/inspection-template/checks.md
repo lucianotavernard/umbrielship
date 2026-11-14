@@ -172,6 +172,6 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit s
 
 - **Settled mid-build:** none
 - **Dispatched:** Verifier at `8f0f467` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 3 findings
-- **Boundary:** C1-C13, C30-C32 closed at `c0b05ad`; C14-C28, C33 closed at `36cbd30`; C29 waits on the walk
+- **Boundary:** C1-C13, C30-C32 closed at `c0b05ad`; C14-C28, C33 closed at `36cbd30`; C29 closed by the walk after the layout header fix
 - **Abandoned:** none
-- **Walked:** none yet
+- **Walked:** headless Chrome over the DevTools protocol against the running dev servers (API 3333, web 4200), signed in as the seed Administrator, viewport 375x812, with and without phone emulation: `/inspection-templates` (2 rows, the long name wraps), "Novo modelo" sheet with 2 questions (Subir/Descer disabled at the ends), a detail page, and its "Editar" sheet prefilled. First run: `scrollWidth` 470 - the shared layout header did not wrap (user button past the edge); fixed in the layout header, then all four states measured `scrollWidth` 375 with no element past the edge. A user reaches them from the menu link "Modelos de inspeção", a row, "Novo modelo" and "Editar" (C29)

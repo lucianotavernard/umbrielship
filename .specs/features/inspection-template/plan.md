@@ -61,7 +61,7 @@ sequenceDiagram
 | --- | --- |
 | domain | `InspectionTemplate` is a new term; nothing branches on it today. `CONTEXT.md` gains its entry |
 | stored data | nothing to migrate - two new tables, empty |
-| readers | the layout menu gains a link; `api/test/layout.spec.ts` lists the routes of today (C32) and requires every write handler under `work-order` to declare Roles (inspector C15), and both learn the new handlers |
+| readers | the layout menu gains a link, and the layout header wraps so a page fits 375 px (C29); `api/test/layout.spec.ts` lists the routes of today (C32) and requires every write handler under `work-order` to declare Roles (inspector C15), and both learn the new handlers |
 
 ```mermaid
 erDiagram
