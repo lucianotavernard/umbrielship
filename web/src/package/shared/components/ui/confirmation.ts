@@ -45,7 +45,7 @@ import { cn } from '../lib/cn';
             <button tButton type="button" variant="outline" (click)="close()">
               {{ cancelLabel() }}
             </button>
-            <button tButton type="button" [disabled]="loading()" (click)="confirm()">
+            <button tButton type="button" [disabled]="loading() || disabled()" (click)="confirm()">
               {{ confirmLabel() }}
             </button>
           </footer>
@@ -66,6 +66,8 @@ export class Confirmation {
   readonly isActive = input(false);
   // True while the confirmed action runs: Confirm stays disabled so it is not sent twice.
   readonly loading = input(false);
+  // Keeps "confirm" off until the content has what it needs (a choice, for example).
+  readonly disabled = input(false);
   readonly confirmLabel = input('Confirmar');
   readonly cancelLabel = input('Cancelar');
 
