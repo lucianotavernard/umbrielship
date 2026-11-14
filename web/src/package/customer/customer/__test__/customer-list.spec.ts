@@ -134,7 +134,9 @@ describe('CustomerList', () => {
     deleted.flush(null, { status: 204, statusText: 'No Content' });
     await settle();
 
-    expect(success).toHaveBeenCalledWith('Cliente excluído');
+    expect(success).toHaveBeenCalledWith('Cliente excluído com sucesso', {
+      description: 'O cliente foi excluído com sucesso.',
+    });
     controller.expectOne('/api/customers?page=1').flush({ customers: [], total: 0 });
     await settle();
     expect(dialogs(element)).toEqual([]);

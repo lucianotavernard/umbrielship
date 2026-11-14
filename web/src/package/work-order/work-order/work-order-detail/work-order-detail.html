@@ -40,7 +40,12 @@
         </header>
 
         <div class="p-6">
-          <work-order-service-list-ui [canWrite]="canWrite()" [loading]="loading()" [services]="services()" />
+          <work-order-service-list-ui
+            [canWrite]="canWrite()"
+            [loading]="loading()"
+            [services]="services()"
+            (fileSelected)="upload($event)"
+          />
         </div>
       </section>
     </div>

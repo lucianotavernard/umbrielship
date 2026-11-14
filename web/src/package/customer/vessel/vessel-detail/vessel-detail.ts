@@ -75,7 +75,7 @@ export class VesselDetail {
 
   vesselResource = httpResource<GetVesselResponse>(() => `/api/vessels/${this.id()}`);
   workOrdersResource = httpResource<GetWorkOrdersResponse>(
-    () => `/api/work-orders?vesselId=${this.id()}`,
+    () => `/api/work-orders?vesselId=${this.id()}&take=10&skip=${(this.page() - 1) * 10}`,
   );
 
   page = signal(1);
@@ -91,6 +91,9 @@ export class VesselDetail {
     this.vesselResource.hasValue() ? (this.vesselResource.value()?.vessel ?? null) : null,
   );
   loadingVessel = computed(() => this.vesselResource.isLoading());
+  notFound = computed(
+    () => (this.vesselResource.error() as { status?: number } | undefined)?.status === HttpStatusCode.NotFound,
+  );
 
   loading = computed(() => this.workOrdersResource.isLoading());
   workOrders = computed(() =>
@@ -128,7 +131,8 @@ export class VesselDetail {
 
   editVessel(vessel: UpdateVesselRequest) {
     this.submitting.set(true);
-    this.vesselService.updateVessel(this.id(), vessel).subscribe({
+    const { customerId, name, type, length } = vessel;
+    this.vesselService.updateVessel(this.id(), { customerId, name, type, length }).subscribe({
       next: () => {
         toast.success('Embarcação atualizada com sucesso', {
           description: 'A embarcação foi atualizada com sucesso.',

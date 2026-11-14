@@ -86,7 +86,7 @@ describe('CustomerDetail', () => {
 
     expect(element.textContent).toContain('Atlantic');
     expect(element.textContent).toContain('ops@atlantic.test');
-    expect(element.textContent).toContain('11999999999');
+    expect(element.textContent).toContain('(11) 9 9999-9999');
     expect(element.textContent).toContain('Rua 1');
     expect(element.textContent).toContain('Santos');
     expect(element.textContent).toContain('Aurora');
@@ -173,7 +173,9 @@ describe('CustomerDetail', () => {
     deleted.flush(null, { status: 204, statusText: 'No Content' });
     await settle();
 
-    expect(success).toHaveBeenCalledWith('Embarcação excluída');
+    expect(success).toHaveBeenCalledWith('Embarcação excluída com sucesso', {
+      description: 'A embarcação foi excluída com sucesso.',
+    });
     controller.expectOne('/api/vessels?customerId=c1&page=1').flush({ vessels: [], total: 0 });
   });
 });
