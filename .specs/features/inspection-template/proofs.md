@@ -1,9 +1,9 @@
 # inspection-template proofs
 
-**HEAD**: e09ae34
+**HEAD**: 8fe1a47
 **Tree**: clean
 **Shell**: /bin/sh
-**Result**: 51 pass, 0 fail
+**Result**: 53 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -33,6 +33,7 @@
 | C13 | `run api / ✓ docs.spec.ts > template C13 CONTEXT.md has the InspectionTemplate entry` | pass |
 | C30 | `grep -q 'CREATE UNIQUE INDEX "inspection_templates_organizationId_name_key"' api/src/package/shared/module/pri` | pass |
 | C31 | `run api / ✓ inspection-template.repository.spec.ts > template C31 turns the unique name violation into Already` | pass |
+| C31 | `run api / ✓ inspection-template.repository.spec.ts > template C31 locks the template before replacing its item` | pass |
 | C32 | `run api / ✓ inspection-template.http.spec.ts > template C32 answers 401 without a token and lets every Role re` | pass |
 | C14 | `run web / ✓ inspection-template-menu.spec.ts > template C14 the menu links Modelos de inspeção for every Role` | pass |
 | C15 | `run web / ✓ inspection-template-list.spec.ts > template C15 lists name and question count, links each row and ` | pass |
@@ -46,6 +47,7 @@
 | C22 | `run web / ✓ inspection-template-form.spec.ts > template C22 Subir and Descer swap neighbours and are disabled ` | pass |
 | C23 | `run web / ✓ inspection-template-form.spec.ts > template C23 Remover drops a question and the limits disable th` | pass |
 | C24 | `run web / ✓ inspection-template-form.spec.ts > template C24 shows the field errors and sends nothing` | pass |
+| C24 | `run web / ✓ inspection-template-form.spec.ts > template C24 measures the name and the questions after trimming` | pass |
 | C25 | `run web / ✓ inspection-template-list.spec.ts > template C25 creates a template in the order shown and reloads ` | pass |
 | C26 | `run web / ✓ inspection-template-detail.spec.ts > template C26 edits the template from a prefilled sheet and re` | pass |
 | C27 | `run web / ✓ inspection-template-list.spec.ts > template C27 a 409 keeps the sheet open with the typed name` | pass |
@@ -64,41 +66,41 @@
 `Run api` - exit 0
 
 ```
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 36ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 8ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C12 lets an operator create a Customer 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C14 answers 403 with statusCode 403 and message Forbidden 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C1 POST /users accepts role inspector and refuses auditor 3ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C3 POST /invitations accepts role inspector 2ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C30 keeps the statuses of /me, /invitations and /organizations/:id/roles 5ms
- ✓ src/package/shared/module/mail/__test__/nodemailer-email-sender.spec.ts > Nodemailer email sender > [C58] sends through one transport built from the mail settings 2ms
- ✓ src/package/shared/module/mail/__test__/nodemailer-email-sender.spec.ts > Nodemailer email sender > [C58] connects without authentication when no user is set 0ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C30 keeps the statuses of /me, /invitations and /organizations/:id/roles 3ms
 
  Test Files  65 passed (65)
-      Tests  228 passed (228)
-   Start at  08:52:17
-   Duration  1.63s (transform 4.96s, setup 0ms, import 18.18s, tests 1.02s, environment 7ms)
+      Tests  229 passed (229)
+   Start at  09:11:14
+   Duration  1.69s (transform 5.18s, setup 0ms, import 18.21s, tests 1.00s, environment 7ms)
 
-[Nest] 1955247  - 14/11/2026, 08:52:18   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"1f565e70-e50b-4296-abbe-9091c1ce209f","message":"redis down"}
-[Nest] 1955333  - 14/11/2026, 08:52:18   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"607b3362-e54d-4380-bee5-3a9facb6afff","message":"redis down"}
+[Nest] 1975612  - 14/11/2026, 09:11:15   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"66fcbff7-de28-4df2-b02f-e8655cd2db38","message":"redis down"}
+[Nest] 1975715  - 14/11/2026, 09:11:15   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"06690231-c2eb-4620-99ad-8293da10067b","message":"redis down"}
 ```
 
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C16 an empty list says Nenhum modelo de inspeção encontrado 18ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C19 renders Novo modelo only for administrator 77ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-detail.spec.ts > InspectionTemplateDetail > template C33 an edit saved without changes sends back what it received 28ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C25 creates a template in the order shown and reloads the list 43ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C35 a template created from page 2 shows page 1, where it is first 39ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C27 a 409 keeps the sheet open with the typed name 23ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C21 Adicionar pergunta appends an empty question 33ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C22 Subir and Descer swap neighbours and are disabled at the ends 44ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C23 Remover drops a question and the limits disable the controls 213ms
- ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C24 shows the field errors and sends nothing 21ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-detail.spec.ts > InspectionTemplateDetail > template C28 confirms, deletes and returns to the list; cancel sends nothing 18ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-detail.spec.ts > InspectionTemplateDetail > template C33 an edit saved without changes sends back what it received 27ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C25 creates a template in the order shown and reloads the list 46ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C35 a template created from page 2 shows page 1, where it is first 34ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-list.spec.ts > InspectionTemplateList > template C27 a 409 keeps the sheet open with the typed name 22ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C21 Adicionar pergunta appends an empty question 29ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C22 Subir and Descer swap neighbours and are disabled at the ends 48ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C23 Remover drops a question and the limits disable the controls 208ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C24 shows the field errors and sends nothing 20ms
+ ✓  web  src/package/work-order/inspection-template/__test__/inspection-template-form.spec.ts > InspectionTemplate form > template C24 measures the name and the questions after trimming them 20ms
 
  Test Files  4 passed (4)
-      Tests  19 passed (19)
-   Start at  08:52:21
-   Duration  1.17s (transform 216ms, setup 639ms, import 796ms, tests 1.01s, environment 1.13s)
+      Tests  20 passed (20)
+   Start at  09:11:18
+   Duration  1.16s (transform 218ms, setup 685ms, import 748ms, tests 1.02s, environment 1.14s)
 ```
 
 `grep -q 'CREATE UNIQUE INDEX "inspection_templates_organizationId_name_key"' api/src/package/shared/module/pri` - exit 0
