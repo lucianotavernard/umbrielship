@@ -146,6 +146,6 @@ Proof: run web | ✓ write-access.inspector.spec.ts > inspector C31 the five pag
 ## Handoff
 
 - **Settled mid-build:** user: "Commit separado antes (Recomendado)" - the owner's in-flight work is committed on `feat/inspector-role` as `bb26f6d`, before this feature. user: "Isolar os testes do S2 (Recomendado)" - 9 web tests in the owner's in-flight specs (customer-list, customer-detail, vessel-detail, work-order-detail) were red before this feature; S2's tests live in `*.inspector.spec.ts` files and `Run web` selects only those, so the 9 stay as they are for the owner. user: "Retirar do plano (Recomendado)" - Organization detail shows no Role counts today, so AC 15 and C20 now hold that it still shows none. user: "Seguir o plano (Recomendado)" - the Papel select order becomes Administrador, Operador, Inspetor (it was Operador, Administrador); the default stays Operador. Verifier findings 1-2: `canWrite` now uses the writer allow-list, so the owner's specs that click write controls (customer-list, customer-detail, vessel-list, vessel-detail, work-order-detail) set an `operator` session in their setup; their assertions are unchanged
-- **Dispatched:** Verifier at `6be756e` (no screens sub-agent: no criterion cites a capture)
-- **Boundary:** C1-C30 closed at `6be756e`
+- **Dispatched:** Verifier at `6be756e` - returned FAIL, 3 findings; resumed at `d61623e` for C31 and C19 - returned PASS (no screens sub-agent: no criterion cites a capture)
+- **Boundary:** C1-C30 closed at `6be756e`; C31 and the C19 proof closed at `d61623e`
 - **Abandoned:** none

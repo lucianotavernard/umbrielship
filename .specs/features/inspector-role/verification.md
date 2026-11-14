@@ -1,7 +1,7 @@
 # Inspector Role verification
 
-**Verdict**: FAIL
-**Proofs**: `proofs.md` at 6be756e
+**Verdict**: PASS
+**Proofs**: `proofs.md` at d61623e
 **Verifier**: independent sub-agent (author != verifier)
 
 ## Checks
@@ -26,7 +26,7 @@
 | C16 | `docs.spec.ts` `inspector C16 CONTEXT.md and AGENTS.md name the three Roles` | yes |
 | C17 | grep on `*_add_inspector_role/migration.sql` and `schema.prisma` | yes - migration `20261114034411_add_inspector_role` present |
 | C18 | `email-invitation-delivery.spec.ts` `inspector C18 names the inspector Role Inspetor in the email` | yes |
-| C19 | `user-form.inspector.spec.ts` `inspector C19 offers Administrador, Operador and Inspetor and sends role inspector`; `organization-detail.inspector.spec.ts` `inspector C19 the Invitation form offers Inspetor and sends role inspector` | yes - options in order; the Invitation side asserts the `POST /invitations` body, the User side asserts the form's emitted value, not the `POST /users` body (the page spreads it into `createUser`) |
+| C19 | `user-form.inspector.spec.ts` `inspector C19 offers Administrador, Operador and Inspetor and sends role inspector`; `organization-detail.inspector.spec.ts` `inspector C19 the Invitation form offers Inspetor and sends role inspector`; `organization-detail.inspector.spec.ts` `inspector C19 the User form posts role inspector to POST /users` | yes - options in order on both forms; the `POST /invitations` body and now the `POST /users` request (method and whole body, `role: 'inspector'` with `organizationId`) are asserted with `toEqual` from Organization detail |
 | C20 | `organization-detail.inspector.spec.ts` `inspector C20 shows the Inspetor badge and no Role counts` | yes - badge text and the fixture count `7` absent |
 | C21 | `internal-layout.inspector.spec.ts` `inspector C21 the switcher shows Inspetor under the Organization` | yes |
 | C22 | `customer-list.inspector.spec.ts` `inspector C22 renders no write control for an inspector` | yes - the detector is first shown to find the controls for an operator, then `toEqual([])` for an inspector |
@@ -38,6 +38,7 @@
 | C28 | `write-access.inspector.spec.ts` `inspector C28 the five pages show the same content to an inspector as to an operator` | yes - text compared with write labels removed, non-empty |
 | C29 | `internal-layout.inspector.spec.ts` `inspector C29 the session Role follows GET /me after an Organization switch` | yes - asserts `canWrite()` false after the reloaded layout reads `/me`; does not render a page (C22-C26 tie pages to the same signal) |
 | C30 | `roles.guard.spec.ts` `inspector C30 keeps the statuses of /me, /invitations and /organizations/:id/roles` | yes |
+| C31 | `write-access.inspector.spec.ts` `inspector C31 the five pages render no write control while the Role is not loaded or is not a writer` | yes - all five pages for `null` and `auditor`, `toEqual([])`, each on a fresh module; the same detector finds every control for an operator in C27, and the throwaway `render(..., null)` / `render(..., 'auditor')` at 6be756e returned controls, so it would fail if the claim were false |
 
 Own examples run at `HEAD` (throwaway, deleted):
 
@@ -50,6 +51,6 @@ API write routes: every `@Post`, `@Put` and `@Delete` under `customer` and `work
 
 | Finding | Evidence | Fix | Closed |
 | --- | --- | --- | --- |
-| An inspector sees and can click the write controls on every page until `GET /me` resolves: `canWrite` is true while the Role is `null`, and `InternalLayout` renders `<router-outlet />` before `/me` loads. No check covers the Role-unknown state | `authentication.service.ts` `canWrite = computed(() => this.role() !== 'inspector')`; `internal-layout.ts:81` outlet outside the `@if (user())`; throwaway `render('customers', null)` returned `['Novo Cliente', 'Excluir']` | make `canWrite` false until a Role is known (for example `role() === 'administrator' \|\| role() === 'operator'`), and add a check that a page renders no write control while the Role is `null` | |
-| The web decides write access with a deny-list while the API uses an allow-list (`WRITERS`): any Role other than `inspector` (a future Role, or an unexpected value) gets every write control the API then refuses with 403 | `authentication.service.ts` `role() !== 'inspector'` vs `roles.ts` `WRITERS = ['administrator', 'operator']`; throwaway `render('work-orders/:id', 'auditor')` returned all three write controls | derive `canWrite` from the same allow-list as `WRITERS` (closes the first finding too) | |
-| C19's User-form half asserts the form's emitted value, not the `POST /users` body the criterion names ("the web SHALL send") | `user-form.inspector.spec.ts` asserts `emitted`; the Invitation half asserts `controller.expectOne('/api/invitations')` | assert the `POST /users` request body from Organization detail, as the Invitation half does | |
+| An inspector sees and can click the write controls on every page until `GET /me` resolves: `canWrite` is true while the Role is `null`, and `InternalLayout` renders `<router-outlet />` before `/me` loads. No check covers the Role-unknown state | `authentication.service.ts` `canWrite = computed(() => this.role() !== 'inspector')`; `internal-layout.ts:81` outlet outside the `@if (user())`; throwaway `render('customers', null)` returned `['Novo Cliente', 'Excluir']` | make `canWrite` false until a Role is known (for example `role() === 'administrator' \|\| role() === 'operator'`), and add a check that a page renders no write control while the Role is `null` | `d61623e` - C31 holds a page with no write control while the Role is `null` |
+| The web decides write access with a deny-list while the API uses an allow-list (`WRITERS`): any Role other than `inspector` (a future Role, or an unexpected value) gets every write control the API then refuses with 403 | `authentication.service.ts` `role() !== 'inspector'` vs `roles.ts` `WRITERS = ['administrator', 'operator']`; throwaway `render('work-orders/:id', 'auditor')` returned all three write controls | derive `canWrite` from the same allow-list as `WRITERS` (closes the first finding too) | `d61623e` - `canWrite` uses the `administrator`/`operator` allow-list; C31 holds `auditor` |
+| C19's User-form half asserts the form's emitted value, not the `POST /users` body the criterion names ("the web SHALL send") | `user-form.inspector.spec.ts` asserts `emitted`; the Invitation half asserts `controller.expectOne('/api/invitations')` | assert the `POST /users` request body from Organization detail, as the Invitation half does | `d61623e` - C19 now also asserts the `POST /users` body from Organization detail |
