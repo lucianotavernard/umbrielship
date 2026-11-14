@@ -150,7 +150,7 @@ import { Customer } from '../customer.service';
   `,
 })
 export class CustomerList {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   loading = input(true);
   customers = input<Customer[]>([]);
 

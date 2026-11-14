@@ -133,7 +133,7 @@ import {
   `,
 })
 export class WorkOrderServiceList {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   loading = input(true);
   services = input<WorkOrderServiceItem[]>([]);
   fileSelected = output<{ serviceId: string; file: File }>();

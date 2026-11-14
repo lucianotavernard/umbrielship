@@ -15,6 +15,7 @@ import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/alr
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
+import { ROLES } from '@/package/shared/module/auth/user-payload.js';
 
 import { InternalAdministratorGuard } from '../organization/internal-administrator.guard.js';
 import { CreateUserUseCase } from './create-user.use-case.js';
@@ -24,7 +25,7 @@ const createUserBodySchema = z.object({
   name: z.string().trim().min(1).max(80),
   email: z.email().max(254),
   password: z.string().min(8).max(72),
-  role: z.enum(['administrator', 'operator', 'inspector']),
+  role: z.enum(ROLES),
   organizationId: z.uuid(),
 });
 

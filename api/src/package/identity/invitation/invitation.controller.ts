@@ -15,6 +15,7 @@ import { ConflictDomainException } from '@/package/shared/lib/exception/conflict
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { Public } from '@/package/shared/module/auth/public.js';
+import { ROLES } from '@/package/shared/module/auth/user-payload.js';
 
 import { InternalAdministratorGuard } from '../organization/internal-administrator.guard.js';
 import { AcceptInvitationUseCase } from './accept-invitation.use-case.js';
@@ -24,7 +25,7 @@ import { SendInvitationUseCase } from './send-invitation.use-case.js';
 const sendInvitationBodySchema = z.object({
   userId: z.uuid(),
   organizationId: z.uuid(),
-  role: z.enum(['administrator', 'operator', 'inspector']),
+  role: z.enum(ROLES),
 });
 
 type SendInvitationBodySchema = z.infer<typeof sendInvitationBodySchema>;

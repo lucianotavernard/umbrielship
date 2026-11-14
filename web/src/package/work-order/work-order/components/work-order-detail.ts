@@ -125,7 +125,7 @@ import { WorkOrderDetail as WorkOrderDetailType } from '../work-order.service';
   `,
 })
 export class WorkOrderDetail {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   workOrder = input.required<WorkOrderDetailType | null>();
   loading = input(false);
 
