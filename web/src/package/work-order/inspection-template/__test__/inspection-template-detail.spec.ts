@@ -122,6 +122,31 @@ describe('InspectionTemplateDetail', () => {
     expect(listed(element)).toEqual(['1. Pintura sem bolhas', '2. Casco limpo e seco']);
   });
 
+  it('template C27 a 409 on edit keeps the sheet open with what was typed', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const element = await render('administrator');
+
+    button(element, 'Editar').click();
+    await settle();
+    const sheet = sheets(element)[0];
+    fill(sheet.querySelector<HTMLInputElement>('#template-name')!, 'Solda');
+    fill(questionFields(sheet)[0], 'Cordão contínuo');
+    sheet.querySelector('form')!.requestSubmit();
+    await settle();
+    const updated = controller.expectOne('/api/inspection-templates/t1');
+    expect(updated.request.method).toBe('PUT');
+    updated.flush(
+      { statusCode: 409, message: 'Inspection template already exists' },
+      { status: 409, statusText: 'Conflict' },
+    );
+    await settle();
+
+    expect(error).toHaveBeenCalledWith('Já existe um modelo de inspeção com este nome');
+    expect(sheets(element)).toHaveLength(1);
+    expect(sheets(element)[0].querySelector<HTMLInputElement>('#template-name')!.value).toBe('Solda');
+    expect(questions(sheets(element)[0])).toEqual(['Cordão contínuo', 'Pintura sem bolhas']);
+  });
+
   it('template C28 confirms, deletes and returns to the list; cancel sends nothing', async () => {
     const success = vi.spyOn(toast, 'success');
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);

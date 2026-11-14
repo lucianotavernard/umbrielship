@@ -5,7 +5,7 @@ Run api: `cd api && npx vitest run --reporter=verbose`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/inspection-template/**/*.spec.ts'`
 Plan: `.specs/features/inspection-template/plan.md`
 
-33 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
+35 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -114,12 +114,19 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C26 edits the
 
 **C27** - A 409 shows "Já existe um modelo de inspeção com este nome" and keeps the sheet open with what was typed (AC 27)
 Proof: run web | ✓ inspection-template-list.spec.ts > template C27 a 409 keeps the sheet open with the typed name
+Proof: run web | ✓ inspection-template-detail.spec.ts > template C27 a 409 on edit keeps the sheet open with what was typed
 
 **C28** - "Excluir" asks "Excluir modelo de inspeção" with the plan's sentence; confirming sends `DELETE`, shows "Modelo de inspeção excluído com sucesso" and goes to `/inspection-templates`; cancelling sends nothing (AC 28)
 Proof: run web | ✓ inspection-template-detail.spec.ts > template C28 confirms, deletes and returns to the list; cancel sends nothing
 
 **C29** - At 375 px wide the list, the detail and the form sheet show every column, question and control without horizontal page scroll (AC 29)
 Proof: walk - open the list, a detail and the form sheet at 375 px wide and check `document.documentElement.scrollWidth` equals 375
+
+**C34** - The template name column is `citext`, so the unique index and the lookup by name ignore case in the database (AC 5, added after verification)
+Proof: `grep -q '"name" CITEXT NOT NULL' api/src/package/shared/module/prisma/migrations/*_add_inspection_templates/migration.sql`
+
+**C35** - A template created while the list shows page 2 or later brings the list back to page 1, where the new template is first (AC 25, added after verification)
+Proof: run web | ✓ inspection-template-list.spec.ts > template C35 a template created from page 2 shows page 1, where it is first
 
 **C33** - A template saved, reopened and saved again comes back with the same name and questions (data lifecycle)
 Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit saved without changes sends back what it received
@@ -136,7 +143,8 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit s
 | one-way doors (2) | tables, unique name, cascade C30, C31 · `@Roles('administrator')` C12, C11 | - |
 | AC 2 examples (2) | trimmed name C2 · label of spaces → 400 C2 | - |
 | AC 3 examples (7) | 0 items C3 · 100 items C3 · 101 items C3 · 200-char label C3 · 201-char label C3 · 100-char name C3 · 101-char name C3 | - |
-| AC 5 examples (3) | `PINTURA` vs `Pintura` C5 · other Organization C5 · own name on edit C5 | - |
+| AC 5 examples (3) | `PINTURA` vs `Pintura` C5, C34 · other Organization C5 · own name on edit C5 | - |
+| AC 27 writes answering 409 (2) | create C27 · edit C27 | - |
 | AC 6 examples (2) | 3 to 2 items C6 · `[A,B]` to `[B,A]` C6 | - |
 | AC 8 examples (3) | page 1 of 11 C8 · page 2 of 11 C8 · empty C8 | - |
 | AC 10 routes (3) | `GET` C10 · `PUT` C10 · `DELETE` C10 | - |
@@ -163,7 +171,7 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit s
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** none
+- **Dispatched:** Verifier at `8f0f467` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 3 findings
 - **Boundary:** C1-C13, C30-C32 closed at `c0b05ad`; C14-C28, C33 closed at `36cbd30`; C29 waits on the walk
 - **Abandoned:** none
 - **Walked:** none yet
