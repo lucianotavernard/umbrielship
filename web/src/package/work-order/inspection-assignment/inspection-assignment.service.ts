@@ -3,6 +3,7 @@ import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import type { QuestionType } from '../inspection-template/inspection-template.service';
+import type { Inspection } from '../inspection/inspection.service';
 
 export type InspectionAssignmentItem = {
   id: string;
@@ -18,6 +19,10 @@ export type InspectionAssignment = {
   service: { id: string; name: string } | null;
   createdAt: string;
   items: InspectionAssignmentItem[];
+  // False once any Inspection exists, discarded ones included.
+  removable: boolean;
+  // Visible Inspections, newest first.
+  inspections: Inspection[];
 };
 
 export type AssignInspectionTemplateRequest = {
