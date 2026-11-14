@@ -1,6 +1,4 @@
 import type { INestApplication } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import {
   afterAll,
@@ -12,37 +10,21 @@ import {
   vi,
 } from 'vitest';
 
-import { JwtStrategy } from '@/package/identity/auth/jwt.strategy.js';
-import { ResolveSessionUseCase } from '@/package/identity/auth/resolve-session.use-case.js';
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
-import { AuthModule } from '@/package/shared/module/auth/auth.module.js';
 import type {
   Role,
   UserPayload,
 } from '@/package/shared/module/auth/user-payload.js';
-import { ConfigModule } from '@/package/shared/module/config/config.module.js';
 
 import { makeInspectionTemplate } from '@test/factory.js';
+import { bootHttp } from '@test/http.js';
 import { CreateInspectionTemplateUseCase } from '../create-inspection-template.use-case.js';
 import { DeleteInspectionTemplateUseCase } from '../delete-inspection-template.use-case.js';
 import { EditInspectionTemplateUseCase } from '../edit-inspection-template.use-case.js';
 import { FetchInspectionTemplatesUseCase } from '../fetch-inspection-templates.use-case.js';
 import { GetInspectionTemplateByIdUseCase } from '../get-inspection-template-by-id.use-case.js';
 import { InspectionTemplateController } from '../inspection-template.controller.js';
-
-Object.assign(process.env, {
-  NODE_ENV: 'test',
-  PORT: '3333',
-  JWT_SECRET: 'inspection-template-http-spec',
-  JWT_EXPIRATION_IN: '1h',
-  DATABASE_URL: 'postgresql://user:pass@localhost:5432/test',
-  REDIS_URL: 'redis://localhost:6379',
-  WEB_ORIGIN: 'http://localhost:4200',
-  MAIL_HOST: 'localhost',
-  MAIL_PORT: '1025',
-  MAIL_FROM: 'test@example.com',
-});
 
 const ORGANIZATION = '11111111-1111-4111-8111-111111111111';
 const ID = '33333333-3333-4333-8333-333333333333';
@@ -116,32 +98,20 @@ describe('InspectionTemplate routes over HTTP', () => {
   let tokens: Record<string, string>;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [ConfigModule, AuthModule],
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
       controllers: [InspectionTemplateController],
       providers: [
-        JwtStrategy,
-        {
-          provide: ResolveSessionUseCase,
-          useValue: {
-            handle: async ({ userId }: { userId: string }) => users[userId],
-          },
-        },
         { provide: CreateInspectionTemplateUseCase, useValue: fakes.create },
         { provide: EditInspectionTemplateUseCase, useValue: fakes.edit },
         { provide: DeleteInspectionTemplateUseCase, useValue: fakes.delete },
         { provide: FetchInspectionTemplatesUseCase, useValue: fakes.fetch },
         { provide: GetInspectionTemplateByIdUseCase, useValue: fakes.get },
       ],
-    }).compile();
+      users,
+    }));
 
-    app = moduleRef.createNestApplication();
-    await app.init();
-
-    const jwt = app.get(JwtService);
-    tokens = Object.fromEntries(
-      ROLES.map((role) => [role, jwt.sign({ sub: subs[role] })]),
-    );
+    tokens = Object.fromEntries(ROLES.map((role) => [role, sign(subs[role])]));
   });
 
   afterAll(async () => {

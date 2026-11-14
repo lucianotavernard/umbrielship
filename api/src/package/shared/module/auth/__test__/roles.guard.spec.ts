@@ -2,8 +2,6 @@ import { readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { INestApplication, Type } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import {
   afterAll,
@@ -18,33 +16,18 @@ import {
 import { CustomerController } from '@/package/customer/customer/customer.controller.js';
 import { VesselController } from '@/package/customer/vessel/vessel.controller.js';
 import { AuthenticationController } from '@/package/identity/auth/authentication.controller.js';
-import { JwtStrategy } from '@/package/identity/auth/jwt.strategy.js';
-import { ResolveSessionUseCase } from '@/package/identity/auth/resolve-session.use-case.js';
 import { InvitationController } from '@/package/identity/invitation/invitation.controller.js';
 import { OrganizationController } from '@/package/identity/organization/organization.controller.js';
 import { UserController } from '@/package/identity/user/user.controller.js';
-import { AuthModule } from '@/package/shared/module/auth/auth.module.js';
 import type {
   Role,
   UserPayload,
 } from '@/package/shared/module/auth/user-payload.js';
-import { ConfigModule } from '@/package/shared/module/config/config.module.js';
 import { WorkOrderServiceImageController } from '@/package/work-order/work-order-service-image/work-order-service-image.controller.js';
 import { WorkOrderServiceController } from '@/package/work-order/work-order-service/work-order-service.controller.js';
 import { WorkOrderController } from '@/package/work-order/work-order/work-order.controller.js';
 
-Object.assign(process.env, {
-  NODE_ENV: 'test',
-  PORT: '3333',
-  JWT_SECRET: 'roles-guard-spec',
-  JWT_EXPIRATION_IN: '1h',
-  DATABASE_URL: 'postgresql://user:pass@localhost:5432/test',
-  REDIS_URL: 'redis://localhost:6379',
-  WEB_ORIGIN: 'http://localhost:4200',
-  MAIL_HOST: 'localhost',
-  MAIL_PORT: '1025',
-  MAIL_FROM: 'test@example.com',
-});
+import { bootHttp } from '@test/http.js';
 
 type Controller = abstract new (...args: never[]) => object;
 
@@ -212,30 +195,18 @@ describe('Roles guard over HTTP', () => {
   let tokens: Record<string, string>;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [ConfigModule, AuthModule],
-      controllers: controllers as never[],
-      providers: [
-        JwtStrategy,
-        {
-          provide: ResolveSessionUseCase,
-          useValue: {
-            handle: async ({ userId }: { userId: string }) => users[userId],
-          },
-        },
-        ...[...fakes].map(([useCase, fake]) => ({
-          provide: useCase,
-          useValue: fake,
-        })),
-      ],
-    }).compile();
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
+      controllers: controllers as Type[],
+      providers: [...fakes].map(([useCase, fake]) => ({
+        provide: useCase,
+        useValue: fake,
+      })),
+      users,
+    }));
 
-    app = moduleRef.createNestApplication();
-    await app.init();
-
-    const jwt = app.get(JwtService);
     tokens = Object.fromEntries(
-      Object.keys(users).map((sub) => [sub, jwt.sign({ sub })]),
+      Object.keys(users).map((sub) => [sub, sign(sub)]),
     );
   });
 
