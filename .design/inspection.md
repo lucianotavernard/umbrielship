@@ -15,7 +15,7 @@ Today a WorkOrder records the services done on a Vessel and the images that docu
 1. An **InspectionTemplate** is a named checklist an Administrator of the Organization maintains.
 2. An **InspectionAssignment** puts a copy of that checklist on one WorkOrder, optionally pointing at one of its WorkOrderServices.
 3. An **Inspection** is one filled-in answer sheet for an assignment, made by a User with the new Role `inspector`. Its result, approved or reproved, is computed from the answers.
-4. An Inspection is never edited or deleted. An inspector may discard it, which hides it from the app and lets the assignment be inspected again.
+4. An assignment accepts as many Inspections as the inspectors make while the work is `IN_PROGRESS`; together they are its history. An Inspection is never edited or deleted. An inspector may discard one made by mistake, which hides it from the app.
 
 **What is expensive to get wrong:** the Role `inspector` is the first Role that changes what a User may do inside an ordinary Organization. Every write route that exists today has to take a position on it, and loosening or tightening that later changes what real Users can do.
 
@@ -39,7 +39,7 @@ Today a WorkOrder records the services done on a Vessel and the images that docu
 
 **Signs it is going wrong:**
 
-- An inspector discards and redoes the same assignment several times: discard is being used as edit. Visible as rows in `inspections` with `discardedAt` set.
+- An inspector discards many Inspections right after making them: discard is being used as edit. Visible as rows in `inspections` with `discardedAt` set a few minutes after `completedAt`.
 - An Organization accumulates templates that differ by one question: the checklist needs more than three fixed answers. Visible as rows in `inspection_templates`.
 
 ## Scope
@@ -81,31 +81,30 @@ flowchart LR
   T -.copied at assignment.-> AS
   I[inspector] -->|3 completes| IN[Inspection<br/>answers + result]
   AS --> IN
-  I -->|4 discards| IN
-  IN -.discarded: assignment is pending again.-> AS
+  I -->|4 discards a mistaken one| IN
+  AS -.receives many.-> IN
   O[operator] -->|reads| AS
 ```
 
 1. An Administrator of the Organization writes an InspectionTemplate: a name and an ordered list of questions.
 2. On a WorkOrder, the Administrator assigns a template and may pick one WorkOrderService of that WorkOrder. The questions are copied.
-3. While the target is `IN_PROGRESS`, an inspector answers every question with conforming, non-conforming or not applicable. The result is stored.
-4. Any inspector of the Organization may discard that Inspection. It disappears from the app and the assignment can be completed again.
+3. While the work is `IN_PROGRESS` (D6), an inspector answers every question with conforming, non-conforming or not applicable. The result is stored. Any inspector may do it again, as many times as needed: each time is a new Inspection of the same assignment.
+4. Any inspector of the Organization may discard an Inspection. It disappears from the app; the others of the assignment stay.
 
 Everybody in the Organization reads templates, assignments and Inspections that are not discarded.
 
 ### Lifecycle
 
-The state belongs to the InspectionAssignment and is derived from its Inspections; nothing stores it.
+An assignment has no state of its own: it accepts a new Inspection whenever the work is `IN_PROGRESS` (D6), and its history is the list of its Inspections that are not discarded. It can be removed only while it has no Inspection at all, discarded ones included. Each Inspection moves once:
 
 ```mermaid
 stateDiagram-v2
-  [*] --> pending: Administrator assigns
-  pending --> completed: inspector completes (target IN_PROGRESS)
-  completed --> pending: inspector discards
-  pending --> [*]: Administrator removes
+  [*] --> visible: inspector completes (work IN_PROGRESS)
+  visible --> discarded: an inspector discards
+  discarded --> [*]
 ```
 
-`completed` means the assignment has one Inspection that is not discarded. Only a `pending` assignment with no Inspection at all, discarded ones included, can be removed.
+`discarded` is kept in the database and leaves every read (D4).
 
 ### Data model
 
@@ -156,9 +155,9 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 | D1 | Inspections live in `work-order` | InspectionTemplate, InspectionAssignment, Inspection, WorkOrder deletion |
 | D2 | Roles gate tenant writes | inspector, InspectionTemplate, InspectionAssignment, Inspection |
 | D3 | Assignment copies the template | InspectionTemplate, InspectionAssignment |
-| D4 | An Inspection is only added or hidden | Inspection |
+| D4 | An Inspection is only added or hidden; an assignment holds many | Inspection |
 | D5 | No delete under an Inspection | InspectionAssignment, Inspection, WorkOrder deletion |
-| D6 | Completion needs the target in progress | Inspection |
+| D6 | Completion needs the work in progress | Inspection |
 | D7 | Result is computed and stored | Inspection |
 
 ### D1 — Inspections live in `work-order`
@@ -181,13 +180,13 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 
 **Rule.** Assigning copies the template's name and questions into the assignment. Nothing done to the template afterwards changes an assignment or an Inspection.
 
-**Consequence.** A template can be edited or deleted at any time. An assignment made before an edit keeps the old questions, including when it is inspected again after a discard.
+**Consequence.** A template can be edited or deleted at any time. An assignment made before an edit keeps the old questions for every Inspection made of it, before or after the edit.
 
-### D4 — An Inspection is only added or hidden
+### D4 — An Inspection is only added or hidden; an assignment holds many
 
-**Rule.** No route edits or deletes an Inspection. Discarding marks it, keeps the row, and no read route returns it again. An assignment has at most one Inspection that is not discarded.
+**Rule.** No route edits or deletes an Inspection. Discarding marks it, keeps the row, and no read route returns it again. An assignment has any number of Inspections, visible or discarded (AD-018).
 
-**Consequence.** A discard cannot be undone from the app, and its history is reachable only in the database. Two inspectors completing the same assignment at once produce one Inspection; the other request is refused.
+**Consequence.** A discard cannot be undone from the app, and it is reachable only in the database. Two inspectors completing the same assignment at once produce two Inspections. A later Inspection never replaces an earlier one: the assignment keeps its full history.
 
 ### D5 — No delete under an Inspection
 
@@ -197,11 +196,11 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 
 **Careful.** `work_order_services` and `work_order_service_images` are deleted by cascade from their parent. Do not copy that for `inspections`: the database itself has to refuse.
 
-### D6 — Completion needs the target in progress
+### D6 — Completion needs the work in progress
 
-**Rule.** An Inspection is completed only while its target is `IN_PROGRESS`. Assigning, discarding and reading have no status rule.
+**Rule.** An Inspection is completed only while the WorkOrder is `IN_PROGRESS` and, when the assignment targets a WorkOrderService, that WorkOrderService is `IN_PROGRESS` too (AD-018). Assigning, discarding and reading have no status rule.
 
-**Consequence.** The status is checked once, at completion. A target that later moves to another status keeps its Inspections.
+**Consequence.** The statuses are checked at each completion. A WorkOrder or WorkOrderService that later moves to another status keeps its Inspections and accepts no new one until it is `IN_PROGRESS` again.
 
 ### D7 — Result is computed and stored
 
@@ -216,7 +215,7 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 | [inspector](#inspector) | A User can hold the Role `inspector`, and existing write routes refuse it | clear — 2 defaults taken |
 | [InspectionTemplate](#inspectiontemplate) | An Administrator maintains checklists | clear — 2 defaults taken |
 | [InspectionAssignment](#inspectionassignment) | A WorkOrder shows the checklists assigned to it | clear — 2 defaults taken |
-| [Inspection](#inspection) | An inspector completes and discards; the WorkOrder shows the result | clear — 5 defaults taken |
+| [Inspection](#inspection) | Inspectors complete an assignment as many times as needed and discard mistakes; the WorkOrder shows the history | clear — 5 defaults taken |
 | [WorkOrder deletion](#workorder-deletion) | Inspected work cannot be deleted | clear |
 
 **Order:** inspector → InspectionTemplate → InspectionAssignment → Inspection → WorkOrder deletion. Nothing runs in parallel: every later slice uses the Role and the Role check the first one builds. Each slice updates `CONTEXT.md` for the terms it introduces. Inspection and WorkOrder deletion are released together: between them, deleting a WorkOrder fails with an unmapped database error instead of 409.
@@ -301,7 +300,7 @@ New records `inspection_templates` and `inspection_template_items`.
 
 ### InspectionAssignment
 
-> **Delivers:** an Administrator assigns a template to a WorkOrder, and the WorkOrder detail page lists its assignments with their state.
+> **Delivers:** an Administrator assigns a template to a WorkOrder, and the WorkOrder detail page lists its assignments and their target.
 > **Status:** clear — 2 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D3 (Assignment copies the template), D5 (No delete under an Inspection) · **Depends on:** inspector, InspectionTemplate · **Screens:** an Inspections section on the WorkOrder detail page (`work-orders/:id`), with the assignment form in a sheet
 
 **Behaviour**
@@ -341,20 +340,21 @@ New records `inspection_assignments` and `inspection_assignment_items`.
 
 ### Inspection
 
-> **Delivers:** an inspector completes an assignment and may discard the result; the WorkOrder detail page shows result, inspector, time and answers.
-> **Status:** clear — 5 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D4 (An Inspection is only added or hidden), D5 (No delete under an Inspection), D6 (Completion needs the target in progress), D7 (Result is computed and stored) · **Depends on:** inspector, InspectionAssignment · **Screens:** the Inspections section on the WorkOrder detail page (`work-orders/:id`), with the checklist in a sheet
+> **Delivers:** inspectors complete an assignment as many times as needed while the work is in progress, and may discard a mistaken Inspection; the WorkOrder detail page shows each assignment's history with result, inspector, time and answers.
+> **Status:** clear — 5 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D4 (An Inspection is only added or hidden; an assignment holds many), D5 (No delete under an Inspection), D6 (Completion needs the work in progress), D7 (Result is computed and stored) · **Depends on:** inspector, InspectionAssignment · **Screens:** the Inspections section on the WorkOrder detail page (`work-orders/:id`), with the checklist in a sheet
 
 **Behaviour**
 
 | Situation | What happens | Response |
 |---|---|---|
-| An inspector sends an answer for every question while the target is `IN_PROGRESS` | The Inspection is stored with its answers, the inspector, the time and the computed result | 201 with the result |
+| An inspector sends an answer for every question while the WorkOrder, and the WorkOrderService when the assignment targets one, are `IN_PROGRESS` | A new Inspection is stored with its answers, the inspector, the time and the computed result; the earlier ones stay | 201 with the result |
 | A question has no answer | Nothing is stored | 409 |
-| The target is not `IN_PROGRESS` | Nothing is stored | 409 |
-| The assignment already has an Inspection that is not discarded, including when a simultaneous request got there first | Nothing is stored, no stray answers | 409 |
+| The WorkOrder is not `IN_PROGRESS`, or the assignment targets a WorkOrderService that is not | Nothing is stored | 409 |
+| The assignment already has Inspections | A new one is added to them | 201 |
+| Two inspectors complete the same assignment at once | Both are stored | 201 and 201 |
 | An inspector opens the checklist on a phone. A desk is the main device, and a phone has to work. | Every question, its three answers and its note can be read and answered by touch, with no horizontal scrolling | — |
 | An Administrator or operator tries to complete or discard | Nothing is written | 403 |
-| Any inspector of the Organization discards an Inspection, in any status of the target | It is marked with who and when, and leaves every read; the assignment is `pending` again | 204 |
+| Any inspector of the Organization discards an Inspection, in any status of the target | It is marked with who and when, and leaves every read; the assignment's other Inspections stay | 204 |
 | Somebody discards an Inspection already discarded | It is not visible, so it is not found | 404 |
 | An Administrator removes an assignment that has an Inspection | Refused | 409 |
 
@@ -362,7 +362,7 @@ New records `inspection_assignments` and `inspection_assignment_items`.
 
 `POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections` `{ answers: [{ itemId, answer, note? }] }` → `201` `{ id, result }` — WorkOrder detail
 `POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections/:id/discard` → `204` — WorkOrder detail
-`GET /work-orders/:workOrderId/inspection-assignments` gains on each assignment its state (`pending` or `completed`) and whether it can be removed, and on a `completed` one its Inspection: `result`, `inspectorName`, `completedAt` and the answers. A discarded Inspection never appears. — WorkOrder detail
+`GET /work-orders/:workOrderId/inspection-assignments` gains on each assignment whether it can be removed and its Inspections, newest first, each with `result`, `inspectorName`, `completedAt` and the answers. A discarded Inspection never appears. — WorkOrder detail, which shows the full history of each assignment
 
 **Data**
 
@@ -370,7 +370,6 @@ New records `inspections` and `inspection_answers`.
 
 | Field or constraint | What it means |
 |---|---|
-| At most one `inspections` row per assignment with `discardedAt` null | The rule of D4, held by the database so a race cannot break it |
 | `inspections.discardedAt`, `.discardedBy` | Null means visible. Set means hidden from every read. |
 | `inspections.result` (`APPROVED`, `REPROVED`) | Stored at completion (D7) |
 | `inspections.inspectorId`, `.inspectorName` | A plain User id, with no foreign key because User belongs to `identity`, and a copy of the name as it was |
@@ -389,18 +388,13 @@ sequenceDiagram
     U-->>C: 403 — nothing read
   end
   U->>DB: read assignment, its questions and its target
-  alt target not IN_PROGRESS
+  alt WorkOrder, or targeted WorkOrderService, not IN_PROGRESS
     U-->>C: 409
   else a question has no answer
     U-->>C: 409
   end
   U->>DB: BEGIN · insert Inspection · insert answers · COMMIT
-  alt another Inspection is already visible for the assignment
-    DB-->>U: uniqueness refused, nothing committed
-    U-->>C: 409
-  else
-    U-->>C: 201 with the result
-  end
+  U-->>C: 201 with the result
 ```
 
 **Alternatives considered**
@@ -442,4 +436,5 @@ sequenceDiagram
 
 - `ROADMAP.md` — what is built (items 1 to 6) and the one pending proposal (item 7); it has no inspection item yet.
 - `CONTEXT.md` — the binding vocabulary this design extends with four terms.
+- AD-018 (`.specs/STATE.md`) — the project owner's decision, 2026-11-14, that an assignment accepts many Inspections while the work is `IN_PROGRESS`, the WorkOrderService as well when it is the target.
 - `AGENTS.md` — the context and aggregate layout, the tenancy rule and the no-foreign-key-across-contexts rule that D1 and the Inspection data follow.
