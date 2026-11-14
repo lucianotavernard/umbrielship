@@ -158,7 +158,7 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 | D4 | An Inspection is only added or hidden; an assignment holds many | Inspection |
 | D5 | No delete under an Inspection | InspectionAssignment, Inspection, WorkOrder deletion |
 | D6 | Completion needs the work in progress | Inspection |
-| D7 | Result is computed and stored | Inspection |
+| D7 | Result is confirmed by the inspector and stored (AD-019) | InspectionTemplate, InspectionAssignment, Inspection |
 
 ### D1 — Inspections live in `work-order`
 
@@ -202,11 +202,11 @@ These are the decisions that are hard to reverse. Slices cite them by code.
 
 **Consequence.** The statuses are checked at each completion. A WorkOrder or WorkOrderService that later moves to another status keeps its Inspections and accepts no new one until it is `IN_PROGRESS` again.
 
-### D7 — Result is computed and stored
+### D7 — Result is confirmed by the inspector and stored
 
-**Rule.** Every question is answered `CONFORMING`, `NON_CONFORMING` or `NOT_APPLICABLE`. One `NON_CONFORMING` makes the Inspection `REPROVED`; otherwise it is `APPROVED`. The result is stored at completion and never recomputed.
+**Rule.** Each question has a type, set on the template and copied with it: free text, yes/no, conforming/non-conforming, or a score from 0 to 10. Every question is answered with a value of its type or "Não se aplica". On closing, the inspector confirms the result, `APPROVED` or `REPROVED`, with nothing pre-selected; it is stored and never recomputed (AD-019, which superseded the computed result).
 
-**Consequence.** An inspector cannot approve with reservations; a reservation is a note on a conforming answer.
+**Consequence.** The answers inform the result but do not decide it. Questions that existed before types became conforming/non-conforming.
 
 ## Slices
 
@@ -264,7 +264,7 @@ Every `POST`, `PUT` and `DELETE` under `/customers`, `/vessels` and `/work-order
 ### InspectionTemplate
 
 > **Delivers:** an Administrator of an Organization creates, edits and deletes checklists, and everybody in it reads them.
-> **Status:** clear — 2 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D3 (Assignment copies the template) · **Depends on:** inspector · **Screens:** a new page at `inspection-templates`, with the form in a sheet
+> **Status:** clear — 2 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D3 (Assignment copies the template), D7 (Result is confirmed by the inspector and stored) · **Depends on:** inspector · **Screens:** a new page at `inspection-templates`, with the form in a sheet
 
 **Behaviour**
 
@@ -301,7 +301,7 @@ New records `inspection_templates` and `inspection_template_items`.
 ### InspectionAssignment
 
 > **Delivers:** an Administrator assigns a template to a WorkOrder, and the WorkOrder detail page lists its assignments and their target.
-> **Status:** clear — 2 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D3 (Assignment copies the template), D5 (No delete under an Inspection) · **Depends on:** inspector, InspectionTemplate · **Screens:** an Inspections section on the WorkOrder detail page (`work-orders/:id`), with the assignment form in a sheet
+> **Status:** clear — 2 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D3 (Assignment copies the template), D5 (No delete under an Inspection), D7 (Result is confirmed by the inspector and stored) · **Depends on:** inspector, InspectionTemplate · **Screens:** an Inspections section on the WorkOrder detail page (`work-orders/:id`), with the assignment form in a sheet
 
 **Behaviour**
 
@@ -341,7 +341,7 @@ New records `inspection_assignments` and `inspection_assignment_items`.
 ### Inspection
 
 > **Delivers:** inspectors complete an assignment as many times as needed while the work is in progress, and may discard a mistaken Inspection; the WorkOrder detail page shows each assignment's history with result, inspector, time and answers.
-> **Status:** clear — 5 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D4 (An Inspection is only added or hidden; an assignment holds many), D5 (No delete under an Inspection), D6 (Completion needs the work in progress), D7 (Result is computed and stored) · **Depends on:** inspector, InspectionAssignment · **Screens:** the Inspections section on the WorkOrder detail page (`work-orders/:id`), with the checklist in a sheet
+> **Status:** clear — 5 defaults taken · **Applies:** D1 (Inspections live in `work-order`), D2 (Roles gate tenant writes), D4 (An Inspection is only added or hidden; an assignment holds many), D5 (No delete under an Inspection), D6 (Completion needs the work in progress), D7 (Result is confirmed by the inspector and stored) · **Depends on:** inspector, InspectionAssignment · **Screens:** the Inspections section on the WorkOrder detail page (`work-orders/:id`), with the checklist in a sheet
 
 **Behaviour**
 
@@ -436,5 +436,6 @@ sequenceDiagram
 
 - `ROADMAP.md` — what is built (items 1 to 6) and the one pending proposal (item 7); it has no inspection item yet.
 - `CONTEXT.md` — the binding vocabulary this design extends with four terms.
+- AD-019 (`.specs/STATE.md`) — the project owner's decision, 2026-11-14, that questions have types (free text, yes/no, conforming, score 0 to 10) and the inspector confirms the result on closing.
 - AD-018 (`.specs/STATE.md`) — the project owner's decision, 2026-11-14, that an assignment accepts many Inspections while the work is `IN_PROGRESS`, the WorkOrderService as well when it is the target.
 - `AGENTS.md` — the context and aggregate layout, the tenancy rule and the no-foreign-key-across-contexts rule that D1 and the Inspection data follow.
