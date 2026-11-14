@@ -24,6 +24,7 @@ const aggregates = [
   'work-order/work-order',
   'work-order/work-order-service',
   'work-order/work-order-service-image',
+  'work-order/inspection-template',
   'identity/auth',
   'identity/user',
   'identity/organization',
@@ -84,6 +85,7 @@ describe('acme layout', () => {
       'IWorkOrdersRepository',
       'IWorkOrderServicesRepository',
       'IWorkOrderServiceImagesRepository',
+      'IInspectionTemplatesRepository',
       'IUsersRepository',
       'IOrganizationsRepository',
       'IInvitationsRepository',
@@ -146,6 +148,11 @@ describe('acme layout', () => {
         'GET /work-orders/:workOrderId/services/:serviceId/images',
         'POST /work-orders/:workOrderId/services/:serviceId/images',
         'DELETE /work-orders/:workOrderId/services/:serviceId/images/:id',
+        'GET /inspection-templates',
+        'GET /inspection-templates/:id',
+        'POST /inspection-templates',
+        'PUT /inspection-templates/:id',
+        'DELETE /inspection-templates/:id',
         'POST /sessions',
         'GET /me',
         'POST /organizations/switch',
@@ -173,6 +180,7 @@ describe('acme layout', () => {
         'work-order.controller.ts',
         'work-order-service.controller.ts',
         'work-order-service-image.controller.ts',
+        'inspection-template.controller.ts',
         'authentication.controller.ts',
         'organization.controller.ts',
         'user.controller.ts',
@@ -243,7 +251,9 @@ describe('acme layout', () => {
     ]);
   });
 
-  it('inspector C15 every POST, PUT and DELETE handler under customer and work-order declares Roles', () => {
+  it('template C12 every POST, PUT and DELETE handler under customer and work-order declares its Roles', () => {
+    // Only an administrator writes InspectionTemplates; the rest write as administrator or operator.
+    const administratorOnly = ['work-order/inspection-template/'];
     const writers: string[] = [];
 
     for (const file of files.filter(
@@ -251,19 +261,26 @@ describe('acme layout', () => {
         path.endsWith('.controller.ts') &&
         /package\/(customer|work-order)\//.test(path),
     )) {
+      const roles = administratorOnly.some((dir) => rel(file).includes(dir))
+        ? "@Roles('administrator')"
+        : '@Roles(...WRITERS)';
+
       // Each chunk ends with the decorators of the next handler.
       for (const chunk of read(file).split('\n  async ').slice(0, -1)) {
         const decorators = chunk.split('\n  }\n').pop()!;
         const method = decorators.match(/@(Post|Put|Delete)\(/);
         if (!method) continue;
 
-        writers.push(`${rel(file)} ${method[1]}`);
-        expect(decorators, `${rel(file)} ${method[1]}`).toContain(
-          '@Roles(...WRITERS)',
-        );
+        writers.push(`${rel(file)} ${method[1]} ${roles}`);
+        expect(decorators, `${rel(file)} ${method[1]}`).toContain(roles);
       }
     }
 
-    expect(writers).toHaveLength(14);
+    expect(
+      writers.filter((line) => line.endsWith('(...WRITERS)')),
+    ).toHaveLength(14);
+    expect(
+      writers.filter((line) => line.endsWith("('administrator')")),
+    ).toHaveLength(3);
   });
 });

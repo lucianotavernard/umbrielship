@@ -60,7 +60,9 @@ export const ModelName = {
   WorkOrderService: 'WorkOrderService',
   WorkOrderServiceImage: 'WorkOrderServiceImage',
   Vessel: 'Vessel',
-  CustomerAddress: 'CustomerAddress'
+  CustomerAddress: 'CustomerAddress',
+  InspectionTemplate: 'InspectionTemplate',
+  InspectionTemplateItem: 'InspectionTemplateItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -197,6 +199,27 @@ export const CustomerAddressScalarFieldEnum = {
 } as const
 
 export type CustomerAddressScalarFieldEnum = (typeof CustomerAddressScalarFieldEnum)[keyof typeof CustomerAddressScalarFieldEnum]
+
+
+export const InspectionTemplateScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type InspectionTemplateScalarFieldEnum = (typeof InspectionTemplateScalarFieldEnum)[keyof typeof InspectionTemplateScalarFieldEnum]
+
+
+export const InspectionTemplateItemScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  templateId: 'templateId',
+  label: 'label',
+  position: 'position'
+} as const
+
+export type InspectionTemplateItemScalarFieldEnum = (typeof InspectionTemplateItemScalarFieldEnum)[keyof typeof InspectionTemplateItemScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -67,3 +67,13 @@ export type Vessel = Prisma.VesselModel
  * 
  */
 export type CustomerAddress = Prisma.CustomerAddressModel
+/**
+ * Model InspectionTemplate
+ * 
+ */
+export type InspectionTemplate = Prisma.InspectionTemplateModel
+/**
+ * Model InspectionTemplateItem
+ * 
+ */
+export type InspectionTemplateItem = Prisma.InspectionTemplateItemModel

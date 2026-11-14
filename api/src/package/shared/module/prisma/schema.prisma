@@ -215,3 +215,30 @@ model CustomerAddress {
   @@index([organizationId])
   @@map("customer_addresses")
 }
+
+model InspectionTemplate {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String   @db.Citext
+  createdAt      DateTime @default(now())
+
+  items InspectionTemplateItem[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("inspection_templates")
+}
+
+model InspectionTemplateItem {
+  id             String @id @default(uuid())
+  organizationId String
+  templateId     String
+  label          String
+  position       Int
+
+  template InspectionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, position])
+  @@index([organizationId])
+  @@map("inspection_template_items")
+}
