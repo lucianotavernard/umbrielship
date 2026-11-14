@@ -32,7 +32,8 @@ import { cn } from '../lib/cn';
         (keydown.escape)="close()"
       >
         <header class="flex flex-col gap-1.5 p-4">
-          <h2 data-slot="sheet-title" class="font-semibold text-foreground">
+          <!-- pe-10 keeps a long title clear of the close button in the corner -->
+          <h2 data-slot="sheet-title" class="pe-10 font-semibold text-foreground">
             {{ title() }}
           </h2>
           <p
