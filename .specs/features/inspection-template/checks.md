@@ -164,6 +164,6 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit s
 
 - **Settled mid-build:** none
 - **Dispatched:** none
-- **Boundary:** none yet
+- **Boundary:** C1-C13, C30-C32 closed at `c0b05ad`; C14-C28, C33 closed at `36cbd30`; C29 waits on the walk
 - **Abandoned:** none
 - **Walked:** none yet
