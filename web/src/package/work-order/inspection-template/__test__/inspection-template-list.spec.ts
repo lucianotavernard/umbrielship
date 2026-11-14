@@ -114,6 +114,29 @@ describe('InspectionTemplateList', () => {
     expect(element.querySelector('tbody td')?.textContent?.trim()).toBe('Pintura do casco');
   });
 
+  it('template C35 a template created from page 2 shows page 1, where it is first', async () => {
+    const element = await render('administrator', undefined, 11);
+    [...element.querySelectorAll('a')].find((anchor) => anchor.textContent?.trim() === '2')?.click();
+    await settle();
+    controller.expectOne('/api/inspection-templates?page=2').flush({ inspectionTemplates: [summary('t0', 'Antigo', 1)], total: 11 });
+    await settle();
+
+    const sheet = await openNew(element);
+    fill(sheet.querySelector<HTMLInputElement>('#template-name')!, 'Novo');
+    fill(questionFields(sheet)[0], 'Pergunta');
+    sheet.querySelector('form')!.requestSubmit();
+    await settle();
+    controller.expectOne('/api/inspection-templates').flush({ inspectionTemplate: { id: 't9' } }, { status: 201, statusText: 'Created' });
+    await settle();
+
+    controller.expectNone('/api/inspection-templates?page=2');
+    controller
+      .expectOne('/api/inspection-templates?page=1')
+      .flush({ inspectionTemplates: [summary('t9', 'Novo', 1)], total: 12 });
+    await settle();
+    expect(element.querySelector('tbody td')?.textContent?.trim()).toBe('Novo');
+  });
+
   it('template C27 a 409 keeps the sheet open with the typed name', async () => {
     const error = vi.spyOn(toast, 'error');
     const element = await render('administrator');
