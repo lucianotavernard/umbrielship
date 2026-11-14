@@ -56,6 +56,8 @@ export class AuthenticationService {
     const role = this.role();
     return role !== null && WRITERS.includes(role);
   });
+  // InspectionTemplates are written by an administrator only.
+  isAdministrator = computed(() => this.role() === 'administrator');
 
   me() {
     return this.http.get<MeResponse>('/api/me');

@@ -1,0 +1,43 @@
+<header class="border-b border-border">
+  <div class="mx-auto flex max-w-7xl flex-wrap items-start justify-between gap-4 px-4 py-8 sm:px-6">
+    @if (loading()) {
+      <div class="grid flex-1 gap-2">
+        <t-skeleton class="h-9 w-64 max-w-full" />
+        <t-skeleton class="h-4 w-80 max-w-full" />
+      </div>
+    } @else {
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">Modelos de inspeção</h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          Checklists que um Administrador atribui às ordens de serviço.
+        </p>
+      </div>
+      @if (isAdministrator()) {
+        <button tButton type="button" (click)="openSheet()">
+          <ng-icon name="lucidePlus" />
+          Novo modelo
+        </button>
+      }
+    }
+  </div>
+</header>
+
+<section class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+  <inspection-template-list-ui [loading]="loading()" [inspectionTemplates]="inspectionTemplates()">
+    <t-pagination [page]="page()" [total]="total()" (changed)="page.set($event)" />
+  </inspection-template-list-ui>
+</section>
+
+<t-sheet
+  title="Novo modelo de inspeção"
+  class="sm:max-w-md"
+  description="Dê um nome ao modelo e escreva as perguntas na ordem em que serão feitas"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <inspection-template-form-ui
+    [loading]="submitting()"
+    (closed)="closeSheet()"
+    (submitted)="createInspectionTemplate($event)"
+  />
+</t-sheet>
