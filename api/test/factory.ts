@@ -12,6 +12,10 @@ import {
 } from '@/package/identity/organization/organization.entity.js';
 import { User, UserProps } from '@/package/identity/user/user.entity.js';
 import {
+  InspectionAssignment,
+  InspectionAssignmentProps,
+} from '@/package/work-order/inspection-assignment/inspection-assignment.entity.js';
+import {
   InspectionTemplate,
   InspectionTemplateProps,
 } from '@/package/work-order/inspection-template/inspection-template.entity.js';
@@ -147,6 +151,23 @@ export const makeInspectionTemplate = (
       organizationId: 'org-1',
       name: 'Pintura do casco',
       labels: ['Casco limpo', 'Pintura sem bolhas'],
+      ...override,
+    },
+    id,
+  );
+
+export const makeInspectionAssignment = (
+  override: Partial<InspectionAssignmentProps> = {},
+  id?: string,
+) =>
+  InspectionAssignment.create(
+    {
+      organizationId: 'org-1',
+      workOrderId: 'work-order-1',
+      service: null,
+      templateName: 'Pintura do casco',
+      labels: ['Casco limpo', 'Pintura sem bolhas'],
+      assignedBy: 'user-1',
       ...override,
     },
     id,

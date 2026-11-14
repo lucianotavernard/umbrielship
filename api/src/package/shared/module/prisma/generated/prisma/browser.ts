@@ -77,3 +77,13 @@ export type InspectionTemplate = Prisma.InspectionTemplateModel
  * 
  */
 export type InspectionTemplateItem = Prisma.InspectionTemplateItemModel
+/**
+ * Model InspectionAssignment
+ * 
+ */
+export type InspectionAssignment = Prisma.InspectionAssignmentModel
+/**
+ * Model InspectionAssignmentItem
+ * 
+ */
+export type InspectionAssignmentItem = Prisma.InspectionAssignmentItemModel

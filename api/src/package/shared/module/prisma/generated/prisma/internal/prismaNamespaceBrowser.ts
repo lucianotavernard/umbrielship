@@ -62,7 +62,9 @@ export const ModelName = {
   Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress',
   InspectionTemplate: 'InspectionTemplate',
-  InspectionTemplateItem: 'InspectionTemplateItem'
+  InspectionTemplateItem: 'InspectionTemplateItem',
+  InspectionAssignment: 'InspectionAssignment',
+  InspectionAssignmentItem: 'InspectionAssignmentItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -220,6 +222,30 @@ export const InspectionTemplateItemScalarFieldEnum = {
 } as const
 
 export type InspectionTemplateItemScalarFieldEnum = (typeof InspectionTemplateItemScalarFieldEnum)[keyof typeof InspectionTemplateItemScalarFieldEnum]
+
+
+export const InspectionAssignmentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  workOrderId: 'workOrderId',
+  workOrderServiceId: 'workOrderServiceId',
+  templateName: 'templateName',
+  assignedBy: 'assignedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type InspectionAssignmentScalarFieldEnum = (typeof InspectionAssignmentScalarFieldEnum)[keyof typeof InspectionAssignmentScalarFieldEnum]
+
+
+export const InspectionAssignmentItemScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  assignmentId: 'assignmentId',
+  label: 'label',
+  position: 'position'
+} as const
+
+export type InspectionAssignmentItemScalarFieldEnum = (typeof InspectionAssignmentItemScalarFieldEnum)[keyof typeof InspectionAssignmentItemScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -39,14 +39,21 @@ type InspectionTemplateBodySchema = z.infer<
   typeof inspectionTemplateBodySchema
 >;
 
-const pageQueryParamSchema = z
-  .string()
-  .optional()
-  .default('1')
-  .transform(Number)
-  .pipe(z.number().int().min(1));
+const integer = (fallback: string, max?: number) =>
+  z
+    .string()
+    .optional()
+    .default(fallback)
+    .transform(Number)
+    .pipe(max ? z.number().int().min(1).max(max) : z.number().int().min(1));
 
-type PageQueryParamSchema = z.infer<typeof pageQueryParamSchema>;
+// `per_page` lets the assignment form list up to 100 templates; the list page keeps 10.
+const pageQuerySchema = z.object({
+  page: integer('1'),
+  per_page: integer('10', 100),
+});
+
+type PageQuerySchema = z.infer<typeof pageQuerySchema>;
 
 const present = ({ id, name, createdAt, items }: InspectionTemplate) => ({
   id,
@@ -68,13 +75,14 @@ export class InspectionTemplateController {
   @Get()
   async get(
     @CurrentUser() user: UserPayload,
-    @Query('page', new ZodValidationPipe(pageQueryParamSchema))
-    page: PageQueryParamSchema,
+    @Query(new ZodValidationPipe(pageQuerySchema))
+    { page, per_page: perPage }: PageQuerySchema,
   ) {
     const { inspectionTemplates, total } =
       await this.fetchInspectionTemplates.handle({
         organizationId: user.organizationId,
         page,
+        perPage,
       });
 
     return {

@@ -3,11 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { IInspectionTemplatesRepository } from './contracts/inspection-template-repository.contract.js';
 import { InspectionTemplate } from './inspection-template.entity.js';
 
-export const INSPECTION_TEMPLATES_PER_PAGE = 10;
-
 type FetchInspectionTemplatesUseCaseRequest = {
   organizationId: string;
   page: number;
+  perPage: number;
 };
 
 type FetchInspectionTemplatesUseCaseResponse = {
@@ -24,11 +23,12 @@ export class FetchInspectionTemplatesUseCase {
   async handle({
     organizationId,
     page,
+    perPage,
   }: FetchInspectionTemplatesUseCaseRequest): Promise<FetchInspectionTemplatesUseCaseResponse> {
     const { data, total } = await this.inspectionTemplatesRepository.findMany(
       organizationId,
-      INSPECTION_TEMPLATES_PER_PAGE,
-      (page - 1) * INSPECTION_TEMPLATES_PER_PAGE,
+      perPage,
+      (page - 1) * perPage,
     );
 
     return { inspectionTemplates: data, total };

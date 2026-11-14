@@ -202,4 +202,18 @@ describe('documents follow the acme platform', () => {
       'unique within its Organization, compared without case',
     );
   });
+
+  it('assignment C16 CONTEXT.md has the InspectionAssignment entry', () => {
+    const entry = glossaryEntry(read('CONTEXT.md'), 'InspectionAssignment');
+
+    expect(entry).toContain('copy');
+    expect(entry).toContain('WorkOrderService');
+    expect(entry).toContain('`administrator`');
+    expect(entry).toContain(
+      'Editing or deleting the InspectionTemplate does not change it',
+    );
+    expect(entry).toContain(
+      'deleted with its WorkOrder or its WorkOrderService',
+    );
+  });
 });

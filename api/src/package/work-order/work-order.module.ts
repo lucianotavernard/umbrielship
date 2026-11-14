@@ -3,6 +3,12 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 
 import { CustomerModule } from '../customer/customer.module.js';
+import { AssignInspectionTemplateUseCase } from './inspection-assignment/assign-inspection-template.use-case.js';
+import { IInspectionAssignmentsRepository } from './inspection-assignment/contracts/inspection-assignment-repository.contract.js';
+import { FetchInspectionAssignmentsUseCase } from './inspection-assignment/fetch-inspection-assignments.use-case.js';
+import { InspectionAssignmentController } from './inspection-assignment/inspection-assignment.controller.js';
+import { PrismaInspectionAssignmentsRepository } from './inspection-assignment/inspection-assignment.repository.js';
+import { RemoveInspectionAssignmentUseCase } from './inspection-assignment/remove-inspection-assignment.use-case.js';
 import { IInspectionTemplatesRepository } from './inspection-template/contracts/inspection-template-repository.contract.js';
 import { CreateInspectionTemplateUseCase } from './inspection-template/create-inspection-template.use-case.js';
 import { DeleteInspectionTemplateUseCase } from './inspection-template/delete-inspection-template.use-case.js';
@@ -41,6 +47,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     WorkOrderServiceController,
     WorkOrderServiceImageController,
     InspectionTemplateController,
+    InspectionAssignmentController,
   ],
   providers: [
     CreateWorkOrderUseCase,
@@ -61,6 +68,9 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     GetInspectionTemplateByIdUseCase,
     EditInspectionTemplateUseCase,
     DeleteInspectionTemplateUseCase,
+    AssignInspectionTemplateUseCase,
+    FetchInspectionAssignmentsUseCase,
+    RemoveInspectionAssignmentUseCase,
     { provide: IWorkOrdersRepository, useClass: PrismaWorkOrdersRepository },
     {
       provide: IWorkOrderServicesRepository,
@@ -73,6 +83,10 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     {
       provide: IInspectionTemplatesRepository,
       useClass: PrismaInspectionTemplatesRepository,
+    },
+    {
+      provide: IInspectionAssignmentsRepository,
+      useClass: PrismaInspectionAssignmentsRepository,
     },
   ],
 })

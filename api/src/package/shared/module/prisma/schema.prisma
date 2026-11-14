@@ -150,7 +150,8 @@ model WorkOrder {
   endDate        DateTime
   status         WorkOrderStatus @default(PENDING)
 
-  services WorkOrderService[]
+  services              WorkOrderService[]
+  inspectionAssignments InspectionAssignment[]
 
   @@index([organizationId])
   @@index([vesselId])
@@ -167,8 +168,9 @@ model WorkOrderService {
   endDate        DateTime
   status         WorkOrderServiceStatus @default(PENDING)
 
-  workOrder WorkOrder               @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
-  images    WorkOrderServiceImage[]
+  workOrder             WorkOrder               @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  images                WorkOrderServiceImage[]
+  inspectionAssignments InspectionAssignment[]
 
   @@index([organizationId])
   @@map("work_order_services")
@@ -241,4 +243,36 @@ model InspectionTemplateItem {
   @@unique([templateId, position])
   @@index([organizationId])
   @@map("inspection_template_items")
+}
+
+model InspectionAssignment {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  workOrderId        String
+  workOrderServiceId String?
+  templateName       String
+  assignedBy         String
+  createdAt          DateTime @default(now())
+
+  workOrder        WorkOrder                  @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrderService WorkOrderService?          @relation(fields: [workOrderServiceId], references: [id], onDelete: Cascade)
+  items            InspectionAssignmentItem[]
+
+  @@index([organizationId])
+  @@index([workOrderId])
+  @@map("inspection_assignments")
+}
+
+model InspectionAssignmentItem {
+  id             String @id @default(uuid())
+  organizationId String
+  assignmentId   String
+  label          String
+  position       Int
+
+  assignment InspectionAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, position])
+  @@index([organizationId])
+  @@map("inspection_assignment_items")
 }

@@ -208,6 +208,7 @@ export type WorkOrderServiceWhereInput = {
   status?: Prisma.EnumWorkOrderServiceStatusFilter<"WorkOrderService"> | $Enums.WorkOrderServiceStatus
   workOrder?: Prisma.XOR<Prisma.WorkOrderScalarRelationFilter, Prisma.WorkOrderWhereInput>
   images?: Prisma.WorkOrderServiceImageListRelationFilter
+  inspectionAssignments?: Prisma.InspectionAssignmentListRelationFilter
 }
 
 export type WorkOrderServiceOrderByWithRelationInput = {
@@ -221,6 +222,7 @@ export type WorkOrderServiceOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   workOrder?: Prisma.WorkOrderOrderByWithRelationInput
   images?: Prisma.WorkOrderServiceImageOrderByRelationAggregateInput
+  inspectionAssignments?: Prisma.InspectionAssignmentOrderByRelationAggregateInput
 }
 
 export type WorkOrderServiceWhereUniqueInput = Prisma.AtLeast<{
@@ -237,6 +239,7 @@ export type WorkOrderServiceWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumWorkOrderServiceStatusFilter<"WorkOrderService"> | $Enums.WorkOrderServiceStatus
   workOrder?: Prisma.XOR<Prisma.WorkOrderScalarRelationFilter, Prisma.WorkOrderWhereInput>
   images?: Prisma.WorkOrderServiceImageListRelationFilter
+  inspectionAssignments?: Prisma.InspectionAssignmentListRelationFilter
 }, "id">
 
 export type WorkOrderServiceOrderByWithAggregationInput = {
@@ -277,6 +280,7 @@ export type WorkOrderServiceCreateInput = {
   status?: $Enums.WorkOrderServiceStatus
   workOrder: Prisma.WorkOrderCreateNestedOneWithoutServicesInput
   images?: Prisma.WorkOrderServiceImageCreateNestedManyWithoutServiceInput
+  inspectionAssignments?: Prisma.InspectionAssignmentCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceUncheckedCreateInput = {
@@ -289,6 +293,7 @@ export type WorkOrderServiceUncheckedCreateInput = {
   endDate: Date | string
   status?: $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageUncheckedCreateNestedManyWithoutServiceInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceUpdateInput = {
@@ -301,6 +306,7 @@ export type WorkOrderServiceUpdateInput = {
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
   workOrder?: Prisma.WorkOrderUpdateOneRequiredWithoutServicesNestedInput
   images?: Prisma.WorkOrderServiceImageUpdateManyWithoutServiceNestedInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUpdateManyWithoutWorkOrderServiceNestedInput
 }
 
 export type WorkOrderServiceUncheckedUpdateInput = {
@@ -313,6 +319,7 @@ export type WorkOrderServiceUncheckedUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageUncheckedUpdateManyWithoutServiceNestedInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedUpdateManyWithoutWorkOrderServiceNestedInput
 }
 
 export type WorkOrderServiceCreateManyInput = {
@@ -395,6 +402,11 @@ export type WorkOrderServiceScalarRelationFilter = {
   isNot?: Prisma.WorkOrderServiceWhereInput
 }
 
+export type WorkOrderServiceNullableScalarRelationFilter = {
+  is?: Prisma.WorkOrderServiceWhereInput | null
+  isNot?: Prisma.WorkOrderServiceWhereInput | null
+}
+
 export type WorkOrderServiceCreateNestedManyWithoutWorkOrderInput = {
   create?: Prisma.XOR<Prisma.WorkOrderServiceCreateWithoutWorkOrderInput, Prisma.WorkOrderServiceUncheckedCreateWithoutWorkOrderInput> | Prisma.WorkOrderServiceCreateWithoutWorkOrderInput[] | Prisma.WorkOrderServiceUncheckedCreateWithoutWorkOrderInput[]
   connectOrCreate?: Prisma.WorkOrderServiceCreateOrConnectWithoutWorkOrderInput | Prisma.WorkOrderServiceCreateOrConnectWithoutWorkOrderInput[]
@@ -455,6 +467,22 @@ export type WorkOrderServiceUpdateOneRequiredWithoutImagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkOrderServiceUpdateToOneWithWhereWithoutImagesInput, Prisma.WorkOrderServiceUpdateWithoutImagesInput>, Prisma.WorkOrderServiceUncheckedUpdateWithoutImagesInput>
 }
 
+export type WorkOrderServiceCreateNestedOneWithoutInspectionAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.WorkOrderServiceCreateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedCreateWithoutInspectionAssignmentsInput>
+  connectOrCreate?: Prisma.WorkOrderServiceCreateOrConnectWithoutInspectionAssignmentsInput
+  connect?: Prisma.WorkOrderServiceWhereUniqueInput
+}
+
+export type WorkOrderServiceUpdateOneWithoutInspectionAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkOrderServiceCreateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedCreateWithoutInspectionAssignmentsInput>
+  connectOrCreate?: Prisma.WorkOrderServiceCreateOrConnectWithoutInspectionAssignmentsInput
+  upsert?: Prisma.WorkOrderServiceUpsertWithoutInspectionAssignmentsInput
+  disconnect?: Prisma.WorkOrderServiceWhereInput | boolean
+  delete?: Prisma.WorkOrderServiceWhereInput | boolean
+  connect?: Prisma.WorkOrderServiceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkOrderServiceUpdateToOneWithWhereWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUpdateWithoutInspectionAssignmentsInput>, Prisma.WorkOrderServiceUncheckedUpdateWithoutInspectionAssignmentsInput>
+}
+
 export type WorkOrderServiceCreateWithoutWorkOrderInput = {
   id?: string
   organizationId: string
@@ -464,6 +492,7 @@ export type WorkOrderServiceCreateWithoutWorkOrderInput = {
   endDate: Date | string
   status?: $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageCreateNestedManyWithoutServiceInput
+  inspectionAssignments?: Prisma.InspectionAssignmentCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceUncheckedCreateWithoutWorkOrderInput = {
@@ -475,6 +504,7 @@ export type WorkOrderServiceUncheckedCreateWithoutWorkOrderInput = {
   endDate: Date | string
   status?: $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageUncheckedCreateNestedManyWithoutServiceInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceCreateOrConnectWithoutWorkOrderInput = {
@@ -526,6 +556,7 @@ export type WorkOrderServiceCreateWithoutImagesInput = {
   endDate: Date | string
   status?: $Enums.WorkOrderServiceStatus
   workOrder: Prisma.WorkOrderCreateNestedOneWithoutServicesInput
+  inspectionAssignments?: Prisma.InspectionAssignmentCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceUncheckedCreateWithoutImagesInput = {
@@ -537,6 +568,7 @@ export type WorkOrderServiceUncheckedCreateWithoutImagesInput = {
   startDate: Date | string
   endDate: Date | string
   status?: $Enums.WorkOrderServiceStatus
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedCreateNestedManyWithoutWorkOrderServiceInput
 }
 
 export type WorkOrderServiceCreateOrConnectWithoutImagesInput = {
@@ -564,6 +596,7 @@ export type WorkOrderServiceUpdateWithoutImagesInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
   workOrder?: Prisma.WorkOrderUpdateOneRequiredWithoutServicesNestedInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUpdateManyWithoutWorkOrderServiceNestedInput
 }
 
 export type WorkOrderServiceUncheckedUpdateWithoutImagesInput = {
@@ -575,6 +608,71 @@ export type WorkOrderServiceUncheckedUpdateWithoutImagesInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedUpdateManyWithoutWorkOrderServiceNestedInput
+}
+
+export type WorkOrderServiceCreateWithoutInspectionAssignmentsInput = {
+  id?: string
+  organizationId: string
+  name: string
+  description: string
+  startDate: Date | string
+  endDate: Date | string
+  status?: $Enums.WorkOrderServiceStatus
+  workOrder: Prisma.WorkOrderCreateNestedOneWithoutServicesInput
+  images?: Prisma.WorkOrderServiceImageCreateNestedManyWithoutServiceInput
+}
+
+export type WorkOrderServiceUncheckedCreateWithoutInspectionAssignmentsInput = {
+  id?: string
+  organizationId: string
+  workOrderId: string
+  name: string
+  description: string
+  startDate: Date | string
+  endDate: Date | string
+  status?: $Enums.WorkOrderServiceStatus
+  images?: Prisma.WorkOrderServiceImageUncheckedCreateNestedManyWithoutServiceInput
+}
+
+export type WorkOrderServiceCreateOrConnectWithoutInspectionAssignmentsInput = {
+  where: Prisma.WorkOrderServiceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkOrderServiceCreateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedCreateWithoutInspectionAssignmentsInput>
+}
+
+export type WorkOrderServiceUpsertWithoutInspectionAssignmentsInput = {
+  update: Prisma.XOR<Prisma.WorkOrderServiceUpdateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedUpdateWithoutInspectionAssignmentsInput>
+  create: Prisma.XOR<Prisma.WorkOrderServiceCreateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedCreateWithoutInspectionAssignmentsInput>
+  where?: Prisma.WorkOrderServiceWhereInput
+}
+
+export type WorkOrderServiceUpdateToOneWithWhereWithoutInspectionAssignmentsInput = {
+  where?: Prisma.WorkOrderServiceWhereInput
+  data: Prisma.XOR<Prisma.WorkOrderServiceUpdateWithoutInspectionAssignmentsInput, Prisma.WorkOrderServiceUncheckedUpdateWithoutInspectionAssignmentsInput>
+}
+
+export type WorkOrderServiceUpdateWithoutInspectionAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
+  workOrder?: Prisma.WorkOrderUpdateOneRequiredWithoutServicesNestedInput
+  images?: Prisma.WorkOrderServiceImageUpdateManyWithoutServiceNestedInput
+}
+
+export type WorkOrderServiceUncheckedUpdateWithoutInspectionAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  workOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
+  images?: Prisma.WorkOrderServiceImageUncheckedUpdateManyWithoutServiceNestedInput
 }
 
 export type WorkOrderServiceCreateManyWorkOrderInput = {
@@ -596,6 +694,7 @@ export type WorkOrderServiceUpdateWithoutWorkOrderInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageUpdateManyWithoutServiceNestedInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUpdateManyWithoutWorkOrderServiceNestedInput
 }
 
 export type WorkOrderServiceUncheckedUpdateWithoutWorkOrderInput = {
@@ -607,6 +706,7 @@ export type WorkOrderServiceUncheckedUpdateWithoutWorkOrderInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumWorkOrderServiceStatusFieldUpdateOperationsInput | $Enums.WorkOrderServiceStatus
   images?: Prisma.WorkOrderServiceImageUncheckedUpdateManyWithoutServiceNestedInput
+  inspectionAssignments?: Prisma.InspectionAssignmentUncheckedUpdateManyWithoutWorkOrderServiceNestedInput
 }
 
 export type WorkOrderServiceUncheckedUpdateManyWithoutWorkOrderInput = {
@@ -626,10 +726,12 @@ export type WorkOrderServiceUncheckedUpdateManyWithoutWorkOrderInput = {
 
 export type WorkOrderServiceCountOutputType = {
   images: number
+  inspectionAssignments: number
 }
 
 export type WorkOrderServiceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | WorkOrderServiceCountOutputTypeCountImagesArgs
+  inspectionAssignments?: boolean | WorkOrderServiceCountOutputTypeCountInspectionAssignmentsArgs
 }
 
 /**
@@ -649,6 +751,13 @@ export type WorkOrderServiceCountOutputTypeCountImagesArgs<ExtArgs extends runti
   where?: Prisma.WorkOrderServiceImageWhereInput
 }
 
+/**
+ * WorkOrderServiceCountOutputType without action
+ */
+export type WorkOrderServiceCountOutputTypeCountInspectionAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InspectionAssignmentWhereInput
+}
+
 
 export type WorkOrderServiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -661,6 +770,7 @@ export type WorkOrderServiceSelect<ExtArgs extends runtime.Types.Extensions.Inte
   status?: boolean
   workOrder?: boolean | Prisma.WorkOrderDefaultArgs<ExtArgs>
   images?: boolean | Prisma.WorkOrderService$imagesArgs<ExtArgs>
+  inspectionAssignments?: boolean | Prisma.WorkOrderService$inspectionAssignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkOrderServiceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workOrderService"]>
 
@@ -703,6 +813,7 @@ export type WorkOrderServiceOmit<ExtArgs extends runtime.Types.Extensions.Intern
 export type WorkOrderServiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workOrder?: boolean | Prisma.WorkOrderDefaultArgs<ExtArgs>
   images?: boolean | Prisma.WorkOrderService$imagesArgs<ExtArgs>
+  inspectionAssignments?: boolean | Prisma.WorkOrderService$inspectionAssignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkOrderServiceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WorkOrderServiceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -717,6 +828,7 @@ export type $WorkOrderServicePayload<ExtArgs extends runtime.Types.Extensions.In
   objects: {
     workOrder: Prisma.$WorkOrderPayload<ExtArgs>
     images: Prisma.$WorkOrderServiceImagePayload<ExtArgs>[]
+    inspectionAssignments: Prisma.$InspectionAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1123,6 +1235,7 @@ export interface Prisma__WorkOrderServiceClient<T, Null = never, ExtArgs extends
   readonly [Symbol.toStringTag]: "PrismaPromise"
   workOrder<T extends Prisma.WorkOrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkOrderDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkOrderClient<runtime.Types.Result.GetResult<Prisma.$WorkOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   images<T extends Prisma.WorkOrderService$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkOrderService$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkOrderServiceImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inspectionAssignments<T extends Prisma.WorkOrderService$inspectionAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkOrderService$inspectionAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InspectionAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1582,6 +1695,30 @@ export type WorkOrderService$imagesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.WorkOrderServiceImageScalarFieldEnum | Prisma.WorkOrderServiceImageScalarFieldEnum[]
+}
+
+/**
+ * WorkOrderService.inspectionAssignments
+ */
+export type WorkOrderService$inspectionAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InspectionAssignment
+   */
+  select?: Prisma.InspectionAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InspectionAssignment
+   */
+  omit?: Prisma.InspectionAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InspectionAssignmentInclude<ExtArgs> | null
+  where?: Prisma.InspectionAssignmentWhereInput
+  orderBy?: Prisma.InspectionAssignmentOrderByWithRelationInput | Prisma.InspectionAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.InspectionAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InspectionAssignmentScalarFieldEnum | Prisma.InspectionAssignmentScalarFieldEnum[]
 }
 
 /**
