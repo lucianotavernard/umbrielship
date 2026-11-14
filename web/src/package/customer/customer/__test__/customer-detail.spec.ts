@@ -8,6 +8,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { toast } from '../../../shared/components/ui/toaster';
 import { CustomerDetail } from '../customer-detail/customer-detail';
 import { customerDetailResources } from '../customer-detail/customer-detail.resources';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({ template: 'Página não encontrada' })
 class NotFoundStub {}
@@ -48,6 +49,8 @@ describe('CustomerDetail', () => {
       ],
     });
     controller = TestBed.inject(HttpTestingController);
+    // Write controls render only for a Role that may write.
+    TestBed.inject(AuthenticationService).role.set('operator');
   });
 
   afterEach(() => controller.verify());

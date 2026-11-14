@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { WorkOrderDetail } from '../work-order-detail/work-order-detail';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 describe('WorkOrderDetail', () => {
   let controller: HttpTestingController;
@@ -13,6 +14,8 @@ describe('WorkOrderDetail', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     controller = TestBed.inject(HttpTestingController);
+    // Write controls render only for a Role that may write.
+    TestBed.inject(AuthenticationService).role.set('operator');
   });
 
   afterEach(() => controller.verify());

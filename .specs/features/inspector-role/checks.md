@@ -5,7 +5,7 @@ Run api: `cd api && npx vitest run --reporter=verbose`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/*.inspector.spec.ts'`
 Plan: `.specs/features/inspector-role/plan.md`
 
-30 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
+31 checks in 2 slices · 2 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -75,6 +75,7 @@ Proof: run api | ✓ roles.guard.spec.ts > inspector C30 keeps the statuses of /
 **C19** - The Papel select of the User form and of the Invitation form offers "Administrador", "Operador", "Inspetor" in that order, and submitting "Inspetor" sends `role: "inspector"` (AC 13, 14)
 Proof: run web | ✓ user-form.inspector.spec.ts > inspector C19 offers Administrador, Operador and Inspetor and sends role inspector
 Proof: run web | ✓ organization-detail.inspector.spec.ts > inspector C19 the Invitation form offers Inspetor and sends role inspector
+Proof: run web | ✓ organization-detail.inspector.spec.ts > inspector C19 the User form posts role inspector to POST /users
 
 **C20** - Organization detail shows the badge "Inspetor" for an inspector in the Users list and renders no Role counts (AC 14, 15)
 Proof: run web | ✓ organization-detail.inspector.spec.ts > inspector C20 shows the Inspetor badge and no Role counts
@@ -106,6 +107,9 @@ Proof: run web | ✓ write-access.inspector.spec.ts > inspector C28 the five pag
 **C29** - The Role that decides the controls is the one `GET /me` returns after the switch reloads the page: operator in A, inspector in B, after switching to B no write control renders (AC 24)
 Proof: run web | ✓ internal-layout.inspector.spec.ts > inspector C29 the session Role follows GET /me after an Organization switch
 
+**C31** - While the session's Role is not loaded (`null`) or is not `administrator` or `operator` (`auditor`), the pages of C22 to C26 render no write control (AC 25)
+Proof: run web | ✓ write-access.inspector.spec.ts > inspector C31 the five pages render no write control while the Role is not loaded or is not a writer
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -117,6 +121,7 @@ Proof: run web | ✓ internal-layout.inspector.spec.ts > inspector C29 the sessi
 | AC 1 examples (3) | ordinary Organization C2 · internal Organization C2 · `auditor` → 400 C1 | - |
 | Role readers in the API (6) | `POST /users` Zod C1 · `POST /invitations` Zod C3 · session `UserPayload` C5 · `CountOrganizationRolesUseCase` C6 · `InternalAdministratorGuard` C13 · Invitation email label C18 | - |
 | Role readers in the web (4) | User form C19 · Invitation form C19 · Users list badge C20 · switcher C21 | - |
+| session Role values on the five pages (5) | `administrator` C27 · `operator` C27 · `inspector` C22 · not loaded C31 · unknown C31 | - |
 | pages with write controls, AC 17-21 (5) | `customers` C22 · `customers/:id` C23 · `vessels` C24 · `vessels/:id` C25 · `work-orders/:id` C26 | - |
 | `POST /users` statuses (3) | 201 C1 · 400 C1 · 403 C13 | - |
 | `POST /invitations` statuses (3) | 201 C3 · 400 C30 · 403 C13 | - |
@@ -140,7 +145,7 @@ Proof: run web | ✓ internal-layout.inspector.spec.ts > inspector C29 the sessi
 
 ## Handoff
 
-- **Settled mid-build:** user: "Commit separado antes (Recomendado)" - the owner's in-flight work is committed on `feat/inspector-role` as `bb26f6d`, before this feature. user: "Isolar os testes do S2 (Recomendado)" - 9 web tests in the owner's in-flight specs (customer-list, customer-detail, vessel-detail, work-order-detail) were red before this feature; S2's tests live in `*.inspector.spec.ts` files and `Run web` selects only those, so the 9 stay as they are for the owner. user: "Retirar do plano (Recomendado)" - Organization detail shows no Role counts today, so AC 15 and C20 now hold that it still shows none. user: "Seguir o plano (Recomendado)" - the Papel select order becomes Administrador, Operador, Inspetor (it was Operador, Administrador); the default stays Operador
-- **Dispatched:** none
-- **Boundary:** none yet
+- **Settled mid-build:** user: "Commit separado antes (Recomendado)" - the owner's in-flight work is committed on `feat/inspector-role` as `bb26f6d`, before this feature. user: "Isolar os testes do S2 (Recomendado)" - 9 web tests in the owner's in-flight specs (customer-list, customer-detail, vessel-detail, work-order-detail) were red before this feature; S2's tests live in `*.inspector.spec.ts` files and `Run web` selects only those, so the 9 stay as they are for the owner. user: "Retirar do plano (Recomendado)" - Organization detail shows no Role counts today, so AC 15 and C20 now hold that it still shows none. user: "Seguir o plano (Recomendado)" - the Papel select order becomes Administrador, Operador, Inspetor (it was Operador, Administrador); the default stays Operador. Verifier findings 1-2: `canWrite` now uses the writer allow-list, so the owner's specs that click write controls (customer-list, customer-detail, vessel-list, vessel-detail, work-order-detail) set an `operator` session in their setup; their assertions are unchanged
+- **Dispatched:** Verifier at `6be756e` (no screens sub-agent: no criterion cites a capture)
+- **Boundary:** C1-C30 closed at `6be756e`
 - **Abandoned:** none

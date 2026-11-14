@@ -112,4 +112,40 @@ describe('OrganizationDetail with inspectors', () => {
       .match(() => true)
       .forEach((request) => request.flush({ invitations: [], users: [], total: 0 }));
   });
+
+  it('inspector C19 the User form posts role inspector to POST /users', async () => {
+    const element = await render();
+
+    [...element.querySelectorAll('button')]
+      .find((button) => button.textContent?.trim() === 'Novo usuário')
+      ?.click();
+    await settle();
+    fill(element, '#user-name', 'Ines');
+    fill(element, '#user-email', 'ines@atlantic.test');
+    fill(element, '#user-password', 'secret-pass');
+    fill(element, '#user-role', 'inspector');
+    await settle();
+    element.querySelector<HTMLInputElement>('#user-name')?.closest('form')?.requestSubmit();
+    await settle();
+
+    const created = controller.expectOne('/api/users');
+    expect(created.request.method).toBe('POST');
+    expect(created.request.body).toEqual({
+      name: 'Ines',
+      email: 'ines@atlantic.test',
+      password: 'secret-pass',
+      role: 'inspector',
+      organizationId: 'org-1',
+    });
+    created.flush({
+      id: 'user-ines',
+      name: 'Ines',
+      email: 'ines@atlantic.test',
+      role: 'inspector',
+    });
+    await settle();
+    controller
+      .match(() => true)
+      .forEach((request) => request.flush({ users: [], roles: [], total: 0 }));
+  });
 });

@@ -35,6 +35,8 @@ export type MeResponse = {
   };
 };
 
+const WRITERS: Role[] = ['administrator', 'operator'];
+
 const TOKEN_KEY = '@umbriel:access-token';
 const ORGANIZATION_SWITCHED_KEY = '@umbriel:organization-switched';
 const ORGANIZATION_CHANGED_KEY = '@umbriel:organization-changed';
@@ -48,8 +50,12 @@ export class AuthenticationService {
 
   // The Role of the active Membership, set by the layout from GET /me.
   role = signal<Role | null>(null);
-  // An inspector reads and writes nothing it reads; the API refuses it with 403.
-  canWrite = computed(() => this.role() !== 'inspector');
+  // The same allow-list as the API's WRITERS: an inspector, an unknown Role and a session
+  // whose Role is not loaded yet see no write control.
+  canWrite = computed(() => {
+    const role = this.role();
+    return role !== null && WRITERS.includes(role);
+  });
 
   me() {
     return this.http.get<MeResponse>('/api/me');

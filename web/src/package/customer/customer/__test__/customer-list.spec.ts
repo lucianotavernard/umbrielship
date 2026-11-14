@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { toast } from '../../../shared/components/ui/toaster';
 import { CustomerList } from '../customer-list/customer-list';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 describe('CustomerList', () => {
   let controller: HttpTestingController;
@@ -14,6 +15,8 @@ describe('CustomerList', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     controller = TestBed.inject(HttpTestingController);
+    // Write controls render only for a Role that may write.
+    TestBed.inject(AuthenticationService).role.set('operator');
   });
 
   afterEach(() => controller.verify());

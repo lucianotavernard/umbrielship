@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { toast } from '../../../shared/components/ui/toaster';
 import { VesselDetail } from '../vessel-detail/vessel-detail';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 const aurora = {
   id: 'vessel-1',
@@ -25,6 +26,8 @@ describe('VesselDetail', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     controller = TestBed.inject(HttpTestingController);
+    // Write controls render only for a Role that may write.
+    TestBed.inject(AuthenticationService).role.set('operator');
   });
 
   afterEach(() => controller.verify());

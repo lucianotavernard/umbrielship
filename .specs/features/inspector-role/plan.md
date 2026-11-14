@@ -141,6 +141,7 @@ An internal Administrator picks "Inspetor" in the forms; a signed-in inspector b
     - an operator on `customers` → the control that opens "Novo cliente" is present
 23. WHILE the session's Role is `inspector`, the pages of criteria 17 to 21 SHALL show the same lists, details and images an operator sees
 24. WHEN a User switches from an Organization where it is `operator` to one where it is `inspector` THEN the page shown after the switch SHALL render no write control, without a new sign-in
+25. WHILE the session's Role is not loaded yet, or is a value other than `administrator` and `operator`, the pages of criteria 17 to 21 SHALL render no write control - the web decides from the same allow-list the API does (added after verification)
 
 ## Out of scope
 
