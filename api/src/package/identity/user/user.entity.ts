@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-export type Role = 'administrator' | 'operator';
+export type Role = 'administrator' | 'operator' | 'inspector';
 
 export type Membership = {
   organizationId: string;

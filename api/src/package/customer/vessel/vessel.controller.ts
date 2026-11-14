@@ -17,6 +17,7 @@ import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/alr
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import { Roles, WRITERS } from '@/package/shared/module/auth/roles.js';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { CreateVesselUseCase } from './create-vessel.use-case.js';
@@ -113,6 +114,7 @@ export class VesselController {
     }
   }
 
+  @Roles(...WRITERS)
   @Post('/vessels')
   async create(
     @CurrentUser() user: UserPayload,
@@ -145,6 +147,7 @@ export class VesselController {
     }
   }
 
+  @Roles(...WRITERS)
   @Put('/customers/:customerId/vessels/:id')
   async edit(
     @CurrentUser() user: UserPayload,
@@ -174,6 +177,7 @@ export class VesselController {
     }
   }
 
+  @Roles(...WRITERS)
   @Delete('/vessels/:id')
   @HttpCode(204)
   async delete(

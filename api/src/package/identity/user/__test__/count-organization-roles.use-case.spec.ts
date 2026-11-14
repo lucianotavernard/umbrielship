@@ -12,7 +12,7 @@ let organizations: InMemoryOrganizationsRepository;
 
 const member = (
   id: string,
-  role: 'administrator' | 'operator',
+  role: 'administrator' | 'operator' | 'inspector',
   organizationId = 'o1',
 ) => {
   const user = makeUser({
@@ -42,6 +42,7 @@ describe('CountOrganizationRolesUseCase', () => {
     expect((await sut.handle({ organizationId: 'o1' })).roles).toEqual([
       { role: 'administrator', users: 1 },
       { role: 'operator', users: 2 },
+      { role: 'inspector', users: 0 },
     ]);
 
     organizations.items.push(
@@ -50,6 +51,7 @@ describe('CountOrganizationRolesUseCase', () => {
     expect((await sut.handle({ organizationId: 'o3' })).roles).toEqual([
       { role: 'administrator', users: 0 },
       { role: 'operator', users: 0 },
+      { role: 'inspector', users: 0 },
     ]);
   });
 
@@ -63,5 +65,26 @@ describe('CountOrganizationRolesUseCase', () => {
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Organization not found');
+  });
+
+  it('inspector C6 lists administrator, operator and inspector in that order with zero inspectors', async () => {
+    const sut = new CountOrganizationRolesUseCase(users, organizations);
+
+    expect((await sut.handle({ organizationId: 'o1' })).roles).toEqual([
+      { role: 'administrator', users: 1 },
+      { role: 'operator', users: 2 },
+      { role: 'inspector', users: 0 },
+    ]);
+
+    users.items.push(
+      member('u5', 'inspector'),
+      member('u6', 'inspector', 'o2'),
+    );
+
+    expect((await sut.handle({ organizationId: 'o1' })).roles).toEqual([
+      { role: 'administrator', users: 1 },
+      { role: 'operator', users: 2 },
+      { role: 'inspector', users: 1 },
+    ]);
   });
 });

@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import { Roles, WRITERS } from '@/package/shared/module/auth/roles.js';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { CreateWorkOrderServiceUseCase } from './create-work-order-service.use-case.js';
@@ -87,6 +88,7 @@ export class WorkOrderServiceController {
     }
   }
 
+  @Roles(...WRITERS)
   @Post()
   async create(
     @CurrentUser() user: UserPayload,
@@ -111,6 +113,7 @@ export class WorkOrderServiceController {
     }
   }
 
+  @Roles(...WRITERS)
   @Put(':id')
   async edit(
     @CurrentUser() user: UserPayload,
@@ -137,6 +140,7 @@ export class WorkOrderServiceController {
     }
   }
 
+  @Roles(...WRITERS)
   @Delete(':id')
   @HttpCode(204)
   async delete(

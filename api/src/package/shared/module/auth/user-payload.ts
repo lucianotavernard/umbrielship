@@ -1,6 +1,8 @@
+export type Role = 'administrator' | 'operator' | 'inspector';
+
 export type UserPayload = {
   sub: string;
   organizationId: string;
-  role: 'administrator' | 'operator';
+  role: Role;
   internal: boolean;
 };

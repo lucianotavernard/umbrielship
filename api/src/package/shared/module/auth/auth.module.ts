@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@/package/shared/module/config/config.module.js';
 import { ConfigService } from '@/package/shared/module/config/config.service.js';
 import { JwtAuthGuard } from '@/package/shared/module/auth/jwt-auth.guard.js';
+import { RolesGuard } from '@/package/shared/module/auth/roles.guard.js';
 
 @Module({
   imports: [
@@ -27,9 +28,14 @@ import { JwtAuthGuard } from '@/package/shared/module/auth/jwt-auth.guard.js';
     }),
   ],
   providers: [
+    // Order matters: the Role is read from the session JwtAuthGuard resolves.
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

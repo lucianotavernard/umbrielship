@@ -72,4 +72,20 @@ describe('GetProfileUseCase', () => {
     await expect(promise).rejects.toBeInstanceOf(NotFoundDomainException);
     await expect(promise).rejects.toThrow('Organization not found');
   });
+
+  it('inspector C5 returns role inspector for the active Organization and its Membership', async () => {
+    users.items.push(
+      makeUser({
+        activeOrganizationId: 'org-2',
+        memberships: [{ organizationId: 'org-2', role: 'inspector' }],
+      }),
+    );
+
+    const { user } = await sut.handle('user-1');
+
+    expect(user.role).toBe('inspector');
+    expect(user.organizations).toEqual([
+      { id: 'org-2', name: 'Atlantic', isInternal: false, role: 'inspector' },
+    ]);
+  });
 });

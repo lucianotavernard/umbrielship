@@ -37,4 +37,10 @@ describe('InternalAdministratorGuard', () => {
       ForbiddenException,
     );
   });
+
+  it('inspector C13 throws ForbiddenException for an internal inspector', () => {
+    expect(() =>
+      sut.canActivate(contextOf({ internal: true, role: 'inspector' })),
+    ).toThrow(ForbiddenException);
+  });
 });

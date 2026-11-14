@@ -180,4 +180,16 @@ describe('documents follow the acme platform', () => {
     expect(roadmapItem(roadmap, 7)).toContain('(proposal)');
     expectNone(roadmap, ['whoami', 'by hand'], 'ROADMAP.md');
   });
+
+  it('inspector C16 CONTEXT.md and AGENTS.md name the three Roles', () => {
+    const context = read('CONTEXT.md');
+    const role = context.split('**Role**:')[1].split('\n\n')[0];
+    expect(role).toContain('`administrator`, `operator` or `inspector`');
+    expect(role).toMatch(/`inspector` reads every record of its Organization/);
+
+    const agents = read('AGENTS.md');
+    expect(agents).toContain(
+      'A Role (`administrator`, `operator`, `inspector`) belongs to a Membership.',
+    );
+  });
 });

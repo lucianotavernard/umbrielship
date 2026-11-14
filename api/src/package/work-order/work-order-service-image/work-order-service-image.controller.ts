@@ -19,6 +19,7 @@ import { diskStorage } from 'multer';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import { Roles, WRITERS } from '@/package/shared/module/auth/roles.js';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { AddWorkOrderServiceImageUseCase } from './add-work-order-service-image.use-case.js';
@@ -74,6 +75,7 @@ export class WorkOrderServiceImageController {
     }
   }
 
+  @Roles(...WRITERS)
   @Post()
   @UseInterceptors(FileInterceptor('file', serviceImageMulterOptions()))
   async upload(
@@ -106,6 +108,7 @@ export class WorkOrderServiceImageController {
     }
   }
 
+  @Roles(...WRITERS)
   @Delete(':id')
   @HttpCode(204)
   async delete(

@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   administrator
   operator
+  inspector
 
   @@map("role")
 }

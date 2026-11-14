@@ -73,4 +73,15 @@ describe('AcceptInvitationUseCase', () => {
     expect(accept).not.toHaveBeenCalled();
     expect(users.items[0].memberships).toHaveLength(2);
   });
+
+  it('inspector C4 accepting an inspector Invitation stores the Membership with Role inspector', async () => {
+    invitations.items[0].role = 'inspector';
+
+    await sut.handle({ secret: 'secret-1' });
+
+    expect(users.items[0].memberships).toEqual([
+      { organizationId: 'org-1', role: 'operator' },
+      { organizationId: 'dest', role: 'inspector' },
+    ]);
+  });
 });

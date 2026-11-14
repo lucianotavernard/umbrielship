@@ -17,7 +17,7 @@ The link between a User and an Organization, with a Role. A User has at most one
 *Avoid*: member, seat
 
 **Role**:
-What a User may do in an Organization, set on its Membership: `administrator` or `operator`. Only an Administrator of the internal Organization may manage Organizations, Users and Invitations.
+What a User may do in an Organization, set on its Membership: `administrator`, `operator` or `inspector`. An `administrator` and an `operator` read and write the Organization's Customers, Vessels and WorkOrders. An `inspector` reads every record of its Organization and writes none of them; it is the Role that will record inspections. Only an Administrator of the internal Organization may manage Organizations, Users and Invitations.
 *Avoid*: permission, privilege level
 
 **Invitation**:
