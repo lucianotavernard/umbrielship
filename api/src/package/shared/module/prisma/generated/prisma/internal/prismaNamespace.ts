@@ -408,7 +408,9 @@ export const ModelName = {
   Vessel: 'Vessel',
   CustomerAddress: 'CustomerAddress',
   InspectionTemplate: 'InspectionTemplate',
-  InspectionTemplateItem: 'InspectionTemplateItem'
+  InspectionTemplateItem: 'InspectionTemplateItem',
+  InspectionAssignment: 'InspectionAssignment',
+  InspectionAssignmentItem: 'InspectionAssignmentItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -424,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "user" | "membership" | "invitation" | "customer" | "workOrder" | "workOrderService" | "workOrderServiceImage" | "vessel" | "customerAddress" | "inspectionTemplate" | "inspectionTemplateItem"
+    modelProps: "organization" | "user" | "membership" | "invitation" | "customer" | "workOrder" | "workOrderService" | "workOrderServiceImage" | "vessel" | "customerAddress" | "inspectionTemplate" | "inspectionTemplateItem" | "inspectionAssignment" | "inspectionAssignmentItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1316,6 +1318,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InspectionAssignment: {
+      payload: Prisma.$InspectionAssignmentPayload<ExtArgs>
+      fields: Prisma.InspectionAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InspectionAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InspectionAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.InspectionAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InspectionAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.InspectionAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.InspectionAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.InspectionAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InspectionAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.InspectionAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        update: {
+          args: Prisma.InspectionAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.InspectionAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InspectionAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InspectionAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.InspectionAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.InspectionAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspectionAssignment>
+        }
+        groupBy: {
+          args: Prisma.InspectionAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InspectionAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    InspectionAssignmentItem: {
+      payload: Prisma.$InspectionAssignmentItemPayload<ExtArgs>
+      fields: Prisma.InspectionAssignmentItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InspectionAssignmentItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InspectionAssignmentItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        findFirst: {
+          args: Prisma.InspectionAssignmentItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InspectionAssignmentItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        findMany: {
+          args: Prisma.InspectionAssignmentItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>[]
+        }
+        create: {
+          args: Prisma.InspectionAssignmentItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        createMany: {
+          args: Prisma.InspectionAssignmentItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InspectionAssignmentItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>[]
+        }
+        delete: {
+          args: Prisma.InspectionAssignmentItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        update: {
+          args: Prisma.InspectionAssignmentItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.InspectionAssignmentItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InspectionAssignmentItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InspectionAssignmentItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.InspectionAssignmentItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspectionAssignmentItemPayload>
+        }
+        aggregate: {
+          args: Prisma.InspectionAssignmentItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspectionAssignmentItem>
+        }
+        groupBy: {
+          args: Prisma.InspectionAssignmentItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAssignmentItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InspectionAssignmentItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspectionAssignmentItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1494,6 +1644,30 @@ export const InspectionTemplateItemScalarFieldEnum = {
 } as const
 
 export type InspectionTemplateItemScalarFieldEnum = (typeof InspectionTemplateItemScalarFieldEnum)[keyof typeof InspectionTemplateItemScalarFieldEnum]
+
+
+export const InspectionAssignmentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  workOrderId: 'workOrderId',
+  workOrderServiceId: 'workOrderServiceId',
+  templateName: 'templateName',
+  assignedBy: 'assignedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type InspectionAssignmentScalarFieldEnum = (typeof InspectionAssignmentScalarFieldEnum)[keyof typeof InspectionAssignmentScalarFieldEnum]
+
+
+export const InspectionAssignmentItemScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  assignmentId: 'assignmentId',
+  label: 'label',
+  position: 'position'
+} as const
+
+export type InspectionAssignmentItemScalarFieldEnum = (typeof InspectionAssignmentItemScalarFieldEnum)[keyof typeof InspectionAssignmentItemScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1835,6 +2009,8 @@ export type GlobalOmitConfig = {
   customerAddress?: Prisma.CustomerAddressOmit
   inspectionTemplate?: Prisma.InspectionTemplateOmit
   inspectionTemplateItem?: Prisma.InspectionTemplateItemOmit
+  inspectionAssignment?: Prisma.InspectionAssignmentOmit
+  inspectionAssignmentItem?: Prisma.InspectionAssignmentItemOmit
 }
 
 /* Types for Logging */

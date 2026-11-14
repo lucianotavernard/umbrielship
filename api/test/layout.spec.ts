@@ -25,6 +25,7 @@ const aggregates = [
   'work-order/work-order-service',
   'work-order/work-order-service-image',
   'work-order/inspection-template',
+  'work-order/inspection-assignment',
   'identity/auth',
   'identity/user',
   'identity/organization',
@@ -86,6 +87,7 @@ describe('acme layout', () => {
       'IWorkOrderServicesRepository',
       'IWorkOrderServiceImagesRepository',
       'IInspectionTemplatesRepository',
+      'IInspectionAssignmentsRepository',
       'IUsersRepository',
       'IOrganizationsRepository',
       'IInvitationsRepository',
@@ -153,6 +155,9 @@ describe('acme layout', () => {
         'POST /inspection-templates',
         'PUT /inspection-templates/:id',
         'DELETE /inspection-templates/:id',
+        'GET /work-orders/:workOrderId/inspection-assignments',
+        'POST /work-orders/:workOrderId/inspection-assignments',
+        'DELETE /work-orders/:workOrderId/inspection-assignments/:id',
         'POST /sessions',
         'GET /me',
         'POST /organizations/switch',
@@ -181,6 +186,7 @@ describe('acme layout', () => {
         'work-order-service.controller.ts',
         'work-order-service-image.controller.ts',
         'inspection-template.controller.ts',
+        'inspection-assignment.controller.ts',
         'authentication.controller.ts',
         'organization.controller.ts',
         'user.controller.ts',
@@ -252,8 +258,11 @@ describe('acme layout', () => {
   });
 
   it('template C12 every POST, PUT and DELETE handler under customer and work-order declares its Roles', () => {
-    // Only an administrator writes InspectionTemplates; the rest write as administrator or operator.
-    const administratorOnly = ['work-order/inspection-template/'];
+    // Only an administrator writes InspectionTemplates and InspectionAssignments; the rest write as administrator or operator.
+    const administratorOnly = [
+      'work-order/inspection-template/',
+      'work-order/inspection-assignment/',
+    ];
     const writers: string[] = [];
 
     for (const file of files.filter(
@@ -281,6 +290,6 @@ describe('acme layout', () => {
     ).toHaveLength(14);
     expect(
       writers.filter((line) => line.endsWith("('administrator')")),
-    ).toHaveLength(3);
+    ).toHaveLength(5);
   });
 });

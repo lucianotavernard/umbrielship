@@ -223,6 +223,7 @@ describe('InspectionTemplate routes over HTTP', () => {
     expect(fakes.fetch.handle).toHaveBeenCalledWith({
       organizationId: ORGANIZATION,
       page: 2,
+      perPage: 10,
     });
     expect(response.body).toEqual({
       inspectionTemplates: [
@@ -253,6 +254,27 @@ describe('InspectionTemplate routes over HTTP', () => {
         { id: expect.any(String), label: 'B', position: 1 },
       ],
     });
+  });
+
+  it('assignment C14 passes per_page from 1 to 100 and defaults to 10', async () => {
+    const list = (query: string) =>
+      request(app.getHttpServer())
+        .get(`/inspection-templates${query}`)
+        .set('Authorization', `Bearer ${tokens.operator}`);
+
+    expect((await list('')).status).toBe(200);
+    expect((await list('?per_page=1')).status).toBe(200);
+    expect((await list('?page=2&per_page=100')).status).toBe(200);
+    expect(fakes.fetch.handle.mock.calls.map(([input]) => input)).toEqual([
+      { organizationId: ORGANIZATION, page: 1, perPage: 10 },
+      { organizationId: ORGANIZATION, page: 1, perPage: 1 },
+      { organizationId: ORGANIZATION, page: 2, perPage: 100 },
+    ]);
+
+    for (const query of ['?per_page=0', '?per_page=101', '?per_page=abc']) {
+      expect((await list(query)).status, query).toBe(400);
+    }
+    expect(fakes.fetch.handle).toHaveBeenCalledTimes(3);
   });
 
   it('template C10 answers 404 to get, put and delete of an unknown id', async () => {
