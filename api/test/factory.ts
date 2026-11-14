@@ -12,6 +12,10 @@ import {
 } from '@/package/identity/organization/organization.entity.js';
 import { User, UserProps } from '@/package/identity/user/user.entity.js';
 import {
+  InspectionTemplate,
+  InspectionTemplateProps,
+} from '@/package/work-order/inspection-template/inspection-template.entity.js';
+import {
   WorkOrderServiceImage,
   WorkOrderServiceImageProps,
 } from '@/package/work-order/work-order-service-image/work-order-service-image.entity.js';
@@ -129,6 +133,20 @@ export const makeOrganization = (
       name: 'Atlantic Marine',
       email: 'contact@atlantic-marine.test',
       isInternal: false,
+      ...override,
+    },
+    id,
+  );
+
+export const makeInspectionTemplate = (
+  override: Partial<InspectionTemplateProps> = {},
+  id?: string,
+) =>
+  InspectionTemplate.create(
+    {
+      organizationId: 'org-1',
+      name: 'Pintura do casco',
+      labels: ['Casco limpo', 'Pintura sem bolhas'],
       ...override,
     },
     id,

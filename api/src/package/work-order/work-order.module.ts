@@ -3,6 +3,14 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 
 import { CustomerModule } from '../customer/customer.module.js';
+import { IInspectionTemplatesRepository } from './inspection-template/contracts/inspection-template-repository.contract.js';
+import { CreateInspectionTemplateUseCase } from './inspection-template/create-inspection-template.use-case.js';
+import { DeleteInspectionTemplateUseCase } from './inspection-template/delete-inspection-template.use-case.js';
+import { EditInspectionTemplateUseCase } from './inspection-template/edit-inspection-template.use-case.js';
+import { FetchInspectionTemplatesUseCase } from './inspection-template/fetch-inspection-templates.use-case.js';
+import { GetInspectionTemplateByIdUseCase } from './inspection-template/get-inspection-template-by-id.use-case.js';
+import { InspectionTemplateController } from './inspection-template/inspection-template.controller.js';
+import { PrismaInspectionTemplatesRepository } from './inspection-template/inspection-template.repository.js';
 import { IWorkOrdersRepository } from './work-order/contracts/work-order-repository.contract.js';
 import { CreateWorkOrderUseCase } from './work-order/create-work-order.use-case.js';
 import { DeleteWorkOrderUseCase } from './work-order/delete-work-order.use-case.js';
@@ -32,6 +40,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     WorkOrderController,
     WorkOrderServiceController,
     WorkOrderServiceImageController,
+    InspectionTemplateController,
   ],
   providers: [
     CreateWorkOrderUseCase,
@@ -47,6 +56,11 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     AddWorkOrderServiceImageUseCase,
     RemoveWorkOrderServiceImageUseCase,
     FetchWorkOrderServiceImagesUseCase,
+    CreateInspectionTemplateUseCase,
+    FetchInspectionTemplatesUseCase,
+    GetInspectionTemplateByIdUseCase,
+    EditInspectionTemplateUseCase,
+    DeleteInspectionTemplateUseCase,
     { provide: IWorkOrdersRepository, useClass: PrismaWorkOrdersRepository },
     {
       provide: IWorkOrderServicesRepository,
@@ -55,6 +69,10 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     {
       provide: IWorkOrderServiceImagesRepository,
       useClass: PrismaWorkOrderServiceImagesRepository,
+    },
+    {
+      provide: IInspectionTemplatesRepository,
+      useClass: PrismaInspectionTemplatesRepository,
     },
   ],
 })

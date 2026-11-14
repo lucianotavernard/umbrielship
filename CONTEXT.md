@@ -47,3 +47,7 @@ One piece of work inside a WorkOrder: a name, a description, its own period, and
 **WorkOrderServiceImage**:
 An image that documents a WorkOrderService, stored as a `url` under `/uploads/work-order-service-images/`. Deleting its WorkOrderService deletes it.
 *Avoid*: photo, attachment
+
+**InspectionTemplate**:
+A named, ordered checklist of 1 to 100 questions that belongs to one Organization; shown in the app as "Modelo de inspeção". Only an `administrator` creates, edits or deletes it, and every Role reads it. Its name is unique within its Organization, compared without case. Editing replaces its whole question list; deleting it deletes its questions.
+*Avoid*: checklist, form, template (unqualified)

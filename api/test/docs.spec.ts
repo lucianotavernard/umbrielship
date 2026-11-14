@@ -192,4 +192,14 @@ describe('documents follow the acme platform', () => {
       'A Role (`administrator`, `operator`, `inspector`) belongs to a Membership.',
     );
   });
+
+  it('template C13 CONTEXT.md has the InspectionTemplate entry', () => {
+    const entry = glossaryEntry(read('CONTEXT.md'), 'InspectionTemplate');
+
+    expect(entry).toContain('1 to 100 questions');
+    expect(entry).toContain('`administrator`');
+    expect(entry).toContain(
+      'unique within its Organization, compared without case',
+    );
+  });
 });
