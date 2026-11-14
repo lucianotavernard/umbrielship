@@ -5,7 +5,7 @@ Run api: `cd api && npx vitest run --reporter=verbose`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/inspection*/**/*.spec.ts' --include='**/vessel/**/*.spec.ts'`
 Plan: `.specs/features/inspection/plan.md`
 
-40 checks in 4 slices · 4 one-way doors · 0 open, of which 0 block
+41 checks in 4 slices · 4 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -14,6 +14,9 @@ Plan: `.specs/features/inspection/plan.md`
 **C1** - Creating or editing a template stores and returns each item's `type`; a missing type or `"DATE"` answers 400 (AC 1)
 Proof: run api | ✓ create-inspection-template.use-case.spec.ts > inspection C1 stores each question's type
 Proof: run api | ✓ inspection-template.http.spec.ts > inspection C1 requires a question type of the four and returns it
+Proof: run api | ✓ edit-inspection-template.use-case.spec.ts > inspection C1 stores each question's type on an edit
+Proof: run api | ✓ inspection-template.http.spec.ts > inspection C1 passes the types of an edit through
+Proof: run api | ✓ inspection-template.repository.spec.ts > inspection C1 writes each question's type on create and on edit
 
 **C2** - An assignment copies each question's type, and editing the template's types afterwards leaves the copy unchanged (AC 2)
 Proof: run api | ✓ assign-inspection-template.use-case.spec.ts > inspection C2 copies each question's type and keeps it after the template changes
@@ -36,6 +39,7 @@ Proof: run api | ✓ docs.spec.ts > inspection C6 CONTEXT.md describes the quest
 **C7** - Completing stores the Inspection with the given `result`, `completedAt`, the session User's id and name, and one answer per question; the route answers 201 with it (AC 7)
 Proof: run api | ✓ complete-inspection.use-case.spec.ts > inspection C7 stores the Inspection with the result, the inspector and every answer
 Proof: run api | ✓ inspection.http.spec.ts > inspection C7 passes the inspector's id and name and answers 201 with the Inspection
+Proof: run api | ✓ inspection.repository.spec.ts > inspection C7 writes each answer to the column of its value and marks a discard once
 
 **C8** - Each answer is `notApplicable` with no value or a value of its type: text 1 to 1000 trimmed, boolean for `YES_NO` and `CONFORMITY`, integer 0 to 10 for `SCORE`; 0 and 10 pass, 11, 7.5, spaces and `"sim"` answer 409 (AC 8)
 Proof: run api | ✓ complete-inspection.use-case.spec.ts > inspection C8 accepts a value of each type or not applicable and refuses the rest
@@ -66,6 +70,7 @@ Proof: run api | ✓ inspection.http.spec.ts > inspection C15 answers 204 to a d
 
 **C16** - Discarding an already discarded, unknown, foreign-assignment or foreign-Organization Inspection answers 404 and changes nothing (AC 16)
 Proof: run api | ✓ discard-inspection.use-case.spec.ts > inspection C16 throws NotFoundDomainException and changes nothing
+Proof: run api | ✓ inspection.repository.spec.ts > inspection C16 finds only a visible Inspection of the Organization
 
 **C17** - `administrator` and `operator` get 403 `{ statusCode: 403, message: "Forbidden" }` on complete and discard, before validation, with no use case called (AC 17)
 Proof: run api | ✓ inspection.http.spec.ts > inspection C17 refuses complete and discard to administrator and operator with 403 before validation
@@ -92,6 +97,11 @@ Proof: `f=$(ls api/src/package/shared/module/prisma/migrations/*_add_inspections
 **C40** - Every new route answers 401 without a token (Surface)
 Proof: run api | ✓ inspection.http.spec.ts > inspection C40 answers 401 without a token
 
+**C41** - Every new 409 reaches HTTP with its message: completing on refused answers or work, removing an inspected assignment, deleting an inspected WorkOrder or service (Surface, added after verification)
+Proof: run api | ✓ inspection.http.spec.ts > inspection C41 answers 409 with the message when the answers or the work are refused
+Proof: run api | ✓ inspection-assignment.http.spec.ts > inspection C41 answers 409 when an inspected assignment is removed
+Proof: run api | ✓ roles.guard.spec.ts > inspection C41 answers 409 when an inspected WorkOrder or service is deleted
+
 ### S3 - Inspectors answer and read inspections on the WorkOrder page
 
 **C21** - Each assignment summary shows "N inspeções" and the latest result, or "Nenhuma inspeção" (AC 21)
@@ -102,6 +112,7 @@ Proof: run web | ✓ inspection-history.spec.ts > inspection C22 lists the Inspe
 
 **C23** - Using an Inspection opens "Inspeção" with result, inspector, date and every numbered answer in its label, "Não se aplica" and notes (AC 23)
 Proof: run web | ✓ inspection-history.spec.ts > inspection C23 the Inspeção sheet shows every answer by type and the notes
+Proof: run web | ✓ inspection-history.spec.ts > inspection C23 reads Sim, Conforme and Não conforme as such
 
 **C24** - "Inspecionar" renders for `inspector` only; enabled with the work in progress, otherwise disabled with the WorkOrder or the service reason (AC 24)
 Proof: run web | ✓ inspection-checklist.spec.ts > inspection C24 Inspecionar is for inspectors and disabled with the reason outside the work in progress
@@ -139,6 +150,7 @@ Proof: walk - at 375 px open a WorkOrder in progress as an inspector, expand an 
 **C34** - Deleting a WorkOrder with any Inspection under it, discarded included, answers 409 and deletes nothing; the database refusal maps to 409 too (AC 34)
 Proof: run api | ✓ delete-work-order.use-case.spec.ts > inspection C34 refuses a WorkOrder with an Inspection under it
 Proof: run api | ✓ work-order.repository.spec.ts > inspection C34 turns the database refusal into ConflictDomainException
+Proof: run api | ✓ inspection.repository.spec.ts > inspection C34 counts every Inspection under a WorkOrder or a service, discarded ones included
 
 **C35** - Deleting a WorkOrderService targeted by an assignment with any Inspection answers 409 and deletes nothing (AC 35)
 Proof: run api | ✓ delete-work-order-service.use-case.spec.ts > inspection C35 refuses a service targeted by an inspected assignment
@@ -164,11 +176,11 @@ Proof: run web | ✓ vessel-detail.inspection.spec.ts > inspection C37 a refused
 | `POST /inspection-templates`, `PUT /inspection-templates/:id` statuses, new (1) | 400 for type C1 | - |
 | `GET /inspection-templates/:id` statuses (3) | 200 C1 · 401 existing template C32 · 404 existing template C10 | - |
 | `GET /work-orders/:workOrderId/inspection-assignments` statuses (3) | 200 C14 · 401 existing assignment C29 · 404 existing assignment C9 | - |
-| `DELETE /work-orders/:workOrderId/inspection-assignments/:id` statuses, new (1) | 409 C19 | - |
-| `POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections` statuses (6) | 201 C7 · 400 C12 · 401 C40 · 403 C17 · 404 C18 · 409 C8, C10, C11 | - |
+| `DELETE /work-orders/:workOrderId/inspection-assignments/:id` statuses, new (1) | 409 C19, C41 | - |
+| `POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections` statuses (6) | 201 C7 · 400 C12 · 401 C40 · 403 C17 · 404 C18 · 409 C8, C10, C11, C41 | - |
 | `POST /work-orders/:workOrderId/inspection-assignments/:assignmentId/inspections/:id/discard` statuses (4) | 204 C15 · 401 C40 · 403 C17 · 404 C16 | - |
-| `DELETE /work-orders/:id` statuses, new (1) | 409 C34 | - |
-| `DELETE /work-orders/:workOrderId/services/:id` statuses, new (1) | 409 C35 | - |
+| `DELETE /work-orders/:id` statuses, new (1) | 409 C34, C41 | - |
+| `DELETE /work-orders/:workOrderId/services/:id` statuses, new (1) | 409 C35, C41 | - |
 | one-way doors (4) | type enum and backfill C3 · tables C39 · restrict C39, C34, C35 · session name C38 | - |
 | session Roles for Inspecionar and Descartar (4) | `inspector` C24, C29 · `administrator` C24, C29 · `operator` C24, C29 · not loaded C24 | - |
 | checklist controls (6) | text box C25 · Sim/Não C25 · Conforme/Não conforme C25 · 0 to 10 C25 · Não se aplica C25 · Observação C25 | - |
@@ -192,7 +204,7 @@ Proof: run web | ✓ vessel-detail.inspection.spec.ts > inspection C37 a refused
 - **Settled mid-build:** none
 - **Changed existing specs:** template and assignment use cases now take `questions: [{ label, type }]` instead of `labels`; the factories still accept `labels` (as `CONFORMITY`), and the old specs' inputs and expected shapes gained `type`, `removable` and `inspections` - their claims are unchanged. `DeleteWorkOrderUseCase` and `DeleteWorkOrderServiceUseCase` take `IInspectionsRepository`. The session carries `name`, so the old session specs expect it. `layout.spec.ts` reads a controller path that Prettier wraps, maps the Roles of each aggregate (`inspector` for `inspection`), and lists the two routes. The assignment section's failed-remove spec expects the new Portuguese for `Inspection assignment has inspections`
 - **Machine load:** the full web suite timed out during the build while the machine ran at a load of 70 to 330 from other projects; the feature's specs passed when run alone
-- **Dispatched:** none
+- **Dispatched:** Verifier at `73a3e90` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 4 findings
 - **Boundary:** C1-C6 closed at `9e6b582`; C7-C20, C38-C40 at `d435bf3`; C34-C36 at `f3d12e8`; C37 at `8b5c6fb`; C21-C32 at `329f470`; C33 closed by the walk after the sheet fix
 - **Abandoned:** none
 - **Walked:** headless Chrome over the DevTools protocol at 375x812, signed in as the seed Administrator. The user's `ng serve` on 4200 did not pick up the S3 bundle, so the walk ran on a second `ng serve` of this checkout on port 4300 (same proxy to the user's API on 3333), stopped afterwards. To write nothing the app cannot delete, the browser saw `/api/me` as an `inspector` and one Inspection injected into the test assignment's `GET` (CDP Fetch interception); a template with one question of each type and its assignment on the first `IN_PROGRESS` WorkOrder were created through the API and removed at the end (204, 204), and "Concluir inspeção" was opened but not confirmed. States: the WorkOrder page with the assignment expanded ("1 inspeção · última: Reprovada", the four type labels, "Inspecionar" enabled); the "Inspecionar" sheet (19 answer controls, all 40 px tall); "Concluir inspeção" (counts 1 and 1, "Confirmar" disabled); the "Inspeção" sheet (every answer by type, the note). `scrollWidth` 360 of 375 in all four. First run: the sheet was 3/4 of the screen (270 px) and its content scrolled sideways by 12 px; fixed in the shared sheet (full width below `sm`, `grid-cols-1`), then rewalked with no overflow. A user reaches these from a WorkOrder, the assignment's chevron, "Inspecionar", "Concluir" and an Inspection row (C33)
