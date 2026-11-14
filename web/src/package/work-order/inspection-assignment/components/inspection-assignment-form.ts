@@ -15,7 +15,15 @@ import { AssignInspectionTemplateRequest, WHOLE_WORK_ORDER } from '../inspection
   imports: [NgIcon, FormField, FormGroup, Label, Select, Button],
   viewProviders: [provideIcons({ lucideCheck, lucideLoader2, lucideX })],
   template: `
-    @if (!loadingTemplates() && templates().length === 0) {
+    @if (failed(); as message) {
+      <p class="rounded-lg border border-destructive/40 p-4 text-sm text-destructive" role="alert">{{ message }}</p>
+      <footer class="mt-6 flex justify-end">
+        <button tButton type="button" variant="outline" (click)="closed.emit()">
+          <ng-icon name="lucideX" class="size-4" />
+          Cancelar
+        </button>
+      </footer>
+    } @else if (!loadingTemplates() && templates().length === 0) {
       <p class="rounded-lg border p-4 text-sm text-muted-foreground">Nenhum modelo de inspeção cadastrado</p>
       <footer class="mt-6 flex justify-end">
         <button tButton type="button" variant="outline" (click)="closed.emit()">
@@ -67,6 +75,8 @@ import { AssignInspectionTemplateRequest, WHOLE_WORK_ORDER } from '../inspection
 export class InspectionAssignmentForm {
   templates = input<InspectionTemplateSummary[]>([]);
   loadingTemplates = input(false);
+  // The message to show when the templates could not be read; the form is not offered then.
+  failed = input<string | null>(null);
   services = input<WorkOrderServiceItem[]>([]);
   loading = input(false);
 

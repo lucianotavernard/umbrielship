@@ -95,6 +95,12 @@ export class WorkOrderDetail {
   assignments = computed(() => resourceValue(this.assignmentsResource)?.inspectionAssignments ?? []);
   loadingTemplates = computed(() => this.templatesResource.isLoading());
   templates = computed(() => resourceValue(this.templatesResource)?.inspectionTemplates ?? []);
+  templatesError = computed(() => {
+    const error = this.templatesResource.error();
+    return error
+      ? apiErrorMessage(error as { error?: unknown }, 'Não foi possível carregar os modelos de inspeção.')
+      : null;
+  });
 
   protected readonly statusLabels = workOrderStatusLabels;
 

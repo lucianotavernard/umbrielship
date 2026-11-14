@@ -65,6 +65,21 @@ describe('Atribuir modelo de inspeção', () => {
     controller.expectNone((request) => request.method === 'POST');
   });
 
+  it('assignment C31 a failed template load shows the error instead of Nenhum modelo', async () => {
+    buttons(element, 'Atribuir modelo')[0].click();
+    await settle();
+    controller
+      .expectOne('/api/inspection-templates?per_page=100')
+      .flush({ statusCode: 500, message: 'Internal server error' }, { status: 500, statusText: 'Server Error' });
+    await settle();
+    const sheet = dialogs(element)[0];
+
+    expect(sheet.textContent).toContain('Não foi possível carregar os modelos de inspeção.');
+    expect(sheet.textContent).not.toContain('Nenhum modelo de inspeção cadastrado');
+    expect(sheet.querySelector('form')).toBeNull();
+    controller.expectNone((request) => request.method === 'POST');
+  });
+
   it('assignment C23 requires a template', async () => {
     const sheet = await open();
 
