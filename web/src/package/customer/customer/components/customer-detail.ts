@@ -39,6 +39,7 @@ import { Customer } from '../customer.service';
                 </div>
               </div>
 
+              @if (canWrite()) {
               <div class="flex gap-2">
                 <button tButton type="button" size="sm" class="gap-2" (click)="edited.emit()">
                   <ng-icon name="lucidePencil" class="!size-4" />
@@ -56,6 +57,7 @@ import { Customer } from '../customer.service';
                   Deletar
                 </button>
               </div>
+              }
             </section>
           </header>
 
@@ -108,6 +110,7 @@ import { Customer } from '../customer.service';
   `,
 })
 export class CustomerDetail {
+  canWrite = input(true);
   customer = input<Customer | null>(null);
   edited = output<void>();
 

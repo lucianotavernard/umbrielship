@@ -16,6 +16,7 @@ import { GetCustomersResponse } from '../../customer/customer.service';
 import { VesselForm } from '../components/vessel-form';
 import { VesselList as VesselListUI } from '../components/vessel-list';
 import { CreateVesselRequest, GetVesselsResponse, Vessel, VesselService } from '../vessel.service';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'vessel-list',
@@ -24,6 +25,7 @@ import { CreateVesselRequest, GetVesselsResponse, Vessel, VesselService } from '
   templateUrl: './vessel-list.html',
 })
 export class VesselList {
+  protected readonly canWrite = inject(AuthenticationService).canWrite;
   private readonly vesselService = inject(VesselService);
   private readonly vesselForm = viewChild(VesselForm);
 

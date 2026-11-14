@@ -12,16 +12,18 @@
           Lista de todos os clientes em sua organização.
         </p>
       </div>
-      <button tButton type="button" (click)="openSheet()">
-        <ng-icon name="lucidePlus" />
-        Novo Cliente
-      </button>
+      @if (canWrite()) {
+        <button tButton type="button" (click)="openSheet()">
+          <ng-icon name="lucidePlus" />
+          Novo Cliente
+        </button>
+      }
     }
   </div>
 </header>
 
 <section class="mx-auto max-w-7xl px-6 py-8">
-  <customer-list-ui [loading]="loading()" [customers]="customers()" (deleted)="openDialog($event)">
+  <customer-list-ui [canWrite]="canWrite()" [loading]="loading()" [customers]="customers()" (deleted)="openDialog($event)">
     <t-pagination [page]="page()" [total]="totalCustomers()" (changed)="page.set($event)" />
   </customer-list-ui>
 </section>

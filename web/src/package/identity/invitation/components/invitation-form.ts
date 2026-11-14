@@ -37,8 +37,9 @@ export type InvitationFormValue = Omit<SendInvitationRequest, 'organizationId'>;
           <t-form-group class="sm:col-span-full">
             <label tLabel for="invitation-role">Papel</label>
             <select tSelect id="invitation-role" [formField]="invitationForm.role">
-              <option value="operator">Operador</option>
               <option value="administrator">Administrador</option>
+              <option value="operator">Operador</option>
+              <option value="inspector">Inspetor</option>
             </select>
           </t-form-group>
         </div>

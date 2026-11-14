@@ -26,6 +26,7 @@ import {
 import { lucideArrowLeft, lucidePlus, lucideWrench } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { WorkOrderDetail as WorkOrderDetailUI } from '../components/work-order-detail';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'work-order-detail',
@@ -34,6 +35,7 @@ import { WorkOrderDetail as WorkOrderDetailUI } from '../components/work-order-d
   templateUrl: './work-order-detail.html',
 })
 export class WorkOrderDetail {
+  protected readonly canWrite = inject(AuthenticationService).canWrite;
   private readonly workOrderService = inject(WorkOrderService);
   private readonly workOrderServiceService = inject(WorkOrderServiceService);
   private readonly imageService = inject(WorkOrderServiceImageService);

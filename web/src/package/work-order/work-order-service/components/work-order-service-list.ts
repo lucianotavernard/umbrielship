@@ -97,6 +97,7 @@ import {
                   </td>
                   <td tTableCell>
                     <div class="flex items-center justify-center">
+                      @if (canWrite()) {
                       <label [class]="uploadClass" [title]="'Enviar foto de ' + service.name">
                         <svg tIcon name="image" class="size-3.5" />
                         <input
@@ -107,6 +108,7 @@ import {
                           (change)="onFile(service, $event)"
                         />
                       </label>
+                      }
                     </div>
                   </td>
                 </tr>
@@ -131,6 +133,7 @@ import {
   `,
 })
 export class WorkOrderServiceList {
+  canWrite = input(true);
   loading = input(true);
   services = input<WorkOrderServiceItem[]>([]);
   fileSelected = output<{ serviceId: string; file: File }>();

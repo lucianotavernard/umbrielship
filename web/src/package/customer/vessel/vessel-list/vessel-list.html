@@ -12,16 +12,18 @@
           Lista de todas as embarcações em sua organização.
         </p>
       </div>
-      <button tButton type="button" (click)="openSheet()">
-        <ng-icon name="lucidePlus" />
-        Nova Embarcação
-      </button>
+      @if (canWrite()) {
+        <button tButton type="button" (click)="openSheet()">
+          <ng-icon name="lucidePlus" />
+          Nova Embarcação
+        </button>
+      }
     }
   </div>
 </header>
 
 <section class="mx-auto max-w-7xl px-6 py-8">
-  <vessel-list-ui [loading]="loading()" [vessels]="vessels()" (deleted)="openDialog($event)">
+  <vessel-list-ui [canWrite]="canWrite()" [loading]="loading()" [vessels]="vessels()" (deleted)="openDialog($event)">
     <t-pagination [page]="page()" [total]="totalVessels()" (changed)="page.set($event)" />
   </vessel-list-ui>
 </section>

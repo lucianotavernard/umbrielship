@@ -24,6 +24,7 @@ import {
 } from '../../vessel/vessel.service';
 import { Customer, CustomerService, UpdateCustomerRequest } from '../customer.service';
 import { CustomerForm } from '../components/customer-form';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'customer-detail',
@@ -43,6 +44,7 @@ import { CustomerForm } from '../components/customer-form';
   templateUrl: './customer-detail.html',
 })
 export class CustomerDetail {
+  protected readonly canWrite = inject(AuthenticationService).canWrite;
   sanitizer = inject(DomSanitizer);
   vesselService = inject(VesselService);
   customerService = inject(CustomerService);

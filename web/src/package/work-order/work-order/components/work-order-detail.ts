@@ -49,12 +49,14 @@ import { WorkOrderDetail as WorkOrderDetailType } from '../work-order.service';
                   </div>
                 </div>
 
+                @if (canWrite()) {
                 <div class="flex flex-wrap items-center gap-3 shrink-0">
                   <button tButton type="button" class="gap-2" (click)="editWorkOrder()">
                     <ng-icon name="lucidePencil" class="size-4" />
                     Editar ordem de serviço
                   </button>
                 </div>
+                }
               </header>
 
               <!-- Info Cards -->
@@ -123,6 +125,7 @@ import { WorkOrderDetail as WorkOrderDetailType } from '../work-order.service';
   `,
 })
 export class WorkOrderDetail {
+  canWrite = input(true);
   workOrder = input.required<WorkOrderDetailType | null>();
   loading = input(false);
 

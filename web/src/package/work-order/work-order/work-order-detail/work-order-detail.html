@@ -12,6 +12,7 @@
     <!-- Main Content Column -->
     <div class="grid grid-cols-1 gap-6 lg:col-span-2">
       <work-order-detail-ui
+        [canWrite]="canWrite()"
         [workOrder]="workOrder()"
         [loading]="loadingWorkOrder()"
         (edited)="openEditWorkOrderSheet()"
@@ -30,14 +31,16 @@
             </div>
           </div>
 
-          <button tButton type="button" (click)="openCreateServiceSheet()">
-            <ng-icon name="lucidePlus" class="size-4 mr-1" />
-            Novo serviço
-          </button>
+          @if (canWrite()) {
+            <button tButton type="button" (click)="openCreateServiceSheet()">
+              <ng-icon name="lucidePlus" class="size-4 mr-1" />
+              Novo serviço
+            </button>
+          }
         </header>
 
         <div class="p-6">
-          <work-order-service-list-ui [loading]="loading()" [services]="services()" />
+          <work-order-service-list-ui [canWrite]="canWrite()" [loading]="loading()" [services]="services()" />
         </div>
       </section>
     </div>

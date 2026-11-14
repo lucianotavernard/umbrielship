@@ -58,7 +58,7 @@ sequenceDiagram
 | --- | --- |
 | domain | `Role` meant `administrator` or `operator`, now also `inspector` - branched on today by `InternalAdministratorGuard`, `CountOrganizationRolesUseCase`, the Zod enums of `POST /users` and `POST /invitations`, the session type `UserPayload`, and in the web by `roleLabels`, the Role type of the session and the internal administrator guard |
 | stored data | nothing to migrate - the enum `role` gains a value and no row changes |
-| readers | Organization detail (Role counts, Users list badge), the Organization switcher, the Papel select of the User and Invitation forms |
+| readers | Organization detail (Users list badge), the Organization switcher, the Papel select of the User and Invitation forms; Organization detail reads the Role counts and does not show them |
 
 ```mermaid
 erDiagram
@@ -130,7 +130,7 @@ An internal Administrator picks "Inspetor" in the forms; a signed-in inspector b
 
 13. WHEN an internal Administrator opens the User form or the Invitation form on Organization detail THEN the Papel select SHALL offer "Administrador", "Operador" and "Inspetor", in that order
 14. WHEN an internal Administrator submits either form with "Inspetor" THEN the web SHALL send `role: "inspector"`, and the Users list SHALL show the badge "Inspetor" for that User
-15. WHEN an internal Administrator opens Organization detail THEN the Role counts SHALL show a third count labelled "Inspetor"
+15. WHEN an internal Administrator opens Organization detail THEN the page SHALL render no Role counts, as today - the counts `GET /organizations/:id/roles` returns are not shown (criterion 4 proves the API)
 16. WHEN a User opens the Organization switcher THEN each Organization where its Membership is `inspector` SHALL show "Inspetor" under its name
 17. WHILE the session's Role is `inspector`, the Customers page (`customers`) SHALL render no control that opens the "Novo cliente" sheet and no "Excluir" control on a row
 18. WHILE the session's Role is `inspector`, the Customer detail page (`customers/:id`) SHALL render no control that edits the Customer, deletes the Customer, opens the "Nova embarcação" sheet or deletes a Vessel
@@ -151,6 +151,7 @@ An internal Administrator picks "Inspetor" in the forms; a signed-in inspector b
 | A route or screen that changes the Role of an existing Membership | None exists today and the design does not ask for one |
 | The session carrying the User's name | Owned by the Inspection slice, which is the first to need it |
 | How the existing pages behave at phone width | Owned by the Inspection slice, for the pages an inspector walks |
+| Showing the Role counts on Organization detail | The page reads them and shows none today; showing them is a new screen. user: "Retirar do plano (Recomendado)" |
 
 ## Assumptions
 
