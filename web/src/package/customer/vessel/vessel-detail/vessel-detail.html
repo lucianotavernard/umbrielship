@@ -7,6 +7,11 @@
   </div>
 </div>
 
+@if (notFound()) {
+  <div class="mx-auto max-w-7xl px-6 py-8">
+    <p class="text-sm text-muted-foreground">Embarcação não encontrada</p>
+  </div>
+} @else {
 <div class="mx-auto max-w-7xl px-6 py-8">
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="grid gap-6 lg:col-span-2">
@@ -127,6 +132,7 @@
     </div>
   </div>
 </div>
+}
 
 <t-sheet
   title="Nova ordem"

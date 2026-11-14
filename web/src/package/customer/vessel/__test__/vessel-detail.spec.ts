@@ -112,7 +112,9 @@ describe('VesselDetail', () => {
     deleted.flush(null, { status: 204, statusText: 'No Content' });
     await settle();
 
-    expect(success).toHaveBeenCalledWith('Ordem de serviço excluída');
+    expect(success).toHaveBeenCalledWith('Ordem de serviço excluída com sucesso', {
+      description: 'A ordem de serviço foi excluída com sucesso.',
+    });
     controller.expectOne(workOrdersUrl).flush({ workOrders: [], total: 0 });
   });
 

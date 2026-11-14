@@ -94,6 +94,7 @@ export class CustomerList {
     const customer = this.selectedCustomer();
     this.customerService.deleteCustomer(customer!.id).subscribe({
       next: () => {
+        this.confirming.set(false);
         this.customerResource.reload();
         this.closeDialog();
 
@@ -102,6 +103,8 @@ export class CustomerList {
         });
       },
       error: (response) => {
+        this.confirming.set(false);
+        this.closeDialog();
         toast.error('Erro ao excluir cliente', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao excluir o cliente.'),
         });

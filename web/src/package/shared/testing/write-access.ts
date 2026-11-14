@@ -175,7 +175,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
         .expectOne('/api/vessels/vessel-1')
         .flush({ vessel: { ...aurora, customer: atlantic } });
       controller
-        .expectOne('/api/work-orders?vesselId=vessel-1')
+        .expectOne('/api/work-orders?vesselId=vessel-1&take=10&skip=0')
         .flush({ workOrders: [workOrder], total: 1 });
       await settle();
       return fixture.nativeElement;

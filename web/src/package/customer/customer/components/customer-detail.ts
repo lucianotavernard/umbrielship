@@ -33,7 +33,8 @@ import { Customer } from '../customer.service';
                       {{ customer.name }}
                     </h1>
                     <p class="text-sm text-muted-foreground flex items-center gap-1">
-                      <ng-icon name="lucideMail" class="!size-4 mr-1" /> {{ customer.email }}
+                      <ng-icon name="lucideMail" class="!size-4 mr-1" />
+                      <a class="hover:underline" [href]="'mailto:' + customer.email">{{ customer.email }}</a>
                     </p>
                   </div>
                 </div>
@@ -110,7 +111,7 @@ import { Customer } from '../customer.service';
   `,
 })
 export class CustomerDetail {
-  canWrite = input(true);
+  canWrite = input.required<boolean>();
   customer = input<Customer | null>(null);
   edited = output<void>();
 
