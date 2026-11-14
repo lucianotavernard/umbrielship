@@ -161,4 +161,33 @@ describe('Inspection history on the WorkOrder page', () => {
     controller.expectNone('/api/work-orders/wo-1/inspection-assignments');
     expect(rows(element)[0].querySelectorAll('[data-slot="inspection"]')).toHaveLength(2);
   });
+
+  it('inspection C23 reads Sim, Conforme and Não conforme as such', async () => {
+    const answered = (yes: boolean, conforming: boolean) => ({
+      ...inspection(`i-${yes}-${conforming}`, 'APPROVED', '2026-11-13T08:00:00'),
+      answers: [
+        { itemId: 'q-text', notApplicable: false, value: 'Ok', note: null },
+        { itemId: 'q-yes', notApplicable: false, value: yes, note: null },
+        { itemId: 'q-conf', notApplicable: false, value: conforming, note: null },
+        { itemId: 'q-score', notApplicable: false, value: 0, note: null },
+      ],
+    });
+    const element = await render(controller, 'operator', [
+      assignment('a1', null, [answered(true, true), answered(false, false)]),
+    ]);
+    await expand(element);
+
+    const read = async (index: number) => {
+      rows(element)[0].querySelectorAll<HTMLButtonElement>('[data-slot="inspection"]')[index].click();
+      await settle();
+      const values = [...dialogs(element)[0].querySelectorAll('[data-slot="value"]')].map((node) => text(node));
+      buttons(dialogs(element)[0], 'Fechar')[0]?.click();
+      dialogs(element)[0].querySelector<HTMLButtonElement>('button.absolute')?.click();
+      await settle();
+      return values;
+    };
+
+    expect(await read(0)).toEqual(['Ok', 'Sim', 'Conforme', '0']);
+    expect(await read(1)).toEqual(['Ok', 'Não', 'Não conforme', '0']);
+  });
 });
