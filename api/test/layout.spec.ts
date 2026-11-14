@@ -242,4 +242,28 @@ describe('acme layout', () => {
       'POST /sessions',
     ]);
   });
+
+  it('inspector C15 every POST, PUT and DELETE handler under customer and work-order declares Roles', () => {
+    const writers: string[] = [];
+
+    for (const file of files.filter(
+      (path) =>
+        path.endsWith('.controller.ts') &&
+        /package\/(customer|work-order)\//.test(path),
+    )) {
+      // Each chunk ends with the decorators of the next handler.
+      for (const chunk of read(file).split('\n  async ').slice(0, -1)) {
+        const decorators = chunk.split('\n  }\n').pop()!;
+        const method = decorators.match(/@(Post|Put|Delete)\(/);
+        if (!method) continue;
+
+        writers.push(`${rel(file)} ${method[1]}`);
+        expect(decorators, `${rel(file)} ${method[1]}`).toContain(
+          '@Roles(...WRITERS)',
+        );
+      }
+    }
+
+    expect(writers).toHaveLength(14);
+  });
 });

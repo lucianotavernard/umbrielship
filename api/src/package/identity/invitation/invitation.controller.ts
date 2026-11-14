@@ -24,7 +24,7 @@ import { SendInvitationUseCase } from './send-invitation.use-case.js';
 const sendInvitationBodySchema = z.object({
   userId: z.uuid(),
   organizationId: z.uuid(),
-  role: z.enum(['administrator', 'operator']),
+  role: z.enum(['administrator', 'operator', 'inspector']),
 });
 
 type SendInvitationBodySchema = z.infer<typeof sendInvitationBodySchema>;

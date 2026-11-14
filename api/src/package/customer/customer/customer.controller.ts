@@ -18,6 +18,7 @@ import { ConflictDomainException } from '@/package/shared/lib/exception/conflict
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { ZodValidationPipe } from '@/package/shared/lib/http/zod-validation.pipe.js';
 import { CurrentUser } from '@/package/shared/module/auth/current-user.decorator.js';
+import { Roles, WRITERS } from '@/package/shared/module/auth/roles.js';
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { CreateCustomerUseCase } from './create-customer.use-case.js';
@@ -100,6 +101,7 @@ export class CustomerController {
     }
   }
 
+  @Roles(...WRITERS)
   @Post()
   async create(
     @CurrentUser() user: UserPayload,
@@ -126,6 +128,7 @@ export class CustomerController {
     }
   }
 
+  @Roles(...WRITERS)
   @Put(':id')
   async edit(
     @CurrentUser() user: UserPayload,
@@ -158,6 +161,7 @@ export class CustomerController {
     }
   }
 
+  @Roles(...WRITERS)
   @Delete(':id')
   @HttpCode(204)
   async delete(

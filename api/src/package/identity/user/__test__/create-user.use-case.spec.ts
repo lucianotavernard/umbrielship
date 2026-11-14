@@ -65,4 +65,26 @@ describe('CreateUserUseCase', () => {
     await expect(promise).rejects.toThrow('Organization not found');
     expect(users.items).toHaveLength(0);
   });
+
+  it('inspector C2 stores a Membership with Role inspector in an ordinary and in the internal Organization', async () => {
+    organizations.items.push(
+      makeOrganization(
+        { name: 'Umbrielship', email: 'i@x.test', isInternal: true },
+        'org-internal',
+      ),
+    );
+
+    await sut.handle({ ...input, role: 'inspector' });
+    await sut.handle({
+      ...input,
+      email: 'ines@x.test',
+      role: 'inspector',
+      organizationId: 'org-internal',
+    });
+
+    expect(users.items.map((user) => user.memberships)).toEqual([
+      [{ organizationId: 'org-1', role: 'inspector' }],
+      [{ organizationId: 'org-internal', role: 'inspector' }],
+    ]);
+  });
 });

@@ -139,25 +139,28 @@ export class PrismaVesselsRepository implements IVesselsRepository {
       customer: PrismaCustomer & { address: PrismaCustomerAddress | null };
     },
   ): VesselDetail {
-    return VesselDetail.create({
-      organizationId: prismaVessel.organizationId,
-      imoNumber: prismaVessel.imoNumber,
-      name: prismaVessel.name,
-      type: prismaVessel.type,
-      length: prismaVessel.length,
-      customerId: prismaVessel.customerId,
-      customer: {
-        id: prismaVessel.customer.id,
-        organizationId: prismaVessel.customer.organizationId,
-        name: prismaVessel.customer.name,
-        email: prismaVessel.customer.email,
-        phone: prismaVessel.customer.phone,
-        address: {
-          address: prismaVessel.customer.address!.address,
-          city: prismaVessel.customer.address!.city,
-          state: prismaVessel.customer.address!.state,
+    return VesselDetail.create(
+      {
+        organizationId: prismaVessel.organizationId,
+        imoNumber: prismaVessel.imoNumber,
+        name: prismaVessel.name,
+        type: prismaVessel.type,
+        length: prismaVessel.length,
+        customerId: prismaVessel.customerId,
+        customer: {
+          id: prismaVessel.customer.id,
+          organizationId: prismaVessel.customer.organizationId,
+          name: prismaVessel.customer.name,
+          email: prismaVessel.customer.email,
+          phone: prismaVessel.customer.phone,
+          address: {
+            address: prismaVessel.customer.address!.address,
+            city: prismaVessel.customer.address!.city,
+            state: prismaVessel.customer.address!.state,
+          },
         },
       },
-    }, prismaVessel.id);
+      prismaVessel.id,
+    );
   }
 }

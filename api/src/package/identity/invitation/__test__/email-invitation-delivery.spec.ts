@@ -60,4 +60,11 @@ describe('Email invitation delivery', () => {
 
     await expect(sut.deliver(input)).rejects.toBe(failure);
   });
+
+  it('inspector C18 names the inspector Role Inspetor in the email', async () => {
+    await sut.deliver({ ...input, role: 'inspector' });
+
+    const [email] = emailSender.sentEmails;
+    expect(email.text).toContain('como Inspetor');
+  });
 });

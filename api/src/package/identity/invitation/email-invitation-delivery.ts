@@ -11,6 +11,7 @@ import {
 const roleLabels: Record<Role, string> = {
   administrator: 'Administrador',
   operator: 'Operador',
+  inspector: 'Inspetor',
 };
 
 function escapeHtml(value: string): string {

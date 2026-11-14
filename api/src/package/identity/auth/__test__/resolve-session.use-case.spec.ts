@@ -52,4 +52,43 @@ describe('ResolveSessionUseCase', () => {
       NotFoundDomainException,
     );
   });
+
+  it('inspector C5 resolves role inspector from the active Membership', async () => {
+    users.items.push(
+      makeUser({
+        memberships: [{ organizationId: 'org-1', role: 'inspector' }],
+      }),
+    );
+
+    expect(await sut.handle({ userId: 'user-1' })).toEqual({
+      sub: 'user-1',
+      organizationId: 'org-1',
+      role: 'inspector',
+      internal: true,
+    });
+  });
+
+  it('inspector C12 resolves the Role of the newly active Membership after a switch', async () => {
+    organizations.items.push(
+      makeOrganization({ name: 'Atlantic', email: 'a@x.test' }, 'org-2'),
+    );
+    users.items.push(
+      makeUser({
+        activeOrganizationId: 'org-1',
+        memberships: [
+          { organizationId: 'org-1', role: 'inspector' },
+          { organizationId: 'org-2', role: 'operator' },
+        ],
+      }),
+    );
+
+    expect((await sut.handle({ userId: 'user-1' })).role).toBe('inspector');
+
+    users.items[0].activeOrganizationId = 'org-2';
+
+    expect(await sut.handle({ userId: 'user-1' })).toMatchObject({
+      organizationId: 'org-2',
+      role: 'operator',
+    });
+  });
 });

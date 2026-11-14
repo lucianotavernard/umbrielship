@@ -18,7 +18,7 @@ type CountOrganizationRolesUseCaseResponse = {
 };
 
 // Every Role is listed, in this order, even when no Membership holds it.
-const roles: Role[] = ['administrator', 'operator'];
+const roles: Role[] = ['administrator', 'operator', 'inspector'];
 
 @Injectable()
 export class CountOrganizationRolesUseCase {
