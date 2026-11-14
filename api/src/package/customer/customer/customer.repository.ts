@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import {
   Customer as PrismaCustomer,
   CustomerAddress as PrismaCustomerAddress,
+  Prisma,
 } from '@/package/shared/module/prisma/generated/prisma/client.js';
 import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 import { Paginate } from '@/package/shared/lib/type/paginate.js';
@@ -127,6 +129,28 @@ export class PrismaCustomersRepository implements ICustomersRepository {
         },
       },
     });
+  }
+
+  async delete(organizationId: string, id: string): Promise<void> {
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        await tx.customerAddress.deleteMany({
+          where: { organizationId, customerId: id },
+        });
+        await tx.customer.deleteMany({
+          where: { organizationId, id },
+        });
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new ConflictDomainException('Customer in use');
+      }
+
+      throw error;
+    }
   }
 
   private toDomain(

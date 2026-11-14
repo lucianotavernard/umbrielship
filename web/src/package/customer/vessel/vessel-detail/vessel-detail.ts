@@ -1,11 +1,24 @@
-import { httpResource } from '@angular/common/http';
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { HttpStatusCode, httpResource } from '@angular/common/http';
+import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideArrowLeft,
+  lucideExternalLink,
+  lucideMail,
+  lucideMapPin,
+  lucidePhone,
+  lucidePlus,
+} from '@ng-icons/lucide';
 
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
+import { Confirmation } from '../../../shared/components/ui/confirmation';
+import { Pagination } from '../../../shared/components/ui/pagination';
 import { Sheet } from '../../../shared/components/ui/sheet';
+import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
 import { WorkOrderForm } from '../../../work-order/work-order/components/work-order-form';
 import { WorkOrderList } from '../../../work-order/work-order/components/work-order-list';
@@ -13,61 +26,155 @@ import {
   CreateWorkOrderRequest,
   GetWorkOrdersResponse,
   UpdateWorkOrderRequest,
+  WorkOrder,
   WorkOrderService,
 } from '../../../work-order/work-order/work-order.service';
-import { GetVesselResponse, vesselTypeLabels, VesselType } from '../vessel.service';
+import { VesselForm } from '../components/vessel-form';
+import { VesselDetail as VesselDetailUI } from '../components/vessel-detail';
+import {
+  CreateVesselRequest,
+  GetVesselResponse,
+  UpdateVesselRequest,
+  VesselService,
+} from '../vessel.service';
 
 @Component({
   selector: 'vessel-detail',
-  imports: [Button, Sheet, WorkOrderList, WorkOrderForm],
+  imports: [
+    NgIcon,
+    RouterLink,
+    Button,
+    Confirmation,
+    Pagination,
+    Sheet,
+    Skeleton,
+    VesselDetailUI,
+    VesselForm,
+    WorkOrderList,
+    WorkOrderForm,
+  ],
+  viewProviders: [
+    provideIcons({
+      lucideArrowLeft,
+      lucidePlus,
+      lucideMapPin,
+      lucideMail,
+      lucidePhone,
+      lucideExternalLink,
+    }),
+  ],
   templateUrl: './vessel-detail.html',
 })
 export class VesselDetail {
-  private readonly router = inject(Router);
-  private readonly workOrderService = inject(WorkOrderService);
+  vesselService = inject(VesselService);
+  workOrderService = inject(WorkOrderService);
 
   id = input.required<string>();
 
-  private readonly vesselResource = httpResource<GetVesselResponse>(() => `/api/vessels/${this.id()}`);
-  private readonly workOrdersResource = httpResource<GetWorkOrdersResponse>(
-    () => `/api/work-orders?vesselId=${this.id()}&take=10&skip=0`,
+  vesselResource = httpResource<GetVesselResponse>(() => `/api/vessels/${this.id()}`);
+  workOrdersResource = httpResource<GetWorkOrdersResponse>(
+    () => `/api/work-orders?vesselId=${this.id()}`,
   );
 
-  isSheetActive = signal(false);
+  page = signal(1);
+  submitting = signal(false);
+  confirming = signal(false);
+  isEditVesselSheetActive = signal(false);
+  isCreateWorkOrderSheetActive = signal(false);
+  isDeleteWorkOrderDialogActive = signal(false);
 
-  vessel = computed(() => resourceValue(this.vesselResource)?.vessel ?? null);
-  workOrders = computed(() => resourceValue(this.workOrdersResource)?.workOrders ?? []);
-  loading = computed(() => this.vesselResource.isLoading());
-  loadingWorkOrders = computed(() => this.workOrdersResource.isLoading());
+  selectedWorkOrder = signal<WorkOrder | null>(null);
 
-  typeLabel(type: string) {
-    return vesselTypeLabels[type as VesselType] ?? type;
+  vessel = computed(() =>
+    this.vesselResource.hasValue() ? (this.vesselResource.value()?.vessel ?? null) : null,
+  );
+  loadingVessel = computed(() => this.vesselResource.isLoading());
+
+  loading = computed(() => this.workOrdersResource.isLoading());
+  workOrders = computed(() =>
+    this.workOrdersResource.hasValue() ? (this.workOrdersResource.value()?.workOrders ?? []) : [],
+  );
+  totalWorkOrders = computed(() =>
+    this.workOrdersResource.hasValue() ? (this.workOrdersResource.value()?.total ?? 0) : 0,
+  );
+
+  openCreateWorkOrderSheet() {
+    this.isCreateWorkOrderSheetActive.set(true);
   }
 
-  goBack() {
-    const vessel = this.vessel();
-    void this.router.navigateByUrl(vessel ? `/customers/${vessel.customerId}` : '/vessels');
+  closeCreateWorkOrderSheet() {
+    this.isCreateWorkOrderSheetActive.set(false);
   }
 
-  openSheet() {
-    this.isSheetActive.set(true);
+  openEditVesselSheet() {
+    this.isEditVesselSheetActive.set(true);
   }
 
-  closeSheet() {
-    this.isSheetActive.set(false);
+  closeEditVesselSheet() {
+    this.isEditVesselSheetActive.set(false);
+  }
+
+  openDeleteWorkOrderDialog(workOrder: WorkOrder) {
+    this.selectedWorkOrder.set(workOrder);
+    this.isDeleteWorkOrderDialogActive.set(true);
+  }
+
+  closeDeleteWorkOrderDialog() {
+    this.isDeleteWorkOrderDialogActive.set(false);
+    this.selectedWorkOrder.set(null);
+  }
+
+  editVessel(vessel: UpdateVesselRequest) {
+    this.submitting.set(true);
+    this.vesselService.updateVessel(this.id(), vessel).subscribe({
+      next: () => {
+        toast.success('Embarcação atualizada com sucesso', {
+          description: 'A embarcação foi atualizada com sucesso.',
+        });
+        this.closeEditVesselSheet();
+        this.vesselResource.reload();
+      },
+      error: (response) => {
+        toast.error('Erro ao atualizar embarcação', {
+          description: apiErrorMessage(response, 'Ocorreu um erro ao atualizar a embarcação.'),
+        });
+      },
+    });
   }
 
   createWorkOrder(workOrder: UpdateWorkOrderRequest) {
-    const request: CreateWorkOrderRequest = { ...workOrder, vesselId: this.id() };
-    this.workOrderService.createWorkOrder(request).subscribe({
+    this.workOrderService.createWorkOrder(workOrder).subscribe({
       next: () => {
-        toast.success('Ordem criada com sucesso');
-        this.closeSheet();
+        toast.success('Ordem de serviço criada com sucesso', {
+          description: 'A ordem de serviço foi criada com sucesso.',
+        });
+        this.closeCreateWorkOrderSheet();
         this.workOrdersResource.reload();
       },
       error: (response) => {
-        toast.error('Erro ao criar ordem', {
+        toast.error('Erro ao criar ordem de serviço', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar a ordem de serviço.'),
+        });
+      },
+    });
+  }
+
+  deleteWorkOrder() {
+    this.confirming.set(true);
+
+    const workOrder = this.selectedWorkOrder();
+    this.workOrderService.deleteWorkOrder(workOrder!.id).subscribe({
+      next: () => {
+        this.workOrdersResource.reload();
+        this.closeDeleteWorkOrderDialog();
+
+        toast.success('Ordem de serviço excluída com sucesso', {
+          description: 'A ordem de serviço foi excluída com sucesso.',
+        });
+      },
+      error: (response) => {
+        toast.error('Erro ao excluir ordem de serviço', {
+          description: apiErrorMessage(response, 'Ocorreu um erro ao excluir a ordem de serviço.'),
         });
       },
     });

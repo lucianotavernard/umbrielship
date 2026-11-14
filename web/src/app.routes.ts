@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { customerDetailResources } from './package/customer/customer/customer-detail/customer-detail.resources';
 import { authGuard } from './package/shared/components/lib/auth.guard';
 import { internalAdministratorGuard } from './package/shared/components/lib/internal-administrator.guard';
 
@@ -42,6 +43,7 @@ export const routes: Routes = [
       {
         path: 'customers/:id',
         title: 'Cliente',
+        resources: customerDetailResources,
         loadComponent: () =>
           import('./package/customer/customer/customer-detail/customer-detail').then((m) => m.CustomerDetail),
       },

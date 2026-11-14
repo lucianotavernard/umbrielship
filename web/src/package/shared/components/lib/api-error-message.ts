@@ -1,5 +1,6 @@
 const MESSAGES: Record<string, string> = {
   'Customer already exists': 'Já existe um cliente com este e-mail.',
+  'Customer in use': 'Este cliente possui embarcações e não pode ser excluído.',
   'Customer not found': 'Cliente não encontrado.',
   'Vessel already exists': 'Já existe uma embarcação com este número IMO.',
   'Vessel not found': 'Embarcação não encontrada.',

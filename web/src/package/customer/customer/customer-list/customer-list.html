@@ -8,24 +8,45 @@
     } @else {
       <div>
         <h1 class="text-3xl font-bold tracking-tight">Clientes</h1>
-        <p class="mt-2 text-sm text-muted-foreground">Lista de todos os clientes em sua organização.</p>
+        <p class="mt-2 text-sm text-muted-foreground">
+          Lista de todos os clientes em sua organização.
+        </p>
       </div>
-      <button tButton type="button" (click)="openSheet()">Novo Cliente</button>
+      <button tButton type="button" (click)="openSheet()">
+        <ng-icon name="lucidePlus" />
+        Novo Cliente
+      </button>
     }
   </div>
 </header>
 
 <section class="mx-auto max-w-7xl px-6 py-8">
-  <customer-list-ui [loading]="loading()" [customers]="customers()">
-    <t-pagination [page]="page()" [total]="total()" [perPage]="perPage" (changed)="changePage($event)" />
+  <customer-list-ui [loading]="loading()" [customers]="customers()" (deleted)="openDialog($event)">
+    <t-pagination [page]="page()" [total]="totalCustomers()" (changed)="page.set($event)" />
   </customer-list-ui>
 </section>
 
 <t-sheet
   title="Novo cliente"
+  class="sm:max-w-md"
   description="Preencha os campos abaixo para criar um novo cliente"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >
-  <customer-form-ui (closed)="closeSheet()" (submitted)="createCustomer($event)" />
+  <customer-form-ui
+    [loading]="submitting()"
+    (closed)="closeSheet()"
+    (submitted)="createCustomer($event)"
+  />
 </t-sheet>
+
+<t-confirmation
+  title="Excluir cliente"
+  description="Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="isDialogActive()"
+  [loading]="confirming()"
+  (closed)="closeDialog()"
+  (confirmed)="deleteCustomer()"
+/>

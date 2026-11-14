@@ -6,6 +6,7 @@ import { CustomerFacade } from './customer.facade.js';
 import { ICustomersRepository } from './customer/contracts/customer-repository.contract.js';
 import { CreateCustomerUseCase } from './customer/create-customer.use-case.js';
 import { CustomerController } from './customer/customer.controller.js';
+import { DeleteCustomerUseCase } from './customer/delete-customer.use-case.js';
 import { PrismaCustomersRepository } from './customer/customer.repository.js';
 import { EditCustomerUseCase } from './customer/edit-customer.use-case.js';
 import { FetchCustomersUseCase } from './customer/fetch-customers.use-case.js';
@@ -24,6 +25,7 @@ import { PrismaVesselsRepository } from './vessel/vessel.repository.js';
   controllers: [CustomerController, VesselController],
   providers: [
     CreateCustomerUseCase,
+    DeleteCustomerUseCase,
     EditCustomerUseCase,
     FetchCustomersUseCase,
     GetCustomerByIdUseCase,

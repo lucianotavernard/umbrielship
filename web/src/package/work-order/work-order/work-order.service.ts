@@ -40,6 +40,7 @@ export type CreateWorkOrderRequest = {
 };
 
 export type UpdateWorkOrderRequest = {
+  vesselId: string;
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
@@ -62,7 +63,11 @@ export class WorkOrderService {
     return this.http.post<GetWorkOrderResponse>('/api/work-orders', request);
   }
 
-  updateWorkOrder(id: string, request: UpdateWorkOrderRequest): Observable<void> {
-    return this.http.put<void>(`/api/work-orders/${id}`, request);
+  updateWorkOrder(workOrderId : string, request: UpdateWorkOrderRequest): Observable<void> {
+    return this.http.put<void>(`/api/work-orders/${workOrderId}`, request);
+  }
+
+  deleteWorkOrder(workOrderId: string): Observable<void> {
+    return this.http.delete<void>(`/api/work-orders/${workOrderId}`);
   }
 }
