@@ -399,4 +399,22 @@ describe('InspectionTemplate routes over HTTP', () => {
       { id: expect.any(String), label: 'Nota', position: 0, type: 'SCORE' },
     ]);
   });
+
+  it('inspection C1 passes the types of an edit through', async () => {
+    const response = await send(writes[1], 'administrator', {
+      name: 'Misto',
+      items: [
+        { label: 'Notas', type: 'TEXT' },
+        { label: 'Nota', type: 'SCORE' },
+      ],
+    });
+
+    expect(response.status).toBe(200);
+    expect(fakes.edit.handle.mock.calls[0][0]).toMatchObject({
+      questions: [
+        { label: 'Notas', type: 'TEXT' },
+        { label: 'Nota', type: 'SCORE' },
+      ],
+    });
+  });
 });

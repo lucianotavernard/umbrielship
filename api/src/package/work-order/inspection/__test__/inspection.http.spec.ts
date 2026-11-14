@@ -10,6 +10,7 @@ import {
   vi,
 } from 'vitest';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import type {
   Role,
@@ -217,5 +218,16 @@ describe('Inspection routes over HTTP', () => {
       401,
     );
     expect(calls()).toBe(0);
+  });
+
+  it('inspection C41 answers 409 with the message when the answers or the work are refused', async () => {
+    fakes.complete.handle.mockRejectedValueOnce(
+      new ConflictDomainException('Work order is not in progress'),
+    );
+
+    const response = await complete('inspector', body);
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toBe('Work order is not in progress');
   });
 });

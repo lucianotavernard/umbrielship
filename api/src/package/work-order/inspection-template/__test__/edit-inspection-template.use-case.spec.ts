@@ -113,4 +113,29 @@ describe('EditInspectionTemplateUseCase', () => {
     expect(templates.items[0].name).toBe('Pintura');
     expect(questions('t1')).toHaveLength(2);
   });
+
+  it("inspection C1 stores each question's type on an edit", async () => {
+    templates.items.push(makeInspectionTemplate({ name: 'Misto' }, 't1'));
+
+    const { inspectionTemplate } = await sut.handle({
+      organizationId: 'org-1',
+      id: 't1',
+      name: 'Misto',
+      questions: [
+        { label: 'Notas', type: 'TEXT' },
+        { label: 'Limpo?', type: 'YES_NO' },
+        { label: 'Pintura', type: 'CONFORMITY' },
+        { label: 'Acabamento', type: 'SCORE' },
+      ],
+    });
+
+    expect(
+      inspectionTemplate.items.map(({ label, type }) => [label, type]),
+    ).toEqual([
+      ['Notas', 'TEXT'],
+      ['Limpo?', 'YES_NO'],
+      ['Pintura', 'CONFORMITY'],
+      ['Acabamento', 'SCORE'],
+    ]);
+  });
 });
