@@ -1,6 +1,6 @@
 # inspector-role proofs
 
-**HEAD**: ae0fef2
+**HEAD**: d750465
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 38 pass, 0 fail
@@ -51,8 +51,8 @@
 `Run api` - exit 0
 
 ```
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 32ms
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 7ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 34ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 8ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C12 lets an operator create a Customer 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C14 answers 403 with statusCode 403 and message Forbidden 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C1 POST /users accepts role inspector and refuses auditor 3ms
@@ -61,11 +61,11 @@
 
  Test Files  58 passed (58)
       Tests  204 passed (204)
-   Start at  01:08:05
-   Duration  1.47s (transform 4.23s, setup 0ms, import 15.90s, tests 599ms, environment 6ms)
+   Start at  01:33:21
+   Duration  1.48s (transform 4.07s, setup 0ms, import 15.07s, tests 574ms, environment 6ms)
 
-[Nest] 1553122  - 14/11/2026, 01:08:05   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c71599c5-f21a-4e1e-8ff4-44aff57c1f3a","message":"redis down"}
-[Nest] 1553093  - 14/11/2026, 01:08:05   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"746ea2f8-e961-4bb0-8948-b29b455db125","message":"redis down"}
+[Nest] 1587835  - 14/11/2026, 01:33:22   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"7e40acb7-2d7f-4f18-9bfd-863544953411","message":"redis down"}
+[Nest] 1587880  - 14/11/2026, 01:33:22   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"04c8a02c-f55c-4470-9ac6-0baf21fe92d2","message":"redis down"}
 ```
 
 `Run web` - exit 0
