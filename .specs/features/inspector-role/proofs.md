@@ -1,6 +1,6 @@
 # inspector-role proofs
 
-**HEAD**: d61623e
+**HEAD**: 77c62c7
 **Tree**: dirty - .agents/, .claude/
 **Shell**: /bin/sh
 **Result**: 38 pass, 0 fail
@@ -51,7 +51,7 @@
 `Run api` - exit 0
 
 ```
- ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 33ms
+ ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C10 lets administrator and operator through each of the 14 write routes 30ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C11 lets an inspector through each of the 9 read routes 8ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C12 lets an operator create a Customer 1ms
  ✓ src/package/shared/module/auth/__test__/roles.guard.spec.ts > Roles guard over HTTP > inspector C14 answers 403 with statusCode 403 and message Forbidden 1ms
@@ -61,11 +61,11 @@
 
  Test Files  58 passed (58)
       Tests  204 passed (204)
-   Start at  01:06:02
-   Duration  1.61s (transform 5.25s, setup 0ms, import 17.10s, tests 605ms, environment 6ms)
+   Start at  01:07:05
+   Duration  1.49s (transform 4.50s, setup 0ms, import 15.57s, tests 565ms, environment 6ms)
 
-[Nest] 1546344  - 14/11/2026, 01:06:02   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c11bcfc3-5b6c-4854-b5ee-381889e04deb","message":"redis down"}
-[Nest] 1546276  - 14/11/2026, 01:06:02   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"2773430b-1a82-43a5-b00d-9d69cc65a70d","message":"redis down"}
+[Nest] 1548577  - 14/11/2026, 01:07:06   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"d9cf8f94-2b41-4b4e-9e2d-5ffdd1750614","message":"redis down"}
+[Nest] 1548558  - 14/11/2026, 01:07:06   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"7e31f386-783b-4eee-919b-fac7a4ccc351","message":"redis down"}
 ```
 
 `Run web` - exit 0
