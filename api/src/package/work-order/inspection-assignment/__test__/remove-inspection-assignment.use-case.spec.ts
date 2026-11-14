@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
 import { makeInspectionAssignment } from '@test/factory.js';
+import { Inspection } from '@/package/work-order/inspection/inspection.entity.js';
+import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { InMemoryInspectionAssignmentsRepository } from '@test/repositories/in-memory-inspection-assignments-repository.js';
 import { RemoveInspectionAssignmentUseCase } from '../remove-inspection-assignment.use-case.js';
 
@@ -52,5 +55,36 @@ describe('RemoveInspectionAssignmentUseCase', () => {
     }
 
     expect(assignments.items).toHaveLength(2);
+  });
+
+  it('inspection C19 refuses an assignment with any Inspection', async () => {
+    const inspections = new InMemoryInspectionsRepository(assignments);
+    assignments.items.push(
+      makeInspectionAssignment({ workOrderId: 'wo-1' }, 'a-visible'),
+      makeInspectionAssignment({ workOrderId: 'wo-1' }, 'a-discarded'),
+    );
+    const make = (assignmentId: string) =>
+      Inspection.create({
+        organizationId: 'org-1',
+        assignmentId,
+        result: 'APPROVED',
+        inspectorId: 'user-9',
+        inspectorName: 'Inês',
+        answers: [],
+      });
+    const discarded = make('a-discarded');
+    discarded.discard('user-9');
+    inspections.items.push(make('a-visible'), discarded);
+
+    for (const id of ['a-visible', 'a-discarded']) {
+      await expect(
+        sut.handle({ organizationId: 'org-1', workOrderId: 'wo-1', id }),
+        id,
+      ).rejects.toBeInstanceOf(ConflictDomainException);
+    }
+    expect(assignments.items.map((item) => item.id)).toEqual([
+      'a-visible',
+      'a-discarded',
+    ]);
   });
 });

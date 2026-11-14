@@ -3,6 +3,11 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 
 import { CustomerModule } from '../customer/customer.module.js';
+import { CompleteInspectionUseCase } from './inspection/complete-inspection.use-case.js';
+import { IInspectionsRepository } from './inspection/contracts/inspection-repository.contract.js';
+import { DiscardInspectionUseCase } from './inspection/discard-inspection.use-case.js';
+import { InspectionController } from './inspection/inspection.controller.js';
+import { PrismaInspectionsRepository } from './inspection/inspection.repository.js';
 import { AssignInspectionTemplateUseCase } from './inspection-assignment/assign-inspection-template.use-case.js';
 import { IInspectionAssignmentsRepository } from './inspection-assignment/contracts/inspection-assignment-repository.contract.js';
 import { FetchInspectionAssignmentsUseCase } from './inspection-assignment/fetch-inspection-assignments.use-case.js';
@@ -48,6 +53,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     WorkOrderServiceImageController,
     InspectionTemplateController,
     InspectionAssignmentController,
+    InspectionController,
   ],
   providers: [
     CreateWorkOrderUseCase,
@@ -71,6 +77,8 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     AssignInspectionTemplateUseCase,
     FetchInspectionAssignmentsUseCase,
     RemoveInspectionAssignmentUseCase,
+    CompleteInspectionUseCase,
+    DiscardInspectionUseCase,
     { provide: IWorkOrdersRepository, useClass: PrismaWorkOrdersRepository },
     {
       provide: IWorkOrderServicesRepository,
@@ -88,6 +96,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
       provide: IInspectionAssignmentsRepository,
       useClass: PrismaInspectionAssignmentsRepository,
     },
+    { provide: IInspectionsRepository, useClass: PrismaInspectionsRepository },
   ],
 })
 export class WorkOrderModule {}

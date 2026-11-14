@@ -33,6 +33,7 @@ describe('ResolveSessionUseCase', () => {
 
     expect(await sut.handle({ userId: 'user-1' })).toEqual({
       sub: 'user-1',
+      name: 'Maria Souza',
       organizationId: 'org-1',
       role: 'administrator',
       internal: true,
@@ -62,6 +63,7 @@ describe('ResolveSessionUseCase', () => {
 
     expect(await sut.handle({ userId: 'user-1' })).toEqual({
       sub: 'user-1',
+      name: 'Maria Souza',
       organizationId: 'org-1',
       role: 'inspector',
       internal: true,
@@ -90,5 +92,18 @@ describe('ResolveSessionUseCase', () => {
       organizationId: 'org-2',
       role: 'operator',
     });
+  });
+
+  it("inspection C38 resolves the User's name into the session", async () => {
+    users.items.push(
+      makeUser({
+        name: 'Inês Prado',
+        memberships: [{ organizationId: 'org-1', role: 'inspector' }],
+      }),
+    );
+
+    const session = await sut.handle({ userId: 'user-1' });
+
+    expect(session.name).toBe('Inês Prado');
   });
 });

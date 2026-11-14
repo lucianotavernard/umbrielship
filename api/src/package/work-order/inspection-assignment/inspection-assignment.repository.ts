@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { Prisma } from '@/package/shared/module/prisma/generated/prisma/client.js';
 import { PrismaService } from '@/package/shared/module/prisma/prisma.service.js';
 
 import { IInspectionAssignmentsRepository } from './contracts/inspection-assignment-repository.contract.js';
+import { inspectionOf } from '../inspection/inspection.repository.js';
 import { InspectionAssignment } from './inspection-assignment.entity.js';
 
 const withItemsAndService = {
   items: { orderBy: { position: 'asc' } },
   workOrderService: { select: { id: true, name: true } },
+  inspections: {
+    where: { discardedAt: null },
+    orderBy: [{ completedAt: 'desc' }, { id: 'desc' }],
+    include: { answers: true },
+  },
+  _count: { select: { inspections: true } },
 } satisfies Prisma.InspectionAssignmentInclude;
 
 type Row = Prisma.InspectionAssignmentGetPayload<{
@@ -81,9 +89,23 @@ export class PrismaInspectionAssignmentsRepository implements IInspectionAssignm
   }
 
   async delete(organizationId: string, id: string): Promise<void> {
-    await this.prisma.inspectionAssignment.deleteMany({
-      where: { organizationId, id },
-    });
+    try {
+      await this.prisma.inspectionAssignment.deleteMany({
+        where: { organizationId, id },
+      });
+    } catch (error) {
+      // An Inspection completed after the use case checked: the database refuses (D5).
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new ConflictDomainException(
+          'Inspection assignment has inspections',
+        );
+      }
+
+      throw error;
+    }
   }
 
   private toDomain(assignment: Row): InspectionAssignment {
@@ -101,6 +123,8 @@ export class PrismaInspectionAssignmentsRepository implements IInspectionAssignm
           position,
           type,
         })),
+        inspections: assignment.inspections.map(inspectionOf),
+        inspectionCount: assignment._count.inspections,
       },
       assignment.id,
     );

@@ -49,9 +49,13 @@ An image that documents a WorkOrderService, stored as a `url` under `/uploads/wo
 *Avoid*: photo, attachment
 
 **InspectionTemplate**:
-A named, ordered checklist of 1 to 100 questions that belongs to one Organization; shown in the app as "Modelo de inspeção". Only an `administrator` creates, edits or deletes it, and every Role reads it. Its name is unique within its Organization, compared without case. Editing replaces its whole question list; deleting it deletes its questions.
+A named, ordered checklist of 1 to 100 questions that belongs to one Organization; shown in the app as "Modelo de inspeção". Only an `administrator` creates, edits or deletes it, and every Role reads it. Its name is unique within its Organization, compared without case. Each question has a type: free text (`TEXT`), yes/no (`YES_NO`), conforming/non-conforming (`CONFORMITY`) or a score from 0 to 10 (`SCORE`). Editing replaces its whole question list; deleting it deletes its questions.
 *Avoid*: checklist, form, template (unqualified)
 
 **InspectionAssignment**:
 A copy of an InspectionTemplate's name and questions placed on one WorkOrder, with or without a target WorkOrderService of that WorkOrder; the target is the WorkOrderService when it has one, otherwise the WorkOrder. Only an `administrator` assigns or removes it, and every Role reads it. Editing or deleting the InspectionTemplate does not change it. It is deleted with its WorkOrder or its WorkOrderService, and a WorkOrder may hold the same template more than once.
 *Avoid*: inspection (for the assignment itself), task
+
+**Inspection**:
+One answer sheet of an InspectionAssignment, completed by an `inspector` while the WorkOrder, and the target WorkOrderService when there is one, are `IN_PROGRESS`. Every question is answered with a value of its type or "not applicable", with an optional note except on free text; on closing, the inspector confirms the result, `APPROVED` or `REPROVED`. It keeps the inspector's name and the time, and is never edited. An inspector may discard it: it is hidden from the app and kept in the database. An assignment holds any number of Inspections, and a WorkOrder, WorkOrderService or assignment with an Inspection, discarded ones included, cannot be deleted.
+*Avoid*: vistoria (in identifiers), report, check

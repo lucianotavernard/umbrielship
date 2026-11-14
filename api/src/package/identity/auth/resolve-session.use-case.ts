@@ -35,6 +35,7 @@ export class ResolveSessionUseCase {
 
     return {
       sub: user.id,
+      name: user.name,
       organizationId: organization.id,
       role: membership.role,
       internal: organization.isInternal,

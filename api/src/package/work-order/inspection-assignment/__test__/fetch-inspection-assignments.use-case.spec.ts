@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
 import { makeInspectionAssignment, makeWorkOrder } from '@test/factory.js';
+import { Inspection } from '@/package/work-order/inspection/inspection.entity.js';
+import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { InMemoryInspectionAssignmentsRepository } from '@test/repositories/in-memory-inspection-assignments-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
 import { FetchInspectionAssignmentsUseCase } from '../fetch-inspection-assignments.use-case.js';
@@ -73,5 +75,53 @@ describe('FetchInspectionAssignmentsUseCase', () => {
     await expect(
       sut.handle({ organizationId: 'org-1', workOrderId: 'unknown' }),
     ).rejects.toBeInstanceOf(NotFoundDomainException);
+  });
+
+  it('inspection C14 lists visible Inspections newest first and removable only without any', async () => {
+    const inspections = new InMemoryInspectionsRepository(assignments);
+    const make = (id: string, assignmentId: string, day: number) =>
+      Inspection.create(
+        {
+          organizationId: 'org-1',
+          assignmentId,
+          result: 'APPROVED',
+          inspectorId: 'user-9',
+          inspectorName: 'Inês',
+          answers: [],
+          completedAt: new Date(2026, 0, day),
+        },
+        id,
+      );
+    assignments.items.push(
+      makeInspectionAssignment({ workOrderId: 'wo-1' }, 'a-inspected'),
+      makeInspectionAssignment({ workOrderId: 'wo-1' }, 'a-discarded-only'),
+      makeInspectionAssignment({ workOrderId: 'wo-1' }, 'a-fresh'),
+    );
+    const discarded = make('i-discarded', 'a-discarded-only', 4);
+    discarded.discard('user-9');
+    inspections.items.push(
+      make('i-old', 'a-inspected', 1),
+      make('i-new', 'a-inspected', 3),
+      discarded,
+    );
+
+    const { inspectionAssignments } = await sut.handle({
+      organizationId: 'org-1',
+      workOrderId: 'wo-1',
+    });
+    const byId = Object.fromEntries(
+      inspectionAssignments.map((item) => [item.id, item]),
+    );
+
+    expect(byId['a-inspected'].inspections.map((item) => item.id)).toEqual([
+      'i-new',
+      'i-old',
+    ]);
+    expect(byId['a-discarded-only'].inspections).toEqual([]);
+    expect(
+      ['a-inspected', 'a-discarded-only', 'a-fresh'].map(
+        (id) => byId[id].removable,
+      ),
+    ).toEqual([false, false, true]);
   });
 });
