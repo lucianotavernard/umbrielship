@@ -8,7 +8,11 @@
 
 Corroborated across multiple features. Safe to apply as guidance.
 
-_none_
+### L-029 - A claim about what is stored needs a test on the real repository's write call; a use-case spec on the in-memory fake proves only the fake.
+- signal: `weak_test` · recurrence: 2 feature(s) · scope: `api` · harmful: 0
+- features: inspection-assignment, inspection
+- evidence: verification.md finding 1, C2 C30 (api) (+1 more)
+- last seen: 2026-11-14T15:13:52Z
 
 ## Candidates (under observation - do NOT load as guidance yet)
 
@@ -182,12 +186,6 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 3, inspection-template-list.ts (web)
 - last seen: 2026-11-14T11:35:58Z
 
-### L-029 - A claim about what is stored needs a test on the real repository's write call; a use-case spec on the in-memory fake proves only the fake.
-- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
-- features: inspection-assignment
-- evidence: verification.md finding 1, C2 C30 (api)
-- last seen: 2026-11-14T12:45:09Z
-
 ### L-030 - A test of an order rule feeds the data out of order, so the order the response already has cannot make it pass.
 - signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
 - features: inspection-assignment
@@ -199,6 +197,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - features: inspection-assignment
 - evidence: verification.md finding 3, AC 3 (api)
 - last seen: 2026-11-14T12:45:09Z
+
+### L-032 - A status a route newly answers needs an HTTP test of the controller's mapping; a use-case test that throws the exception leaves the mapping unproven.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: inspection
+- evidence: verification.md finding 2, Surface 409 (api)
+- last seen: 2026-11-14T15:13:52Z
+
+### L-033 - A mapping with several outputs (answer labels by type and value) gets a fixture that renders every output.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: inspection
+- evidence: verification.md finding 4, C23 (web)
+- last seen: 2026-11-14T15:13:52Z
 
 ## Quarantined (failed when applied - ignore)
 

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 32,
+  "next_id": 34,
   "lessons": [
     {
       "id": "L-001",
@@ -516,17 +516,19 @@
       "text": "A claim about what is stored needs a test on the real repository's write call; a use-case spec on the in-memory fake proves only the fake.",
       "signal": "weak_test",
       "scope": "api",
-      "status": "candidate",
+      "status": "confirmed",
       "features": [
-        "inspection-assignment"
+        "inspection-assignment",
+        "inspection"
       ],
-      "recurrence": 1,
+      "recurrence": 2,
       "harmful": 0,
       "evidence": [
-        "verification.md finding 1, C2 C30 (api)"
+        "verification.md finding 1, C2 C30 (api)",
+        "verification.md finding 1, C7 C16 C34 (api)"
       ],
       "created": "2026-11-14T12:45:09Z",
-      "last_seen": "2026-11-14T12:45:09Z"
+      "last_seen": "2026-11-14T15:13:52Z"
     },
     {
       "id": "L-030",
@@ -563,6 +565,42 @@
       ],
       "created": "2026-11-14T12:45:09Z",
       "last_seen": "2026-11-14T12:45:09Z"
+    },
+    {
+      "id": "L-032",
+      "key": "weak_test::a status a route newly answers needs an http test of the controller s mapping a use case test that throws the exception leaves the mapping unproven",
+      "text": "A status a route newly answers needs an HTTP test of the controller's mapping; a use-case test that throws the exception leaves the mapping unproven.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "inspection"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2, Surface 409 (api)"
+      ],
+      "created": "2026-11-14T15:13:52Z",
+      "last_seen": "2026-11-14T15:13:52Z"
+    },
+    {
+      "id": "L-033",
+      "key": "weak_test::a mapping with several outputs answer labels by type and value gets a fixture that renders every output",
+      "text": "A mapping with several outputs (answer labels by type and value) gets a fixture that renders every output.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "inspection"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 4, C23 (web)"
+      ],
+      "created": "2026-11-14T15:13:52Z",
+      "last_seen": "2026-11-14T15:13:52Z"
     }
   ]
 }
