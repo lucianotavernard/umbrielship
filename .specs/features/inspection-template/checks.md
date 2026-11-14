@@ -66,6 +66,7 @@ Proof: `grep -q 'CREATE UNIQUE INDEX "inspection_templates_organizationId_name_k
 
 **C31** - A duplicate name the database refuses (two creates at once) answers 409, not 500 (concurrency)
 Proof: run api | ✓ inspection-template.repository.spec.ts > template C31 turns the unique name violation into AlreadyExistsDomainException
+Proof: run api | ✓ inspection-template.repository.spec.ts > template C31 locks the template before replacing its items, so concurrent edits wait
 
 **C32** - Every route answers 401 without a token, and every Role reads both `GET` routes (Surface)
 Proof: run api | ✓ inspection-template.http.spec.ts > template C32 answers 401 without a token and lets every Role read
@@ -105,6 +106,7 @@ Proof: run web | ✓ inspection-template-form.spec.ts > template C23 Remover dro
 
 **C24** - An empty or too long name or question shows the field error and sends nothing (AC 24)
 Proof: run web | ✓ inspection-template-form.spec.ts > template C24 shows the field errors and sends nothing
+Proof: run web | ✓ inspection-template-form.spec.ts > template C24 measures the name and the questions after trimming them
 
 **C25** - Submitting a new template posts the questions in the order shown, closes the sheet, shows "Modelo de inspeção criado com sucesso" and requests the list again (AC 25)
 Proof: run web | ✓ inspection-template-list.spec.ts > template C25 creates a template in the order shown and reloads the list
@@ -174,4 +176,5 @@ Proof: run web | ✓ inspection-template-detail.spec.ts > template C33 an edit s
 - **Dispatched:** Verifier at `8f0f467` (no screens sub-agent: no criterion cites a capture) - returned FAIL, 3 findings
 - **Boundary:** C1-C13, C30-C32 closed at `c0b05ad`; C14-C28, C33 closed at `36cbd30`; C29 closed by the walk after the layout header fix
 - **Abandoned:** none
+- **Review (the-judge, PR #2 round 1):** F1 two concurrent edits answered 409 name taken (29 of 60) - `save` now updates the template row first, so the second edit waits; 60 of 60 answered 200 against the local API afterwards. F2 the form bounds the trimmed length, as the API does. F3 the HTTP specs share `api/test/http.ts`
 - **Walked:** headless Chrome over the DevTools protocol against the running dev servers (API 3333, web 4200), signed in as the seed Administrator, viewport 375x812, with and without phone emulation: `/inspection-templates` (2 rows, the long name wraps), "Novo modelo" sheet with 2 questions (Subir/Descer disabled at the ends), a detail page, and its "Editar" sheet prefilled. First run: `scrollWidth` 470 - the shared layout header did not wrap (user button past the edge); fixed in the layout header, then all four states measured `scrollWidth` 375 with no element past the edge. A user reaches them from the menu link "Modelos de inspeção", a row, "Novo modelo" and "Editar" (C29)
