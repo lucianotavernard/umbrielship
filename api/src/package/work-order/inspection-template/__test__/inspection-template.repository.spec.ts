@@ -20,6 +20,7 @@ const fakePrisma = () => {
   };
   const inspectionTemplateItem = {
     deleteMany: vi.fn(async (_args: unknown) => ({ count: 0 })),
+    createMany: vi.fn(async (_args: unknown) => ({ count: 0 })),
   };
   const prisma = {
     inspectionTemplate,
@@ -88,6 +89,53 @@ describe('PrismaInspectionTemplatesRepository', () => {
       where: { id: 't1', organizationId: 'org-1' },
     });
     expect(template!.items.map((item) => item.label)).toEqual(['A', 'B']);
+  });
+
+  it('template C31 locks the template before replacing its items, so concurrent edits wait', async () => {
+    const { prisma, sut } = fakePrisma();
+    const order: string[] = [];
+    prisma.inspectionTemplate.update.mockImplementationOnce(async () => {
+      order.push('update template');
+      return {};
+    });
+    prisma.inspectionTemplateItem.deleteMany.mockImplementationOnce(
+      async () => {
+        order.push('delete items');
+        return { count: 2 };
+      },
+    );
+    prisma.inspectionTemplateItem.createMany.mockImplementationOnce(
+      async () => {
+        order.push('create items');
+        return { count: 2 };
+      },
+    );
+    const template = makeInspectionTemplate({ labels: ['A', 'B'] }, 't1');
+
+    await sut.save(template);
+
+    expect(order).toEqual(['update template', 'delete items', 'create items']);
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.inspectionTemplate.update).toHaveBeenCalledWith({
+      where: { id: 't1', organizationId: 'org-1' },
+      data: { name: 'Pintura do casco' },
+    });
+    expect(prisma.inspectionTemplateItem.createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          templateId: 't1',
+          organizationId: 'org-1',
+          label: 'A',
+          position: 0,
+        }),
+        expect.objectContaining({
+          templateId: 't1',
+          organizationId: 'org-1',
+          label: 'B',
+          position: 1,
+        }),
+      ],
+    });
   });
 
   it('template C31 turns the unique name violation into AlreadyExistsDomainException', async () => {
