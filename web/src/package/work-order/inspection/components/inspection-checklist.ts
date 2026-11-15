@@ -80,7 +80,7 @@ const option = (selected: boolean) =>
                     <button
                       type="button"
                       [class]="optionClass(model().answers[index].score === score && !model().answers[index].notApplicable)"
-                      [attr.aria-pressed]="model().answers[index].score === score"
+                      [attr.aria-pressed]="model().answers[index].score === score && !model().answers[index].notApplicable"
                       (click)="setScore(index, score)"
                     >
                       {{ score }}
@@ -94,7 +94,7 @@ const option = (selected: boolean) =>
                     <button
                       type="button"
                       [class]="optionClass(model().answers[index].choice === choice.value && !model().answers[index].notApplicable)"
-                      [attr.aria-pressed]="model().answers[index].choice === choice.value"
+                      [attr.aria-pressed]="model().answers[index].choice === choice.value && !model().answers[index].notApplicable"
                       (click)="setChoice(index, choice.value)"
                     >
                       {{ choice.label }}
@@ -294,9 +294,5 @@ export class InspectionChecklist {
         return { ...base, value };
       }),
     });
-  }
-
-  close() {
-    this.confirming.set(false);
   }
 }

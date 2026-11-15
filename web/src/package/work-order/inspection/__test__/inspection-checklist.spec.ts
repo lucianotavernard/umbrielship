@@ -203,4 +203,19 @@ describe('Inspecionar on the WorkOrder page', () => {
     expect(buttons(questions(element)[1], 'Não')[0].getAttribute('aria-pressed')).toBe('true');
     controller.expectNone('/api/work-orders/wo-1/inspection-assignments');
   });
+
+  it('inspection C25 Não se aplica unpresses the value chosen before it', async () => {
+    const element = await render(controller, 'inspector', [assignment('a1', null)]);
+    await open(element);
+    const [, yesNo, , score] = questions(element);
+    await press(yesNo, 'Sim');
+    await press(score, '7');
+
+    await press(yesNo, 'Não se aplica');
+    await press(score, 'Não se aplica');
+
+    expect(buttons(yesNo, 'Sim')[0].getAttribute('aria-pressed')).toBe('false');
+    expect(buttons(score, '7')[0].getAttribute('aria-pressed')).toBe('false');
+    expect(buttons(score, 'Não se aplica')[0].getAttribute('aria-pressed')).toBe('true');
+  });
 });
