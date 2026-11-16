@@ -22,6 +22,8 @@ const icons = {
     ['rect', { x: 3, y: 4, width: 18, height: 18, rx: 2 }],
     ['path', { d: 'M3 10h18' }],
   ],
+  check: [['path', { d: 'M20 6 9 17l-5-5' }]],
+  'chevron-right': [['path', { d: 'm9 18 6-6-6-6' }]],
   'clipboard-list': [
     ['rect', { x: 8, y: 2, width: 8, height: 4, rx: 1 }],
     ['path', { d: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2' }],
@@ -66,6 +68,10 @@ const icons = {
       },
     ],
     ['circle', { cx: 12, cy: 10, r: 3 }],
+  ],
+  'panel-left': [
+    ['rect', { x: 3, y: 3, width: 18, height: 18, rx: 2 }],
+    ['path', { d: 'M9 3v18' }],
   ],
   phone: [
     [
