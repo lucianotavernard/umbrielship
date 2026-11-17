@@ -1,112 +1,330 @@
 import { httpResource } from '@angular/common/http';
+import { Component, computed, DestroyRef, effect, HostListener, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  Component,
-  computed,
-  effect,
-  ElementRef,
-  HostListener,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+  lucideAnchor,
+  lucideBuilding2,
+  lucideChevronRight,
+  lucideClipboardCheck,
+  lucideEllipsis,
+  lucideLayoutDashboard,
+  lucideLogOut,
+  lucideMoon,
+  lucideShip,
+  lucideSun,
+  lucideUsers,
+} from '@ng-icons/lucide';
+import { filter } from 'rxjs';
 
 import { AuthenticationService, MeResponse } from '../../identity/authentication/authentication.service';
 import { OrganizationSwitcher } from '../../identity/organization/components/organization-switcher';
+import { roleLabels } from '../../identity/user/user.service';
 import { apiErrorMessage } from './lib/api-error-message';
+import { initials } from './lib/initials';
 import { PAGE_RELOAD } from './lib/page-reload';
 import { resourceValue } from './lib/resource-value';
-import { Button } from './ui/button';
+import { applyTheme, saveTheme } from './lib/theme';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarSeparator,
+  SidebarTrigger,
+} from './ui/sidebar';
 import { Skeleton } from './ui/skeleton';
 import { toast } from './ui/toaster';
 
+type MenuItem = { key: string; label: string; link: string; icon: string };
+
+const MAIN_MENU: MenuItem[] = [
+  { key: 'overview', label: 'Visão geral', link: '/dashboard', icon: 'lucideLayoutDashboard' },
+  { key: 'vessels', label: 'Embarcações', link: '/vessels', icon: 'lucideShip' },
+  { key: 'customers', label: 'Clientes', link: '/customers', icon: 'lucideUsers' },
+  {
+    key: 'inspection-templates',
+    label: 'Modelos de inspeção',
+    link: '/inspection-templates',
+    icon: 'lucideClipboardCheck',
+  },
+];
+
+const MANAGEMENT_MENU: MenuItem[] = [
+  { key: 'organizations', label: 'Organizações', link: '/organizations', icon: 'lucideBuilding2' },
+];
+
+/** The menu item a route belongs to; a WorkOrder is reached from its Vessel. */
+const SECTIONS: { prefix: string; key: string }[] = [
+  { prefix: '/dashboard', key: 'overview' },
+  { prefix: '/vessels', key: 'vessels' },
+  { prefix: '/work-orders', key: 'vessels' },
+  { prefix: '/customers', key: 'customers' },
+  { prefix: '/inspection-templates', key: 'inspection-templates' },
+  { prefix: '/organizations', key: 'organizations' },
+];
+
+const LABELS = Object.fromEntries(
+  [...MAIN_MENU, ...MANAGEMENT_MENU].map((item) => [item.key, item.label]),
+);
+
 @Component({
   selector: 'internal-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Skeleton, OrganizationSwitcher],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    NgIcon,
+    Skeleton,
+    OrganizationSwitcher,
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    SidebarProvider,
+    Sidebar,
+    SidebarHeader,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+    SidebarSeparator,
+    SidebarTrigger,
+    SidebarInset,
+  ],
+  viewProviders: [
+    provideIcons({
+      lucideAnchor,
+      lucideBuilding2,
+      lucideChevronRight,
+      lucideClipboardCheck,
+      lucideEllipsis,
+      lucideLayoutDashboard,
+      lucideLogOut,
+      lucideMoon,
+      lucideShip,
+      lucideSun,
+      lucideUsers,
+    }),
+  ],
   template: `
-    <main class="min-h-screen bg-background">
-      <!-- Sticky from sm only: on a phone the wrapped header would cover a third of the screen. -->
-      <header class="z-50 border-b border-border bg-background/95 sm:sticky sm:top-0">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-4 sm:px-6">
-          <nav class="flex flex-wrap items-center gap-1">
-            <a tButton routerLink="/dashboard" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">
-              Dashboard
-            </a>
-            <a tButton routerLink="/customers" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">
-              Clientes
-            </a>
-            <a tButton routerLink="/vessels" routerLinkActive="bg-accent text-accent-foreground" variant="ghost">
-              Embarcações
-            </a>
-            <a
-              tButton
-              routerLink="/inspection-templates"
-              routerLinkActive="bg-accent text-accent-foreground"
-              variant="ghost"
-            >
-              Modelos de inspeção
-            </a>
+    <t-sidebar-provider>
+      <t-sidebar class="border-sidebar-border">
+        <t-sidebar-header class="gap-0 px-4 py-0">
+          <div class="-mx-2 mb-4 flex h-[69px] shrink-0 items-center gap-2.5 border-b border-sidebar-border px-2">
+            <span class="grid size-[31px] place-items-center rounded-[9px] bg-primary text-primary-foreground">
+              <ng-icon name="lucideAnchor" class="size-[19px]" />
+            </span>
+            <span class="text-[17px] font-extrabold tracking-[0.4px]">UMBRIEL<span class="text-primary">SHIP</span></span>
+            <button
+              tSidebarTrigger
+              type="button"
+              aria-label="Recolher menu"
+              class="ml-auto text-muted-foreground"
+            ></button>
+          </div>
+
+          @if (user(); as user) {
+            <organization-switcher-ui
+              class="mb-2"
+              [organizations]="user.organizations"
+              [activeId]="user.organization.id"
+              (picked)="switchOrganization($event)"
+            />
+          } @else {
+            <t-skeleton class="mb-2 h-[52px] w-full rounded-lg" />
+          }
+        </t-sidebar-header>
+
+        <t-sidebar-content>
+          <nav aria-label="Menu principal" class="contents">
+            <t-sidebar-group class="px-2 py-0">
+              <span tSidebarGroupLabel class="mb-[9px] h-auto px-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+                MENU PRINCIPAL
+              </span>
+              <t-sidebar-group-content>
+                <ul tSidebarMenu class="gap-[3px]">
+                  @for (item of mainMenu; track item.key) {
+                    <li tSidebarMenuItem>
+                      <a
+                        tSidebarMenuButton
+                        class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:size-[17px]"
+                        [routerLink]="item.link"
+                        [isActive]="section() === item.key"
+                        [tooltip]="item.label"
+                        [attr.aria-current]="section() === item.key ? 'page' : null"
+                      >
+                        <ng-icon [name]="item.icon" />
+                        <span>{{ item.label }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </t-sidebar-group-content>
+            </t-sidebar-group>
+
             @if (isInternalAdministrator()) {
-              <a
-                tButton
-                routerLink="/organizations"
-                routerLinkActive="bg-accent text-accent-foreground"
-                variant="ghost"
-              >
-                Administração
-              </a>
+              <t-sidebar-group class="mt-2 px-2 py-0">
+                <span tSidebarGroupLabel class="mb-[9px] h-auto px-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+                  GESTÃO
+                </span>
+                <t-sidebar-group-content>
+                  <ul tSidebarMenu class="gap-[3px]">
+                    @for (item of managementMenu; track item.key) {
+                      <li tSidebarMenuItem>
+                        <a
+                          tSidebarMenuButton
+                          class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:size-[17px]"
+                          [routerLink]="item.link"
+                          [isActive]="section() === item.key"
+                          [tooltip]="item.label"
+                          [attr.aria-current]="section() === item.key ? 'page' : null"
+                        >
+                          <ng-icon [name]="item.icon" />
+                          <span>{{ item.label }}</span>
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </t-sidebar-group-content>
+              </t-sidebar-group>
             }
           </nav>
+        </t-sidebar-content>
 
-          <div class="flex min-w-0 flex-wrap items-center gap-2">
-            <button tButton variant="ghost" size="icon-sm" type="button" (click)="toggleDarkMode()">
-              {{ isDarkMode() ? 'Claro' : 'Escuro' }}
-            </button>
-
-            @if (loading()) {
-              <t-skeleton class="h-4 w-32 rounded" />
-            } @else if (user(); as user) {
-              <organization-switcher-ui
-                [organizations]="user.organizations"
-                [activeId]="user.organization.id"
-                (picked)="switchOrganization($event)"
-              />
-              <div #userMenu class="relative">
-                <button tButton type="button" variant="ghost" (click)="toggleMenu()">
-                  {{ user.name }}
+        <t-sidebar-footer class="gap-0 px-4 pt-0 pb-3">
+          <t-sidebar-separator class="mx-0 mb-3" />
+          @if (user(); as user) {
+            <div class="flex items-center gap-2.5" data-slot="profile">
+              <span
+                class="grid size-[30px] shrink-0 place-items-center rounded-full bg-primary/10 text-[11px] font-bold text-primary"
+              >
+                {{ initialsOf(user.name) }}
+              </span>
+              <span class="min-w-0 flex-1">
+                <strong class="block truncate text-[11px] font-bold">{{ user.name }}</strong>
+                <small class="mt-0.5 block text-[10px] text-muted-foreground">{{ roleLabels[user.role] }}</small>
+              </span>
+              <t-dropdown-menu>
+                <button
+                  tDropdownMenuTrigger
+                  type="button"
+                  aria-label="Abrir menu do usuário"
+                  class="grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
+                >
+                  <ng-icon name="lucideEllipsis" class="size-[19px]" />
                 </button>
-                @if (isMenuOpen()) {
-                  <div class="absolute right-0 z-20 mt-2 w-40 rounded-md bg-popover p-1 shadow-lg" role="menu">
-                    <button tButton class="w-full justify-start" type="button" variant="ghost" (click)="handleLogout()">
-                      Sair
-                    </button>
-                  </div>
-                }
-              </div>
+                <t-dropdown-menu-content side="top" align="end" class="w-40">
+                  <button tDropdownMenuItem type="button" (click)="handleLogout()">
+                    <ng-icon name="lucideLogOut" />
+                    Sair
+                  </button>
+                </t-dropdown-menu-content>
+              </t-dropdown-menu>
+            </div>
+          } @else {
+            <t-skeleton class="h-[30px] w-full rounded-md" />
+          }
+        </t-sidebar-footer>
+      </t-sidebar>
+
+      <main tSidebarInset class="min-w-0">
+        <header
+          class="flex h-[59px] shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4 sm:px-6 lg:px-[37px]"
+        >
+          <div class="flex min-w-0 items-center gap-2 text-[12px] text-muted-foreground">
+            @if (showMenuTrigger()) {
+              <button tSidebarTrigger type="button" aria-label="Abrir menu" class="-ml-1"></button>
+            }
+            <span>Operação</span>
+            <ng-icon name="lucideChevronRight" class="size-3.5 shrink-0" />
+            <strong class="truncate font-bold text-foreground" data-slot="breadcrumb-section">
+              {{ sectionLabel() }}
+            </strong>
+          </div>
+
+          <div class="flex shrink-0 items-center gap-3">
+            <button
+              type="button"
+              class="grid size-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              [attr.aria-label]="isDarkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
+              [attr.title]="isDarkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
+              [attr.aria-pressed]="isDarkMode()"
+              (click)="toggleDarkMode()"
+            >
+              <ng-icon [name]="isDarkMode() ? 'lucideSun' : 'lucideMoon'" class="size-[17px]" />
+            </button>
+            <span class="h-6 border-l border-border"></span>
+            @if (user(); as user) {
+              <span
+                class="grid size-[30px] place-items-center rounded-full bg-primary/10 text-[11px] font-bold text-primary"
+                aria-hidden="true"
+              >
+                {{ initialsOf(user.name) }}
+              </span>
             }
           </div>
-        </div>
-      </header>
-      <router-outlet />
-    </main>
+        </header>
+
+        <router-outlet />
+      </main>
+    </t-sidebar-provider>
   `,
 })
 export class InternalLayout {
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
   private readonly reloadPage = inject(PAGE_RELOAD);
-  private readonly userMenu = viewChild<ElementRef<HTMLElement>>('userMenu');
+  private readonly sidebar = viewChild(SidebarProvider);
 
   private readonly userResource = httpResource<MeResponse>(() => '/api/me');
 
+  protected readonly mainMenu = MAIN_MENU;
+  protected readonly managementMenu = MANAGEMENT_MENU;
+  protected readonly roleLabels = roleLabels;
+  protected readonly initialsOf = initials;
+
   isDarkMode = signal(document.documentElement.classList.contains('dark'));
-  isMenuOpen = signal(false);
+  private readonly url = signal(this.router.url);
 
   user = computed(() => resourceValue(this.userResource)?.user ?? null);
-  loading = computed(() => this.userResource.isLoading());
   isInternalAdministrator = computed(() => {
     const user = this.user();
     return user?.role === 'administrator' && user.organization.isInternal;
+  });
+
+  section = computed(() => {
+    const path = this.url().split(/[?#]/)[0];
+    return SECTIONS.find(({ prefix }) => path === prefix || path.startsWith(`${prefix}/`))?.key ?? null;
+  });
+  sectionLabel = computed(() => {
+    const key = this.section();
+    return key ? LABELS[key] : '';
+  });
+
+  /** On a phone the sidebar is a panel; on a desktop the trigger comes back once it is collapsed. */
+  showMenuTrigger = computed(() => {
+    const sidebar = this.sidebar();
+    return !!sidebar && (sidebar.isMobile() || !sidebar.open());
   });
 
   constructor() {
@@ -120,14 +338,17 @@ export class InternalLayout {
       if (!user || !this.authenticationService.takeOrganizationChanged()) return;
       toast.info(`A organização ativa mudou para ${user.organization.name}.`);
     });
-  }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const menu = this.userMenu()?.nativeElement;
-    if (menu && event.target instanceof Node && !menu.contains(event.target)) {
-      this.isMenuOpen.set(false);
-    }
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(inject(DestroyRef)),
+      )
+      .subscribe((event) => {
+        this.url.set(event.urlAfterRedirects);
+        // Picking a menu item on a phone closes the panel.
+        this.sidebar()?.openMobile.set(false);
+      });
   }
 
   @HostListener('window:storage', ['$event'])
@@ -137,15 +358,11 @@ export class InternalLayout {
     this.reloadPage();
   }
 
-  toggleMenu() {
-    this.isMenuOpen.update((open) => !open);
-  }
-
   toggleDarkMode() {
-    const html = document.documentElement;
-    const dark = html.classList.toggle('dark');
-    this.isDarkMode.set(dark);
-    localStorage.setItem('@umbriel:theme', dark ? 'dark' : 'light');
+    const theme = this.isDarkMode() ? 'light' : 'dark';
+    applyTheme(theme);
+    saveTheme(theme);
+    this.isDarkMode.set(theme === 'dark');
   }
 
   switchOrganization(organizationId: string) {
