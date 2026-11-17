@@ -174,9 +174,21 @@ export const cells = (element: HTMLElement) => [
 export const cell = (element: HTMLElement, day: number, row: number) =>
   cells(element)[row * headers(element).length + day];
 
+/**
+ * The fields each item shows, as drawn: a compact card (two or more in a cell, AD-052) shows the
+ * time and the Vessel on its first line and "<name> · <code>" on its second; a card hidden with CSS
+ * would not count.
+ */
 export const itemsIn = (node: ParentNode) =>
   [...node.querySelectorAll<HTMLButtonElement>('[data-slot="agenda-item"]')].map((item) =>
-    [...item.children].map((part) => text(part)),
+    [...item.children]
+      .filter((part) => !part.classList.contains('hidden'))
+      .flatMap((part) => {
+        const slot = part.getAttribute('data-slot');
+        if (slot === 'compact-head') return [...part.querySelectorAll('span, strong')].map((field) => text(field));
+        if (slot === 'compact-detail') return (text(part) ?? '').split(' · ');
+        return [text(part)];
+      }),
   );
 
 export const metrics = (element: HTMLElement) =>

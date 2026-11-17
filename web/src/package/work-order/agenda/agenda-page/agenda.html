@@ -187,20 +187,28 @@
                       type="button"
                       data-slot="agenda-item"
                       class="flex w-full shrink-0 flex-col items-start overflow-hidden rounded-[4px] border-l-2 text-left"
-                      [class]="kindTones[item.kind] + (items.length > 1 ? ' h-[30px] justify-center px-[5px] py-0.5' : ' min-h-[63px] px-1.5 py-[5px]')"
+                      [class]="kindTones[item.kind] + (items.length > 1 ? ' h-[30px] justify-center gap-px px-[5px] py-0.5' : ' min-h-[63px] px-1.5 py-[5px]')"
                       [attr.aria-label]="itemLabel(item)"
                       (click)="openItem(item)"
                     >
-                      <span class="flex items-center gap-1 text-[8px] leading-tight font-semibold text-foreground/70">
-                        {{ item.time }} <i class="size-[5px] rounded-full" [class]="dotTones[item.kind]"></i>
-                      </span>
-                      <strong class="mt-0.5 max-w-full truncate text-[9px] leading-tight font-semibold text-foreground">{{ item.vesselName }}</strong>
-                      <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground" [class.hidden]="items.length > 1">
-                        {{ item.title }}
-                      </span>
-                      <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground/80" [class.hidden]="items.length > 1">
-                        {{ item.code }}
-                      </span>
+                      @if (items.length > 1) {
+                        <!-- Compact: every field of criterion 59 on two lines (AD-052). -->
+                        <span data-slot="compact-head" class="flex w-full min-w-0 items-center gap-1 text-[8px] leading-tight">
+                          <span class="shrink-0 font-semibold text-foreground/70">{{ item.time }}</span>
+                          <i class="size-[5px] shrink-0 rounded-full" [class]="dotTones[item.kind]"></i>
+                          <strong class="min-w-0 truncate text-[9px] font-semibold text-foreground">{{ item.vesselName }}</strong>
+                        </span>
+                        <span data-slot="compact-detail" class="w-full truncate text-[8px] leading-tight text-muted-foreground">
+                          {{ item.title }} · {{ item.code }}
+                        </span>
+                      } @else {
+                        <span class="flex items-center gap-1 text-[8px] leading-tight font-semibold text-foreground/70">
+                          {{ item.time }} <i class="size-[5px] rounded-full" [class]="dotTones[item.kind]"></i>
+                        </span>
+                        <strong class="mt-0.5 max-w-full truncate text-[9px] leading-tight font-semibold text-foreground">{{ item.vesselName }}</strong>
+                        <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground">{{ item.title }}</span>
+                        <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground/80">{{ item.code }}</span>
+                      }
                     </button>
                   } @empty {
                     @if (canWrite()) {
