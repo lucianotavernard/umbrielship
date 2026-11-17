@@ -1,152 +1,219 @@
-<header class="border-b border-border">
-  <div class="mx-auto max-w-7xl px-6 py-4">
-    <button type="button" variant="ghost" class="gap-2">
-      <ng-icon name="lucideArrowLeft" class="size-4" />
-      Voltar para detalhes da embarcação
-    </button>
-  </div>
-</header>
+<div class="mx-auto w-full max-w-[988px] px-[13px] pt-[18px] pb-[21px] sm:px-6 sm:pt-6 lg:px-[37px]">
+  <nav aria-label="Navegação estrutural" class="mb-[17px] flex items-center gap-[9px] text-[10px] text-muted-foreground">
+    <a routerLink="/work-orders" class="hover:text-primary">Ordens de serviço</a>
+    <span aria-hidden="true">/</span>
+    <span data-slot="breadcrumb-current" class="truncate font-semibold text-foreground">OS {{ code() }}</span>
+  </nav>
 
-<section class="mx-auto max-w-7xl px-6 py-8">
-  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
-    <!-- Main Content Column -->
-    <div class="grid grid-cols-1 gap-6 lg:col-span-2">
-      <work-order-detail-ui
-        [canWrite]="canWrite()"
-        [workOrder]="workOrder()"
-        [loading]="loadingWorkOrder()"
-        (edited)="openEditWorkOrderSheet()"
-      />
-
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <header class="flex items-center justify-between gap-3 px-6 py-4 border-b bg-popover">
-          <div class="flex items-center gap-3">
-            <div class="flex p-3 bg-background rounded-lg shadow-xs">
-              <ng-icon name="lucideWrench" class="!size-4" />
+  @if (notFound()) {
+    <section
+      data-slot="not-found"
+      class="mx-auto my-10 flex max-w-[430px] flex-col items-center gap-2.5 rounded-lg border border-border bg-card p-7 text-center"
+    >
+      <span class="grid size-[45px] place-items-center rounded-[11px] bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+        <span>?</span>
+      </span>
+      <h1 class="text-[18px] font-normal text-foreground">Ordem de serviço não encontrada</h1>
+      <p class="text-[11px] text-muted-foreground">Esse registro não está disponível na sua organização.</p>
+      <a routerLink="/work-orders" class="mt-1 text-[11px] font-semibold text-primary">Voltar para ordens de serviço</a>
+    </section>
+  } @else {
+    <div class="flex min-w-0 flex-col gap-[15px]">
+      <section aria-labelledby="work-order-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+        @if (workOrder(); as order) {
+          <div class="flex flex-wrap items-start gap-[13px]">
+            <span class="grid size-[45px] shrink-0 place-items-center rounded-[11px] bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+              <ng-icon name="lucideClipboardList" class="!size-[22px]" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">ORDEM DE SERVIÇO</span>
+              <div class="mt-[5px] flex flex-wrap items-center gap-[9px]">
+                <h1 id="work-order-title" class="text-[20px] leading-tight font-normal tracking-[-0.45px] text-foreground">
+                  OS {{ code() }}
+                </h1>
+                <span
+                  data-slot="status"
+                  class="inline-flex items-center gap-[5px] rounded-full px-2 py-[5px] text-[8px] font-semibold whitespace-nowrap"
+                  [class]="statusTones[order.status]"
+                >
+                  <i class="size-[5px] rounded-full bg-current"></i>
+                  {{ statusLabels[order.status] }}
+                </span>
+              </div>
+              <p class="mt-1.5 text-[10px] text-muted-foreground">Período, serviços e inspeções desta ordem.</p>
             </div>
-
-            <div>
-              <h3 class="text-sm font-semibold">Serviços</h3>
-              <p class="text-xs text-muted-foreground">Serviços executados nesta ordem</p>
+            @if (canWrite()) {
+              <button
+                type="button"
+                class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
+                (click)="openEditWorkOrderSheet()"
+              >
+                <ng-icon name="lucidePencil" class="!size-3.5" />
+                Editar
+              </button>
+            }
+          </div>
+          <dl class="mt-[18px] grid grid-cols-1 gap-[14px] border-t border-border pt-[15px] sm:grid-cols-3">
+            <div class="min-w-0" data-slot="vessel">
+              <dt class="text-[9px] text-muted-foreground">Embarcação</dt>
+              <dd class="mt-1.5 flex items-start gap-2">
+                <ng-icon name="lucideShip" class="mt-px !size-3.5 shrink-0 text-muted-foreground" />
+                <span class="min-w-0">
+                  <a
+                    data-slot="vessel-link"
+                    class="block truncate text-[10px] font-semibold text-foreground hover:text-primary hover:underline"
+                    [routerLink]="['/vessels', order.vessel.vesselId]"
+                  >
+                    {{ order.vessel.name }}
+                  </a>
+                  <span data-slot="vessel-spec" class="mt-1 block text-[9px] text-muted-foreground">
+                    {{ vesselType() }} · {{ length(order.vessel.length) }} m
+                  </span>
+                </span>
+              </dd>
+            </div>
+            <div class="min-w-0" data-slot="start">
+              <dt class="text-[9px] text-muted-foreground">Docagem</dt>
+              <dd class="mt-1.5 flex items-start gap-2">
+                <ng-icon name="lucideCalendarDays" class="mt-px !size-3.5 shrink-0 text-muted-foreground" />
+                <span>
+                  <span data-slot="date" class="block text-[10px] font-semibold text-foreground">
+                    {{ order.startDate | date: 'longDate' }}, {{ order.startDate | date: 'HH:mm' }}
+                  </span>
+                  <span data-slot="weekday" class="mt-1 block text-[9px] text-muted-foreground capitalize">
+                    {{ order.startDate | date: 'EEEE' }}
+                  </span>
+                </span>
+              </dd>
+            </div>
+            <div class="min-w-0" data-slot="end">
+              <dt class="text-[9px] text-muted-foreground">Desdocagem</dt>
+              <dd class="mt-1.5 flex items-start gap-2">
+                <ng-icon name="lucideCalendarDays" class="mt-px !size-3.5 shrink-0 text-muted-foreground" />
+                <span>
+                  <span data-slot="date" class="block text-[10px] font-semibold text-foreground">
+                    {{ order.endDate | date: 'longDate' }}, {{ order.endDate | date: 'HH:mm' }}
+                  </span>
+                  <span data-slot="weekday" class="mt-1 block text-[9px] text-muted-foreground capitalize">
+                    {{ order.endDate | date: 'EEEE' }}
+                  </span>
+                </span>
+              </dd>
+            </div>
+          </dl>
+        } @else {
+          <div data-slot="header-skeleton" class="flex items-center gap-[13px]">
+            <t-skeleton class="size-[45px] rounded-[11px]" />
+            <div class="grid flex-1 gap-2">
+              <t-skeleton class="h-3 w-24 rounded" />
+              <t-skeleton class="h-5 w-48 rounded" />
             </div>
           </div>
+        }
+      </section>
 
+      <section aria-labelledby="work-order-services-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+        <div class="mb-[15px] flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="grid size-[30px] place-items-center rounded-[8px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+              <ng-icon name="lucideWrench" class="!size-[15px]" />
+            </span>
+            <div>
+              <h2 id="work-order-services-title" class="text-[13px] font-normal text-foreground">Serviços</h2>
+              <p class="mt-[3px] text-[10px] text-muted-foreground">Serviços executados nesta ordem</p>
+            </div>
+          </div>
           @if (canWrite()) {
-            <button tButton type="button" (click)="openCreateServiceSheet()">
-              <ng-icon name="lucidePlus" class="size-4 mr-1" />
+            <button
+              type="button"
+              class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
+              (click)="openCreateServiceSheet()"
+            >
+              <ng-icon name="lucidePlus" class="!size-[15px]" />
               Novo serviço
             </button>
           }
-        </header>
-
-        <div class="p-6">
-          <work-order-service-list-ui
-            [canWrite]="canWrite()"
-            [loading]="loading()"
-            [services]="services()"
-            (fileSelected)="upload($event)"
-          />
         </div>
+        <work-order-service-list-ui
+          [canWrite]="canWrite()"
+          [loading]="loadingServices()"
+          [services]="services()"
+          (fileSelected)="upload($event)"
+        />
       </section>
 
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <header class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 border-b bg-popover sm:px-6">
-          <div class="flex items-center gap-3">
-            <div class="flex p-3 bg-background rounded-lg shadow-xs">
-              <ng-icon name="lucideClipboardCheck" class="!size-4" />
-            </div>
-
+      <section aria-labelledby="work-order-inspections-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+        <div class="mb-[15px] flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="grid size-[30px] place-items-center rounded-[8px] bg-[#eaf5ef] text-[#498b68] dark:bg-[#15291f] dark:text-[#8fcfab]">
+              <ng-icon name="lucideClipboardCheck" class="!size-[15px]" />
+            </span>
             <div>
-              <h3 class="text-sm font-semibold">Inspeções</h3>
-              <p class="text-xs text-muted-foreground">Modelos de inspeção atribuídos a esta ordem</p>
+              <h2 id="work-order-inspections-title" class="text-[13px] font-normal text-foreground">Inspeções</h2>
+              <p class="mt-[3px] text-[10px] text-muted-foreground">Modelos de inspeção atribuídos a esta ordem</p>
             </div>
           </div>
-
           @if (isAdministrator()) {
-            <button tButton type="button" (click)="openAssignSheet()">
-              <ng-icon name="lucidePlus" class="size-4 mr-1" />
+            <button
+              type="button"
+              class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
+              (click)="openAssignSheet()"
+            >
+              <ng-icon name="lucidePlus" class="!size-[15px]" />
               Atribuir modelo
             </button>
           }
-        </header>
-
-        <div class="p-4 sm:p-6">
-          <inspection-assignment-list-ui
-            [canAdminister]="isAdministrator()"
-            [canInspect]="isInspector()"
-            [workOrderStatus]="workOrderStatus()"
-            [serviceStatuses]="serviceStatuses()"
-            [loading]="loadingAssignments()"
-            [assignments]="assignments()"
-            (removed)="openRemoveDialog($event)"
-            (inspected)="openChecklist($event)"
-            (opened)="openInspection($event)"
-          />
         </div>
+        <inspection-assignment-list-ui
+          [canAdminister]="isAdministrator()"
+          [canInspect]="isInspector()"
+          [workOrderStatus]="workOrderStatus()"
+          [serviceStatuses]="serviceStatuses()"
+          [loading]="loadingAssignments()"
+          [assignments]="assignments()"
+          (removed)="openRemoveDialog($event)"
+          (inspected)="inspect($event)"
+          (opened)="openInspection($event)"
+        />
       </section>
     </div>
-
-    <!-- Sidebar Column -->
-    <div class="grid grid-cols-1 gap-6">
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <header class="flex items-center gap-3 px-6 py-4 border-b bg-popover">
-          <div class="flex p-3 bg-background rounded-lg shadow-xs">
-            <ng-icon name="lucideHistory" class="!size-4" />
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold">Atividade recente</h3>
-            <p class="text-xs text-muted-foreground">
-              Acompanhe todas as alterações e atualizações
-            </p>
-          </div>
-        </header>
-
-        <div class="p-4">
-          <div class="flow-root overflow-h-scroll pr-2">
-            <ul class="flex flex-col gap-1">
-              <li>
-                <div class="flex flex-col items-center py-8">
-                  <div class="flex mb-2 bg-muted rounded-lg p-3 text-xl">
-                    <ng-icon name="lucideHistory" class="!size-8 text-muted-foreground" />
-                  </div>
-                  <p class="text-sm font-medium text-foreground">Nenhuma atividade recente</p>
-                  <p class="text-xs text-muted-foreground mt-1">
-                    As atividades aparecerão aqui à medida que forem realizadas
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>
-</section>
+  }
+</div>
 
 <t-sheet
+  kicker="ORDEM DE SERVIÇO"
+  closeLabel="Fechar formulário"
   title="Editar ordem de serviço"
-  description="Preencha os campos abaixo para atualizar as informações da ordem de serviço"
-  class="sm:max-w-md"
+  description="Atualize o período e o status da ordem de serviço."
+  class="sm:w-full sm:max-w-[580px]"
+  [flush]="true"
   [isActive]="isEditWorkOrderSheetActive()"
   (closed)="closeEditWorkOrderSheet()"
 >
   <work-order-form-ui
     [loading]="submitting()"
-    [workOrder]="workOrder()"
+    [vessels]="formVessels()"
+    [workOrder]="formValue()"
     (closed)="closeEditWorkOrderSheet()"
     (submitted)="editWorkOrder($event)"
   />
 </t-sheet>
 
 <t-sheet
+  kicker="ORDEM DE SERVIÇO"
+  closeLabel="Fechar formulário"
   title="Novo serviço"
   description="Preencha os campos abaixo para criar um novo serviço"
-  class="sm:max-w-md"
+  class="sm:w-full sm:max-w-[520px]"
+  [flush]="true"
   [isActive]="isCreateServiceSheetActive()"
   (closed)="closeCreateServiceSheet()"
 >
-  <work-order-service-form-ui [loading]="submitting()" (closed)="closeCreateServiceSheet()" (submitted)="createWorkOrderService($event)" />
+  <work-order-service-form-ui
+    [loading]="submitting()"
+    (closed)="closeCreateServiceSheet()"
+    (submitted)="createWorkOrderService($event)"
+  />
 </t-sheet>
 
 <t-sheet
@@ -178,49 +245,4 @@
   [loading]="removing()"
   (closed)="closeRemoveDialog()"
   (confirmed)="removeInspectionAssignment()"
-/>
-
-<t-sheet
-  title="Inspecionar"
-  [description]="inspecting()?.templateName ?? ''"
-  class="sm:max-w-lg"
-  [isActive]="inspecting() !== null"
-  (closed)="closeChecklist()"
->
-  @if (inspecting(); as assignment) {
-    <inspection-checklist-ui
-      [items]="assignment.items"
-      [loading]="completing()"
-      (closed)="closeChecklist()"
-      (submitted)="completeInspection($event)"
-    />
-  }
-</t-sheet>
-
-<t-sheet
-  title="Inspeção"
-  [description]="viewing()?.assignment?.templateName ?? ''"
-  class="sm:max-w-lg"
-  [isActive]="viewing() !== null"
-  (closed)="closeInspection()"
->
-  @if (viewing(); as selection) {
-    <inspection-view-ui
-      [inspection]="selection.inspection"
-      [items]="selection.assignment.items"
-      [canDiscard]="isInspector()"
-      (discarded)="isDiscardDialogActive.set(true)"
-    />
-  }
-</t-sheet>
-
-<t-confirmation
-  title="Descartar inspeção"
-  description="Tem certeza que deseja descartar esta inspeção? Ela deixará de aparecer no app."
-  confirmLabel="Confirmar"
-  cancelLabel="Cancelar"
-  [isActive]="isDiscardDialogActive()"
-  [loading]="discarding()"
-  (closed)="isDiscardDialogActive.set(false)"
-  (confirmed)="discardInspection()"
 />

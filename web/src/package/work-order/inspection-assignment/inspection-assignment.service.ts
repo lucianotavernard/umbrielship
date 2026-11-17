@@ -25,6 +25,16 @@ export type InspectionAssignment = {
   inspections: Inspection[];
 };
 
+/** An assignment as `GET /inspection-assignments` lists it for the whole Organization (Landing door 4). */
+export type OrganizationInspectionAssignment = Omit<InspectionAssignment, 'service'> & {
+  service: { id: string; name: string; status: string } | null;
+  workOrder: { id: string; vesselId: string; status: string };
+};
+
+export type GetOrganizationInspectionAssignmentsResponse = {
+  inspectionAssignments: OrganizationInspectionAssignment[];
+};
+
 export type AssignInspectionTemplateRequest = {
   templateId: string;
   serviceId?: string;

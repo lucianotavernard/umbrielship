@@ -7,8 +7,10 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAnchor,
   lucideBuilding2,
+  lucideCalendarDays,
   lucideChevronRight,
   lucideClipboardCheck,
+  lucideClipboardList,
   lucideEllipsis,
   lucideLayoutDashboard,
   lucideLogOut,
@@ -56,27 +58,26 @@ type MenuItem = { key: string; label: string; link: string; icon: string };
 
 const MAIN_MENU: MenuItem[] = [
   { key: 'overview', label: 'Visão geral', link: '/dashboard', icon: 'lucideLayoutDashboard' },
+  { key: 'work-orders', label: 'Ordens de serviço', link: '/work-orders', icon: 'lucideClipboardList' },
+  { key: 'inspections', label: 'Inspeções', link: '/inspections', icon: 'lucideClipboardCheck' },
   { key: 'vessels', label: 'Embarcações', link: '/vessels', icon: 'lucideShip' },
   { key: 'customers', label: 'Clientes', link: '/customers', icon: 'lucideUsers' },
-  {
-    key: 'inspection-templates',
-    label: 'Modelos de inspeção',
-    link: '/inspection-templates',
-    icon: 'lucideClipboardCheck',
-  },
+  { key: 'agenda', label: 'Agenda', link: '/agenda', icon: 'lucideCalendarDays' },
 ];
 
 const MANAGEMENT_MENU: MenuItem[] = [
   { key: 'organizations', label: 'Organizações', link: '/organizations', icon: 'lucideBuilding2' },
 ];
 
-/** The menu item a route belongs to; a WorkOrder is reached from its Vessel. */
+/** The menu item a route belongs to (AD-032); a template belongs to the Inspections hub. */
 const SECTIONS: { prefix: string; key: string }[] = [
   { prefix: '/dashboard', key: 'overview' },
+  { prefix: '/work-orders', key: 'work-orders' },
+  { prefix: '/inspections', key: 'inspections' },
+  { prefix: '/inspection-templates', key: 'inspections' },
   { prefix: '/vessels', key: 'vessels' },
-  { prefix: '/work-orders', key: 'vessels' },
   { prefix: '/customers', key: 'customers' },
-  { prefix: '/inspection-templates', key: 'inspection-templates' },
+  { prefix: '/agenda', key: 'agenda' },
   { prefix: '/organizations', key: 'organizations' },
 ];
 
@@ -115,8 +116,10 @@ const LABELS = Object.fromEntries(
     provideIcons({
       lucideAnchor,
       lucideBuilding2,
+      lucideCalendarDays,
       lucideChevronRight,
       lucideClipboardCheck,
+      lucideClipboardList,
       lucideEllipsis,
       lucideLayoutDashboard,
       lucideLogOut,
@@ -326,7 +329,10 @@ export class InternalLayout {
   constructor() {
     effect(() => {
       const user = this.user();
-      if (user) this.authenticationService.role.set(user.role);
+      if (user) {
+        this.authenticationService.role.set(user.role);
+        this.authenticationService.name.set(user.name);
+      }
     });
 
     effect(() => {

@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendarDays, lucideFileText, lucideTrash2 } from '@ng-icons/lucide';
 
 import { Skeleton } from '../../../shared/components/ui/skeleton';
-import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order.service';
+import { WorkOrder, workOrderStatusLabels, workOrderStatusTones } from '../work-order.service';
 
 @Component({
   selector: 'work-order-list-ui',
@@ -114,10 +114,5 @@ export class WorkOrderList {
   protected readonly labels = workOrderStatusLabels;
 
   /** The mareos status pills: in progress blue, done green, cancelled rose, pending grey. */
-  protected readonly tones: Record<WorkOrderStatus, string> = {
-    PENDING: 'bg-[#f0f2f4] text-[#778590] dark:bg-[#1a2632] dark:text-[#9aaab8]',
-    IN_PROGRESS: 'bg-[#edf4fb] text-[#4e84b7] dark:bg-[#18283a] dark:text-[#8db4dc]',
-    COMPLETED: 'bg-[#eaf5ef] text-[#498b68] dark:bg-[#15291f] dark:text-[#8fcfab]',
-    CANCELLED: 'bg-[#fbefed] text-[#b86b61] dark:bg-[#2e1d1b] dark:text-[#e3a49b]',
-  };
+  protected readonly tones = workOrderStatusTones;
 }

@@ -50,6 +50,8 @@ export class AuthenticationService {
 
   // The Role of the active Membership, set by the layout from GET /me.
   role = signal<Role | null>(null);
+  // The signed-in User's name, set by the layout from GET /me with the Role.
+  name = signal<string | null>(null);
   // The same allow-list as the API's WRITERS: an inspector, an unknown Role and a session
   // whose Role is not loaded yet see no write control.
   canWrite = computed(() => {
@@ -98,5 +100,6 @@ export class AuthenticationService {
     this.isAuthenticated.set(false);
     this.activeOrganizationId.set(null);
     this.role.set(null);
+    this.name.set(null);
   }
 }

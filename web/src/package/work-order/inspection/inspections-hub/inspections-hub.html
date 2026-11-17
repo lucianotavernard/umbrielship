@@ -1,0 +1,132 @@
+<div class="mx-auto w-full max-w-[930px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+  <div class="mb-[23px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
+    <div>
+      <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-5 bg-muted-foreground/60"></span>
+        OPERAÇÃO / QUALIDADE
+      </div>
+      <h1 class="mt-[9px] mb-[5px] text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]">
+        Inspeções
+      </h1>
+      <p class="text-[12px] text-muted-foreground">Crie roteiros, atribua ordens e acompanhe as inspeções de campo.</p>
+    </div>
+    @if (isAdministrator()) {
+      <button
+        type="button"
+        class="inline-flex h-[37px] items-center gap-2 rounded-md bg-primary px-[13px] text-[11px] font-semibold text-primary-foreground shadow-[0_2px_3px_#087f8c22] hover:bg-primary/90"
+        (click)="openTemplateSheet()"
+      >
+        <ng-icon name="lucidePlus" class="!size-4" />
+        Novo modelo
+      </button>
+    }
+  </div>
+
+  <section aria-label="Resumo de inspeções" class="mb-[17px] grid grid-cols-1 gap-2 sm:grid-cols-3 lg:gap-[13px]">
+    @if (loading()) {
+      @for (slot of [1, 2, 3]; track slot) {
+        <t-skeleton data-slot="metric-skeleton" class="h-[78px] rounded-lg" />
+      }
+    } @else {
+      <t-metric label="Modelos ativos" note="roteiros" tone="blue" [value]="metrics().templates">
+        <ng-icon name="lucideClipboardList" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Aguardando conclusão" note="atribuições" tone="amber" [value]="metrics().waiting">
+        <ng-icon name="lucideClock3" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Concluídas" note="inspeções" tone="green" [value]="metrics().completed">
+        <ng-icon name="lucideClipboardCheck" class="!size-[17px]" />
+      </t-metric>
+    }
+  </section>
+
+  <section aria-labelledby="inspection-list-title" class="rounded-lg border border-border bg-card px-[13px] py-[18px] sm:px-[18px]">
+    @if (isInspector()) {
+      <h2 id="inspection-list-title" class="text-[13px] font-normal text-foreground">Atribuições de inspeção</h2>
+      <p class="mt-[5px] text-[10px] text-muted-foreground">Abra uma atribuição para preencher o roteiro em campo.</p>
+      <div class="mt-[15px]">
+        @if (loading()) {
+          <t-skeleton data-slot="list-skeleton" class="h-[78px] rounded-[9px]" />
+        } @else {
+          <inspection-assignment-cards-ui [rows]="assignmentRows()" [canInspect]="true" (inspected)="inspect($event)" />
+        }
+      </div>
+    } @else {
+      <h2 id="inspection-list-title" class="text-[13px] font-normal text-foreground">Central de inspeções</h2>
+      <p class="mt-[5px] text-[10px] text-muted-foreground">Gerencie os modelos e acompanhe as execuções por ordem de serviço.</p>
+      <div role="tablist" aria-label="Seções de inspeções" class="mt-[15px] flex gap-1 border-b border-border">
+        <button
+          type="button"
+          role="tab"
+          class="group -mb-px flex h-[34px] items-center gap-2 rounded-t-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-border aria-selected:border-b-card aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+          [attr.aria-selected]="tab() === 'templates'"
+          (click)="tab.set('templates')"
+        >
+          Modelos
+          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-selected:bg-primary/10">
+            {{ templates().length }}
+          </span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="group -mb-px flex h-[34px] items-center gap-2 rounded-t-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-border aria-selected:border-b-card aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+          [attr.aria-selected]="tab() === 'assignments'"
+          (click)="tab.set('assignments')"
+        >
+          Atribuições
+          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-selected:bg-primary/10">
+            {{ assignmentRows().length }}
+          </span>
+        </button>
+      </div>
+      <div class="mt-[15px]">
+        @if (tab() === 'templates') {
+          <inspection-template-cards-ui
+            [loading]="loading()"
+            [canAdminister]="isAdministrator()"
+            [templates]="templates()"
+            (assigned)="openAssign($event)"
+            (created)="openTemplateSheet()"
+          />
+        } @else if (loading()) {
+          <t-skeleton data-slot="list-skeleton" class="h-[78px] rounded-[9px]" />
+        } @else {
+          <inspection-assignment-cards-ui [rows]="assignmentRows()" />
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<t-sheet
+  kicker="BIBLIOTECA DE INSPEÇÕES"
+  closeLabel="Fechar formulário"
+  title="Novo modelo"
+  description="Defina as perguntas que o inspetor deverá responder em campo."
+  class="sm:w-full sm:max-w-[520px]"
+  [flush]="true"
+  [isActive]="isTemplateSheetActive()"
+  (closed)="closeTemplateSheet()"
+>
+  <inspection-template-form-ui [loading]="submitting()" (closed)="closeTemplateSheet()" (submitted)="createTemplate($event)" />
+</t-sheet>
+
+<t-sheet
+  kicker="ATRIBUIR INSPEÇÃO"
+  closeLabel="Fechar atribuição"
+  title="Escolha a OS e o alvo"
+  [description]="'A inspeção usará o modelo ' + (assigning()?.name ?? '') + '.'"
+  class="sm:w-full sm:max-w-[460px]"
+  [flush]="true"
+  [isActive]="assigning() !== null"
+  (closed)="closeAssign()"
+>
+  <assign-to-work-order-form-ui
+    [workOrders]="workOrders()"
+    [questionCount]="assigning()?.itemCount ?? 0"
+    [loading]="submitting()"
+    (closed)="closeAssign()"
+    (submitted)="assign($event)"
+  />
+</t-sheet>

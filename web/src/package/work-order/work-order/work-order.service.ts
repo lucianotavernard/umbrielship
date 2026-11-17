@@ -2,7 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import type { WorkOrderServiceStatus } from '../work-order-service/work-order-service.service';
+
 export type WorkOrderStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export const WORK_ORDER_STATUSES: WorkOrderStatus[] = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
 
 export const workOrderStatusLabels: Record<WorkOrderStatus, string> = {
   PENDING: 'Pendente',
@@ -11,12 +15,36 @@ export const workOrderStatusLabels: Record<WorkOrderStatus, string> = {
   CANCELLED: 'Cancelado',
 };
 
+/** The mareos status pills: in progress blue, done green, cancelled rose, pending grey. */
+export const workOrderStatusTones: Record<WorkOrderStatus, string> = {
+  PENDING: 'bg-[#f0f2f4] text-[#778590] dark:bg-[#1a2632] dark:text-[#9aaab8]',
+  IN_PROGRESS: 'bg-[#edf4fb] text-[#4e84b7] dark:bg-[#18283a] dark:text-[#8db4dc]',
+  COMPLETED: 'bg-[#eaf5ef] text-[#498b68] dark:bg-[#15291f] dark:text-[#8fcfab]',
+  CANCELLED: 'bg-[#fbefed] text-[#b86b61] dark:bg-[#2e1d1b] dark:text-[#e3a49b]',
+};
+
+/** "#AB12CD34": the short code of a WorkOrder, the first 8 characters of its id. */
+export function workOrderCode(id: string): string {
+  return `#${id.slice(0, 8).toUpperCase()}`;
+}
+
+/** A service as `GET /work-orders` lists it with its WorkOrder (Landing door 1). */
+export type WorkOrderServiceSummary = {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: WorkOrderServiceStatus;
+};
+
 export type WorkOrder = {
   id: string;
   vesselId: string;
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
+  /** By `startDate`, then `name`. */
+  services: WorkOrderServiceSummary[];
 };
 
 export type WorkOrderDetail = {
@@ -32,15 +60,21 @@ export type WorkOrderDetail = {
   };
 };
 
+/** A service written with its WorkOrder: it takes the WorkOrder's period and starts `PENDING`. */
+export type NewWorkOrderService = {
+  name: string;
+  description: string;
+};
+
 export type CreateWorkOrderRequest = {
   vesselId: string;
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
+  services?: NewWorkOrderService[];
 };
 
 export type UpdateWorkOrderRequest = {
-  vesselId: string;
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
@@ -63,7 +97,7 @@ export class WorkOrderService {
     return this.http.post<GetWorkOrderResponse>('/api/work-orders', request);
   }
 
-  updateWorkOrder(workOrderId : string, request: UpdateWorkOrderRequest): Observable<void> {
+  updateWorkOrder(workOrderId: string, request: UpdateWorkOrderRequest): Observable<void> {
     return this.http.put<void>(`/api/work-orders/${workOrderId}`, request);
   }
 

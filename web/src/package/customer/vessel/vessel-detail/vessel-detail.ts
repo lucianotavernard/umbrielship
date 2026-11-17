@@ -27,8 +27,8 @@ import { toast } from '../../../shared/components/ui/toaster';
 import { WorkOrderForm } from '../../../work-order/work-order/components/work-order-form';
 import { WorkOrderList } from '../../../work-order/work-order/components/work-order-list';
 import {
+  CreateWorkOrderRequest,
   GetWorkOrdersResponse,
-  UpdateWorkOrderRequest,
   WorkOrder,
   WorkOrderService,
 } from '../../../work-order/work-order/work-order.service';
@@ -74,6 +74,7 @@ export class VesselDetail {
   vesselService = inject(VesselService);
   workOrderService = inject(WorkOrderService);
   private readonly vesselForm = viewChild(VesselForm);
+  private readonly workOrderForm = viewChild(WorkOrderForm);
 
   id = input.required<string>();
 
@@ -105,7 +106,18 @@ export class VesselDetail {
   protected readonly length = formatLength;
   protected readonly initialsOf = initials;
 
+  /** The "Nova ordem de serviço" drawer offers only this Vessel, locked (AD-042). */
+  formVessels = computed(() => {
+    const vessel = this.vessel();
+    return vessel ? [{ id: vessel.id, name: vessel.name, customerId: vessel.customerId }] : [];
+  });
+  formCustomerNames = computed(() => {
+    const vessel = this.vessel();
+    return new Map(vessel?.customer ? [[vessel.customerId, vessel.customer.name]] : []);
+  });
+
   openCreateWorkOrderSheet() {
+    this.workOrderForm()?.reset();
     this.isCreateWorkOrderSheetActive.set(true);
   }
 
@@ -159,9 +171,11 @@ export class VesselDetail {
       });
   }
 
-  createWorkOrder(workOrder: UpdateWorkOrderRequest) {
+  createWorkOrder(workOrder: CreateWorkOrderRequest) {
+    this.submitting.set(true);
     this.workOrderService.createWorkOrder(workOrder).subscribe({
       next: () => {
+        this.submitting.set(false);
         toast.success('Ordem de serviço criada com sucesso', {
           description: 'A ordem de serviço foi criada com sucesso.',
         });
@@ -169,6 +183,7 @@ export class VesselDetail {
         this.workOrdersResource.reload();
       },
       error: (response) => {
+        this.submitting.set(false);
         toast.error('Erro ao criar ordem de serviço', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar a ordem de serviço.'),
         });

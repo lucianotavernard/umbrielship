@@ -21,9 +21,12 @@ const ROUTES = [
   'customers/:id',
   'vessels',
   'vessels/:id',
+  'work-orders',
   'work-orders/:id',
-  'inspection-templates',
+  'work-orders/:id/assignments/:assignmentId/inspect',
+  'inspections',
   'inspection-templates/:id',
+  'agenda',
   'organizations',
   'organizations/:id',
   'auth',
@@ -117,36 +120,44 @@ describe('Shell', () => {
     expect(element.querySelector('header a')).toBeNull();
   });
 
-  it('customer-ui C2 lists four items for an operator and Organizações under GESTÃO only for the internal Administrator', async () => {
+  const SIX_ITEMS = [
+    ['Visão geral', '/dashboard'],
+    ['Ordens de serviço', '/work-orders'],
+    ['Inspeções', '/inspections'],
+    ['Embarcações', '/vessels'],
+    ['Clientes', '/customers'],
+    ['Agenda', '/agenda'],
+  ];
+
+  it('work-order-ui C16 lists six items in the mareos order and Organizações only for the internal Administrator', async () => {
     const operator = await open([atlantic()], 'org-a');
 
     expect(operator.element.textContent?.replace(/\s+/g, '')).toContain('UMBRIELSHIP');
     expect(operator.element.textContent).toContain('MENU PRINCIPAL');
-    expect(menuLinks(operator.element)).toEqual([
-      ['Visão geral', '/dashboard'],
-      ['Embarcações', '/vessels'],
-      ['Clientes', '/customers'],
-      ['Modelos de inspeção', '/inspection-templates'],
-    ]);
+    expect(menuLinks(operator.element)).toEqual(SIX_ITEMS);
     expect(operator.element.textContent).not.toContain('GESTÃO');
+    expect(operator.element.textContent).not.toContain('Modelos de inspeção');
     operator.fixture.destroy();
 
     const administrator = await open([internal], 'org-u');
 
-    expect(administrator.element.textContent).toContain('GESTÃO');
-    expect(menuLinks(administrator.element)).toEqual([
-      ['Visão geral', '/dashboard'],
-      ['Embarcações', '/vessels'],
-      ['Clientes', '/customers'],
-      ['Modelos de inspeção', '/inspection-templates'],
-      ['Organizações', '/organizations'],
+    expect(menuLinks(administrator.element)).toEqual([...SIX_ITEMS, ['Organizações', '/organizations']]);
+    expect(administrator.element.textContent).not.toContain('Modelos de inspeção');
+    // "Organizações" sits under "GESTÃO", not in "MENU PRINCIPAL".
+    const groups = [...administrator.element.querySelectorAll<HTMLElement>('t-sidebar-group')].map((group) => [
+      group.textContent?.includes('GESTÃO') ? 'GESTÃO' : group.textContent?.includes('MENU PRINCIPAL') ? 'MENU PRINCIPAL' : '',
+      [...group.querySelectorAll('a')].map((link) => link.textContent?.trim()),
+    ]);
+    expect(groups).toEqual([
+      ['MENU PRINCIPAL', SIX_ITEMS.map(([label]) => label)],
+      ['GESTÃO', ['Organizações']],
     ]);
     administrator.fixture.destroy();
 
     // An administrator of a client Organization is not the internal one.
     const clientAdministrator = await open([atlantic('administrator')], 'org-a');
     expect(clientAdministrator.element.textContent).not.toContain('GESTÃO');
-    expect(menuLinks(clientAdministrator.element)).toHaveLength(4);
+    expect(menuLinks(clientAdministrator.element)).toEqual(SIX_ITEMS);
   });
 
   it('customer-ui C4 the theme button switches to dark, says Ativar tema claro and keeps the choice', async () => {
@@ -169,34 +180,43 @@ describe('Shell', () => {
     expect(byLabel(element, 'Ativar tema escuro')).not.toBeNull();
   });
 
-  it('customer-ui C5 the breadcrumb and the active item follow the route', async () => {
+  it('work-order-ui C16 the breadcrumb and the active item follow the work order, inspection and agenda routes', async () => {
     const { fixture, element } = await open([internal], 'org-u');
     const router = TestBed.inject(Router);
 
     const cases: [string, string][] = [
+      ['/work-orders', 'Ordens de serviço'],
+      ['/work-orders/wo-1', 'Ordens de serviço'],
+      ['/work-orders/wo-1/assignments/a1/inspect', 'Ordens de serviço'],
+      ['/inspections', 'Inspeções'],
+      ['/inspection-templates/t1', 'Inspeções'],
+      ['/agenda', 'Agenda'],
+      // The other sections keep theirs.
+      ['/dashboard', 'Visão geral'],
       ['/customers', 'Clientes'],
       ['/customers/c1', 'Clientes'],
       ['/vessels', 'Embarcações'],
       ['/vessels/v1', 'Embarcações'],
-      ['/work-orders/w1', 'Embarcações'],
-      ['/dashboard', 'Visão geral'],
-      ['/inspection-templates', 'Modelos de inspeção'],
-      ['/inspection-templates/t1', 'Modelos de inspeção'],
       ['/organizations', 'Organizações'],
       ['/organizations/o1', 'Organizações'],
     ];
+
+    const LINKS: Record<string, string> = Object.fromEntries([...SIX_ITEMS, ['Organizações', '/organizations']]);
 
     for (const [url, label] of cases) {
       await router.navigateByUrl(url);
       await settle();
       fixture.detectChanges();
 
-      const crumb = element.querySelector('[data-slot="breadcrumb-section"]');
-      expect(crumb?.textContent?.trim(), url).toBe(label);
-      const current = [...element.querySelectorAll('nav a[aria-current="page"]')].map((link) =>
+      const crumb = element.querySelector('main[data-slot="sidebar-inset"] > header [data-slot="breadcrumb-section"]')!;
+      expect(crumb.textContent?.trim(), url).toBe(label);
+      // "Operação" > the section.
+      expect(crumb.parentElement!.textContent?.replace(/\s+/g, ' ').trim(), url).toBe(`Operação ${label}`);
+      const current = [...element.querySelectorAll('nav a[aria-current="page"]')].map((link) => [
         link.textContent?.trim(),
-      );
-      expect(current, url).toEqual([label]);
+        link.getAttribute('href'),
+      ]);
+      expect(current, url).toEqual([[label, LINKS[label]]]);
     }
   });
 

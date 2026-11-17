@@ -1,105 +1,82 @@
 import { DatePipe } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
-import { Badge } from '../../../shared/components/ui/badge';
-import { buttonVariants } from '../../../shared/components/ui/button';
-import { Icon } from '../../../shared/components/ui/icon';
-import { Skeleton } from '../../../shared/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../shared/components/ui/table';
-import {
-  WorkOrderServiceItem,
-  workOrderServiceStatusLabels,
-} from '../work-order-service.service';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideImagePlus, lucideWrench } from '@ng-icons/lucide';
 
+import { Skeleton } from '../../../shared/components/ui/skeleton';
+import { workOrderStatusTones } from '../../work-order/work-order.service';
+import { WorkOrderServiceItem, workOrderServiceStatusLabels } from '../work-order-service.service';
+
+/** The services of a WorkOrder in the mareos table look: name and description, period, status, photo. */
 @Component({
   selector: 'work-order-service-list-ui',
-  imports: [DatePipe, Badge, Icon, Table, TableHeader, TableHead, TableRow, TableBody, TableCell, Skeleton],
+  imports: [DatePipe, NgIcon, Skeleton],
+  viewProviders: [provideIcons({ lucideImagePlus, lucideWrench })],
   template: `
-    <div class="overflow-hidden rounded-lg border">
-      <div class="relative w-full overflow-x-auto">
-        <table tTable>
-          <thead tTableHeader>
-            <tr tTableRow>
-              <th tTableHead>Serviço</th>
-              <th tTableHead>Início</th>
-              <th tTableHead>Fim</th>
-              <th tTableHead>Status</th>
-              <th tTableHead><span class="sr-only">Foto</span></th>
+    @if (!loading() && services().length === 0) {
+      <div data-slot="services-empty" class="flex min-h-[140px] flex-col items-center justify-center text-center">
+        <span class="grid size-[34px] place-items-center rounded-[9px] bg-accent text-accent-foreground">
+          <ng-icon name="lucideWrench" class="!size-[17px]" />
+        </span>
+        <strong class="mt-2.5 text-[11px] font-semibold text-foreground">Nenhum serviço executado</strong>
+        <p class="mt-[5px] text-[10px] text-muted-foreground">Não há serviços registrados para esta ordem.</p>
+      </div>
+    } @else {
+      <div class="relative overflow-x-auto">
+        <table class="w-full min-w-[600px] border-collapse text-left">
+          <thead>
+            <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
+              <th class="h-[34px] border-b border-border px-2 font-bold">SERVIÇO</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">INÍCIO</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">FIM</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">STATUS</th>
+              <th class="h-[34px] border-b border-border px-2"><span class="sr-only">Foto</span></th>
             </tr>
           </thead>
-          <tbody tTableBody>
+          <tbody>
             @if (loading()) {
               @for (row of [1, 2, 3]; track row) {
-                <tr tTableRow>
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <t-skeleton class="size-6 rounded" />
-                      <t-skeleton class="h-4 w-40 rounded" />
-                    </div>
-                  </td>
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <t-skeleton class="size-6 rounded" />
-                      <t-skeleton class="h-4 w-32 rounded" />
-                    </div>
-                  </td>
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <t-skeleton class="size-6 rounded" />
-                      <t-skeleton class="h-4 w-32 rounded" />
-                    </div>
-                  </td>
-                  <td tTableCell><t-skeleton class="h-5 w-20 rounded-full" /></td>
-                  <td tTableCell>
-                    <div class="flex justify-center"><t-skeleton class="size-8 rounded-md" /></div>
-                  </td>
+                <tr data-slot="skeleton-row" class="border-b border-border last:border-b-0">
+                  <td class="h-[51px] px-2"><t-skeleton class="h-3 w-40 rounded" /></td>
+                  <td class="h-[51px] px-2"><t-skeleton class="h-3 w-24 rounded" /></td>
+                  <td class="h-[51px] px-2"><t-skeleton class="h-3 w-24 rounded" /></td>
+                  <td class="h-[51px] px-2"><t-skeleton class="h-5 w-20 rounded-full" /></td>
+                  <td class="h-[51px] px-2"></td>
                 </tr>
               }
             } @else {
               @for (service of services(); track service.id) {
-                <tr tTableRow class="group">
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <svg tIcon name="wrench" class="size-3" />
-                      </div>
-                      <div class="grid">
-                        <span class="text-sm font-medium">{{ service.name }}</span>
-                        <span class="truncate text-xs text-muted-foreground">{{ service.description }}</span>
-                      </div>
-                    </div>
+                <tr data-slot="service-row" class="border-b border-border text-[10px] text-muted-foreground last:border-b-0">
+                  <td class="px-2 py-2.5">
+                    <span data-slot="service-name" class="block font-semibold text-foreground">{{ service.name }}</span>
+                    <span data-slot="service-description" class="mt-1 block max-w-[320px] break-words text-[9px]">
+                      {{ service.description }}
+                    </span>
                   </td>
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <svg tIcon name="calendar" class="size-3" />
-                      </div>
-                      <span class="text-sm text-muted-foreground">{{ service.startDate | date: 'short' }}</span>
-                    </div>
+                  <td data-slot="service-start" class="px-2 py-2.5 whitespace-nowrap tabular-nums">
+                    {{ service.startDate | date: 'dd/MM/yyyy HH:mm' }}
                   </td>
-                  <td tTableCell>
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <svg tIcon name="calendar" class="size-3" />
-                      </div>
-                      <span class="text-sm text-muted-foreground">{{ service.endDate | date: 'short' }}</span>
-                    </div>
+                  <td data-slot="service-end" class="px-2 py-2.5 whitespace-nowrap tabular-nums">
+                    {{ service.endDate | date: 'dd/MM/yyyy HH:mm' }}
                   </td>
-                  <td tTableCell>
-                    <t-badge variant="secondary">{{ labels[service.status] }}</t-badge>
+                  <td class="px-2 py-2.5">
+                    <span
+                      data-slot="service-status"
+                      class="inline-flex items-center gap-[5px] rounded-full px-2 py-[5px] text-[8px] font-semibold whitespace-nowrap"
+                      [class]="tones[service.status]"
+                    >
+                      <i class="size-[5px] rounded-full bg-current"></i>
+                      {{ labels[service.status] }}
+                    </span>
                   </td>
-                  <td tTableCell>
-                    <div class="flex items-center justify-center">
-                      @if (canWrite()) {
-                      <label [class]="uploadClass" [title]="'Enviar foto de ' + service.name">
-                        <svg tIcon name="image" class="size-3.5" />
+                  <td class="px-2 py-2.5 text-right">
+                    @if (canWrite()) {
+                      <label
+                        class="inline-grid size-[27px] cursor-pointer place-items-center rounded-[5px] border border-border bg-card text-muted-foreground focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-primary/40 hover:text-primary"
+                        [title]="'Enviar foto de ' + service.name"
+                      >
+                        <ng-icon name="lucideImagePlus" class="!size-3.5" />
                         <input
                           type="file"
                           accept="image/*"
@@ -108,20 +85,7 @@ import {
                           (change)="onFile(service, $event)"
                         />
                       </label>
-                      }
-                    </div>
-                  </td>
-                </tr>
-              } @empty {
-                <tr tTableRow>
-                  <td tTableCell colspan="5">
-                    <div class="flex flex-col items-center justify-center px-4 py-12">
-                      <div class="mb-2 flex rounded-full bg-muted p-3 text-xl">
-                        <svg tIcon name="ghost" class="size-6 text-muted-foreground" />
-                      </div>
-                      <p class="mb-1 text-base font-medium text-muted-foreground">Nenhum serviço executado</p>
-                      <p class="max-w-sm text-center text-sm">Não há serviços registrados para esta ordem.</p>
-                    </div>
+                    }
                   </td>
                 </tr>
               }
@@ -129,7 +93,7 @@ import {
           </tbody>
         </table>
       </div>
-    </div>
+    }
   `,
 })
 export class WorkOrderServiceList {
@@ -139,16 +103,13 @@ export class WorkOrderServiceList {
   fileSelected = output<{ serviceId: string; file: File }>();
 
   protected readonly labels = workOrderServiceStatusLabels;
-  protected readonly uploadClass = buttonVariants({
-    variant: 'ghost',
-    size: 'icon',
-    className: 'cursor-pointer text-gray-400 hover:text-foreground focus-within:ring-[3px] focus-within:ring-ring/50',
-  });
+  protected readonly tones = workOrderStatusTones;
 
   onFile(service: WorkOrderServiceItem, event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
     this.fileSelected.emit({ serviceId: service.id, file });
+    input.value = '';
   }
 }

@@ -1,12 +1,12 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, output, signal, viewChildren } from '@angular/core';
 import { applyEach, form, FormField, validate } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideLoader2, lucideX } from '@ng-icons/lucide';
+import { lucideCheck, lucideLoader2, lucideShieldCheck } from '@ng-icons/lucide';
 
+import { cn } from '../../../shared/components/lib/cn';
 import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
-import { cn } from '../../../shared/components/lib/cn';
 import type { QuestionType } from '../../inspection-template/inspection-template.service';
 import type { InspectionAssignmentItem } from '../../inspection-assignment/inspection-assignment.service';
 import {
@@ -43,110 +43,174 @@ const unanswered = (answer: Answer) => {
 };
 
 const textarea =
-  'min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none md:text-sm dark:bg-input/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
+  'min-h-[75px] w-full resize-y rounded-[6px] border border-input bg-card px-2.5 py-2 text-[11px] leading-[1.5] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30';
 
 // Answer controls are at least 40 px tall, for a finger on a phone.
 const option = (selected: boolean) =>
+  cn(
+    'inline-flex h-10 min-w-10 items-center gap-2 rounded-[6px] border px-3 text-[11px] transition-colors',
+    selected
+      ? 'border-primary bg-primary/10 font-semibold text-primary'
+      : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground',
+  );
+
+const resultOption = (selected: boolean) =>
   cn(
     'h-10 min-w-10 rounded-md border px-3 text-sm font-medium transition-colors',
     selected ? 'border-primary bg-primary text-primary-foreground' : 'border-input bg-transparent hover:bg-accent',
   );
 
+/** "01", "02"…: the mareos number of a question. */
+const number = (index: number) => String(index + 1).padStart(2, '0');
+
+/**
+ * The mareos "Roteiro de inspeção" (AD-045): one numbered card per question with the controls of its
+ * type, "Não se aplica" on every question, "Observação (opcional)" on the non-text ones (AD-019).
+ */
 @Component({
   selector: 'inspection-checklist-ui',
   imports: [NgIcon, FormField, Button, Confirmation],
-  viewProviders: [provideIcons({ lucideCheck, lucideLoader2, lucideX })],
+  viewProviders: [provideIcons({ lucideCheck, lucideLoader2, lucideShieldCheck })],
   template: `
-    <form class="flex flex-col gap-6" novalidate (submit)="conclude($event)">
-      <ol class="flex flex-col gap-5">
+    <form class="flex flex-col" novalidate (submit)="conclude($event)">
+      <div class="flex items-start justify-between gap-3 border-b border-border pb-[15px]">
+        <div class="flex items-start gap-2.5">
+          <span class="grid size-[32px] shrink-0 place-items-center rounded-[8px] bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
+            <ng-icon name="lucideShieldCheck" class="!size-4" />
+          </span>
+          <div>
+            <h2 class="text-[13px] font-normal text-foreground">Roteiro de inspeção</h2>
+            <p class="mt-[3px] text-[10px] text-muted-foreground">Preencha cada item antes de concluir.</p>
+          </div>
+        </div>
+        <span data-slot="question-total" class="text-[9px] whitespace-nowrap text-muted-foreground">
+          {{ items().length }} {{ items().length === 1 ? 'pergunta' : 'perguntas' }}
+        </span>
+      </div>
+
+      <ol class="mt-[15px] flex flex-col gap-[11px]">
         @for (item of items(); track item.id; let index = $index) {
-          <li class="flex flex-col gap-3 rounded-lg border p-3" data-slot="question">
-            <p class="text-sm font-medium break-words">
-              <span class="tabular-nums text-muted-foreground">{{ index + 1 }}.</span> {{ item.label }}
-            </p>
+          <li
+            #question
+            tabindex="-1"
+            data-slot="question"
+            class="flex gap-3 rounded-[9px] border border-border p-[13px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            <span
+              data-slot="question-number"
+              class="grid size-[27px] shrink-0 place-items-center rounded-[6px] bg-muted text-[9px] font-bold text-muted-foreground"
+            >
+              {{ numberOf(index) }}
+            </span>
+            <div class="flex min-w-0 flex-1 flex-col gap-2.5">
+              <p data-slot="question-label" class="text-[11px] font-semibold break-words text-foreground">{{ item.label }}</p>
 
-            @switch (item.type) {
-              @case ('TEXT') {
-                <textarea
-                  [class]="textareaClass"
-                  [id]="'answer-' + index"
-                  aria-label="Resposta"
-                  [formField]="checklistForm.answers[index].text"
-                ></textarea>
-              }
-              @case ('SCORE') {
-                <div class="flex flex-wrap gap-2" role="group" aria-label="Nota">
-                  @for (score of scores; track score) {
+              @switch (item.type) {
+                @case ('TEXT') {
+                  <textarea
+                    [class]="textareaClass"
+                    [id]="'answer-' + index"
+                    aria-label="Resposta"
+                    placeholder="Registre sua observação"
+                    [formField]="checklistForm.answers[index].text"
+                  ></textarea>
+                  <div class="flex flex-wrap gap-2" role="group" aria-label="Resposta">
                     <button
                       type="button"
-                      [class]="optionClass(model().answers[index].score === score && !model().answers[index].notApplicable)"
-                      [attr.aria-pressed]="model().answers[index].score === score && !model().answers[index].notApplicable"
-                      (click)="setScore(index, score)"
+                      [class]="optionClass(model().answers[index].notApplicable)"
+                      [attr.aria-pressed]="model().answers[index].notApplicable"
+                      (click)="toggleNotApplicable(index)"
                     >
-                      {{ score }}
+                      Não se aplica
                     </button>
-                  }
-                </div>
-              }
-              @default {
-                <div class="flex flex-wrap gap-2" role="group">
-                  @for (choice of choicesOf(item.type); track choice.label) {
+                  </div>
+                }
+                @case ('SCORE') {
+                  <div class="flex flex-wrap gap-2" role="group" aria-label="Nota">
+                    @for (score of scores; track score) {
+                      <button
+                        type="button"
+                        [class]="optionClass(model().answers[index].score === score && !model().answers[index].notApplicable)"
+                        [attr.aria-pressed]="model().answers[index].score === score && !model().answers[index].notApplicable"
+                        (click)="setScore(index, score)"
+                      >
+                        {{ score }}
+                      </button>
+                    }
                     <button
                       type="button"
-                      [class]="optionClass(model().answers[index].choice === choice.value && !model().answers[index].notApplicable)"
-                      [attr.aria-pressed]="model().answers[index].choice === choice.value && !model().answers[index].notApplicable"
-                      (click)="setChoice(index, choice.value)"
+                      [class]="optionClass(model().answers[index].notApplicable)"
+                      [attr.aria-pressed]="model().answers[index].notApplicable"
+                      (click)="toggleNotApplicable(index)"
                     >
-                      {{ choice.label }}
+                      Não se aplica
                     </button>
-                  }
-                </div>
+                  </div>
+                }
+                @default {
+                  <div class="flex flex-wrap gap-2" role="group" aria-label="Resposta">
+                    @for (choice of choicesOf(item.type); track choice.label) {
+                      <button
+                        type="button"
+                        [class]="optionClass(model().answers[index].choice === choice.value && !model().answers[index].notApplicable)"
+                        [attr.aria-pressed]="model().answers[index].choice === choice.value && !model().answers[index].notApplicable"
+                        (click)="setChoice(index, choice.value)"
+                      >
+                        <i class="size-3 rounded-full border border-current" aria-hidden="true"></i>
+                        {{ choice.label }}
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      [class]="optionClass(model().answers[index].notApplicable)"
+                      [attr.aria-pressed]="model().answers[index].notApplicable"
+                      (click)="toggleNotApplicable(index)"
+                    >
+                      <i class="size-3 rounded-full border border-current" aria-hidden="true"></i>
+                      Não se aplica
+                    </button>
+                  </div>
+                }
               }
-            }
 
-            <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                [class]="optionClass(model().answers[index].notApplicable)"
-                [attr.aria-pressed]="model().answers[index].notApplicable"
-                (click)="toggleNotApplicable(index)"
-              >
-                Não se aplica
-              </button>
+              @if (item.type !== 'TEXT') {
+                <label class="flex flex-col gap-1 text-[10px]">
+                  <span class="text-muted-foreground">Observação (opcional)</span>
+                  <textarea
+                    [class]="textareaClass"
+                    [id]="'note-' + index"
+                    [formField]="checklistForm.answers[index].note"
+                  ></textarea>
+                </label>
+              }
+
+              @for (error of lengthErrors(index); track $index) {
+                <p class="text-[10px] font-medium text-destructive" data-slot="error">{{ error }}</p>
+              }
             </div>
-
-            @if (item.type !== 'TEXT') {
-              <label class="flex flex-col gap-1 text-sm">
-                <span class="text-muted-foreground">Observação (opcional)</span>
-                <textarea
-                  [class]="textareaClass"
-                  [id]="'note-' + index"
-                  [formField]="checklistForm.answers[index].note"
-                ></textarea>
-              </label>
-            }
-
-            @if (submittedOnce()) {
-              @for (error of checklistForm.answers[index]().errors(); track $index) {
-                <p class="text-sm font-medium text-destructive" data-slot="error">{{ error.message }}</p>
-              }
-            }
           </li>
         }
       </ol>
 
-      <footer class="flex items-center justify-end gap-3">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">
-          <ng-icon name="lucideX" class="size-4" />
-          Cancelar
-        </button>
-        <button tButton type="submit" [disabled]="loading()">
+      @if (missing(); as label) {
+        <p role="alert" data-slot="missing" class="mt-[13px] text-[11px] font-medium text-destructive">
+          Responda à pergunta obrigatória: “{{ label }}”.
+        </p>
+      }
+
+      <footer
+        class="mt-[15px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[15px]"
+      >
+        <span data-slot="saved-note" class="text-[9px] text-muted-foreground">
+          As respostas só são gravadas ao concluir a inspeção.
+        </span>
+        <button tButton type="submit" class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold" [disabled]="loading()">
           @if (loading()) {
             <ng-icon name="lucideLoader2" class="animate-spin" />
             Salvando...
           } @else {
-            <ng-icon name="lucideCheck" class="size-4" />
-            Concluir
+            <ng-icon name="lucideCheck" class="!size-[15px]" />
+            Concluir inspeção
           }
         </button>
       </footer>
@@ -171,7 +235,7 @@ const option = (selected: boolean) =>
           @for (choice of results; track choice.value) {
             <button
               type="button"
-              [class]="optionClass(result() === choice.value)"
+              [class]="resultClass(result() === choice.value)"
               [attr.aria-pressed]="result() === choice.value"
               (click)="result.set(choice.value)"
             >
@@ -188,11 +252,14 @@ export class InspectionChecklist {
   loading = input(false);
 
   submitted = output<CompleteInspectionRequest>();
-  closed = output<void>();
+
+  private readonly questions = viewChildren<ElementRef<HTMLElement>>('question');
 
   protected readonly scores = Array.from({ length: 11 }, (_, score) => score);
   protected readonly textareaClass = textarea;
   protected readonly optionClass = option;
+  protected readonly resultClass = resultOption;
+  protected readonly numberOf = number;
   protected readonly results: { value: InspectionResult; label: string }[] = [
     { value: 'APPROVED', label: 'Aprovada' },
     { value: 'REPROVED', label: 'Reprovada' },
@@ -203,6 +270,15 @@ export class InspectionChecklist {
   protected readonly confirming = signal(false);
   protected readonly result = signal<InspectionResult | null>(null);
 
+  /** How many questions are answered now; "Não se aplica" counts. */
+  readonly answered = computed(() => this.model().answers.filter((answer) => !unanswered(answer)).length);
+
+  /** The label of the first unanswered question, once "Concluir inspeção" was used. */
+  protected readonly missing = computed(() => {
+    if (!this.submittedOnce()) return null;
+    const index = this.model().answers.findIndex(unanswered);
+    return index === -1 ? null : (this.items()[index]?.label ?? null);
+  });
 
   checklistForm = form(this.model, (path) => {
     applyEach(path.answers, (answer) => {
@@ -234,6 +310,15 @@ export class InspectionChecklist {
     effect(() => {
       this.model.set({ answers: this.items().map((item) => blank(item.type)) });
     });
+  }
+
+  /** The length errors of a question, once "Concluir inspeção" was used; "unanswered" reads in the alert. */
+  protected lengthErrors(index: number): string[] {
+    if (!this.submittedOnce()) return [];
+    return this.checklistForm.answers[index]()
+      .errors()
+      .filter((error) => error.kind === 'maxLength')
+      .map((error) => error.message ?? '');
   }
 
   protected choicesOf(type: QuestionType) {
@@ -270,9 +355,12 @@ export class InspectionChecklist {
     event.preventDefault();
     this.submittedOnce.set(true);
 
-    if (this.checklistForm().invalid()) {
+    const first = this.model().answers.findIndex(unanswered);
+    if (first !== -1) {
+      this.questions()[first]?.nativeElement.focus();
       return;
     }
+    if (this.checklistForm().invalid()) return;
 
     this.result.set(null);
     this.confirming.set(true);
@@ -294,5 +382,10 @@ export class InspectionChecklist {
         return { ...base, value };
       }),
     });
+  }
+
+  /** Closes the result question, as a failed complete keeps the answers on the page. */
+  closeConfirmation() {
+    this.confirming.set(false);
   }
 }

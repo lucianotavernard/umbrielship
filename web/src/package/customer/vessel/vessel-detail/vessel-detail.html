@@ -155,14 +155,19 @@
 </div>
 
 <t-sheet
-  title="Nova ordem"
-  description="Informe o período e o status da ordem de serviço"
-  class="sm:max-w-md"
+  kicker="NOVA SOLICITAÇÃO"
+  closeLabel="Fechar formulário"
+  title="Nova ordem de serviço"
+  description="Preencha os dados dos serviços para programar o atendimento da embarcação."
+  class="sm:w-full sm:max-w-[580px]"
+  [flush]="true"
   [isActive]="isCreateWorkOrderSheetActive()"
   (closed)="closeCreateWorkOrderSheet()"
 >
   <work-order-form-ui
-    [vesselId]="id()"
+    [lockedVesselId]="id()"
+    [vessels]="formVessels()"
+    [customerNames]="formCustomerNames()"
     [loading]="submitting()"
     (closed)="closeCreateWorkOrderSheet()"
     (submitted)="createWorkOrder($event)"
