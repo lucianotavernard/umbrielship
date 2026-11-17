@@ -1,24 +1,20 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router, withComponentInputBinding, withRouterResources } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withRouterResources } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { toast } from '../../../shared/components/ui/toaster';
 import { CustomerDetail } from '../customer-detail/customer-detail';
 import { customerDetailResources } from '../customer-detail/customer-detail.resources';
-import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
-@Component({ template: 'Página não encontrada' })
-class NotFoundStub {}
-
-const customer = {
+const atlantic = {
   id: 'c1',
-  name: 'Atlantic',
-  email: 'ops@atlantic.test',
-  phone: '11999999999',
-  address: { address: 'Rua 1', city: 'Santos', state: 'SP' },
+  name: 'Pescados Atlântico',
+  email: 'ops@atlantico.test',
+  phone: '47966665555',
+  address: { address: 'Rua Atlântica, 55', city: 'Itajaí', state: 'SC' },
 };
 
 const aurora = {
@@ -30,6 +26,8 @@ const aurora = {
   customerId: 'c1',
 };
 
+const lula = { ...aurora, id: 'vessel-2', imoNumber: '9236178', name: 'Lula Branca', type: 'FISHING' };
+
 describe('CustomerDetail', () => {
   let controller: HttpTestingController;
 
@@ -39,10 +37,7 @@ describe('CustomerDetail', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter(
-          [
-            { path: 'customers/:id', component: CustomerDetail, resources: customerDetailResources },
-            { path: '404', component: NotFoundStub },
-          ],
+          [{ path: 'customers/:id', component: CustomerDetail, resources: customerDetailResources }],
           withComponentInputBinding(),
           withRouterResources(),
         ),
@@ -53,129 +48,147 @@ describe('CustomerDetail', () => {
     TestBed.inject(AuthenticationService).role.set('operator');
   });
 
-  afterEach(() => controller.verify());
+  afterEach(() => {
+    controller.verify();
+    vi.restoreAllMocks();
+  });
 
   async function settle() {
     await new Promise((resolve) => setTimeout(resolve));
     TestBed.tick();
   }
 
-  function fill(element: ParentNode, selector: string, value: string) {
-    const field = element.querySelector<HTMLInputElement | HTMLSelectElement>(selector);
-    if (!field) throw new Error(selector);
-    field.value = value;
-    field.dispatchEvent(new Event('input', { bubbles: true }));
-    field.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  async function render(vessels = [aurora], total = vessels.length) {
+  async function render(customer: object = atlantic, vessels: object[] = [aurora]) {
     const harness = await RouterTestingHarness.create();
     const navigation = harness.navigateByUrl('/customers/c1', CustomerDetail);
     await settle();
-    expect(harness.routeNativeElement?.querySelector('customer-detail')).toBeFalsy();
     controller.expectOne('/api/customers/c1').flush({ customer });
     await navigation;
     await settle();
-    controller.expectOne('/api/vessels?customerId=c1&page=1').flush({ vessels, total });
+    const request = controller.expectOne('/api/vessels?customerId=c1');
+    request.flush({ vessels, total: vessels.length });
     await settle();
-    return harness.routeNativeElement as HTMLElement;
+    return { element: harness.routeNativeElement as HTMLElement, request };
   }
 
-  it('shows the customer, the address and the vessels of that customer', async () => {
-    const element = await render();
+  const text = (element: ParentNode, selector: string) =>
+    element.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();
 
-    expect(element.textContent).toContain('Atlantic');
-    expect(element.textContent).toContain('ops@atlantic.test');
-    expect(element.textContent).toContain('(11) 9 9999-9999');
-    expect(element.textContent).toContain('Rua 1');
-    expect(element.textContent).toContain('Santos');
-    expect(element.textContent).toContain('Aurora');
-    expect(element.querySelector('a[href="mailto:ops@atlantic.test"]')).toBeTruthy();
-    expect(element.querySelector('a[routerlink="/customers"], a[href="/customers"]')).toBeTruthy();
+  it('customer-ui C27 requests the vessels with no page and shows the profile without Editar, Nova embarcação or map', async () => {
+    const { element, request } = await render();
+
+    expect(request.request.urlWithParams).toBe('/api/vessels?customerId=c1');
+    expect(element.textContent).toContain('CADASTRO DE CLIENTE');
+    expect(element.textContent).not.toContain('PROPRIETÁRIO DA FROTA');
+    expect(text(element, 'h1')).toBe('Pescados Atlântico');
+    expect(text(element, '[data-slot="owner-sentence"]')).toBe('Proprietário de 1 embarcação na frota.');
+    expect(element.textContent).toContain('Proprietário');
+    const buttons = [...element.querySelectorAll('button')].map((button) => button.textContent?.trim());
+    expect(buttons).not.toContain('Editar');
+    expect(buttons).not.toContain('Nova embarcação');
+    expect(element.querySelector('iframe')).toBeNull();
   });
 
-  it('redirects to /404 when the customer answers 404', async () => {
+  it('customer-ui C28 the breadcrumb links Clientes and names the customer', async () => {
+    const { element } = await render();
+
+    const breadcrumb = element.querySelector('nav[aria-label="Navegação estrutural"]')!;
+    const link = breadcrumb.querySelector('a')!;
+    expect(link.textContent?.trim()).toBe('Clientes');
+    expect(link.getAttribute('href')).toBe('/customers');
+    expect([...breadcrumb.children].map((part) => part.textContent?.trim())).toEqual([
+      'Clientes',
+      '/',
+      'Pescados Atlântico',
+    ]);
+  });
+
+  it('customer-ui C29 shows the contact, the address and the location', async () => {
+    const { element } = await render();
+
+    expect(element.textContent).toContain('Contato e endereço');
+    expect(text(element, '[data-slot="contact-email"] dd')).toBe('ops@atlantico.test');
+    expect(text(element, '[data-slot="contact-phone"] dd')).toBe('47966665555');
+    expect(text(element, '[data-slot="contact-address"] dd')).toBe('Rua Atlântica, 55, Itajaí, SC');
+    expect(element.textContent).toContain('Localização');
+    expect(text(element, '[data-slot="location-city"]')).toBe('Itajaí, SC');
+    expect(text(element, '[data-slot="location-street"]')).toBe('Rua Atlântica, 55');
+    expect(text(element, '[data-slot="location-region"]')).toBe('Itajaí — SC');
+  });
+
+  it('customer-ui C29 shows Não informado for a missing phone', async () => {
+    const { element } = await render({ ...atlantic, phone: '' });
+
+    expect(text(element, '[data-slot="contact-phone"] dd')).toBe('Não informado');
+  });
+
+  it('customer-ui C30 lists every vessel with its type and links it', async () => {
+    const { element } = await render(atlantic, [aurora, lula]);
+
+    expect(text(element, '[data-slot="vessel-total"]')).toBe('2');
+    expect(text(element, '[data-slot="owner-sentence"]')).toBe('Proprietário de 2 embarcações na frota.');
+    const rows = [...element.querySelectorAll('[data-slot="vessel-row"]')].map((row) => ({
+      href: row.querySelector('a')?.getAttribute('href'),
+      name: row.querySelector('strong')?.textContent?.trim(),
+      type: row.querySelector('small')?.textContent?.trim(),
+    }));
+    expect(rows).toEqual([
+      { href: '/vessels/vessel-1', name: 'Aurora', type: 'Carga' },
+      { href: '/vessels/vessel-2', name: 'Lula Branca', type: 'Pesca' },
+    ]);
+  });
+
+  it('customer-ui C30 says Nenhuma embarcação vinculada a este cliente', async () => {
+    const { element } = await render(atlantic, []);
+
+    expect(text(element, '[data-slot="vessels-empty"]')).toBe('Nenhuma embarcação vinculada a este cliente.');
+    expect(text(element, '[data-slot="vessel-total"]')).toBe('0');
+    expect(text(element, '[data-slot="owner-sentence"]')).toBe('Proprietário de 0 embarcações na frota.');
+  });
+
+  it('customer-ui C31 Excluir deletes the vessel after the confirmation and lowers the count', async () => {
+    const success = vi.spyOn(toast, 'success');
+    const { element } = await render(atlantic, [aurora, lula]);
+
+    element.querySelector<HTMLButtonElement>('[aria-label="Excluir Aurora"]')!.click();
+    await settle();
+    const confirmation = document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!;
+    expect(confirmation.textContent).toContain(
+      'Tem certeza que deseja excluir esta embarcação? Esta ação não pode ser desfeita.',
+    );
+    controller.expectNone('/api/vessels/vessel-1');
+
+    [...confirmation.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Confirmar')!.click();
+    await settle();
+    const deletion = controller.expectOne('/api/vessels/vessel-1');
+    expect(deletion.request.method).toBe('DELETE');
+    deletion.flush(null, { status: 204, statusText: 'No Content' });
+    await settle();
+    controller.expectOne('/api/vessels?customerId=c1').flush({ vessels: [lula], total: 1 });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Embarcação excluída com sucesso', expect.anything());
+    expect(element.querySelectorAll('[data-slot="vessel-row"]')).toHaveLength(1);
+    expect(text(element, '[data-slot="vessel-total"]')).toBe('1');
+    expect(text(element, '[data-slot="owner-sentence"]')).toBe('Proprietário de 1 embarcação na frota.');
+  });
+
+  it('customer-ui C32 a 404 shows Cliente não encontrado with a link back', async () => {
     const harness = await RouterTestingHarness.create();
-    const navigation = harness.navigateByUrl('/customers/missing');
+    const navigation = harness.navigateByUrl('/customers/c1', CustomerDetail);
     await settle();
     controller
-      .expectOne('/api/customers/missing')
+      .expectOne('/api/customers/c1')
       .flush({ message: 'Customer not found' }, { status: 404, statusText: 'Not Found' });
     await navigation;
     await settle();
 
-    expect(TestBed.inject(Router).url).toBe('/404');
-    expect(harness.routeNativeElement?.textContent).toContain('Página não encontrada');
-    expect(harness.routeNativeElement?.textContent).not.toContain('Embarcações');
-  });
-
-  it('says Nenhuma embarcação encontrada when the customer has none', async () => {
-    const element = await render([], 0);
-
-    expect(element.textContent).toContain('Nenhuma embarcação encontrada');
-  });
-
-  it('requests the next page of vessels', async () => {
-    const element = await render([aurora], 11);
-
-    [...element.querySelectorAll<HTMLElement>('a, button')]
-      .find((item) => item.textContent?.trim() === '2')
-      ?.click();
-    await settle();
-    const second = controller.expectOne('/api/vessels?customerId=c1&page=2');
-    expect(second.request.url).not.toContain('organizationId');
-    second.flush({ vessels: [], total: 11 });
-  });
-
-  it('creates a vessel for this customer', async () => {
-    const element = await render([], 0);
-
-    [...element.querySelectorAll('button')].find((button) => button.textContent?.includes('Nova Embarcação'))?.click();
-    await settle();
-    expect(element.querySelector('#customerId')).toBeNull();
-    fill(element, '#vessel-name', 'Aurora');
-    fill(element, '#imoNumber', '9074729');
-    fill(element, '#type', 'CARGO');
-    fill(element, '#length', '12');
-    element.querySelector('#vessel-name')?.closest('form')?.requestSubmit();
-    await settle();
-
-    const created = controller.expectOne('/api/vessels');
-    expect(created.request.method).toBe('POST');
-    expect(created.request.body).toEqual({
-      name: 'Aurora',
-      customerId: 'c1',
-      imoNumber: '9074729',
-      type: 'CARGO',
-      length: 12,
-    });
-    created.flush({ vessel: aurora });
-    await settle();
-    controller.expectOne('/api/vessels?customerId=c1&page=1').flush({ vessels: [aurora], total: 1 });
-  });
-
-  it('deletes a vessel only after Confirmar', async () => {
-    const success = vi.spyOn(toast, 'success');
-    const element = await render();
-
-    element.querySelector<HTMLButtonElement>('button[aria-label="Excluir"]')?.click();
-    await settle();
-    expect(element.textContent).toContain('Excluir embarcação');
-    [...element.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Cancelar')?.click();
-    await settle();
-    controller.expectNone((request) => request.method === 'DELETE');
-
-    element.querySelector<HTMLButtonElement>('button[aria-label="Excluir"]')?.click();
-    await settle();
-    [...element.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Confirmar')?.click();
-    const deleted = controller.expectOne('/api/vessels/vessel-1');
-    expect(deleted.request.method).toBe('DELETE');
-    deleted.flush(null, { status: 204, statusText: 'No Content' });
-    await settle();
-
-    expect(success).toHaveBeenCalledWith('Embarcação excluída com sucesso', {
-      description: 'A embarcação foi excluída com sucesso.',
-    });
-    controller.expectOne('/api/vessels?customerId=c1&page=1').flush({ vessels: [], total: 0 });
+    const element = harness.routeNativeElement as HTMLElement;
+    expect(text(element, 'h1')).toBe('Cliente não encontrado');
+    expect(element.textContent).toContain('Este cadastro não está disponível na lista de clientes.');
+    const back = [...element.querySelectorAll('a')].find((link) => link.textContent?.trim() === 'Voltar para clientes');
+    expect(back?.getAttribute('href')).toBe('/customers');
+    // A Customer that is not there has no Vessels to ask for.
+    controller.expectNone((request) => request.url.startsWith('/api/vessels'));
   });
 });

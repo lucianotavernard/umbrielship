@@ -132,7 +132,7 @@ The Customer list shows every Customer with counts, search and row actions.
 14. The API SHALL make `vesselCount` equal the number of Vessels of that Customer in PostgreSQL, proven by `api/test/smoke/api-smoke.sh`
     - Customer with 0 Vessels -> 0; with 2 Vessels -> 2; after one is deleted -> 1
 15. The list SHALL be sorted by name with `localeCompare(…, 'pt-BR')`
-    - "Ágata Pesca", "Barco Azul", "anchor co" -> "anchor co", "Ágata Pesca", "Barco Azul"
+    - "Barco Azul", "anchor co", "Ágata Pesca" -> "Ágata Pesca", "anchor co", "Barco Azul" (accent and case do not move a name out of its letter)
 16. The four metrics SHALL read, over every Customer and never over the search result: "Clientes cadastrados" = number of Customers; "Embarcações vinculadas" = sum of `vesselCount`; "Com e-mail cadastrado" = Customers with an email; "Com telefone cadastrado" = Customers whose `phone` is not null nor empty - each padded to two digits
     - 8 Customers, 3 with phone, 11 Vessels -> "08", "11", "08", "03"; 120 Customers -> "120"
 17. WHEN the user types in "Buscar por nome, contato ou cidade..." THEN the table SHALL keep only Customers whose name, email, phone, city or state contains the text, case-insensitive (`toLocaleLowerCase('pt-BR')`), with no request; the footer SHALL read "Exibindo <shown> de <all> clientes"

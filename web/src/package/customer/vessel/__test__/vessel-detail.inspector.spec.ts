@@ -23,4 +23,24 @@ describe('VesselDetail for an inspector', () => {
     const inspector = await render('vessels/:id', 'inspector');
     expect(writeControls(inspector)).toEqual([]);
   });
+
+  it('customer-ui C55 renders no write control for an inspector', async () => {
+    const texts = ['Editar', 'Nova ordem'];
+    const labels = ['Excluir'];
+    const present = (element: HTMLElement) => [
+      ...[...element.querySelectorAll('button')]
+        .map((button) => button.textContent?.trim() ?? '')
+        .filter((text) => texts.includes(text)),
+      ...labels.filter((label) => element.querySelector(`[aria-label="${label}"]`)),
+    ];
+
+    const writer = await render('vessels/:id', 'operator');
+    expect(present(writer).sort()).toEqual([...texts, ...labels].sort());
+
+    TestBed.resetTestingModule();
+    configureWriteAccess();
+
+    const inspector = await render('vessels/:id', 'inspector');
+    expect(present(inspector)).toEqual([]);
+  });
 });

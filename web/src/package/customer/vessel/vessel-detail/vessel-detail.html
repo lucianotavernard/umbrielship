@@ -1,138 +1,155 @@
-<div class="border-b border-border">
-  <div class="mx-auto max-w-7xl px-6 py-4">
-    <a tButton variant="ghost" class="-ml-2 gap-2">
-      <ng-icon name="lucideArrowLeft" class="size-4" />
-      {{ vessel() ? 'Voltar para o cliente' : 'Voltar para Embarcações' }}
+<div class="mx-auto w-full max-w-[988px] px-[13px] pt-[18px] pb-[21px] sm:px-6 sm:pt-6 lg:px-[37px]">
+  <nav aria-label="Navegação estrutural" class="mb-[17px] flex items-center gap-[9px] text-[10px] text-muted-foreground">
+    <a routerLink="/vessels" class="inline-flex items-center gap-1.5 hover:text-primary">
+      <ng-icon name="lucideArrowLeft" class="size-[15px]" />
+      Voltar à frota
     </a>
-  </div>
-</div>
+    @if (vessel(); as vessel) {
+      <ng-icon name="lucideChevronRight" class="size-3.5" />
+      <span class="truncate font-semibold text-foreground">{{ vessel.name }}</span>
+    }
+  </nav>
 
-@if (notFound()) {
-  <div class="mx-auto max-w-7xl px-6 py-8">
-    <p class="text-sm text-muted-foreground">Embarcação não encontrada</p>
-  </div>
-} @else {
-<div class="mx-auto max-w-7xl px-6 py-8">
-  <div class="grid gap-6 lg:grid-cols-3">
-    <div class="grid gap-6 lg:col-span-2">
-      <vessel-detail-ui [canWrite]="canWrite()" [vessel]="vessel()" (edited)="openEditVesselSheet()" />
-
-      <section class="rounded-lg border border-border p-6">
-        <div class="mb-6 flex items-center justify-between gap-4">
-          <div class="grid gap-2">
-            <h2 class="text-lg leading-none font-semibold text-foreground">Ordens de serviço</h2>
-            <p class="text-sm text-muted-foreground">Ordens vinculadas a esta embarcação.</p>
-          </div>
-
-          @if (vessel() && canWrite()) {
-            <div class="shrink-0">
-              <button
-                tButton
-                type="button"
-                size="sm"
-                class="gap-2"
-                (click)="openCreateWorkOrderSheet()"
-              >
-                <ng-icon name="lucidePlus" class="size-4" />
-                Nova ordem
-              </button>
+  @if (notFound()) {
+    <section class="mx-auto my-10 flex max-w-[430px] flex-col items-center gap-2.5 rounded-lg border border-border bg-card p-7 text-center">
+      <span class="grid size-[45px] place-items-center rounded-[11px] bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+        <span>?</span>
+      </span>
+      <h1 class="text-[18px] font-normal text-foreground">Embarcação não encontrada</h1>
+      <p class="text-[11px] text-muted-foreground">Esse registro não está disponível na sua organização.</p>
+      <a routerLink="/vessels" class="mt-1 text-[11px] font-semibold text-primary">Voltar à frota</a>
+    </section>
+  } @else {
+    <div class="grid grid-cols-1 items-start gap-[15px] lg:grid-cols-[minmax(0,1.8fr)_minmax(260px,0.85fr)]">
+      <div class="flex min-w-0 flex-col gap-[15px]">
+        <section aria-labelledby="vessel-detail-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+          @if (vessel(); as vessel) {
+            <div class="flex items-start gap-[13px]">
+              <span class="grid size-[45px] shrink-0 place-items-center rounded-[11px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+                <ng-icon name="lucideShip" class="size-[22px]" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">FROTA</span>
+                <div class="mt-[5px] flex flex-wrap items-center gap-[9px]">
+                  <h1 id="vessel-detail-title" class="text-[20px] leading-tight font-normal tracking-[-0.45px] text-foreground">
+                    {{ vessel.name }}
+                  </h1>
+                  <span data-slot="type-pill" class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-[8px] font-semibold whitespace-nowrap text-accent-foreground">
+                    {{ typeLabels[vessel.type] }}
+                  </span>
+                </div>
+                <p class="mt-1.5 text-[10px] text-muted-foreground">Informações cadastrais e operacionais da embarcação.</p>
+              </div>
+              @if (canWrite()) {
+                <button
+                  type="button"
+                  class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
+                  (click)="openEditVesselSheet()"
+                >
+                  <ng-icon name="lucidePencil" class="size-3.5" />
+                  Editar
+                </button>
+              }
+            </div>
+            <dl class="mt-[18px] grid grid-cols-2 gap-[14px] border-t border-border pt-[15px] sm:grid-cols-3">
+              <div class="min-w-0" data-slot="spec-imo">
+                <dt class="text-[9px] text-muted-foreground">Número IMO</dt>
+                <dd class="mt-1.5 text-[10px] font-semibold text-foreground">{{ vessel.imoNumber || 'Não informado' }}</dd>
+              </div>
+              <div class="min-w-0" data-slot="spec-length">
+                <dt class="text-[9px] text-muted-foreground">Comprimento</dt>
+                <dd class="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
+                  <ng-icon name="lucideRuler" class="size-3.5 text-muted-foreground" />{{ length(vessel.length) }} m
+                </dd>
+              </div>
+            </dl>
+          } @else {
+            <div class="flex items-center gap-[13px]">
+              <t-skeleton class="size-[45px] rounded-[11px]" />
+              <div class="grid flex-1 gap-2">
+                <t-skeleton class="h-3 w-24 rounded" />
+                <t-skeleton class="h-5 w-48 rounded" />
+              </div>
             </div>
           }
-        </div>
+        </section>
 
-        <work-order-list-ui
-          [canWrite]="canWrite()"
-          [loading]="loading()"
-          [workOrders]="workOrders()"
-          (deleted)="openDeleteWorkOrderDialog($event)"
-        >
-          <t-pagination [page]="page()" [total]="totalWorkOrders()" (changed)="page.set($event)" />
-        </work-order-list-ui>
-      </section>
-    </div>
-
-    <div>
-      <section class="sticky top-20 rounded-lg border border-border p-6">
-        @if (vessel()?.customer; as customer) {
-          <div class="flex items-start gap-3">
-            <div
-              class="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold"
-            >
-              {{ customer.name[0] }} {{ customer.name[1] }}
+        <section aria-labelledby="vessel-orders-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+          <div class="mb-[15px] flex items-center justify-between gap-3">
+            <div>
+              <h2 id="vessel-orders-title" class="text-[13px] font-normal text-foreground">Ordens de serviço</h2>
+              <p class="mt-[5px] text-[10px] text-muted-foreground">Ordens vinculadas a esta embarcação.</p>
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <h2 class="truncate text-base font-semibold">{{ customer.name }}</h2>
-                  <p class="text-sm text-muted-foreground">
-                    {{ customer.address.city }}
-                    @if (customer.address.state) {
-                      , {{ customer.address.state }}
-                    }
-                  </p>
-                </div>
-                <span
-                  class="shrink-0 rounded-md bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground"
-                >
-                  Cliente
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-5 grid gap-3 text-sm">
-            <div class="flex items-center gap-2 text-muted-foreground">
-              <ng-icon name="lucideMapPin" class="size-4 shrink-0" />
-              <span class="truncate text-foreground">{{ customer.address.address }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-muted-foreground">
-              <ng-icon name="lucideMail" class="size-4 shrink-0" />
-              <a class="truncate text-primary hover:underline" [href]="'mailto:' + customer.email">
-                {{ customer.email }}
-              </a>
-            </div>
-            @if (customer.phone) {
-              <div class="flex items-center gap-2 text-muted-foreground">
-                <ng-icon name="lucidePhone" class="size-4 shrink-0" />
-                <a
-                  class="truncate text-foreground hover:underline"
-                  [href]="'tel:' + customer.phone"
-                >
-                  {{ customer.phone }}
-                </a>
-              </div>
+            @if (vessel() && canWrite()) {
+              <button
+                type="button"
+                class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
+                (click)="openCreateWorkOrderSheet()"
+              >
+                <ng-icon name="lucidePlus" class="size-[15px]" />
+                Nova ordem
+              </button>
             }
           </div>
 
-          <div class="mt-4 flex gap-2 border-t border-border pt-4">
-            <a tButton variant="secondary" class="flex-1" [href]="'mailto:' + customer.email">
-              <ng-icon name="lucideMail" class="size-4" />
-              E-mail
-            </a>
-            <a
-              tButton
-              variant="ghost"
-              size="icon"
-              aria-label="Abrir cliente"
-              [routerLink]="['/customers', customer.id]"
+          <work-order-list-ui
+            [canWrite]="canWrite()"
+            [loading]="loading()"
+            [workOrders]="workOrders()"
+            (deleted)="openDeleteWorkOrderDialog($event)"
+          >
+            <t-pagination [page]="page()" [total]="totalWorkOrders()" (changed)="page.set($event)" />
+          </work-order-list-ui>
+        </section>
+      </div>
+
+      <aside aria-labelledby="vessel-client-title" class="flex flex-col gap-[17px] rounded-lg border border-border bg-card px-5 py-[19px]">
+        @if (vessel()?.customer; as customer) {
+          <div class="flex items-center gap-[11px]">
+            <span
+              aria-hidden="true"
+              class="grid size-[39px] shrink-0 place-items-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground"
             >
-              <ng-icon name="lucideExternalLink" class="size-4" />
-            </a>
+              {{ initialsOf(customer.name) }}
+            </span>
+            <div class="min-w-0 flex-1">
+              <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">CLIENTE RESPONSÁVEL</span>
+              <h2 id="vessel-client-title" class="mt-1 text-[13px] font-normal break-words text-foreground">{{ customer.name }}</h2>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-muted px-[7px] py-1 text-[8px] font-semibold whitespace-nowrap text-muted-foreground">
+              Cliente
+            </span>
           </div>
+          <div class="grid gap-3 border-t border-border pt-[15px] text-[10px] text-foreground/80">
+            <div data-slot="client-email" class="flex min-w-0 items-center gap-2">
+              <ng-icon name="lucideMail" class="size-[15px] shrink-0 text-muted-foreground" />
+              <span class="truncate">{{ customer.email || 'Não informado' }}</span>
+            </div>
+            <div data-slot="client-phone" class="flex min-w-0 items-center gap-2">
+              <ng-icon name="lucidePhone" class="size-[15px] shrink-0 text-muted-foreground" />
+              <span class="truncate">{{ customer.phone || 'Não informado' }}</span>
+            </div>
+          </div>
+          <a
+            class="flex min-h-[34px] items-center justify-center gap-[7px] rounded-[5px] bg-accent text-[10px] font-semibold text-accent-foreground hover:bg-accent/80"
+            [routerLink]="['/customers', customer.id]"
+          >
+            <ng-icon name="lucideUser" class="size-[15px]" />
+            Ver cliente
+          </a>
         } @else {
           <div class="flex items-center gap-3">
-            <t-skeleton class="size-11 rounded-full" />
+            <t-skeleton class="size-[39px] rounded-full" />
             <div class="grid flex-1 gap-2">
-              <t-skeleton class="h-4 w-32 rounded" />
+              <t-skeleton class="h-3 w-32 rounded" />
               <t-skeleton class="h-3 w-24 rounded" />
             </div>
           </div>
         }
-      </section>
+      </aside>
     </div>
-  </div>
+  }
 </div>
-}
 
 <t-sheet
   title="Nova ordem"
@@ -150,9 +167,12 @@
 </t-sheet>
 
 <t-sheet
+  kicker="FROTA / EMBARCAÇÕES"
+  closeLabel="Fechar formulário"
   title="Editar embarcação"
-  description="Altere o nome, o tipo e o comprimento"
-  class="sm:max-w-md"
+  description="Atualize as informações cadastrais e operacionais desta embarcação."
+  class="sm:w-full sm:max-w-[560px]"
+  [flush]="true"
   [isActive]="isEditVesselSheetActive()"
   (closed)="closeEditVesselSheet()"
 >

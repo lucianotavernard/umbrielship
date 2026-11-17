@@ -1,8 +1,8 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { form, FormField, hidden, required } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideBuilding2, lucideCheck, lucideLoader2, lucideRuler, lucideShip, lucideX } from '@ng-icons/lucide';
+import { lucideCheck, lucideLoader2, lucideRuler, lucideShip, lucideX } from '@ng-icons/lucide';
 
 import { Button } from '../../../shared/components/ui/button';
 import { FormGroup, Input, Label, Select } from '../../../shared/components/ui/form';
@@ -15,129 +15,137 @@ import {
   vesselTypeLabels,
 } from '../vessel.service';
 
+/**
+ * The fields of the mareos "Nova embarcação" / "Editar embarcação" drawer, without the "Operação"
+ * card (AD-021) and with today's rules (AD-028): the Customer and the IMO number only on create.
+ */
 @Component({
   selector: 'vessel-form-ui',
   imports: [NgIcon, FormField, FormGroup, Label, Input, Select, Button],
-  viewProviders: [provideIcons({ lucideCheck, lucideShip, lucideBuilding2, lucideRuler, lucideLoader2, lucideX })],
+  viewProviders: [provideIcons({ lucideCheck, lucideShip, lucideRuler, lucideLoader2, lucideX })],
   template: `
-    <form class="flex flex-col gap-6" (submit)="submitForm($event)">
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <div class="flex items-center gap-3 border-b bg-muted px-6 py-4">
-          <div class="flex rounded-lg bg-background p-3 shadow-xs">
-            <ng-icon name="lucideShip" />
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Detalhes da Embarcação</h3>
-            <p class="text-xs text-muted-foreground">Informações básicas sobre a embarcação</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 gap-x-6 gap-y-5 p-6 sm:grid-cols-6">
-          <t-form-group class="sm:col-span-full">
-            <label tLabel for="vessel-name">Nome</label>
-            <input
-              tInput
-              id="vessel-name"
-              type="text"
-              placeholder="Aurora"
-              [formField]="vesselForm.name"
-            />
-          </t-form-group>
-        </div>
-      </section>
-
-      @if (!vesselForm.customerId().hidden()) {
-        <section class="rounded-2xl shadow-xs border overflow-hidden">
-          <div class="flex items-center gap-3 border-b bg-muted px-6 py-4">
-            <div class="flex rounded-lg bg-background p-3 shadow-xs">
-              <ng-icon name="lucideBuilding2" />
-            </div>
-            <div>
-              <h3 class="text-sm font-semibold">Cliente</h3>
-              <p class="text-xs text-muted-foreground">Associação da embarcação com um cliente</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 gap-x-6 gap-y-5 p-6 sm:grid-cols-6">
-            <t-form-group class="sm:col-span-full">
-              <label tLabel for="customerId">Cliente</label>
-              <select tSelect id="customerId" [formField]="vesselForm.customerId">
-                <optgroup>
-                  <option value="">Selecione o cliente</option>
-                  @for (customer of customers(); track customer.id) {
-                    <option [value]="customer.id">{{ customer.name }}</option>
-                  }
-                </optgroup>
-              </select>
-            </t-form-group>
-          </div>
-        </section>
-      }
-
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <div class="flex items-center gap-3 border-b bg-muted px-6 py-4">
-          <div class="flex rounded-lg bg-background p-3 shadow-xs">
-            <ng-icon name="lucideRuler" />
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Tipo & Comprimento</h3>
-            <p class="text-xs text-muted-foreground">
-              Informações sobre o tipo e comprimento da embarcação
-            </p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 gap-x-6 gap-y-5 p-6 sm:grid-cols-6">
-          @if (!vesselForm.imoNumber().hidden()) {
-            <t-form-group class="sm:col-span-full">
-              <label tLabel for="imoNumber">Número IMO</label>
+    <form class="flex min-h-0 flex-1 flex-col" (submit)="submitForm($event)">
+      <div
+        class="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overscroll-y-contain bg-muted/60 px-[13px] py-[14px] sm:gap-[13px] sm:px-[25px] sm:py-[19px]"
+      >
+        <section class="overflow-hidden rounded-[11px] border border-border bg-card">
+          <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
+            <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
+              <ng-icon name="lucideShip" class="size-[17px]" />
+            </span>
+            <span>
+              <strong class="block text-[12px] font-semibold text-foreground">Detalhes da embarcação</strong>
+              <small class="mt-0.5 block text-[10px] text-muted-foreground">Informações básicas sobre a embarcação</small>
+            </span>
+          </header>
+          <div class="grid grid-cols-1 gap-[14px] px-[18px] pt-4 pb-[18px]">
+            <t-form-group class="gap-[7px]">
+              <label tLabel for="vessel-name" class="text-[10px] font-semibold">
+                Nome <span class="text-destructive">*</span>
+              </label>
               <input
                 tInput
-                id="imoNumber"
+                id="vessel-name"
                 type="text"
-                placeholder="1234567"
-                [formField]="vesselForm.imoNumber"
+                class="bg-card text-[11px] md:text-[11px]"
+                placeholder="Ex.: Aurora"
+                [formField]="vesselForm.name"
               />
             </t-form-group>
-          }
-          <t-form-group class="sm:col-span-4">
-            <label tLabel for="type">Tipo de Embarcação</label>
-            <select tSelect id="type" [formField]="vesselForm.type">
-              <optgroup>
+            @if (!vesselForm.customerId().hidden()) {
+              <t-form-group class="gap-[7px]">
+                <label tLabel for="customerId" class="text-[10px] font-semibold">
+                  Cliente responsável <span class="text-destructive">*</span>
+                </label>
+                <select tSelect id="customerId" class="bg-card text-[11px]" [formField]="vesselForm.customerId">
+                  <option value="">Selecione o cliente</option>
+                  @for (customer of sortedCustomers(); track customer.id) {
+                    <option [value]="customer.id">{{ customer.name }}</option>
+                  }
+                </select>
+              </t-form-group>
+            }
+          </div>
+        </section>
+
+        <section class="overflow-hidden rounded-[11px] border border-border bg-card">
+          <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
+            <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
+              <ng-icon name="lucideRuler" class="size-[17px]" />
+            </span>
+            <span>
+              <strong class="block text-[12px] font-semibold text-foreground">Tipo e comprimento</strong>
+              <small class="mt-0.5 block text-[10px] text-muted-foreground">Identificação e dimensões da embarcação</small>
+            </span>
+          </header>
+          <div class="grid grid-cols-1 gap-[14px] px-[18px] pt-4 pb-[18px] sm:grid-cols-2">
+            @if (!vesselForm.imoNumber().hidden()) {
+              <t-form-group class="gap-[7px] sm:col-span-2">
+                <label tLabel for="imoNumber" class="text-[10px] font-semibold">
+                  Número IMO <span class="text-destructive">*</span>
+                </label>
+                <input
+                  tInput
+                  id="imoNumber"
+                  type="text"
+                  class="bg-card text-[11px] md:text-[11px]"
+                  placeholder="Ex.: 1234567"
+                  [formField]="vesselForm.imoNumber"
+                />
+              </t-form-group>
+            }
+            <t-form-group class="gap-[7px]">
+              <label tLabel for="type" class="text-[10px] font-semibold">
+                Tipo de embarcação <span class="text-destructive">*</span>
+              </label>
+              <select tSelect id="type" class="bg-card text-[11px]" [formField]="vesselForm.type">
                 <option value="">Selecione o tipo</option>
                 @for (type of types; track type) {
                   <option [value]="type">{{ labels[type] }}</option>
                 }
-              </optgroup>
-            </select>
-          </t-form-group>
-          <t-form-group class="sm:col-span-2">
-            <label tLabel for="length">Comprimento</label>
-            <input
-              tInput
-              id="length"
-              type="number"
-              placeholder="100"
-              [formField]="vesselForm.length"
-            />
-          </t-form-group>
-        </div>
-      </section>
+              </select>
+            </t-form-group>
+            <t-form-group class="gap-[7px]">
+              <label tLabel for="length" class="text-[10px] font-semibold">
+                Comprimento (m) <span class="text-destructive">*</span>
+              </label>
+              <input
+                tInput
+                id="length"
+                type="number"
+                step="0.1"
+                class="bg-card text-[11px] md:text-[11px]"
+                placeholder="Ex.: 32,5"
+                [formField]="vesselForm.length"
+              />
+            </t-form-group>
+          </div>
+        </section>
+      </div>
 
-      <footer class="flex items-center justify-end gap-3">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">
-          <ng-icon name="lucideX" />
-          Cancelar
-        </button>
-        <button tButton type="submit" [disabled]="loading()">
-          @if (loading()) {
-            <ng-icon name="lucideLoader2" class="animate-spin" />
-            Salvando...
-          } @else {
-            <ng-icon name="lucideCheck" />
-            Salvar
-          }
-        </button>
+      <footer
+        class="flex min-h-[70px] shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px] sm:py-3"
+      >
+        <span class="text-[10px] text-muted-foreground"><span class="text-destructive">*</span> Campos obrigatórios</span>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">
+            <ng-icon name="lucideX" class="size-3.5" />
+            Cancelar
+          </button>
+          <button tButton type="submit" class="h-[35px] px-[13px] text-[11px] font-semibold" [disabled]="loading()">
+            @if (loading()) {
+              <ng-icon name="lucideLoader2" class="animate-spin" />
+              Salvando...
+            } @else {
+              <ng-icon name="lucideCheck" class="size-[15px]" />
+              {{ vessel() ? 'Salvar alterações' : 'Salvar embarcação' }}
+            }
+          </button>
+        </div>
       </footer>
     </form>
   `,
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
 })
 export class VesselForm {
   loading = input(false);
@@ -150,6 +158,9 @@ export class VesselForm {
 
   protected readonly types = VESSEL_TYPES;
   protected readonly labels = vesselTypeLabels;
+  protected readonly sortedCustomers = computed(() =>
+    [...this.customers()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+  );
 
   model = signal({
     name: '',
