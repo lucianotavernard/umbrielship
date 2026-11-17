@@ -3,135 +3,95 @@ import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideFlag, lucideCalendar, lucideGhost, lucideTrash } from '@ng-icons/lucide';
+import { lucideCalendarDays, lucideFileText, lucideTrash2 } from '@ng-icons/lucide';
 
-import { Badge } from '../../../shared/components/ui/badge';
-import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../shared/components/ui/table';
-import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
+import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order.service';
 
 @Component({
   selector: 'work-order-list-ui',
-  imports: [
-    NgIcon,
-    DatePipe,
-    RouterLink,
-    Badge,
-    Button,
-    Table,
-    TableHeader,
-    TableHead,
-    TableRow,
-    TableBody,
-    TableCell,
-    Skeleton,
-  ],
-  viewProviders: [provideIcons({ lucideFlag, lucideCalendar, lucideTrash, lucideGhost })],
+  imports: [NgIcon, DatePipe, RouterLink, Skeleton],
+  viewProviders: [provideIcons({ lucideCalendarDays, lucideFileText, lucideTrash2 })],
   template: `
-    <div class="overflow-hidden rounded-lg border">
-      <div class="relative w-full overflow-x-auto">
-        <table tTable>
-          <thead tTableHeader>
-            <tr tTableRow>
-              <th tTableHead>Ordem</th>
-              <th tTableHead>Docagem</th>
-              <th tTableHead>Desdocagem</th>
-              <th tTableHead>Status</th>
-              <th tTableHead><span class="sr-only">Opções</span></th>
+    @if (!loading() && workOrders().length === 0) {
+      <div data-slot="orders-empty" class="flex min-h-[140px] flex-col items-center justify-center text-center">
+        <span class="grid size-[34px] place-items-center rounded-[9px] bg-accent text-accent-foreground">
+          <ng-icon name="lucideFileText" class="size-[17px]" />
+        </span>
+        <strong class="mt-2.5 text-[10px] font-semibold text-foreground">Nenhuma ordem vinculada</strong>
+        <p class="mt-[5px] text-[9px] text-muted-foreground">As ordens de serviço desta embarcação aparecerão aqui.</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[570px] border-collapse text-left whitespace-nowrap">
+          <thead>
+            <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
+              <th class="h-[34px] border-b border-border px-2 font-bold">Ordem</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">Docagem</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">Desdocagem</th>
+              <th class="h-[34px] border-b border-border px-2 font-bold">Status</th>
+              <th class="h-[34px] border-b border-border px-2"><span class="sr-only">Opções</span></th>
             </tr>
           </thead>
-          <tbody tTableBody>
+          <tbody>
             @if (loading()) {
               @for (row of [1, 2, 3]; track row) {
-                <tr tTableRow>
-                  <td tTableCell><t-skeleton class="h-4 w-32 rounded" /></td>
-                  <td tTableCell><t-skeleton class="h-4 w-40 rounded" /></td>
-                  <td tTableCell><t-skeleton class="h-4 w-40 rounded" /></td>
-                  <td tTableCell><t-skeleton class="h-5 w-20 rounded-full" /></td>
-                  <td tTableCell>
-                    <div class="flex justify-center"><t-skeleton class="size-8 rounded-md" /></div>
-                  </td>
+                <tr class="border-b border-border last:border-b-0">
+                  <td class="h-[47px] px-2"><t-skeleton class="h-3 w-24 rounded" /></td>
+                  <td class="h-[47px] px-2"><t-skeleton class="h-3 w-32 rounded" /></td>
+                  <td class="h-[47px] px-2"><t-skeleton class="h-3 w-32 rounded" /></td>
+                  <td class="h-[47px] px-2"><t-skeleton class="h-5 w-20 rounded-full" /></td>
+                  <td class="h-[47px] px-2"></td>
                 </tr>
               }
             } @else {
               @for (workOrder of workOrders(); track workOrder.id) {
-                <tr tTableRow class="group cursor-pointer">
-                  <td tTableCell [routerLink]="['/work-orders', workOrder.id]">
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <ng-icon name="lucideFlag" class="size-3" />
-                      </div>
-                      <a class="text-sm font-medium" [routerLink]="['/work-orders', workOrder.id]">
-                        #{{ workOrder.id.slice(0, 8).toUpperCase() }}
-                      </a>
-                    </div>
-                  </td>
-                  <td tTableCell [routerLink]="['/work-orders', workOrder.id]">
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <ng-icon name="lucideCalendar" class="size-3" />
-                      </div>
-                      <span class="text-sm text-muted-foreground">
-                        {{ workOrder.startDate | date: 'longDate' }}
-                      </span>
-                    </div>
-                  </td>
-                  <td tTableCell [routerLink]="['/work-orders', workOrder.id]">
-                    <div class="flex items-center gap-2">
-                      <div class="flex shrink-0 rounded-md bg-muted p-1.5">
-                        <ng-icon name="lucideCalendar" class="size-3" />
-                      </div>
-                      <span class="text-sm text-muted-foreground">
-                        {{ workOrder.endDate | date: 'longDate' }}
-                      </span>
-                    </div>
-                  </td>
-                  <td tTableCell [routerLink]="['/work-orders', workOrder.id]">
-                    <t-badge variant="secondary">{{ labels[workOrder.status] }}</t-badge>
-                  </td>
-                  <td tTableCell>
-                    <div
-                      class="flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+                <tr data-slot="work-order-row" class="group border-b border-border text-[10px] last:border-b-0">
+                  <td class="h-[47px] px-2">
+                    <a
+                      class="inline-flex items-center gap-[7px] font-semibold text-foreground/85 hover:text-primary"
+                      [routerLink]="['/work-orders', workOrder.id]"
                     >
-                      @if (canWrite()) {
-                      <button
-                        tButton
-                        type="button"
-                        aria-label="Excluir"
-                        title="Deletar ordem de serviço"
-                        size="icon"
-                        variant="ghost"
-                        class="cursor-pointer text-gray-400 hover:bg-red-50 hover:text-red-500"
-                        (click)="deleted.emit(workOrder)"
-                      >
-                        <ng-icon name="lucideTrash" class="size-3.5" />
-                      </button>
-                      }
-                    </div>
+                      <ng-icon name="lucideFileText" class="size-[15px] text-muted-foreground" />
+                      #{{ workOrder.id.slice(0, 8).toUpperCase() }}
+                    </a>
                   </td>
-                </tr>
-              } @empty {
-                <tr tTableRow>
-                  <td tTableCell colspan="5">
-                    <div class="flex flex-col items-center justify-center px-4 py-12">
-                      <div class="mb-2 flex rounded-full bg-muted p-3 text-xl">
-                        <ng-icon name="lucideGhost" class="size-6 text-muted-foreground" />
+                  <td class="h-[47px] px-2">
+                    <span data-slot="start-date" class="inline-flex items-center gap-[7px] text-muted-foreground">
+                      <ng-icon name="lucideCalendarDays" class="size-3.5" />
+                      {{ workOrder.startDate | date: 'longDate' : 'UTC' }}
+                    </span>
+                  </td>
+                  <td class="h-[47px] px-2">
+                    <span data-slot="end-date" class="inline-flex items-center gap-[7px] text-muted-foreground">
+                      <ng-icon name="lucideCalendarDays" class="size-3.5" />
+                      {{ workOrder.endDate | date: 'longDate' : 'UTC' }}
+                    </span>
+                  </td>
+                  <td class="h-[47px] px-2">
+                    <span
+                      data-slot="status"
+                      class="inline-flex items-center gap-[5px] rounded-full px-2 py-[5px] text-[8px] font-semibold"
+                      [class]="tones[workOrder.status]"
+                    >
+                      <i class="size-[5px] rounded-full bg-current"></i>
+                      {{ labels[workOrder.status] }}
+                    </span>
+                  </td>
+                  <td class="h-[47px] px-2">
+                    @if (canWrite()) {
+                      <div class="flex justify-end">
+                        <button
+                          type="button"
+                          aria-label="Excluir"
+                          title="Excluir ordem de serviço"
+                          class="inline-grid size-[27px] place-items-center rounded-[5px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:text-destructive focus-visible:opacity-100"
+                          (click)="deleted.emit(workOrder)"
+                        >
+                          <ng-icon name="lucideTrash2" class="size-3.5" />
+                        </button>
                       </div>
-                      <p class="mb-1 text-base font-medium text-muted-foreground">
-                        Nenhuma ordem de serviço encontrada
-                      </p>
-                      <p class="max-w-sm text-center text-sm">
-                        Nenhuma ordem de serviço registrada encontrada.
-                      </p>
-                    </div>
+                    }
                   </td>
                 </tr>
               }
@@ -139,10 +99,10 @@ import { WorkOrder, workOrderStatusLabels } from '../work-order.service';
           </tbody>
         </table>
       </div>
-    </div>
-    <div class="mt-4">
-      <ng-content select="t-pagination" />
-    </div>
+      <div class="mt-4">
+        <ng-content select="t-pagination" />
+      </div>
+    }
   `,
 })
 export class WorkOrderList {
@@ -152,4 +112,12 @@ export class WorkOrderList {
   deleted = output<WorkOrder>();
 
   protected readonly labels = workOrderStatusLabels;
+
+  /** The mareos status pills: in progress blue, done green, cancelled rose, pending grey. */
+  protected readonly tones: Record<WorkOrderStatus, string> = {
+    PENDING: 'bg-[#f0f2f4] text-[#778590] dark:bg-[#1a2632] dark:text-[#9aaab8]',
+    IN_PROGRESS: 'bg-[#edf4fb] text-[#4e84b7] dark:bg-[#18283a] dark:text-[#8db4dc]',
+    COMPLETED: 'bg-[#eaf5ef] text-[#498b68] dark:bg-[#15291f] dark:text-[#8fcfab]',
+    CANCELLED: 'bg-[#fbefed] text-[#b86b61] dark:bg-[#2e1d1b] dark:text-[#e3a49b]',
+  };
 }

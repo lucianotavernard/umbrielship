@@ -1,98 +1,196 @@
-<div class="border-b border-border">
-  <div class="mx-auto max-w-7xl px-6 py-4">
-    <a tButton variant="ghost" class="-ml-2 gap-2" routerLink="/customers">
-      <ng-icon name="lucideArrowLeft" class="size-4" />
-      Voltar para Clientes
-    </a>
-  </div>
-</div>
+<div class="mx-auto w-full max-w-[647px] px-[13px] pt-[18px] pb-[21px] sm:px-6 sm:pt-6 lg:px-[37px]">
+  @if (customer(); as customer) {
+    <nav
+      aria-label="Navegação estrutural"
+      class="mb-[17px] flex items-center gap-[9px] text-[10px] text-muted-foreground"
+    >
+      <a routerLink="/customers" class="inline-flex items-center gap-1.5 hover:text-primary">
+        <ng-icon name="lucideArrowLeft" class="size-[15px]" />
+        Clientes
+      </a>
+      <span aria-hidden="true">/</span>
+      <strong class="truncate font-semibold text-foreground">{{ customer.name }}</strong>
+    </nav>
 
-<div class="mx-auto max-w-7xl px-6 py-8">
-  <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3 lg:gap-8">
-    <div class="grid gap-6 lg:col-span-2">
-      <customer-detail-ui [canWrite]="canWrite()" [customer]="customer()" (edited)="openEditCustomerSheet()" />
+    <section
+      aria-labelledby="customer-detail-title"
+      class="rounded-lg border border-border bg-card p-5"
+    >
+      <div class="flex items-center gap-[14px]">
+        <span
+          aria-hidden="true"
+          class="grid size-[52px] shrink-0 place-items-center rounded-[11px] bg-[#e8f3f3] text-[15px] font-bold text-[#408384] dark:bg-[#17302f] dark:text-[#7cc7c2]"
+        >
+          {{ initialsOf(customer.name) }}
+        </span>
+        <div class="min-w-0 flex-1">
+          <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">CADASTRO DE CLIENTE</span>
+          <h1
+            id="customer-detail-title"
+            class="mt-[5px] mb-1 truncate text-[20px] font-normal tracking-[-0.4px] text-foreground"
+          >
+            {{ customer.name }}
+          </h1>
+          <p data-slot="owner-sentence" class="text-[10px] text-muted-foreground">
+            Proprietário de {{ vesselCount() }} {{ vesselCount() === 1 ? 'embarcação' : 'embarcações' }} na frota.
+          </p>
+        </div>
+        <span
+          class="hidden shrink-0 items-center gap-1.5 rounded-full bg-accent px-[9px] py-1.5 text-[9px] font-semibold whitespace-nowrap text-accent-foreground sm:inline-flex"
+        >
+          <ng-icon name="lucideBuilding2" class="size-[13px]" />
+          Proprietário
+        </span>
+      </div>
+    </section>
 
-      <section class="rounded-lg border border-border p-6">
-        <div class="mb-6 flex items-center justify-between gap-4">
-          <div class="grid gap-2">
-            <h2 class="text-lg leading-none font-semibold text-foreground">Embarcações</h2>
-            <p class="text-sm text-muted-foreground">Embarcações registradas para este cliente.</p>
+    <div class="mt-[15px] grid grid-cols-1 items-start gap-[15px] md:grid-cols-[minmax(0,1fr)_280px]">
+      <div class="grid min-w-0 gap-[15px]">
+        <section
+          aria-labelledby="customer-contact-title"
+          class="rounded-lg border border-border bg-card px-5 py-[18px]"
+        >
+          <div class="flex items-center gap-2.5">
+            <span class="grid size-[31px] shrink-0 place-items-center rounded-lg bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+              <ng-icon name="lucidePhone" class="size-4" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <h2 id="customer-contact-title" class="text-[12px] font-normal text-foreground">Contato e endereço</h2>
+              <p class="mt-1 text-[9px] text-muted-foreground">Dados cadastrados para este cliente.</p>
+            </div>
+          </div>
+          <dl class="mt-[19px] grid grid-cols-2 gap-x-5 gap-y-[17px]">
+            <div class="min-w-0" data-slot="contact-email">
+              <dt class="flex items-center gap-[7px] text-[9px] text-muted-foreground">
+                <ng-icon name="lucideMail" class="size-3.5" />E-mail
+              </dt>
+              <dd class="mt-1.5 ml-[21px] text-[10px] break-words text-foreground">
+                {{ customer.email || 'Não informado' }}
+              </dd>
+            </div>
+            <div class="min-w-0" data-slot="contact-phone">
+              <dt class="flex items-center gap-[7px] text-[9px] text-muted-foreground">
+                <ng-icon name="lucidePhone" class="size-3.5" />Telefone
+              </dt>
+              <dd class="mt-1.5 ml-[21px] text-[10px] break-words text-foreground">
+                {{ customer.phone || 'Não informado' }}
+              </dd>
+            </div>
+            <div class="col-span-2 min-w-0" data-slot="contact-address">
+              <dt class="flex items-center gap-[7px] text-[9px] text-muted-foreground">
+                <ng-icon name="lucideMapPin" class="size-3.5" />Endereço
+              </dt>
+              <dd class="mt-1.5 ml-[21px] text-[10px] break-words text-foreground">
+                {{ customer.address.address || 'Rua não informada' }}{{ customer.address.city ? ', ' + customer.address.city : '' }}{{ customer.address.state ? ', ' + customer.address.state : '' }}
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section
+          aria-labelledby="customer-vessels-title"
+          class="rounded-lg border border-border bg-card px-5 py-[18px]"
+        >
+          <div class="flex items-center gap-2.5">
+            <span class="grid size-[31px] shrink-0 place-items-center rounded-lg bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+              <ng-icon name="lucideShip" class="size-4" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <h2 id="customer-vessels-title" class="text-[12px] font-normal text-foreground">Embarcações vinculadas</h2>
+              <p class="mt-1 text-[9px] text-muted-foreground">Frota registrada em nome deste cliente.</p>
+            </div>
+            <span
+              data-slot="vessel-total"
+              class="grid h-[25px] min-w-[25px] place-items-center rounded-md bg-accent px-1.5 text-[10px] font-bold text-accent-foreground"
+            >
+              {{ vesselCount() }}
+            </span>
           </div>
 
-          @if (canWrite()) {
-            <div class="shrink-0">
-              <button tButton type="button" size="sm" class="gap-2" (click)="openCreateVesselSheet()">
-                <ng-icon name="lucidePlus" class="size-4" />
-                Nova Embarcação
-              </button>
+          @if (loading()) {
+            <div class="mt-[14px] grid gap-3 border-t border-border pt-4">
+              <t-skeleton class="h-8 w-full rounded" />
+            </div>
+          } @else if (vessels().length) {
+            <ul class="mt-[14px]">
+              @for (vessel of vessels(); track vessel.id) {
+                <li data-slot="vessel-row" class="flex min-h-[60px] items-center gap-2.5 border-t border-border">
+                  <a [routerLink]="['/vessels', vessel.id]" class="group flex min-w-0 flex-1 items-center gap-2.5">
+                    <span class="grid size-[31px] shrink-0 place-items-center rounded-lg bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+                      <ng-icon name="lucideShip" class="size-4" />
+                    </span>
+                    <span class="min-w-0 flex-1">
+                      <strong class="block truncate text-[10px] font-semibold text-foreground group-hover:text-primary">
+                        {{ vessel.name }}
+                      </strong>
+                      <small class="mt-1 block truncate text-[9px] text-muted-foreground">
+                        {{ typeLabels[vessel.type] }}
+                      </small>
+                    </span>
+                    <ng-icon name="lucideArrowUpRight" class="size-[15px] shrink-0 text-muted-foreground" />
+                  </a>
+                  @if (canWrite()) {
+                    <button
+                      type="button"
+                      class="inline-grid size-[29px] shrink-0 place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                      [attr.aria-label]="'Excluir ' + vessel.name"
+                      (click)="openDeleteVesselDialog(vessel)"
+                    >
+                      <ng-icon name="lucideTrash2" class="size-3.5" />
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <div
+              data-slot="vessels-empty"
+              class="flex min-h-[100px] flex-col items-center justify-center gap-2 text-center text-[10px] text-muted-foreground"
+            >
+              <ng-icon name="lucideShip" class="size-[18px]" />
+              <span>Nenhuma embarcação vinculada a este cliente.</span>
             </div>
           }
+        </section>
+      </div>
+
+      <aside
+        aria-labelledby="customer-address-title"
+        class="rounded-lg border border-border bg-card px-5 py-[18px]"
+      >
+        <span class="mb-[11px] grid size-[31px] place-items-center rounded-lg bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+          <ng-icon name="lucideMapPin" class="size-[17px]" />
+        </span>
+        <h2 id="customer-address-title" class="text-[12px] font-normal text-foreground">Localização</h2>
+        <p data-slot="location-city" class="mt-[7px] mb-4 text-[10px] text-muted-foreground">
+          {{ customer.address.city || 'Cidade não informada' }}{{ customer.address.state ? ', ' + customer.address.state : '' }}
+        </p>
+        <div class="flex items-start gap-2 border-t border-border py-[11px] text-[9px] leading-normal text-muted-foreground">
+          <ng-icon name="lucideMapPin" class="mt-px size-3.5 shrink-0" />
+          <span data-slot="location-street">{{ customer.address.address || 'Endereço não informado' }}</span>
         </div>
-
-        <vessel-list-ui [canWrite]="canWrite()" [loading]="loading()" [vessels]="vessels()" (deleted)="openDeleteVesselDialog($event)">
-          <t-pagination [page]="page()" [total]="totalVessels()" (changed)="page.set($event)" />
-        </vessel-list-ui>
-      </section>
-    </div>
-
-    <!-- Sidebar Column -->
-    <div class="grid grid-cols-1 gap-6">
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <header class="flex items-center gap-3 px-6 py-4 border-b bg-popover">
-          <div class="flex p-3 bg-background rounded-lg shadow-xs">
-            <ng-icon name="lucideMapPin" class="!size-4" />
-          </div>
-
-          <div>
-            <h3 class="text-sm font-semibold">Localização & Endereço</h3>
-            <p class="text-xs text-muted-foreground">Onde o cliente está localizado?</p>
-          </div>
-        </header>
-
-        <div class="p-4">
-          @if (mapEmbedSrc(); as src) {
-            <iframe
-              class="block w-full h-72 rounded-xl border-0 bg-muted"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-              [title]="'Mapa do endereço do cliente'"
-              [src]="src"
-            ></iframe>
-          } @else {
-            <p class="text-sm text-muted-foreground px-1 py-8 text-center">
-              Cadastre um endereço no cliente para ver a localização no mapa.
-            </p>
-          }
+        <div class="flex items-start gap-2 border-t border-border py-[11px] text-[9px] leading-normal text-muted-foreground">
+          <ng-icon name="lucideBuilding2" class="mt-px size-3.5 shrink-0" />
+          <span data-slot="location-region">
+            {{ customer.address.city && customer.address.state ? customer.address.city + ' — ' + customer.address.state : 'Cidade e estado não informados' }}
+          </span>
         </div>
-      </section>
+      </aside>
     </div>
-  </div>
+  } @else {
+    <section class="mx-auto my-[50px] max-w-[520px] rounded-lg border border-border bg-card p-[30px] text-center">
+      <span class="mx-auto grid size-[31px] place-items-center rounded-lg bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+        <ng-icon name="lucideBuilding2" class="size-5" />
+      </span>
+      <h1 class="mt-3 mb-[5px] text-[18px] font-normal text-foreground">Cliente não encontrado</h1>
+      <p class="mb-4 text-[10px] text-muted-foreground">Este cadastro não está disponível na lista de clientes.</p>
+      <a routerLink="/customers" class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+        <ng-icon name="lucideArrowLeft" class="size-[15px]" />
+        Voltar para clientes
+      </a>
+    </section>
+  }
 </div>
-
-<t-sheet
-  title="Nova embarcação"
-  description="Preencha os campos abaixo para registrar uma embarcação deste cliente"
-  class="sm:max-w-md"
-  [isActive]="isCreateVesselSheetActive()"
-  (closed)="closeCreateVesselSheet()"
->
-  <vessel-form-ui [customerId]="id()" (closed)="closeCreateVesselSheet()" (submitted)="createVessel($event)" />
-</t-sheet>
-
-<t-sheet
-  title="Editar cliente"
-  class="sm:max-w-md"
-  description="Preencha os campos abaixo para editar as informações do cliente"
-  [isActive]="isEditCustomerSheetActive()"
-  (closed)="closeEditCustomerSheet()"
->
-  <customer-form-ui
-    [customer]="customer()"
-    (closed)="closeEditCustomerSheet()"
-    (submitted)="editCustomer($event)"
-  />
-</t-sheet>
 
 <t-confirmation
   title="Excluir embarcação"

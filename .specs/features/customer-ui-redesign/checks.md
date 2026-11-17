@@ -258,5 +258,5 @@ Proof: run web | ✓ vessel-detail.inspector.spec.ts > VesselDetail for an inspe
 - **Settled mid-build:** none
 - **Dispatched:** none
 - **Boundary:** none closed
-- **Abandoned:** none
+- **Abandoned:** the plan's example under AC 15 read "anchor co", "Ágata Pesca", "Barco Azul"; `localeCompare(…, 'pt-BR')`, the rule AC 15 and the mareos both name, gives "Ágata Pesca", "anchor co", "Barco Azul" (checked with node). The example was miscomputed when the plan was written; it is corrected in the plan and the rule is unchanged
 - **Walked:** not yet

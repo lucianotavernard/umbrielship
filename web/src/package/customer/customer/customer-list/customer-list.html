@@ -1,44 +1,111 @@
-<header class="border-b border-border">
-  <div class="mx-auto flex max-w-7xl items-start justify-between gap-4 px-6 py-8">
-    @if (loading()) {
-      <div class="grid flex-1 gap-2">
-        <t-skeleton class="h-9 w-64" />
-        <t-skeleton class="h-4 w-80" />
+<div class="mx-auto w-full max-w-[1008px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+  <div class="mb-[23px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
+    <div>
+      <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-5 bg-muted-foreground/60"></span>
+        OPERAÇÃO / RELACIONAMENTO
       </div>
-    } @else {
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight">Clientes</h1>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Lista de todos os clientes em sua organização.
-        </p>
-      </div>
-      @if (canWrite()) {
-        <button tButton type="button" (click)="openSheet()">
-          <ng-icon name="lucidePlus" />
-          Novo Cliente
-        </button>
-      }
+      <h1 class="mt-[9px] mb-[5px] text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]">
+        Clientes
+      </h1>
+      <p class="text-[12px] text-muted-foreground">
+        Gerencie os proprietários das embarcações e seus dados de contato.
+      </p>
+    </div>
+    @if (canWrite()) {
+      <button
+        tButton
+        type="button"
+        class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+        (click)="openCreate()"
+      >
+        <ng-icon name="lucidePlus" class="size-[17px]" />
+        Novo cliente
+      </button>
     }
   </div>
-</header>
 
-<section class="mx-auto max-w-7xl px-6 py-8">
-  <customer-list-ui [canWrite]="canWrite()" [loading]="loading()" [customers]="customers()" (deleted)="openDialog($event)">
-    <t-pagination [page]="page()" [total]="totalCustomers()" (changed)="page.set($event)" />
-  </customer-list-ui>
-</section>
+  <section
+    aria-label="Resumo de clientes"
+    class="mb-[17px] grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-[13px]"
+  >
+    <t-metric label="Clientes cadastrados" note="proprietários" tone="blue" [value]="metrics().customers">
+      <ng-icon name="lucideUsers" class="size-[17px]" />
+    </t-metric>
+    <t-metric label="Embarcações vinculadas" note="na frota" tone="teal" [value]="metrics().vessels">
+      <ng-icon name="lucideShip" class="size-[17px]" />
+    </t-metric>
+    <t-metric label="Com e-mail cadastrado" note="contatos" tone="amber" [value]="metrics().emails">
+      <ng-icon name="lucideMail" class="size-[17px]" />
+    </t-metric>
+    <t-metric label="Com telefone cadastrado" note="contatos" tone="green" [value]="metrics().phones">
+      <ng-icon name="lucidePhone" class="size-[17px]" />
+    </t-metric>
+  </section>
+
+  <section
+    aria-labelledby="customer-list-title"
+    class="rounded-lg border border-border bg-card px-[18px] pt-5 pb-0"
+  >
+    <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 id="customer-list-title" class="text-[13px] font-normal text-foreground">Lista de clientes</h2>
+        <p class="mt-[5px] text-[10px] text-muted-foreground">
+          Consulte, cadastre e atualize os clientes da sua organização.
+        </p>
+      </div>
+      <label
+        class="flex h-[34px] w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 sm:w-[290px]"
+      >
+        <ng-icon name="lucideSearch" class="size-[15px] shrink-0" />
+        <span class="sr-only">Buscar clientes</span>
+        <input
+          type="search"
+          class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground"
+          placeholder="Buscar por nome, contato ou cidade..."
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        />
+      </label>
+    </div>
+
+    <customer-list-ui
+      [canWrite]="canWrite()"
+      [loading]="loading()"
+      [customers]="shown()"
+      [total]="customers().length"
+      (edited)="openEdit($event)"
+      (deleted)="openDialog($event)"
+    />
+
+    <footer
+      data-slot="list-footer"
+      class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground"
+    >
+      @if (loading()) {
+        <t-skeleton class="h-3 w-32 rounded" />
+      } @else {
+        <span>Exibindo {{ shown().length }} de {{ customers().length }} clientes</span>
+      }
+    </footer>
+  </section>
+</div>
 
 <t-sheet
-  title="Novo cliente"
-  class="sm:max-w-md"
-  description="Preencha os campos abaixo para criar um novo cliente"
+  kicker="RELACIONAMENTO / CLIENTES"
+  closeLabel="Fechar cadastro"
+  class="sm:w-full sm:max-w-[580px]"
+  description="Cadastre os dados de contato do proprietário da embarcação."
+  [title]="editing() ? 'Editar cliente' : 'Novo cliente'"
+  [flush]="true"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >
   <customer-form-ui
     [loading]="submitting()"
+    [customer]="editing()"
     (closed)="closeSheet()"
-    (submitted)="createCustomer($event)"
+    (submitted)="saveCustomer($event)"
   />
 </t-sheet>
 

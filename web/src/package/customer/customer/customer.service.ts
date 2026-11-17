@@ -17,8 +17,11 @@ export type Customer = {
 export type CreateCustomerRequest = Omit<Customer, 'id'>;
 export type UpdateCustomerRequest = Omit<Customer, 'id'>;
 
+/** A Customer as `GET /api/customers` lists it, with how many Vessels it owns. */
+export type CustomerListItem = Customer & { vesselCount: number };
+
 export type GetCustomersResponse = {
-  customers: Customer[];
+  customers: CustomerListItem[];
   total: number;
 };
 

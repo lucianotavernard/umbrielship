@@ -1,20 +1,24 @@
 import { HttpStatusCode, httpResource } from '@angular/common/http';
-import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideArrowLeft,
-  lucideExternalLink,
+  lucideChevronRight,
   lucideMail,
-  lucideMapPin,
+  lucidePencil,
   lucidePhone,
   lucidePlus,
+  lucideRuler,
+  lucideShip,
+  lucideUser,
 } from '@ng-icons/lucide';
 
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
+import { initials } from '../../../shared/components/lib/initials';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
-import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
 import { Pagination } from '../../../shared/components/ui/pagination';
 import { Sheet } from '../../../shared/components/ui/sheet';
@@ -23,33 +27,29 @@ import { toast } from '../../../shared/components/ui/toaster';
 import { WorkOrderForm } from '../../../work-order/work-order/components/work-order-form';
 import { WorkOrderList } from '../../../work-order/work-order/components/work-order-list';
 import {
-  CreateWorkOrderRequest,
   GetWorkOrdersResponse,
   UpdateWorkOrderRequest,
   WorkOrder,
   WorkOrderService,
 } from '../../../work-order/work-order/work-order.service';
 import { VesselForm } from '../components/vessel-form';
-import { VesselDetail as VesselDetailUI } from '../components/vessel-detail';
+import { formatLength } from '../vessel-csv';
 import {
   CreateVesselRequest,
   GetVesselResponse,
-  UpdateVesselRequest,
   VesselService,
+  vesselTypeLabels,
 } from '../vessel.service';
-import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
 @Component({
   selector: 'vessel-detail',
   imports: [
     NgIcon,
     RouterLink,
-    Button,
     Confirmation,
     Pagination,
     Sheet,
     Skeleton,
-    VesselDetailUI,
     VesselForm,
     WorkOrderList,
     WorkOrderForm,
@@ -57,11 +57,14 @@ import { AuthenticationService } from '../../../identity/authentication/authenti
   viewProviders: [
     provideIcons({
       lucideArrowLeft,
-      lucidePlus,
-      lucideMapPin,
+      lucideChevronRight,
       lucideMail,
+      lucidePencil,
       lucidePhone,
-      lucideExternalLink,
+      lucidePlus,
+      lucideRuler,
+      lucideShip,
+      lucideUser,
     }),
   ],
   templateUrl: './vessel-detail.html',
@@ -74,6 +77,7 @@ export class VesselDetail {
   id = input.required<string>();
 
   vesselResource = httpResource<GetVesselResponse>(() => `/api/vessels/${this.id()}`);
+  /** WorkOrders stay ten per page (AD-029). */
   workOrdersResource = httpResource<GetWorkOrdersResponse>(
     () => `/api/work-orders?vesselId=${this.id()}&take=10&skip=${(this.page() - 1) * 10}`,
   );
@@ -87,21 +91,18 @@ export class VesselDetail {
 
   selectedWorkOrder = signal<WorkOrder | null>(null);
 
-  vessel = computed(() =>
-    this.vesselResource.hasValue() ? (this.vesselResource.value()?.vessel ?? null) : null,
-  );
-  loadingVessel = computed(() => this.vesselResource.isLoading());
+  vessel = computed(() => resourceValue(this.vesselResource)?.vessel ?? null);
   notFound = computed(
     () => (this.vesselResource.error() as { status?: number } | undefined)?.status === HttpStatusCode.NotFound,
   );
 
   loading = computed(() => this.workOrdersResource.isLoading());
-  workOrders = computed(() =>
-    this.workOrdersResource.hasValue() ? (this.workOrdersResource.value()?.workOrders ?? []) : [],
-  );
-  totalWorkOrders = computed(() =>
-    this.workOrdersResource.hasValue() ? (this.workOrdersResource.value()?.total ?? 0) : 0,
-  );
+  workOrders = computed(() => resourceValue(this.workOrdersResource)?.workOrders ?? []);
+  totalWorkOrders = computed(() => resourceValue(this.workOrdersResource)?.total ?? 0);
+
+  protected readonly typeLabels = vesselTypeLabels;
+  protected readonly length = formatLength;
+  protected readonly initialsOf = initials;
 
   openCreateWorkOrderSheet() {
     this.isCreateWorkOrderSheetActive.set(true);
@@ -129,23 +130,29 @@ export class VesselDetail {
     this.selectedWorkOrder.set(null);
   }
 
-  editVessel(vessel: UpdateVesselRequest) {
+  editVessel(vessel: CreateVesselRequest) {
+    const current = this.vessel();
+    if (!current) return;
     this.submitting.set(true);
-    const { customerId, name, type, length } = vessel;
-    this.vesselService.updateVessel(this.id(), { customerId, name, type, length }).subscribe({
-      next: () => {
-        toast.success('Embarcação atualizada com sucesso', {
-          description: 'A embarcação foi atualizada com sucesso.',
-        });
-        this.closeEditVesselSheet();
-        this.vesselResource.reload();
-      },
-      error: (response) => {
-        toast.error('Erro ao atualizar embarcação', {
-          description: apiErrorMessage(response, 'Ocorreu um erro ao atualizar a embarcação.'),
-        });
-      },
-    });
+    const { name, type, length } = vessel;
+    this.vesselService
+      .updateVessel(this.id(), { customerId: current.customerId, name, type, length })
+      .subscribe({
+        next: () => {
+          this.submitting.set(false);
+          toast.success('Embarcação atualizada com sucesso', {
+            description: 'A embarcação foi atualizada com sucesso.',
+          });
+          this.closeEditVesselSheet();
+          this.vesselResource.reload();
+        },
+        error: (response) => {
+          this.submitting.set(false);
+          toast.error('Erro ao atualizar embarcação', {
+            description: apiErrorMessage(response, 'Ocorreu um erro ao atualizar a embarcação.'),
+          });
+        },
+      });
   }
 
   createWorkOrder(workOrder: UpdateWorkOrderRequest) {
@@ -171,6 +178,7 @@ export class VesselDetail {
     const workOrder = this.selectedWorkOrder();
     this.workOrderService.deleteWorkOrder(workOrder!.id).subscribe({
       next: () => {
+        this.confirming.set(false);
         this.workOrdersResource.reload();
         this.closeDeleteWorkOrderDialog();
 

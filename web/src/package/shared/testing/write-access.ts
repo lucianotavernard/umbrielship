@@ -25,6 +25,7 @@ const atlantic = {
   email: 'ops@atlantic.test',
   phone: '11999999999',
   address: { address: 'Rua 1', city: 'Santos', state: 'SP' },
+  vesselCount: 1,
 };
 
 const aurora = {
@@ -86,24 +87,27 @@ export const pages: Page[] = [
   'work-orders/:id',
 ];
 
-// What each page renders for a Role that may write, as it rendered before the inspector Role.
+// What each page renders for a Role that may write (the mareos screens of customer-ui-redesign).
 export const writeControlsOf: Record<Page, string[]> = {
-  customers: ['Novo Cliente', 'Excluir'],
-  'customers/:id': ['Editar', 'Deletar', 'Nova Embarcação', 'Excluir'],
-  vessels: ['Nova Embarcação', 'Excluir'],
-  'vessels/:id': ['Editar', 'Deletar', 'Nova ordem', 'Excluir'],
+  customers: ['Novo cliente', 'Editar Atlantic', 'Excluir Atlantic'],
+  'customers/:id': ['Excluir Aurora'],
+  vessels: ['Nova embarcação', 'Editar embarcação Aurora', 'Excluir embarcação Aurora'],
+  'vessels/:id': ['Editar', 'Nova ordem', 'Excluir'],
   'work-orders/:id': ['Editar ordem de serviço', 'Novo serviço', 'Enviar foto de Pintura'],
 };
 
 const labels = [
-  'Novo Cliente',
-  'Nova Embarcação',
+  'Novo cliente',
+  'Nova embarcação',
   'Nova ordem',
   'Novo serviço',
   'Editar ordem de serviço',
   'Editar',
-  'Deletar',
 ];
+
+// A row action is named by its aria-label: "Excluir", "Excluir Atlantic", "Editar embarcação Aurora".
+const isRowAction = (aria: string) =>
+  aria === 'Excluir' || aria.startsWith('Excluir ') || aria.startsWith('Editar ');
 
 // Every control on the page that creates, edits, deletes or uploads, by its label.
 export function writeControls(element: HTMLElement): string[] {
@@ -111,8 +115,8 @@ export function writeControls(element: HTMLElement): string[] {
 
   for (const button of element.querySelectorAll('button')) {
     const aria = button.getAttribute('aria-label');
-    if (aria === 'Excluir') {
-      found.push('Excluir');
+    if (aria && isRowAction(aria)) {
+      found.push(aria);
       continue;
     }
     const text = button.textContent?.trim() ?? '';
@@ -142,7 +146,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
     case 'customers': {
       const fixture = TestBed.createComponent(CustomerList);
       await settle();
-      controller.expectOne('/api/customers?page=1').flush({ customers: [atlantic], total: 1 });
+      controller.expectOne('/api/customers').flush({ customers: [atlantic], total: 1 });
       await settle();
       return fixture.nativeElement;
     }
@@ -154,7 +158,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       await navigation;
       await settle();
       controller
-        .expectOne('/api/vessels?customerId=c1&page=1')
+        .expectOne('/api/vessels?customerId=c1')
         .flush({ vessels: [aurora], total: 1 });
       await settle();
       return harness.routeNativeElement as HTMLElement;
@@ -162,8 +166,8 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
     case 'vessels': {
       const fixture = TestBed.createComponent(VesselList);
       await settle();
-      controller.expectOne('/api/vessels?page=1').flush({ vessels: [aurora], total: 1 });
-      controller.expectOne('/api/customers?page=1').flush({ customers: [atlantic], total: 1 });
+      controller.expectOne('/api/vessels').flush({ vessels: [aurora], total: 1 });
+      controller.expectOne('/api/customers').flush({ customers: [atlantic], total: 1 });
       await settle();
       return fixture.nativeElement;
     }
