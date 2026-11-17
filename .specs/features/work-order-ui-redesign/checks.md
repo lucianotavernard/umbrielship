@@ -6,7 +6,7 @@ Run smoke: `bash api/test/smoke/api-smoke.sh`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose`
 Plan: `.specs/features/work-order-ui-redesign/plan.md`
 
-71 checks in 6 slices · 5 one-way doors · 0 open, of which 0 block
+75 checks in 6 slices (C72-C75 appended from the Verifier) · 5 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -68,7 +68,7 @@ Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C14
 **C15** - An inspector sees no Nova ordem de serviço, Editar or Excluir on the list; selection and Exportar stay (AC 15)
 Proof: run web | ✓ work-order-list.inspector.spec.ts > WorkOrderList as inspector > work-order-ui C15 hides the write controls and keeps selection and export
 
-**C16** - The sidebar lists Visão geral, Ordens de serviço, Inspeções, Embarcações, Clientes, Agenda in that order and no Modelos de inspeção; `/work-orders[/…]`, `/inspections`, `/inspection-templates/:id` and `/agenda` read Ordens de serviço, Inspeções, Inspeções and Agenda with the item `aria-current="page"` (AC 16)
+**C16** - The sidebar lists Visão geral, Ordens de serviço, Inspeções, Embarcações, Clientes, Agenda in that order and no Modelos de inspeção; `/work-orders[/…]`, `/inspections`, `/inspection-templates/:id`, `/work-orders/:id/assignments/…` and `/agenda` read Ordens de serviço, Inspeções, Inspeções, Inspeções and Agenda with the item `aria-current="page"` (AC 16, AD-048)
 Proof: run web | ✓ app-shell.spec.ts > Shell > work-order-ui C16 lists six items in the mareos order and Organizações only for the internal Administrator
 Proof: run web | ✓ app-shell.spec.ts > Shell > work-order-ui C16 the breadcrumb and the active item follow the work order, inspection and agenda routes
 
@@ -164,7 +164,7 @@ Proof: run web | ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C3
 Proof: run web | ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C38 an operator reads the tabs with no write control
 Proof: run web | ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C38 says there is no template
 
-**C39** - Novo modelo opens the drawer of `.specs/features/work-order-ui-redesign/captures/inspection-template-drawer.png` with the mareos labels as `modelo`, four answer types, Subir, Descer and Remover pergunta from two; Criar modelo posts, toasts and puts the card first; a 409 keeps the drawer and shows the name-taken toast (AC 39)
+**C39** - Novo modelo opens the drawer of `.specs/features/work-order-ui-redesign/captures/inspection-template-drawer.png` with the mareos labels as `modelo`, four answer types, Subir, Descer (AD-051) and Remover pergunta from two; Criar modelo posts, toasts and puts the card first; a 409 keeps the drawer and shows the name-taken toast (AC 39)
 Proof: run web | ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C39 creates a template from the drawer and shows its card first
 Proof: run web | ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C39 a taken name keeps the drawer open
 Proof: browser - open "Novo modelo" on `/inspections` at 1440x1000, save `captures/inspection-template-drawer.running.png`
@@ -246,7 +246,7 @@ Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C59 shows each item
 **C60** - Each day header shows the weekday, the day and "1 item", "<n> itens" or "Livre" (AC 60)
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C60 the day headers count one item, many items or Livre
 
-**C61** - Hoje, Semana anterior and Próxima semana move the week (a day in Dia view); the label reads the month or the cross-month range with the day range beneath (AC 61)
+**C61** - Hoje, Semana anterior and Próxima semana move the week, Dia anterior and Próximo dia a day in the Dia view; the label reads "Novembro 2026" or "30 de nov — 06 de dez, 2026" with "16 de nov — 22 de nov" beneath (AC 61, AD-049)
 Proof: run web | ✓ agenda-week.spec.ts > weekLabel > work-order-ui C61 reads one month or the cross month range
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C61 Hoje, Semana anterior and Próxima semana move the week
 
@@ -259,13 +259,13 @@ Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C63 the type chips 
 **C64** - The metrics read Compromissos na semana and Docagens programadas over the shown week, padded (AC 64)
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C64 counts the week items and dockings
 
-**C65** - SELEÇÃO DO DIA shows the long date, the count, Dia produtivo or Dia sem compromissos with its sentence, and the day's items by time (AC 65)
+**C65** - SELEÇÃO DO DIA shows the long date, the count, Dia produtivo or Dia sem compromissos with its sentence and an Adicionar à agenda button opening the drawer at that day 08:00, and the day's items by time (AC 65, AD-049)
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C65 the day panel names the day, counts it and lists its items
 
 **C66** - An item in the grid or the panel opens `/work-orders/:id` (AC 66)
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C66 an item opens its work order
 
-**C67** - Novo compromisso, an empty cell and Adicionar compromisso neste dia open the drawer with the open WorkOrders, Serviço, Descrição, Início filled from the cell or 08:00 and Fim; Adicionar à agenda posts a PENDING service, toasts and shows the item (AC 67)
+**C67** - Novo compromisso, an empty cell and Adicionar compromisso neste dia open the drawer titled Adicionar à agenda with the open WorkOrders, Serviço, Descrição, Início filled from the cell or 08:00 and Fim; Agendar serviço posts a PENDING service, toasts and shows the item (AC 67, AD-049)
 Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid
 
 **C68** - An inspector sees no Novo compromisso, cell buttons or day button (AC 68)
@@ -282,6 +282,21 @@ Proof: run web | ✓ agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons
 **C71** - The web routes are `/work-orders`, `/work-orders/:id`, `/work-orders/:id/assignments/:assignmentId/inspect`, `/work-orders/:id/assignments/:assignmentId/inspections/:inspectionId`, `/inspections`, `/inspection-templates/:id` and `/agenda`, inside the authenticated layout (Landing door 5)
 Proof: run web | ✓ app.routes.spec.ts > routes > work-order-ui C71 declares the work order, inspection and agenda routes in the authenticated layout
 
+### Verifier findings (appended)
+
+**C72** - The layout keeps the signed-in User's name from `GET /me` in `AuthenticationService.name`, which the inspection page shows under Inspetor (AC 47; Verifier finding 7)
+Proof: run web | ✓ app-shell.spec.ts > Shell > work-order-ui C72 the layout keeps the signed-in name for the inspection page
+
+**C73** - A create whose service PostgreSQL refuses stores no WorkOrder: the transaction rolls back in the database (AC 21; Verifier finding 8)
+Proof: run smoke | ok   work-order-ui C73 refused service write fails (500)
+Proof: run smoke | ok   work-order-ui C73 refused service write stores no work order (same)
+
+**C74** - `PrismaInspectionTemplatesRepository` asks for every template newest first when no page is given (AC 36; Verifier finding 10)
+Proof: run api | ✓ inspection-template.repository.spec.ts > PrismaInspectionTemplatesRepository > work-order-ui C36 asks for every template newest first when no page is given
+
+**C75** - Editar on the WorkOrder detail shows the Vessel's Customer read-only in Cliente responsável, as from the list (AC 25; Verifier finding 11)
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > work-order-ui C75 Editar on the detail shows the vessel's customer
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -297,9 +312,9 @@ Proof: run web | ✓ app.routes.spec.ts > routes > work-order-ui C71 declares th
 | status tabs (5) | Todas C6 · Pendente C6 · Em andamento C6 · Concluído C6 · Cancelado C6 | - |
 | paging rule, AC 9 (2 examples) | 17 C9 · none C9 | - |
 | CSV rule, AC 13 (3 examples) | Aurora line C13 · `=SUM(A1)` C13 · `"` doubled C13 | - |
-| create rule, AC 21 (5 examples) | 2 services C21, C22 · none C21 · 51 services C21 · empty name C21, C22 · other Organization's Vessel C21 | - |
+| create rule, AC 21 (6 examples) | 2 services C21, C22 · none C21 · 51 services C21 · empty name C21, C22 · other Organization's Vessel C21 · a service PostgreSQL refuses C73 | - |
 | assignment list, AC 34 (2 examples) | 3 over 2 WorkOrders C34 · discarded Inspection C34 | - |
-| templates rule, AC 36 (2 examples) | 12 C36 · page=1 C36 | - |
+| templates rule, AC 36 (3) | 12 C36 · page=1 C36 · newest first in the Prisma call C74 | - |
 | progress rule, AC 49 (2 examples) | 2 of 3 C49 · Não se aplica counts C49 | - |
 | agenda placement, AC 59 (4 examples) | Tue 09:30 C59 · 06:00 C59 · 21:00 C59 · cancelled C59 | - |
 | answer types (4) | TEXT C48 · YES_NO C48 · CONFORMITY C48 · SCORE C48 | - |
@@ -310,8 +325,8 @@ Proof: run web | ✓ app.routes.spec.ts > routes > work-order-ui C71 declares th
 | source controls: assignment drawer, without Inspetor (4) | Ordem de serviço C40 · Alvo C40 · Atribuir inspeção C40 · Cancelar C40 | - |
 | source controls: Atribuições and inspector view (2) | Abrir ordem C41, C42 · Inspecionar C42 | - |
 | source controls: inspection page, without photos (4) | Voltar C47 · answer options C48 · Não se aplica C48 · Concluir inspeção C50, C51 | - |
-| source controls: Agenda, without teams and tide (10) | Novo compromisso C67 · Hoje C61 · Semana anterior / Próxima semana C61 · search C63 · Limpar busca C63 · Semana / Dia C62 · Tipo chips C63 · day header C62 · item C66 · empty cell and "+" C67 | - |
-| added controls (4) | row menu Editar C25 · row menu Excluir C14 · Descartar C56 · Editar modelo / Excluir C44 | - |
+| source controls: Agenda, without teams and tide (10) | Novo compromisso C67 · Hoje C61 · Semana anterior / Próxima semana, Dia anterior / Próximo dia C61 · search C63 · Limpar busca C63 · Semana / Dia C62 · Tipo chips C63 · day header C62 · item C66 · empty cell and "+" C67 | - |
+| added controls (6) | row menu Editar C25 · row menu Excluir C14 · Descartar C56 · Editar modelo / Excluir C44 · Subir / Descer C39 (AD-051) · day panel Adicionar à agenda C65 (AD-049) | - |
 | inspector write controls (5 pages) | WorkOrder list C15 · WorkOrder detail C32 · hub C42 · template detail C44 · Agenda C68 | - |
 | widths (5) | 640 C17, C57 · 768 C17 · 1024 C17 · 1280 C17 · 1536 C17 | - |
 | menu items (7) | Visão geral C16 · Ordens de serviço C16 · Inspeções C16 · Embarcações C16 · Clientes C16 · Agenda C16 · Organizações C16 | - |
@@ -319,19 +334,19 @@ Proof: run web | ✓ app.routes.spec.ts > routes > work-order-ui C71 declares th
 ## Swept
 
 - validation: C20, C21 (51 services, empty name), C48 (1000 and 500 character limits)
-- failure modes: C21 and C22 (one transaction, nothing stored on 400), C23, C52
+- failure modes: C21, C22 and C73 (one transaction, nothing stored on 400 or on a write the database refuses), C23, C52
 - idempotency: C19 ("Criar ordem" disabled while the request runs, one POST)
 - authorization: C21 (403 to an inspector), C15, C32, C42, C54, C68; existing - `RolesGuard` on every write route
 - concurrency: n/a - no new shared state; the only multi-row write is one transaction (C21)
 - data lifecycle: C25 (edited values shown back), C14 (delete drops the row), C3 (services follow create and delete)
-- dependency failure: C11, C23, C46, C52, C70
+- dependency failure: C11, C46, C70 (each read failing in turn), C23, C52
 - state transitions: C42 and C54 (inspectable only while IN_PROGRESS), C6
 - observability: n/a - no logging requirement in this plan
 
 ## Handoff
 
-- **Settled mid-build:** none
-- **Dispatched:** API builder sub-agent (doors 1-4, C2, C3, C21, C22, C34, C35, C36; works only under `api/`, does not commit) at `ddda435` - returned, all doors built, committed by the author at `1bdc8bb`; web test builder S1-S3 (C1, C4-C20, C23-C32, C16; owns `work-order/work-order/**`, `work-order-service/**`, `customer/vessel/**`, the shell) at `1bdc8bb` - returned, 36 owned lines pass, whole web suite 223 tests green; it fixed the same tracked-effect toast in `work-order-list.ts` and replaced the superseded `customer-ui C2`, `C5`, `C50`, `[C91]` and `inspector C26` tests with C16, C24, C28 and C32; web test builder S4-S6 (C29, C33, C37-C71; owns `inspection/**`, `inspection-template/**`, `inspection-assignment/**`, `agenda/**`, `app.routes.ts`) at `1bdc8bb` - returned, 45 owned lines pass; it fixed toasts raised inside tracked effects (hub, Agenda) and made "Novo compromisso" start at the selected day 08:00; it deleted `inspection-checklist.spec.ts`, `inspection-history.spec.ts` (claims moved to `inspection-page.spec.ts` and the section spec), `inspection-template-list.spec.ts` and `inspection-template-menu.spec.ts` (superseded by C16, C38, C39)
-- **Boundary:** C2, C3, C21, C22, C34, C35, C36 at `1bdc8bb`; C1, C4-C20, C23-C33, C37-C71 at `98c4d6d`
+- **Settled mid-build:** after the Verifier and screens round 1 (2026-11-17): "Inspeções, como o mareos (Recomendado)" (AD-048); "Seguir o mareos (Recomendado)" (AD-049); "Manter o singular (Recomendado)" (AD-050); "Manter, só com 2+ perguntas (Recomendado)" (AD-051)
+- **Dispatched:** API builder sub-agent (doors 1-4, C2, C3, C21, C22, C34, C35, C36; works only under `api/`, does not commit) at `ddda435` - returned, all doors built, committed by the author at `1bdc8bb`; web test builder S1-S3 (C1, C4-C20, C23-C32, C16; owns `work-order/work-order/**`, `work-order-service/**`, `customer/vessel/**`, the shell) at `1bdc8bb` - returned, 36 owned lines pass, whole web suite 223 tests green; it fixed the same tracked-effect toast in `work-order-list.ts` and replaced the superseded `customer-ui C2`, `C5`, `C50`, `[C91]` and `inspector C26` tests with C16, C24, C28 and C32; Verifier at `a512d9a` (diff `ddda435..a512d9a`) - returned FAIL, 12 findings; screens round 1 at `a512d9a` (pictures taken at `98c4d6d`) - returned, 8 of 9 diverge, 35 rows differ; fix-pass builder sub-agent (screens rows, Verifier findings 7-11, AD-048 to AD-051; does not commit) at `a512d9a` - interrupted when the session ended, resumed from its transcript in the next session, returned: every screens row and findings 7-11 fixed, web 225 tests, API 317, smoke 56 ok; committed by the author at `f89463f`; web test builder S4-S6 (C29, C33, C37-C71; owns `inspection/**`, `inspection-template/**`, `inspection-assignment/**`, `agenda/**`, `app.routes.ts`) at `1bdc8bb` - returned, 45 owned lines pass; it fixed toasts raised inside tracked effects (hub, Agenda) and made "Novo compromisso" start at the selected day 08:00; it deleted `inspection-checklist.spec.ts`, `inspection-history.spec.ts` (claims moved to `inspection-page.spec.ts` and the section spec), `inspection-template-list.spec.ts` and `inspection-template-menu.spec.ts` (superseded by C16, C38, C39)
+- **Boundary:** C2, C3, C21, C22, C34, C35, C36 at `1bdc8bb`; C1, C4-C20, C23-C33, C37-C71 at `98c4d6d`; the Verifier and screens round 1 findings, C72-C75 and AD-048 to AD-051 at `f89463f`
 - **Abandoned:** none
-- **Walked:** an isolated stack started for the walk (PostgreSQL, Redis and Mailpit in new containers `wo-walk-pg`, `wo-walk-redis`, `wo-walk-mailpit` on ports 55500, 56500, 51500/58500; the API built from this checkout on 3334; `ng serve` on 4300 with a proxy to 3334), seeded through the API with eight fictional Customers and Vessels, eight WorkOrders in the week of 16 Nov 2026 created with their services through the new `POST /work-orders`, the templates "Inspeção de segurança de bordo" and "Checklist de manutenção preventiva", one assignment on the Santa Maria WorkOrder (`IN_PROGRESS`), the operator "Lucas Costa" and the inspector "Camila Rocha". Headless Chrome (Playwright on `/usr/bin/google-chrome`) saved every `*.running.png` at its capture's size: `/work-orders` at 1440x1250 as the operator; "Nova ordem de serviço" at 1440x1000; `/inspections` as the administrator, "Novo modelo", the first card's "Atribuir à OS" and the "Atribuições" tab at 1440x1000; `/inspections` as the inspector and its first "Inspecionar" (the inspect page) at 1440x1000; `/agenda` at 1440x1161 as the operator. The flows, performed with clicks and typing: the operator created a WorkOrder on Pescador I with two services (the read-only customer read "João Batista"; the total went 08 -> 09; the search "pintura" found it with "+1 serviço"), opened it from the row menu "Ver detalhes" (two services), and set it "Em andamento" with "Editar"; the administrator assigned "Inspeção de segurança de bordo" to it from a card ("Atribuições" selected, two cards); the inspector opened it with "Inspecionar" (`?from=inspections`), "Concluir inspeção" with nothing answered showed "Responda à pergunta obrigatória: “Coletes salva-vidas estão acessíveis e em bom estado?”.", answered the three ("3 de 3 respondidas"), chose "Aprovada", confirmed, landed on `/inspections` with the pill "Aprovada", then opened it from the WorkOrder history ("Aprovada", "Concluída em 17/11/2026 14:32"); the operator used the empty cell "Criar compromisso em Sábado, 21 de novembro às 08:00" (Início prefilled `2026-11-21T08:00`) and added a service (24 items, from 23). C17 and C57: `/work-orders`, `/work-orders/:id`, `/inspections`, the inspect page and `/agenda` at 640, 768, 1024, 1280 and 1536 px - `scrollWidth` equals `innerWidth` in all 25; in the dark theme the badges read `rgb(24, 40, 58)` on `rgb(141, 180, 220)` (Em andamento) and `rgb(26, 38, 50)` on `rgb(154, 170, 184)` (Pendente). A user reaches the states from the sidebar (Ordens de serviço, Inspeções, Agenda), "Nova ordem de serviço", a row's "Ações para #…", "Novo modelo", "Atribuir à OS", the "Atribuições" tab, "Inspecionar", a history row and an empty Agenda cell. Seen in the walk: on the inspect page reached from the hub the topbar reads "Operação > Ordens de serviço" (criterion 16 maps `/work-orders[/…]` there) while `captures/inspection-run.png` reads "Inspeções".
+- **Walked:** an isolated stack started for the walk (PostgreSQL, Redis and Mailpit in new containers `wo-walk-pg`, `wo-walk-redis`, `wo-walk-mailpit` on ports 55500, 56500, 51500/58500; the API built from this checkout on 3334; `ng serve` on 4300 with a proxy to 3334), seeded through the API with eight fictional Customers and Vessels, eight WorkOrders in the week of 16 Nov 2026 created with their services through the new `POST /work-orders`, the templates "Inspeção de segurança de bordo" and "Checklist de manutenção preventiva", one assignment on the Santa Maria WorkOrder (`IN_PROGRESS`), the operator "Lucas Costa" and the inspector "Camila Rocha". Headless Chrome (Playwright on `/usr/bin/google-chrome`) saved every `*.running.png` at its capture's size: `/work-orders` at 1440x1250 as the operator; "Nova ordem de serviço" at 1440x1000; `/inspections` as the administrator, "Novo modelo", the first card's "Atribuir à OS" and the "Atribuições" tab at 1440x1000; `/inspections` as the inspector and its first "Inspecionar" (the inspect page) at 1440x1000; `/agenda` at 1440x1161 as the operator. The flows, performed with clicks and typing: the operator created a WorkOrder on Pescador I with two services (the read-only customer read "João Batista"; the total went 08 -> 09; the search "pintura" found it with "+1 serviço"), opened it from the row menu "Ver detalhes" (two services), and set it "Em andamento" with "Editar"; the administrator assigned "Inspeção de segurança de bordo" to it from a card ("Atribuições" selected, two cards); the inspector opened it with "Inspecionar" (`?from=inspections`), "Concluir inspeção" with nothing answered showed "Responda à pergunta obrigatória: “Coletes salva-vidas estão acessíveis e em bom estado?”.", answered the three ("3 de 3 respondidas"), chose "Aprovada", confirmed, landed on `/inspections` with the pill "Aprovada", then opened it from the WorkOrder history ("Aprovada", "Concluída em 17/11/2026 14:32"); the operator used the empty cell "Criar compromisso em Sábado, 21 de novembro às 08:00" (Início prefilled `2026-11-21T08:00`) and added a service (24 items, from 23). C17 and C57: `/work-orders`, `/work-orders/:id`, `/inspections`, the inspect page and `/agenda` at 640, 768, 1024, 1280 and 1536 px - `scrollWidth` equals `innerWidth` in all 25; in the dark theme the badges read `rgb(24, 40, 58)` on `rgb(141, 180, 220)` (Em andamento) and `rgb(26, 38, 50)` on `rgb(154, 170, 184)` (Pendente). A user reaches the states from the sidebar (Ordens de serviço, Inspeções, Agenda), "Nova ordem de serviço", a row's "Ações para #…", "Novo modelo", "Atribuir à OS", the "Atribuições" tab, "Inspecionar", a history row and an empty Agenda cell. Seen in the walk: on the inspect page reached from the hub the topbar reads "Operação > Ordens de serviço" (criterion 16 maps `/work-orders[/…]` there) while `captures/inspection-run.png` reads "Inspeções". After screens round 1 (`f89463f`): the walk stack's API and `ng serve` restarted on the same data; every picture retaken at its capture's size with the same script; the five pages again show `scrollWidth` equal to `innerWidth` at all five widths; the inspect page now reads "Operação > Inspeções" and fits 1440x1000 with "Concluir inspeção" in view; the Agenda grid and legend fit 1440x1161.
