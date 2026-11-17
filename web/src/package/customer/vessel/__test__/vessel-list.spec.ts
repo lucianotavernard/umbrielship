@@ -330,9 +330,16 @@ describe('VesselList', () => {
     expect(sheet.querySelector<HTMLSelectElement>('#type')!.value).toBe('CARGO');
     expect(sheet.querySelector<HTMLInputElement>('#length')!.value).toBe('32.5');
 
+    // What is typed and cancelled never comes back on the next Editar.
+    await type('#vessel-name', 'Digitado e cancelado');
+    await click(buttonByText('Cancelar', sheet));
+    await click(byLabel('Editar embarcação Aurora'));
+    expect(drawer()!.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Aurora');
+    expect(drawer()!.querySelector<HTMLInputElement>('#length')!.value).toBe('32.5');
+
     await type('#vessel-name', 'Aurora II');
     await type('#length', '33');
-    await click(buttonByText('Salvar alterações', sheet));
+    await click(buttonByText('Salvar alterações', drawer()!));
 
     const put = controller.expectOne('/api/customers/c-atl/vessels/v-aur');
     expect(put.request.method).toBe('PUT');

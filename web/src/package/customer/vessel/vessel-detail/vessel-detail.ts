@@ -1,5 +1,5 @@
 import { HttpStatusCode, httpResource } from '@angular/common/http';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -73,6 +73,7 @@ export class VesselDetail {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
   vesselService = inject(VesselService);
   workOrderService = inject(WorkOrderService);
+  private readonly vesselForm = viewChild(VesselForm);
 
   id = input.required<string>();
 
@@ -112,8 +113,11 @@ export class VesselDetail {
     this.isCreateWorkOrderSheetActive.set(false);
   }
 
+  /** Every opening shows the Vessel's values, also after a Cancelar that left typed ones. */
   openEditVesselSheet() {
+    this.vesselForm()?.load(this.vessel());
     this.isEditVesselSheetActive.set(true);
+    this.vesselForm()?.focusName();
   }
 
   closeEditVesselSheet() {
@@ -179,7 +183,13 @@ export class VesselDetail {
     this.workOrderService.deleteWorkOrder(workOrder!.id).subscribe({
       next: () => {
         this.confirming.set(false);
-        this.workOrdersResource.reload();
+        // The last WorkOrder of a page takes the page with it: step back to the last one left.
+        const lastPage = Math.max(1, Math.ceil((this.totalWorkOrders() - 1) / 10));
+        if (this.page() > lastPage) {
+          this.page.set(lastPage);
+        } else {
+          this.workOrdersResource.reload();
+        }
         this.closeDeleteWorkOrderDialog();
 
         toast.success('Ordem de serviço excluída com sucesso', {

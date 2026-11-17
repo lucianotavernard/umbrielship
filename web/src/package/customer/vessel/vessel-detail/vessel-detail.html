@@ -1,11 +1,11 @@
 <div class="mx-auto w-full max-w-[988px] px-[13px] pt-[18px] pb-[21px] sm:px-6 sm:pt-6 lg:px-[37px]">
   <nav aria-label="Navegação estrutural" class="mb-[17px] flex items-center gap-[9px] text-[10px] text-muted-foreground">
     <a routerLink="/vessels" class="inline-flex items-center gap-1.5 hover:text-primary">
-      <ng-icon name="lucideArrowLeft" class="size-[15px]" />
+      <ng-icon name="lucideArrowLeft" class="!size-[15px]" />
       Voltar à frota
     </a>
     @if (vessel(); as vessel) {
-      <ng-icon name="lucideChevronRight" class="size-3.5" />
+      <ng-icon name="lucideChevronRight" class="!size-3.5" />
       <span class="truncate font-semibold text-foreground">{{ vessel.name }}</span>
     }
   </nav>
@@ -26,7 +26,7 @@
           @if (vessel(); as vessel) {
             <div class="flex items-start gap-[13px]">
               <span class="grid size-[45px] shrink-0 place-items-center rounded-[11px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
-                <ng-icon name="lucideShip" class="size-[22px]" />
+                <ng-icon name="lucideShip" class="!size-[22px]" />
               </span>
               <div class="min-w-0 flex-1">
                 <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">FROTA</span>
@@ -46,7 +46,7 @@
                   class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
                   (click)="openEditVesselSheet()"
                 >
-                  <ng-icon name="lucidePencil" class="size-3.5" />
+                  <ng-icon name="lucidePencil" class="!size-3.5" />
                   Editar
                 </button>
               }
@@ -59,7 +59,7 @@
               <div class="min-w-0" data-slot="spec-length">
                 <dt class="text-[9px] text-muted-foreground">Comprimento</dt>
                 <dd class="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-foreground">
-                  <ng-icon name="lucideRuler" class="size-3.5 text-muted-foreground" />{{ length(vessel.length) }} m
+                  <ng-icon name="lucideRuler" class="!size-3.5 text-muted-foreground" />{{ length(vessel.length) }} m
                 </dd>
               </div>
             </dl>
@@ -86,7 +86,7 @@
                 class="inline-flex h-[31px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] whitespace-nowrap text-foreground/75 hover:border-primary/40 hover:text-primary"
                 (click)="openCreateWorkOrderSheet()"
               >
-                <ng-icon name="lucidePlus" class="size-[15px]" />
+                <ng-icon name="lucidePlus" class="!size-[15px]" />
                 Nova ordem
               </button>
             }
@@ -125,11 +125,11 @@
           </div>
           <div class="grid gap-3 border-t border-border pt-[15px] text-[10px] text-foreground/80">
             <div data-slot="client-email" class="flex min-w-0 items-center gap-2">
-              <ng-icon name="lucideMail" class="size-[15px] shrink-0 text-muted-foreground" />
+              <ng-icon name="lucideMail" class="!size-[15px] shrink-0 text-muted-foreground" />
               <span class="truncate">{{ customer.email || 'Não informado' }}</span>
             </div>
             <div data-slot="client-phone" class="flex min-w-0 items-center gap-2">
-              <ng-icon name="lucidePhone" class="size-[15px] shrink-0 text-muted-foreground" />
+              <ng-icon name="lucidePhone" class="!size-[15px] shrink-0 text-muted-foreground" />
               <span class="truncate">{{ customer.phone || 'Não informado' }}</span>
             </div>
           </div>
@@ -137,7 +137,7 @@
             class="flex min-h-[34px] items-center justify-center gap-[7px] rounded-[5px] bg-accent text-[10px] font-semibold text-accent-foreground hover:bg-accent/80"
             [routerLink]="['/customers', customer.id]"
           >
-            <ng-icon name="lucideUser" class="size-[15px]" />
+            <ng-icon name="lucideUser" class="!size-[15px]" />
             Ver cliente
           </a>
         } @else {

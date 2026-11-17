@@ -46,7 +46,7 @@ import { roleLabels } from '../../user/user.service';
               {{ roleLabels[organization.role] }}
             </small>
           </span>
-          <ng-icon name="lucideChevronDown" class="size-3.5 shrink-0 text-muted-foreground" />
+          <ng-icon name="lucideChevronDown" class="!size-3.5 shrink-0 text-muted-foreground" />
         </button>
 
         <t-dropdown-menu-content align="start" [sideOffset]="8" class="w-[214px] p-[5px]">
@@ -74,7 +74,7 @@ import { roleLabels } from '../../user/user.service';
                 <small class="text-[9px] text-muted-foreground">{{ roleLabels[option.role] }}</small>
               </span>
               @if (option.id === activeId()) {
-                <ng-icon name="lucideCheck" class="size-3.5 text-primary" data-slot="active-check" />
+                <ng-icon name="lucideCheck" class="!size-3.5 text-primary" data-slot="active-check" />
                 <span class="sr-only">(ativa)</span>
               }
             </button>

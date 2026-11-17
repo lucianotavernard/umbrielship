@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, output, signal, untracked, viewChild } from '@angular/core';
 import { form, FormField, hidden, required } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -31,7 +31,7 @@ import {
         <section class="overflow-hidden rounded-[11px] border border-border bg-card">
           <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
             <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
-              <ng-icon name="lucideShip" class="size-[17px]" />
+              <ng-icon name="lucideShip" class="!size-[17px]" />
             </span>
             <span>
               <strong class="block text-[12px] font-semibold text-foreground">Detalhes da embarcação</strong>
@@ -44,6 +44,7 @@ import {
                 Nome <span class="text-destructive">*</span>
               </label>
               <input
+                #nameInput
                 tInput
                 id="vessel-name"
                 type="text"
@@ -71,7 +72,7 @@ import {
         <section class="overflow-hidden rounded-[11px] border border-border bg-card">
           <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
             <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
-              <ng-icon name="lucideRuler" class="size-[17px]" />
+              <ng-icon name="lucideRuler" class="!size-[17px]" />
             </span>
             <span>
               <strong class="block text-[12px] font-semibold text-foreground">Tipo e comprimento</strong>
@@ -129,7 +130,7 @@ import {
         <span class="text-[10px] text-muted-foreground"><span class="text-destructive">*</span> Campos obrigatórios</span>
         <div class="flex items-center gap-1.5 sm:gap-2">
           <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">
-            <ng-icon name="lucideX" class="size-3.5" />
+            <ng-icon name="lucideX" class="!size-3.5" />
             Cancelar
           </button>
           <button tButton type="submit" class="h-[35px] px-[13px] text-[11px] font-semibold" [disabled]="loading()">
@@ -137,7 +138,7 @@ import {
               <ng-icon name="lucideLoader2" class="animate-spin" />
               Salvando...
             } @else {
-              <ng-icon name="lucideCheck" class="size-[15px]" />
+              <ng-icon name="lucideCheck" class="!size-[15px]" />
               {{ vessel() ? 'Salvar alterações' : 'Salvar embarcação' }}
             }
           </button>
@@ -155,6 +156,8 @@ export class VesselForm {
 
   submitted = output<CreateVesselRequest>();
   closed = output<void>();
+
+  private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   protected readonly types = VESSEL_TYPES;
   protected readonly labels = vesselTypeLabels;
@@ -183,25 +186,29 @@ export class VesselForm {
   constructor() {
     effect(() => {
       const vessel = this.vessel();
-
-      if (vessel) {
-        this.model.set({
-          name: vessel.name,
-          customerId: vessel.customerId,
-          imoNumber: vessel.imoNumber,
-          type: vessel.type,
-          length: String(vessel.length),
-        });
-      } else {
-        this.model.set({
-          name: '',
-          customerId: this.customerId(),
-          imoNumber: '',
-          type: '',
-          length: '',
-        });
-      }
+      const customerId = this.customerId();
+      untracked(() => this.load(vessel, customerId));
     });
+  }
+
+  /** Puts the Vessel's values in the fields (or empties them), whatever was typed before. */
+  load(vessel: Vessel | null, customerId = this.customerId()) {
+    this.vesselForm().reset(
+      vessel
+        ? {
+            name: vessel.name,
+            customerId: vessel.customerId,
+            imoNumber: vessel.imoNumber,
+            type: vessel.type,
+            length: String(vessel.length),
+          }
+        : { name: '', customerId, imoNumber: '', type: '', length: '' },
+    );
+  }
+
+  /** The mareos opens the drawer with the cursor in "Nome". */
+  focusName() {
+    setTimeout(() => this.nameInput()?.nativeElement.focus());
   }
 
   reset() {

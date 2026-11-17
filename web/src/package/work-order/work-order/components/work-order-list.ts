@@ -16,7 +16,7 @@ import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order
     @if (!loading() && workOrders().length === 0) {
       <div data-slot="orders-empty" class="flex min-h-[140px] flex-col items-center justify-center text-center">
         <span class="grid size-[34px] place-items-center rounded-[9px] bg-accent text-accent-foreground">
-          <ng-icon name="lucideFileText" class="size-[17px]" />
+          <ng-icon name="lucideFileText" class="!size-[17px]" />
         </span>
         <strong class="mt-2.5 text-[10px] font-semibold text-foreground">Nenhuma ordem vinculada</strong>
         <p class="mt-[5px] text-[9px] text-muted-foreground">As ordens de serviço desta embarcação aparecerão aqui.</p>
@@ -52,20 +52,20 @@ import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order
                       class="inline-flex items-center gap-[7px] font-semibold text-foreground/85 hover:text-primary"
                       [routerLink]="['/work-orders', workOrder.id]"
                     >
-                      <ng-icon name="lucideFileText" class="size-[15px] text-muted-foreground" />
+                      <ng-icon name="lucideFileText" class="!size-[15px] text-muted-foreground" />
                       #{{ workOrder.id.slice(0, 8).toUpperCase() }}
                     </a>
                   </td>
                   <td class="h-[47px] px-2">
                     <span data-slot="start-date" class="inline-flex items-center gap-[7px] text-muted-foreground">
-                      <ng-icon name="lucideCalendarDays" class="size-3.5" />
-                      {{ workOrder.startDate | date: 'longDate' : 'UTC' }}
+                      <ng-icon name="lucideCalendarDays" class="!size-3.5" />
+                      {{ workOrder.startDate | date: 'longDate' }}
                     </span>
                   </td>
                   <td class="h-[47px] px-2">
                     <span data-slot="end-date" class="inline-flex items-center gap-[7px] text-muted-foreground">
-                      <ng-icon name="lucideCalendarDays" class="size-3.5" />
-                      {{ workOrder.endDate | date: 'longDate' : 'UTC' }}
+                      <ng-icon name="lucideCalendarDays" class="!size-3.5" />
+                      {{ workOrder.endDate | date: 'longDate' }}
                     </span>
                   </td>
                   <td class="h-[47px] px-2">
@@ -85,10 +85,10 @@ import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order
                           type="button"
                           aria-label="Excluir"
                           title="Excluir ordem de serviço"
-                          class="inline-grid size-[27px] place-items-center rounded-[5px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:text-destructive focus-visible:opacity-100"
+                          class="inline-grid size-[27px] place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-destructive/40 hover:text-destructive"
                           (click)="deleted.emit(workOrder)"
                         >
-                          <ng-icon name="lucideTrash2" class="size-3.5" />
+                          <ng-icon name="lucideTrash2" class="!size-3.5" />
                         </button>
                       </div>
                     }

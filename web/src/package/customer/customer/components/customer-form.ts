@@ -17,56 +17,55 @@ const EMPTY = { name: '', email: '', phone: '', address: { address: '', city: ''
   imports: [NgIcon, FormField, FormGroup, Label, Input, Select, Button],
   viewProviders: [provideIcons({ lucideBuilding2, lucideMapPin, lucideLoader2, lucidePlus })],
   template: `
-    <form class="flex min-h-0 flex-1 flex-col" (submit)="submitForm($event)">
-      <div
-        class="flex min-h-0 flex-1 flex-col gap-[13px] overflow-y-auto overscroll-y-contain bg-muted/60 px-[13px] py-[14px] sm:px-[25px] sm:py-[19px]"
-      >
-        <section class="overflow-hidden rounded-[11px] border border-border bg-card">
-          <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
-            <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
-              <ng-icon name="lucideBuilding2" class="size-[15px]" />
+    <!-- The mareos client drawer: flat sections and the footer right under the fields. -->
+    <form class="flex flex-col" (submit)="submitForm($event)">
+      <div class="flex flex-col px-[13px] py-[14px] sm:px-[25px] sm:py-[19px]">
+        <section class="mb-[17px]">
+          <div class="mb-[13px] flex items-center gap-[9px]">
+            <span class="grid size-[29px] shrink-0 place-items-center rounded-[7px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+              <ng-icon name="lucideBuilding2" class="!size-[15px]" />
             </span>
             <span>
-              <strong class="block text-[12px] font-semibold text-foreground">Dados do cliente</strong>
-              <small class="mt-0.5 block text-[10px] text-muted-foreground">Identificação e formas de contato</small>
+              <strong class="block text-[11px] font-bold text-foreground">Dados do cliente</strong>
+              <small class="mt-[3px] block text-[9px] text-muted-foreground">Identificação e formas de contato</small>
             </span>
-          </header>
-          <div class="grid grid-cols-1 gap-[14px] px-4 pt-4 pb-[18px] sm:grid-cols-2">
-            <t-form-group class="gap-[7px] sm:col-span-2">
-              <label tLabel for="name" class="text-[10px] font-semibold">
-                Nome do cliente <span class="text-destructive">*</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <t-form-group class="gap-1.5 sm:col-span-2">
+              <label tLabel for="name" class="text-[9px] font-semibold text-foreground/70">
+                Nome do cliente <span class="text-[#c6765c]">*</span>
               </label>
               <input
                 tInput
                 id="name"
                 type="text"
-                class="bg-card text-[11px] md:text-[11px]"
+                class="h-[35px] bg-card text-[10px] md:text-[10px]"
                 placeholder="Ex.: Náutica Costa Sul"
                 [formField]="customerForm.name"
               />
             </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="email" class="text-[10px] font-semibold">
-                E-mail <span class="text-destructive">*</span>
+            <t-form-group class="gap-1.5">
+              <label tLabel for="email" class="text-[9px] font-semibold text-foreground/70">
+                E-mail <span class="text-[#c6765c]">*</span>
               </label>
               <input
                 tInput
                 id="email"
                 type="email"
-                class="bg-card text-[11px] md:text-[11px]"
+                class="h-[35px] bg-card text-[10px] md:text-[10px]"
                 placeholder="contato@empresa.com.br"
                 [formField]="customerForm.email"
               />
             </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="phone" class="text-[10px] font-semibold">
-                Telefone para contato <span class="text-destructive">*</span>
+            <t-form-group class="gap-1.5">
+              <label tLabel for="phone" class="text-[9px] font-semibold text-foreground/70">
+                Telefone para contato <span class="text-[#c6765c]">*</span>
               </label>
               <input
                 tInput
                 id="phone"
                 type="tel"
-                class="bg-card text-[11px] md:text-[11px]"
+                class="h-[35px] bg-card text-[10px] md:text-[10px]"
                 placeholder="(00) 00000-0000"
                 [formField]="customerForm.phone"
               />
@@ -74,48 +73,48 @@ const EMPTY = { name: '', email: '', phone: '', address: { address: '', city: ''
           </div>
         </section>
 
-        <section class="overflow-hidden rounded-[11px] border border-border bg-card">
-          <header class="flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted">
-            <span class="grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
-              <ng-icon name="lucideMapPin" class="size-[15px]" />
+        <section class="mb-[17px]">
+          <div class="mb-[13px] flex items-center gap-[9px]">
+            <span class="grid size-[29px] shrink-0 place-items-center rounded-[7px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+              <ng-icon name="lucideMapPin" class="!size-[15px]" />
             </span>
             <span>
-              <strong class="block text-[12px] font-semibold text-foreground">Endereço</strong>
-              <small class="mt-0.5 block text-[10px] text-muted-foreground">Localização do cliente</small>
+              <strong class="block text-[11px] font-bold text-foreground">Endereço</strong>
+              <small class="mt-[3px] block text-[9px] text-muted-foreground">Localização do cliente</small>
             </span>
-          </header>
-          <div class="grid grid-cols-1 gap-[14px] px-4 pt-4 pb-[18px] sm:grid-cols-2">
-            <t-form-group class="gap-[7px] sm:col-span-2">
-              <label tLabel for="address" class="text-[10px] font-semibold">
-                Rua e número <span class="text-destructive">*</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <t-form-group class="gap-1.5 sm:col-span-2">
+              <label tLabel for="address" class="text-[9px] font-semibold text-foreground/70">
+                Rua e número <span class="text-[#c6765c]">*</span>
               </label>
               <input
                 tInput
                 id="address"
                 type="text"
-                class="bg-card text-[11px] md:text-[11px]"
+                class="h-[35px] bg-card text-[10px] md:text-[10px]"
                 placeholder="Rua, número e complemento"
                 [formField]="customerForm.address.address"
               />
             </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="city" class="text-[10px] font-semibold">
-                Cidade <span class="text-destructive">*</span>
+            <t-form-group class="gap-1.5">
+              <label tLabel for="city" class="text-[9px] font-semibold text-foreground/70">
+                Cidade <span class="text-[#c6765c]">*</span>
               </label>
               <input
                 tInput
                 id="city"
                 type="text"
-                class="bg-card text-[11px] md:text-[11px]"
+                class="h-[35px] bg-card text-[10px] md:text-[10px]"
                 placeholder="Cidade"
                 [formField]="customerForm.address.city"
               />
             </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="state" class="text-[10px] font-semibold">
-                Estado (UF) <span class="text-destructive">*</span>
+            <t-form-group class="gap-1.5">
+              <label tLabel for="state" class="text-[9px] font-semibold text-foreground/70">
+                Estado (UF) <span class="text-[#c6765c]">*</span>
               </label>
-              <select tSelect id="state" class="bg-card text-[11px]" [formField]="customerForm.address.state">
+              <select tSelect id="state" class="h-[35px] bg-card text-[10px]" [formField]="customerForm.address.state">
                 <option value="">Selecione o estado</option>
                 @for (state of states; track state.value) {
                   <option [value]="state.value">{{ state.label }}</option>
@@ -127,10 +126,10 @@ const EMPTY = { name: '', email: '', phone: '', address: { address: '', city: ''
       </div>
 
       <footer
-        class="flex min-h-[70px] shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px] sm:py-3"
+        class="flex min-h-[70px] flex-wrap items-center justify-between gap-2.5 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px] sm:py-3"
       >
-        <span class="text-[10px] text-muted-foreground">
-          Campos com <span class="text-destructive">*</span> são obrigatórios
+        <span class="text-[9px] text-muted-foreground">
+          Campos com <span class="text-[#c6765c]">*</span> são obrigatórios
         </span>
         <div class="flex items-center gap-2">
           <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">
@@ -141,7 +140,7 @@ const EMPTY = { name: '', email: '', phone: '', address: { address: '', city: ''
               <ng-icon name="lucideLoader2" class="animate-spin" />
               Salvando...
             } @else {
-              <ng-icon name="lucidePlus" class="size-[15px]" />
+              <ng-icon name="lucidePlus" class="!size-[15px]" />
               {{ submitLabel() }}
             }
           </button>
@@ -149,7 +148,7 @@ const EMPTY = { name: '', email: '', phone: '', address: { address: '', city: ''
       </footer>
     </form>
   `,
-  host: { class: 'flex min-h-0 flex-1 flex-col' },
+  host: { class: 'block bg-card' },
 })
 export class CustomerForm {
   loading = input(false);
@@ -180,11 +179,12 @@ export class CustomerForm {
       const customer = this.customer();
 
       // Only the Customer is read here: resetting reads and writes the form, which must not re-run this.
-      untracked(() => this.fill(customer));
+      untracked(() => this.load(customer));
     });
   }
 
-  private fill(customer: Customer | null) {
+  /** Puts the Customer's values in the fields (or empties them), whatever was typed before. */
+  load(customer: Customer | null) {
     if (!customer) {
       this.reset();
       return;

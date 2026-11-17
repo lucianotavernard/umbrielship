@@ -203,6 +203,17 @@ select,
   appearance: base-select;
 }
 
+/* The mareos draws a chevron where the browser draws a filled triangle. */
+select::picker-icon {
+  content: '';
+  width: 0.875rem;
+  height: 0.875rem;
+  background-color: currentColor;
+  opacity: 0.6;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
 ::picker(select) {
   border: 0 !important;
 

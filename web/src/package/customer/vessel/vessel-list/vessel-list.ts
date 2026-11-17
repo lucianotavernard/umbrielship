@@ -111,11 +111,15 @@ export class VesselList {
     this.editing.set(null);
     this.vesselForm()?.reset();
     this.isSheetActive.set(true);
+    this.vesselForm()?.focusName();
   }
 
+  /** Every opening shows the Vessel's values, also after a Cancelar that left typed ones. */
   openEdit(vessel: VesselRow) {
     this.editing.set(vessel);
+    this.vesselForm()?.load(vessel);
     this.isSheetActive.set(true);
+    this.vesselForm()?.focusName();
   }
 
   closeSheet() {

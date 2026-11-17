@@ -80,7 +80,7 @@ export type VesselRow = Vessel & { customerName: string };
                       aria-hidden="true"
                       class="grid size-[30px] shrink-0 place-items-center rounded-[7px] bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]"
                     >
-                      <ng-icon name="lucideShip" class="size-4" />
+                      <ng-icon name="lucideShip" class="!size-4" />
                     </span>
                     <a
                       class="text-[10px] font-semibold text-foreground hover:text-primary hover:underline"
@@ -103,7 +103,7 @@ export type VesselRow = Vessel & { customerName: string };
                         [attr.aria-label]="'Editar embarcação ' + vessel.name"
                         (click)="edited.emit(vessel)"
                       >
-                        <ng-icon name="lucidePencil" class="size-3.5" />
+                        <ng-icon name="lucidePencil" class="!size-3.5" />
                         <span>Editar</span>
                       </button>
                       <button
@@ -112,7 +112,7 @@ export type VesselRow = Vessel & { customerName: string };
                         [attr.aria-label]="'Excluir embarcação ' + vessel.name"
                         (click)="deleted.emit(vessel)"
                       >
-                        <ng-icon name="lucideTrash2" class="size-3.5" />
+                        <ng-icon name="lucideTrash2" class="!size-3.5" />
                       </button>
                     </div>
                   }

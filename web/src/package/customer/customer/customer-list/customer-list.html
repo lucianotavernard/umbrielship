@@ -19,7 +19,7 @@
         class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
         (click)="openCreate()"
       >
-        <ng-icon name="lucidePlus" class="size-[17px]" />
+        <ng-icon name="lucidePlus" class="!size-[17px]" />
         Novo cliente
       </button>
     }
@@ -30,16 +30,16 @@
     class="mb-[17px] grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-[13px]"
   >
     <t-metric label="Clientes cadastrados" note="proprietários" tone="blue" [value]="metrics().customers">
-      <ng-icon name="lucideUsers" class="size-[17px]" />
+      <ng-icon name="lucideUsers" class="!size-[17px]" />
     </t-metric>
     <t-metric label="Embarcações vinculadas" note="na frota" tone="teal" [value]="metrics().vessels">
-      <ng-icon name="lucideShip" class="size-[17px]" />
+      <ng-icon name="lucideShip" class="!size-[17px]" />
     </t-metric>
     <t-metric label="Com e-mail cadastrado" note="contatos" tone="amber" [value]="metrics().emails">
-      <ng-icon name="lucideMail" class="size-[17px]" />
+      <ng-icon name="lucideMail" class="!size-[17px]" />
     </t-metric>
     <t-metric label="Com telefone cadastrado" note="contatos" tone="green" [value]="metrics().phones">
-      <ng-icon name="lucidePhone" class="size-[17px]" />
+      <ng-icon name="lucidePhone" class="!size-[17px]" />
     </t-metric>
   </section>
 
@@ -57,7 +57,7 @@
       <label
         class="flex h-[34px] w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 sm:w-[290px]"
       >
-        <ng-icon name="lucideSearch" class="size-[15px] shrink-0" />
+        <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
         <span class="sr-only">Buscar clientes</span>
         <input
           type="search"
@@ -80,7 +80,7 @@
 
     <footer
       data-slot="list-footer"
-      class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground"
+      class="flex min-h-[45px] items-center text-[9px] text-muted-foreground"
     >
       @if (loading()) {
         <t-skeleton class="h-3 w-32 rounded" />
@@ -98,6 +98,7 @@
   description="Cadastre os dados de contato do proprietário da embarcação."
   [title]="editing() ? 'Editar cliente' : 'Novo cliente'"
   [flush]="true"
+  [compact]="true"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >

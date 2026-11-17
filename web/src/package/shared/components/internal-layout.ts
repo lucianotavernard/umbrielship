@@ -132,15 +132,9 @@ const LABELS = Object.fromEntries(
         <t-sidebar-header class="gap-0 px-4 py-0">
           <div class="-mx-2 mb-4 flex h-[69px] shrink-0 items-center gap-2.5 border-b border-sidebar-border px-2">
             <span class="grid size-[31px] place-items-center rounded-[9px] bg-primary text-primary-foreground">
-              <ng-icon name="lucideAnchor" class="size-[19px]" />
+              <ng-icon name="lucideAnchor" class="!size-[19px]" />
             </span>
             <span class="text-[17px] font-extrabold tracking-[0.4px]">UMBRIEL<span class="text-primary">SHIP</span></span>
-            <button
-              tSidebarTrigger
-              type="button"
-              aria-label="Recolher menu"
-              class="ml-auto text-muted-foreground"
-            ></button>
           </div>
 
           @if (user(); as user) {
@@ -167,11 +161,12 @@ const LABELS = Object.fromEntries(
                     <li tSidebarMenuItem>
                       <a
                         tSidebarMenuButton
-                        class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:size-[17px]"
+                        class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:!size-[17px]"
                         [routerLink]="item.link"
                         [isActive]="section() === item.key"
                         [tooltip]="item.label"
                         [attr.aria-current]="section() === item.key ? 'page' : null"
+                        (click)="closeMobile()"
                       >
                         <ng-icon [name]="item.icon" />
                         <span>{{ item.label }}</span>
@@ -193,11 +188,12 @@ const LABELS = Object.fromEntries(
                       <li tSidebarMenuItem>
                         <a
                           tSidebarMenuButton
-                          class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:size-[17px]"
+                          class="h-[38px] gap-[11px] px-2.5 text-[12px] text-muted-foreground data-[active=true]:font-semibold [&>ng-icon]:!size-[17px]"
                           [routerLink]="item.link"
                           [isActive]="section() === item.key"
                           [tooltip]="item.label"
                           [attr.aria-current]="section() === item.key ? 'page' : null"
+                          (click)="closeMobile()"
                         >
                           <ng-icon [name]="item.icon" />
                           <span>{{ item.label }}</span>
@@ -231,7 +227,7 @@ const LABELS = Object.fromEntries(
                   aria-label="Abrir menu do usuário"
                   class="grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
                 >
-                  <ng-icon name="lucideEllipsis" class="size-[19px]" />
+                  <ng-icon name="lucideEllipsis" class="!size-[19px]" />
                 </button>
                 <t-dropdown-menu-content side="top" align="end" class="w-40">
                   <button tDropdownMenuItem type="button" (click)="handleLogout()">
@@ -256,7 +252,7 @@ const LABELS = Object.fromEntries(
               <button tSidebarTrigger type="button" aria-label="Abrir menu" class="-ml-1"></button>
             }
             <span>Operação</span>
-            <ng-icon name="lucideChevronRight" class="size-3.5 shrink-0" />
+            <ng-icon name="lucideChevronRight" class="!size-3.5 shrink-0" />
             <strong class="truncate font-bold text-foreground" data-slot="breadcrumb-section">
               {{ sectionLabel() }}
             </strong>
@@ -265,13 +261,13 @@ const LABELS = Object.fromEntries(
           <div class="flex shrink-0 items-center gap-3">
             <button
               type="button"
-              class="grid size-8 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              class="grid size-[30px] place-items-center rounded-[7px] text-muted-foreground transition-colors hover:bg-accent hover:text-primary aria-pressed:bg-accent aria-pressed:text-primary"
               [attr.aria-label]="isDarkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
               [attr.title]="isDarkMode() ? 'Ativar tema claro' : 'Ativar tema escuro'"
               [attr.aria-pressed]="isDarkMode()"
               (click)="toggleDarkMode()"
             >
-              <ng-icon [name]="isDarkMode() ? 'lucideSun' : 'lucideMoon'" class="size-[17px]" />
+              <ng-icon [name]="isDarkMode() ? 'lucideSun' : 'lucideMoon'" class="!size-[17px]" />
             </button>
             <span class="h-6 border-l border-border"></span>
             @if (user(); as user) {
@@ -356,6 +352,11 @@ export class InternalLayout {
     if (!this.authenticationService.isOrganizationSwitch(event)) return;
     this.authenticationService.markOrganizationChanged();
     this.reloadPage();
+  }
+
+  /** Picking a menu item on a phone closes the panel, the page already open included. */
+  closeMobile() {
+    this.sidebar()?.openMobile.set(false);
   }
 
   toggleDarkMode() {

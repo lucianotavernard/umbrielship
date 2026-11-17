@@ -30,19 +30,27 @@ import { cn } from '../lib/cn';
         [class]="computedClass()"
         (keydown.escape)="close()"
       >
-        <header class="flex items-start justify-between gap-5 border-b border-border bg-card px-[27px] pt-[25px] pb-[19px]">
+        <header
+          class="flex items-start justify-between gap-5 border-b border-border bg-card"
+          [class]="compact() ? 'px-[22px] pt-[22px] pb-[17px]' : 'px-[27px] pt-[25px] pb-[19px]'"
+        >
           <div class="min-w-0">
             @if (kicker()) {
               <div data-slot="sheet-kicker" class="mb-2 text-[9px] font-bold tracking-[1.1px] text-primary">
                 {{ kicker() }}
               </div>
             }
-            <h2 data-slot="sheet-title" class="text-[19px] leading-tight font-normal tracking-[-0.3px] text-foreground">
+            <h2
+              data-slot="sheet-title"
+              class="leading-tight font-normal tracking-[-0.4px] text-foreground"
+              [class]="compact() ? 'text-[17px]' : 'text-[20px]'"
+            >
               {{ title() }}
             </h2>
             <p
               data-slot="sheet-description"
-              class="mt-1.5 max-w-[430px] text-[11px] leading-[1.55] text-muted-foreground"
+              class="mt-1.5 max-w-[430px] leading-[1.55] text-muted-foreground"
+              [class]="compact() ? 'text-[10px]' : 'text-[11px]'"
             >
               {{ description() }}
             </p>
@@ -77,7 +85,7 @@ import { cn } from '../lib/cn';
         <div
           [class]="
             flush()
-              ? 'flex min-h-0 flex-1 flex-col'
+              ? 'flex min-h-0 flex-1 flex-col overflow-y-auto'
               : 'grid min-h-0 flex-1 auto-rows-min grid-cols-1 gap-6 overflow-y-auto px-4 pt-4 pb-4'
           "
         >
@@ -101,6 +109,8 @@ export class Sheet {
   readonly closeLabel = input('Fechar');
   /** True when the content brings its own padding, scroll and footer. */
   readonly flush = input(false);
+  /** The smaller header of the mareos client drawer. */
+  readonly compact = input(false);
 
   readonly closed = output<boolean>();
 

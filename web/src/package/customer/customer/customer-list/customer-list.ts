@@ -94,12 +94,14 @@ export class CustomerList {
 
   openCreate() {
     this.editing.set(null);
-    this.customerForm()?.reset();
+    this.customerForm()?.load(null);
     this.isSheetActive.set(true);
   }
 
+  /** Every opening shows the Customer's values, also after a Cancelar that left typed ones. */
   openEdit(customer: CustomerListItem) {
     this.editing.set(customer);
+    this.customerForm()?.load(customer);
     this.isSheetActive.set(true);
   }
 
