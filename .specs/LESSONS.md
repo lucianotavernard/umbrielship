@@ -246,6 +246,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 6; C57 (web)
 - last seen: 2026-11-17T16:05:50Z
 
+### L-040 - Check every label, count form and control a criterion fixes against the binding source's text before approval, and list each departure in Differences from the source
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 1 (C16 vs captures/inspection-run.png) (web) (+5 more)
+- last seen: 2026-11-17T19:09:24Z
+
+### L-041 - A value a test helper injects needs its own test on the layer that really sets it, or the page test stays green when that layer breaks
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 7 (C47 helper sets authentication.name) (web)
+- last seen: 2026-11-17T19:09:24Z
+
+### L-042 - Prove a transaction rolls back with a write the database itself refuses after validation passes; a request the validator rejects never reaches the transaction
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 8 (C22 400 stops at Zod) (api)
+- last seen: 2026-11-17T19:09:24Z
+
+### L-043 - Prove an if-any-read-fails rule by failing each read in turn; one failing read leaves the others unproven
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 9 (C11, C46, C70) (web)
+- last seen: 2026-11-17T19:09:24Z
+
+### L-044 - An ordering claim needs a proof on the real repository's orderBy; the in-memory fake's order proves only the fake
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 10 (C36 order via the in-memory fake) (api)
+- last seen: 2026-11-17T19:09:24Z
+
+### L-045 - A component reused by several pages needs each page to feed every input it shows; a field left empty on one page is a gap no single-page test sees
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: work-order-ui-redesign
+- evidence: verification.md finding 11 (Editar drawer on the WorkOrder detail) (web)
+- last seen: 2026-11-17T19:09:24Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

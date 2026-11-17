@@ -1,9 +1,9 @@
 # work-order-ui-redesign proofs
 
-**HEAD**: bd7ee26
+**HEAD**: ef3837b
 **Tree**: clean
 **Shell**: /bin/sh
-**Result**: 116 pass, 8 fail
+**Result**: 123 pass, 1 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -38,7 +38,7 @@
 | C17 | `walk - open /work-orders, /work-orders/:id, /inspections, the inspection page and /agenda at the five widths a` | pass (Walked) |
 | C18 | `run web / ✓ work-order-drawer.spec.ts > WorkOrderDrawer > work-order-ui C18 opens with the vessel, the read-on` | pass |
 | C18 | `run web / ✓ work-order-drawer.spec.ts > WorkOrderDrawer > work-order-ui C18 adds and removes services, with Re` | pass |
-| C18 | `browser - open "Nova ordem de serviço" on /work-orders at 1440x1000, save captures/work-order-drawer.running.p` | **diverges** (screens.md) |
+| C18 | `browser - open "Nova ordem de serviço" on /work-orders at 1440x1000, save captures/work-order-drawer.running.p` | pass |
 | C19 | `run web / ✓ work-order-drawer.spec.ts > WorkOrderDrawer > work-order-ui C19 posts the work order with its serv` | pass |
 | C20 | `run web / ✓ work-order-drawer.spec.ts > WorkOrderDrawer > work-order-ui C20 sends nothing and shows each requi` | pass |
 | C21 | `run api / ✓ create-work-order.use-case.spec.ts > CreateWorkOrderUseCase > work-order-ui C21 creates the servic` | pass |
@@ -64,7 +64,7 @@
 | C31 | `run web / ✓ work-order-detail.spec.ts > WorkOrderDetail > work-order-ui C31 shows skeletons while the work ord` | pass |
 | C32 | `run web / ✓ work-order-detail.inspector.spec.ts > WorkOrderDetail as inspector > work-order-ui C32 hides every` | pass |
 | C33 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C33 requests templates, assignments, work` | pass |
-| C33 | `browser - open /inspections at 1440x1000 as the administrator, save captures/inspection-templates.running.png` | **diverges** (screens.md) |
+| C33 | `browser - open /inspections at 1440x1000 as the administrator, save captures/inspection-templates.running.png` | pass |
 | C34 | `run api / ✓ fetch-organization-inspection-assignments.use-case.spec.ts > FetchOrganizationInspectionAssignment` | pass |
 | C34 | `run api / ✓ inspection-assignment.repository.spec.ts > PrismaInspectionAssignmentsRepository > work-order-ui C` | pass |
 | C34 | `run api / ✓ inspection-assignment.http.spec.ts > GET /inspection-assignments > work-order-ui C34 answers every` | pass |
@@ -79,22 +79,22 @@
 | C38 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C38 says there is no template` | pass |
 | C39 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C39 creates a template from the drawer an` | pass |
 | C39 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C39 a taken name keeps the drawer open` | pass |
-| C39 | `browser - open "Novo modelo" on /inspections at 1440x1000, save captures/inspection-template-drawer.running.pn` | **diverges** (screens.md) |
+| C39 | `browser - open "Novo modelo" on /inspections at 1440x1000, save captures/inspection-template-drawer.running.pn` | pass |
 | C40 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C40 assigns a template to a work order se` | pass |
-| C40 | `browser - open "Atribuir à OS" on the first card at 1440x1000, save captures/inspection-assignment-drawer.runn` | **diverges** (screens.md) |
+| C40 | `browser - open "Atribuir à OS" on the first card at 1440x1000, save captures/inspection-assignment-drawer.runn` | pass |
 | C41 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C41 lists the assignments with target, pi` | pass |
 | C41 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C41 says no inspection is assigned` | pass |
-| C41 | `browser - open the Atribuições tab at 1440x1000, save captures/inspection-assignments.running.png` | **diverges** (screens.md) |
+| C41 | `browser - open the Atribuições tab at 1440x1000, save captures/inspection-assignments.running.png` | pass |
 | C42 | `run web / ✓ inspections-hub.inspector.spec.ts > InspectionsHub as inspector > work-order-ui C42 lists inspecta` | pass |
 | C42 | `run web / ✓ inspection-availability.spec.ts > inspectionBlockedReason > work-order-ui C42 blocks on the work o` | pass |
-| C42 | `browser - open /inspections at 1440x1000 as an inspector, save captures/inspection-inspector-view.running.png` | **diverges** (screens.md) |
+| C42 | `browser - open /inspections at 1440x1000 as an inspector, save captures/inspection-inspector-view.running.png` | pass |
 | C43 | `run web / ✓ app.routes.spec.ts > routes > work-order-ui C43 redirects the template list to the hub` | pass |
 | C44 | `run web / ✓ inspection-template-detail.spec.ts > InspectionTemplateDetail > work-order-ui C44 shows the breadc` | pass |
 | C44 | `run web / ✓ inspection-template-detail.spec.ts > InspectionTemplateDetail > work-order-ui C44 edits in the Edi` | pass |
 | C45 | `run web / ✓ inspection-template-detail.spec.ts > InspectionTemplateDetail > work-order-ui C45 a 404 shows the ` | pass |
 | C46 | `run web / ✓ inspections-hub.spec.ts > InspectionsHub > work-order-ui C46 shows skeletons while loading and a t` | pass |
 | C47 | `run web / ✓ inspection-page.spec.ts > InspectionPage > work-order-ui C47 shows the header, meta and the back l` | pass |
-| C47 | `browser - open the inspect page of an assignment of a WorkOrder in progress at 1440x1000 as an inspector, save` | **diverges** (screens.md) |
+| C47 | `browser - open the inspect page of an assignment of a WorkOrder in progress at 1440x1000 as an inspector, save` | pass |
 | C48 | `run web / ✓ inspection-page.spec.ts > InspectionPage > work-order-ui C48 offers the controls of each type with` | pass |
 | C49 | `run web / ✓ inspection-page.spec.ts > InspectionPage > work-order-ui C49 counts answered questions as they cha` | pass |
 | C50 | `run web / ✓ inspection-page.spec.ts > InspectionPage > work-order-ui C50 names and focuses the first unanswere` | pass |
@@ -137,41 +137,41 @@
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C11 shows skeleton rows while loading and a toast when a request fails 76ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C66 an item opens its work order 48ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 75ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 71ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 28ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 59ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 161ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 38ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C65 the day panel names the day, counts it and lists its items 97ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C66 an item opens its work order 45ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 163ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 36ms
  ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 69ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 37ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 43ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 65ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 71ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 29ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 60ms
 
  Test Files  45 passed (45)
       Tests  225 passed (225)
-   Start at  15:33:40
-   Duration  4.70s (transform 5.40s, setup 7.58s, import 15.48s, tests 34.41s, environment 29.09s)
+   Start at  16:08:27
+   Duration  4.31s (transform 4.29s, setup 7.15s, import 13.66s, tests 31.67s, environment 28.69s)
 ```
 
 `Run api` - exit 0
 
 ```
- ✓ src/package/work-order/work-order-service/__test__/fetch-work-order-services.use-case.spec.ts > FetchWorkOrderServicesUseCase > [C24] returns only the services of that work order 1ms
- ✓ src/package/identity/user/__test__/fetch-users.use-case.spec.ts > FetchUsersUseCase > [C61] returns only the Users with no Membership in the Organization, paged, with the total 3ms
- ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns plain vessel data for a Vessel of the Organization 2ms
  ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns null for an unknown id and for a Vessel of another Organization 0ms
- ✓ src/package/work-order/inspection-assignment/__test__/fetch-organization-inspection-assignments.use-case.spec.ts > FetchOrganizationInspectionAssignmentsUseCase > work-order-ui C34 returns every assignment of the Organization and no other 5ms
- ✓ src/package/work-order/work-order-service/__test__/work-order-service.repository.spec.ts > PrismaWorkOrderServicesRepository > inspection C35 turns the database refusal into ConflictDomainException 3ms
+ ✓ src/package/identity/user/__test__/fetch-users.use-case.spec.ts > FetchUsersUseCase > [C61] returns only the Users with no Membership in the Organization, paged, with the total 3ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for an unknown email 2ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for a wrong password 0ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] returns an access token encrypted from { sub: user id } 0ms
  ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 2ms
+ ✓ src/package/work-order/work-order-service/__test__/work-order-service.repository.spec.ts > PrismaWorkOrderServicesRepository > inspection C35 turns the database refusal into ConflictDomainException 3ms
 
  Test Files  81 passed (81)
       Tests  313 passed (313)
-   Start at  15:33:45
-   Duration  2.27s (transform 5.93s, setup 0ms, import 25.25s, tests 2.24s, environment 9ms)
+   Start at  16:08:32
+   Duration  2.25s (transform 6.16s, setup 0ms, import 24.98s, tests 2.17s, environment 9ms)
 
-[Nest] 413302  - 17/11/2026, 15:33:46   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"493fe948-366f-4ce5-b875-b9ea28e9668e","message":"redis down"}
-[Nest] 413492  - 17/11/2026, 15:33:47   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c7b4930c-d42d-48c6-9c72-b607e83d2cc2","message":"redis down"}
+[Nest] 449586  - 17/11/2026, 16:08:33   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"7ca9cb73-0bf6-498a-9f53-c82814cdd3a4","message":"redis down"}
+[Nest] 449714  - 17/11/2026, 16:08:33   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c0a4758e-d11b-4d54-b7e0-de88644d5f59","message":"redis down"}
 ```
 
 `Run smoke` - exit 0

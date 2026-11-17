@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 40,
+  "next_id": 46,
   "lessons": [
     {
       "id": "L-001",
@@ -709,6 +709,119 @@
       ],
       "created": "2026-11-17T16:05:50Z",
       "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-040",
+      "key": "spec_deviation::check every label count form and control a criterion fixes against the binding source s text before approval and list each departure in differences from the source",
+      "text": "Check every label, count form and control a criterion fixes against the binding source's text before approval, and list each departure in Differences from the source",
+      "signal": "spec_deviation",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1 (C16 vs captures/inspection-run.png) (web)",
+        "verification.md finding 2 (web)",
+        "verification.md finding 3 (web)",
+        "verification.md finding 4 (web)",
+        "verification.md finding 5 (web)",
+        "verification.md finding 6 (web)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-041",
+      "key": "weak_test::a value a test helper injects needs its own test on the layer that really sets it or the page test stays green when that layer breaks",
+      "text": "A value a test helper injects needs its own test on the layer that really sets it, or the page test stays green when that layer breaks",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 7 (C47 helper sets authentication.name) (web)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-042",
+      "key": "weak_test::prove a transaction rolls back with a write the database itself refuses after validation passes a request the validator rejects never reaches the transaction",
+      "text": "Prove a transaction rolls back with a write the database itself refuses after validation passes; a request the validator rejects never reaches the transaction",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 8 (C22 400 stops at Zod) (api)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-043",
+      "key": "weak_test::prove an if any read fails rule by failing each read in turn one failing read leaves the others unproven",
+      "text": "Prove an if-any-read-fails rule by failing each read in turn; one failing read leaves the others unproven",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 9 (C11, C46, C70) (web)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-044",
+      "key": "weak_test::an ordering claim needs a proof on the real repository s orderby the in memory fake s order proves only the fake",
+      "text": "An ordering claim needs a proof on the real repository's orderBy; the in-memory fake's order proves only the fake",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 10 (C36 order via the in-memory fake) (api)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-045",
+      "key": "ac_gap::a component reused by several pages needs each page to feed every input it shows a field left empty on one page is a gap no single page test sees",
+      "text": "A component reused by several pages needs each page to feed every input it shows; a field left empty on one page is a gap no single-page test sees",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "work-order-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 11 (Editar drawer on the WorkOrder detail) (web)"
+      ],
+      "created": "2026-11-17T19:09:24Z",
+      "last_seen": "2026-11-17T19:09:24Z"
     }
   ]
 }
