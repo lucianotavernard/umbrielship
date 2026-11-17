@@ -69,6 +69,7 @@
 }
 
 @theme inline {
+  --font-sans: Arial, Helvetica, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -116,72 +117,74 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  /* mareos palette (AD-020), Landing door 3 of .specs/features/customer-ui-redesign/plan.md */
+  --radius: 0.65rem;
+  --background: #f7f8fa;
+  --foreground: #17283b;
+  --card: #fff;
+  --card-foreground: #17283b;
+  --popover: #fff;
+  --popover-foreground: #17283b;
+  --primary: #087f8c;
+  --primary-foreground: #fff;
+  --secondary: #edf4f5;
+  --secondary-foreground: #1c5961;
+  --muted: #f2f5f7;
+  --muted-foreground: #7b8794;
+  --accent: #edf4f5;
+  --accent-foreground: #1c5961;
+  --destructive: #bd5550;
+  --border: #e9edf0;
+  --input: #e9edf0;
+  --ring: #087f8c;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #fff;
+  --sidebar-foreground: #17283b;
+  --sidebar-primary: #087f8c;
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: #eaf4f4;
+  --sidebar-accent-foreground: #087f8c;
+  --sidebar-border: #e9edf0;
+  --sidebar-ring: #087f8c;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #0c131b;
+  --foreground: #e5edf4;
+  --card: #141e29;
+  --card-foreground: #e5edf4;
+  --popover: #141e29;
+  --popover-foreground: #e5edf4;
+  --primary: #2da9ad;
+  --primary-foreground: #071216;
+  --secondary: #1b2c37;
+  --secondary-foreground: #b7e5e0;
+  --muted: #1a2632;
+  --muted-foreground: #9aaab8;
+  --accent: #1b2c37;
+  --accent-foreground: #b7e5e0;
+  --destructive: #e17670;
+  --border: #293847;
+  --input: #293847;
+  --ring: #2da9ad;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* The mareos never sets these in dark, which leaves its sidebar white (AD-030). */
+  --sidebar: #141e29;
+  --sidebar-foreground: #e5edf4;
+  --sidebar-primary: #2da9ad;
+  --sidebar-primary-foreground: #071216;
+  --sidebar-accent: #1b343a;
+  --sidebar-accent-foreground: #65d0c7;
+  --sidebar-border: #293847;
+  --sidebar-ring: #2da9ad;
 }
 
 @layer base {
@@ -191,6 +194,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-size: 13px;
   }
 }
 
