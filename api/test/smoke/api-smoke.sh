@@ -104,6 +104,16 @@ req GET "/vessels/$VB" "$TA"; check "GET vessel of B from A" 404 "$STATUS"
 req POST /work-orders "$TA" "{\"vesselId\":\"$VB\",\"startDate\":\"2026-01-01\",\"endDate\":\"2026-01-02\",\"status\":\"PENDING\"}"; check "work order with B's vessel" 404 "$STATUS"
 check "work order message" "Vessel not found" "$(echo "$BODY" | jq -r '.message')"
 
+echo "vessel count"
+req POST /customers "$TA" '{"name":"Count","email":"count@x.test","phone":"1","address":{"address":"r","state":"SP","city":"Santos"}}'; CC="$(echo "$BODY" | jq -r '.customer.id')"
+count_of() { req GET /customers "$TA"; echo "$BODY" | jq -r --arg id "$1" '.customers[] | select(.id == $id) | .vesselCount'; }
+check "customer-ui C14 vesselCount with no vessel" 0 "$(count_of "$CC")"
+req POST /vessels "$TA" "{\"imoNumber\":\"7000001\",\"name\":\"C1\",\"type\":\"CARGO\",\"length\":10,\"customerId\":\"$CC\"}"; VC1="$(echo "$BODY" | jq -r '.vessel.id')"
+req POST /vessels "$TA" "{\"imoNumber\":\"7000002\",\"name\":\"C2\",\"type\":\"CARGO\",\"length\":10,\"customerId\":\"$CC\"}"
+check "customer-ui C14 vesselCount with two vessels" 2 "$(count_of "$CC")"
+req DELETE "/vessels/$VC1" "$TA"
+check "customer-ui C14 vesselCount after a vessel delete" 1 "$(count_of "$CC")"
+
 echo "authorization"
 req GET /organizations "$TA"; check "non-internal member on GET /organizations" 403 "$STATUS"
 req GET /organizations "$T"; check "internal administrator on GET /organizations" 200 "$STATUS"

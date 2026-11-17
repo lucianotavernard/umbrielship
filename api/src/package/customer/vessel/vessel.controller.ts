@@ -50,12 +50,12 @@ const customerIdQueryParamSchema = z.string().optional();
 
 type CustomerIdQueryParamSchema = z.infer<typeof customerIdQueryParamSchema>;
 
+// No `page` answers every record; `page=n` answers that page of 10.
 const pageQueryParamSchema = z
   .string()
   .optional()
-  .default('1')
-  .transform(Number)
-  .pipe(z.number().min(1));
+  .transform((page) => (page === undefined ? undefined : Number(page)))
+  .pipe(z.number().min(1).optional());
 
 type PageQueryParamSchema = z.infer<typeof pageQueryParamSchema>;
 
@@ -77,8 +77,8 @@ export class VesselController {
     @Query('page', new ZodValidationPipe(pageQueryParamSchema))
     page: PageQueryParamSchema,
   ) {
-    const take = page * 10;
-    const skip = (page - 1) * 10;
+    const take = page === undefined ? undefined : page * 10;
+    const skip = page === undefined ? undefined : (page - 1) * 10;
 
     const result = await this.fetchVessels.handle({
       organizationId: user.organizationId,

@@ -9,7 +9,9 @@ import { InMemoryCustomersRepository } from '@test/repositories/in-memory-custom
 export class InMemoryVesselsRepository implements IVesselsRepository {
   public items: Vessel[] = [];
 
-  constructor(private readonly customers: InMemoryCustomersRepository) {}
+  constructor(private readonly customers: InMemoryCustomersRepository) {
+    customers.vessels = this;
+  }
 
   private of(organizationId: string) {
     return this.items.filter((item) => item.organizationId === organizationId);
@@ -58,25 +60,31 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>> {
     const owned = this.of(organizationId);
 
-    return { data: owned.slice(skip, skip + take), total: owned.length };
+    return { data: this.page(owned, take, skip), total: owned.length };
+  }
+
+  private page(vessels: Vessel[], take?: number, skip?: number) {
+    return take === undefined
+      ? vessels
+      : vessels.slice(skip ?? 0, (skip ?? 0) + take);
   }
 
   async findManyByCustomerId(
     organizationId: string,
     customerId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>> {
     const owned = this.of(organizationId).filter(
       (vessel) => vessel.customerId === customerId,
     );
 
-    return { data: owned.slice(skip, skip + take), total: owned.length };
+    return { data: this.page(owned, take, skip), total: owned.length };
   }
 
   async create(vessel: Vessel): Promise<void> {

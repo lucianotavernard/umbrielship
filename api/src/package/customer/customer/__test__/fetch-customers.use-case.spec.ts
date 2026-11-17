@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeCustomer } from '@test/factory.js';
+import { makeCustomer, makeVessel } from '@test/factory.js';
 import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
+import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
 import { FetchCustomersUseCase } from '../fetch-customers.use-case.js';
 
 describe('FetchCustomersUseCase', () => {
@@ -24,5 +25,41 @@ describe('FetchCustomersUseCase', () => {
       'c3',
     ]);
     expect(result.total).toBe(3);
+  });
+});
+
+describe('FetchCustomersUseCase without a page', () => {
+  it('customer-ui C13 returns every customer of the Organization with its vessel count when no page is given', async () => {
+    const customers = new InMemoryCustomersRepository();
+    const vessels = new InMemoryVesselsRepository(customers);
+    for (let index = 1; index <= 23; index++) {
+      customers.items.push(
+        makeCustomer(
+          { organizationId: 'A', email: `c${index}@a.test` },
+          `c${index}`,
+        ),
+      );
+    }
+    // Same email, another Organization: never listed.
+    customers.items.push(
+      makeCustomer({ organizationId: 'B', email: 'c1@a.test' }, 'b1'),
+    );
+    vessels.items.push(
+      makeVessel({ organizationId: 'A', customerId: 'c2' }, 'v1'),
+      makeVessel({ organizationId: 'A', customerId: 'c2' }, 'v2'),
+      makeVessel({ organizationId: 'B', customerId: 'b1' }, 'v3'),
+    );
+
+    const result = await new FetchCustomersUseCase(customers).handle({
+      organizationId: 'A',
+    });
+
+    expect(result.customers).toHaveLength(23);
+    expect(result.total).toBe(23);
+    expect(result.customers.map((customer) => customer.id)).not.toContain('b1');
+    const count = (id: string) =>
+      result.customers.find((customer) => customer.id === id)?.vesselCount;
+    expect(count('c1')).toBe(0);
+    expect(count('c2')).toBe(2);
   });
 });

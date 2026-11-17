@@ -70,3 +70,43 @@ describe('FetchVesselsUseCase', () => {
     expect(result.total).toBe(4);
   });
 });
+
+describe('FetchVesselsUseCase without a page', () => {
+  it('customer-ui C35 returns every vessel of the Organization when no page is given', async () => {
+    const vessels = new InMemoryVesselsRepository(
+      new InMemoryCustomersRepository(),
+    );
+    for (let index = 1; index <= 14; index++) {
+      vessels.items.push(
+        makeVessel(
+          {
+            organizationId: 'A',
+            customerId: index <= 3 ? 'c1' : 'c2',
+            imoNumber: `${index}`,
+          },
+          `v${index}`,
+        ),
+      );
+    }
+    vessels.items.push(
+      makeVessel({ organizationId: 'B', customerId: 'c1' }, 'b1'),
+    );
+    const sut = new FetchVesselsUseCase(vessels);
+
+    const all = await sut.handle({ organizationId: 'A' });
+    const ofCustomer = await sut.handle({
+      organizationId: 'A',
+      customerId: 'c1',
+    });
+
+    expect(all.vessels).toHaveLength(14);
+    expect(all.total).toBe(14);
+    expect(all.vessels.map((vessel) => vessel.id)).not.toContain('b1');
+    expect(ofCustomer.vessels.map((vessel) => vessel.id)).toEqual([
+      'v1',
+      'v2',
+      'v3',
+    ]);
+    expect(ofCustomer.total).toBe(3);
+  });
+});

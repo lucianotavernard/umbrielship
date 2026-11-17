@@ -55,8 +55,8 @@ export class PrismaVesselsRepository implements IVesselsRepository {
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>> {
     const where = { organizationId };
     const total = await this.prisma.vessel.count({ where });
@@ -71,8 +71,8 @@ export class PrismaVesselsRepository implements IVesselsRepository {
   async findManyByCustomerId(
     organizationId: string,
     customerId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>> {
     const where = { organizationId, customerId };
 
