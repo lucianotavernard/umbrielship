@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
+import { WorkOrderService } from '../work-order-service/work-order-service.entity.js';
 import { WorkOrder, WorkOrderStatus } from './work-order.entity.js';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
 import { CustomerFacade } from '@/package/customer/customer.facade.js';
@@ -12,6 +13,7 @@ type CreateWorkOrderUseCaseRequest = {
   startDate: Date;
   endDate: Date;
   status: WorkOrderStatus;
+  services?: { name: string; description: string }[];
 };
 
 type CreateWorkOrderUseCaseResponse = {
@@ -31,6 +33,7 @@ export class CreateWorkOrderUseCase {
     startDate,
     endDate,
     status,
+    services = [],
   }: CreateWorkOrderUseCaseRequest): Promise<CreateWorkOrderUseCaseResponse> {
     const vessel = await this.customerFacade.findVesselById(
       organizationId,
@@ -49,7 +52,20 @@ export class CreateWorkOrderUseCase {
       status,
     });
 
-    await this.workOrdersRepository.create(workOrder);
+    // Each service starts PENDING over the WorkOrder's period.
+    const workOrderServices = services.map(({ name, description }) =>
+      WorkOrderService.create({
+        organizationId,
+        workOrderId: workOrder.id,
+        name,
+        description,
+        startDate,
+        endDate,
+        status: 'PENDING',
+      }),
+    );
+
+    await this.workOrdersRepository.create(workOrder, workOrderServices);
 
     return { workOrder };
   }

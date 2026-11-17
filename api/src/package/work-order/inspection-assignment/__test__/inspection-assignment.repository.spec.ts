@@ -266,4 +266,114 @@ describe('PrismaInspectionAssignmentsRepository', () => {
       ConflictDomainException,
     );
   });
+
+  it("work-order-ui C34 reads the Organization's assignments newest first with the work order and visible inspections", async () => {
+    const findMany = vi.fn(async (_args: unknown) => [
+      {
+        id: 'a2',
+        organizationId: 'org-1',
+        workOrderId: 'wo-2',
+        workOrderServiceId: 'svc-1',
+        templateName: 'Pintura',
+        assignedBy: 'user-1',
+        createdAt: new Date(2026, 0, 3),
+        workOrder: { id: 'wo-2', vesselId: 'v2', status: 'IN_PROGRESS' },
+        workOrderService: {
+          id: 'svc-1',
+          name: 'Pintura do casco',
+          status: 'COMPLETED',
+        },
+        items: [
+          {
+            id: 'i1',
+            organizationId: 'org-1',
+            assignmentId: 'a2',
+            label: 'Casco limpo',
+            position: 0,
+            type: 'CONFORMITY',
+          },
+        ],
+        inspections: [
+          {
+            id: 'insp-1',
+            organizationId: 'org-1',
+            assignmentId: 'a2',
+            result: 'APPROVED',
+            inspectorId: 'user-9',
+            inspectorName: 'Inês',
+            completedAt: new Date(2026, 0, 4),
+            discardedAt: null,
+            discardedBy: null,
+            answers: [],
+          },
+        ],
+        _count: { inspections: 2 },
+      },
+      {
+        id: 'a1',
+        organizationId: 'org-1',
+        workOrderId: 'wo-1',
+        workOrderServiceId: null,
+        templateName: 'Motor',
+        assignedBy: 'user-1',
+        createdAt: new Date(2026, 0, 1),
+        workOrder: { id: 'wo-1', vesselId: 'v1', status: 'PENDING' },
+        workOrderService: null,
+        items: [],
+        inspections: [],
+        _count: { inspections: 0 },
+      },
+    ]);
+    const sut = new PrismaInspectionAssignmentsRepository({
+      inspectionAssignment: { findMany },
+    } as unknown as PrismaService);
+
+    const [inspected, whole] = await sut.findMany('org-1');
+
+    expect(findMany).toHaveBeenCalledWith({
+      include: {
+        items: { orderBy: { position: 'asc' } },
+        workOrderService: { select: { id: true, name: true, status: true } },
+        inspections: {
+          where: { discardedAt: null },
+          orderBy: [{ completedAt: 'desc' }, { id: 'desc' }],
+          include: { answers: true },
+        },
+        _count: { select: { inspections: true } },
+        workOrder: { select: { id: true, vesselId: true, status: true } },
+      },
+      where: { organizationId: 'org-1' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
+    expect(inspected.workOrder).toEqual({
+      id: 'wo-2',
+      vesselId: 'v2',
+      status: 'IN_PROGRESS',
+    });
+    expect(inspected.service).toEqual({
+      id: 'svc-1',
+      name: 'Pintura do casco',
+      status: 'COMPLETED',
+    });
+    expect(inspected.assignment).toMatchObject({
+      id: 'a2',
+      templateName: 'Pintura',
+      service: { id: 'svc-1', name: 'Pintura do casco' },
+      removable: false,
+    });
+    expect(inspected.assignment.service).not.toHaveProperty('status');
+    expect(inspected.assignment.inspections.map((item) => item.id)).toEqual([
+      'insp-1',
+    ]);
+    expect(inspected.assignment.items.map((item) => item.label)).toEqual([
+      'Casco limpo',
+    ]);
+    expect(whole.workOrder).toEqual({
+      id: 'wo-1',
+      vesselId: 'v1',
+      status: 'PENDING',
+    });
+    expect(whole.service).toBeNull();
+    expect(whole.assignment.removable).toBe(true);
+  });
 });

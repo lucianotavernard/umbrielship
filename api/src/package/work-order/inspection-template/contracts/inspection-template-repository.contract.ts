@@ -12,11 +12,11 @@ export abstract class IInspectionTemplatesRepository {
     organizationId: string,
     name: string,
   ): Promise<InspectionTemplate | null>;
-  // Newest first, ties by id.
+  // Newest first, ties by id; every template when `take` and `skip` are not given.
   abstract findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<InspectionTemplate>>;
   abstract create(template: InspectionTemplate): Promise<void>;
   // Replaces the name and every item.

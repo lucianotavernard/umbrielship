@@ -86,4 +86,33 @@ describe('FetchInspectionTemplatesUseCase', () => {
       'Modelo 0',
     ]);
   });
+
+  it('work-order-ui C36 returns every template when no page is given', async () => {
+    for (let day = 1; day <= 12; day++) {
+      templates.items.push(
+        makeInspectionTemplate({
+          name: `Modelo ${day}`,
+          createdAt: new Date(2026, 0, day),
+        }),
+      );
+    }
+    templates.items.push(
+      makeInspectionTemplate({ organizationId: 'org-2', name: 'Outro' }),
+    );
+
+    const all = await sut.handle({ organizationId: 'org-1' });
+
+    expect(all.total).toBe(12);
+    expect(all.inspectionTemplates.map((item) => item.name)).toEqual(
+      Array.from({ length: 12 }, (_, index) => `Modelo ${12 - index}`),
+    );
+
+    const first = await sut.handle({
+      organizationId: 'org-1',
+      page: 1,
+      perPage: 10,
+    });
+    expect(first.inspectionTemplates).toHaveLength(10);
+    expect(first.total).toBe(12);
+  });
 });

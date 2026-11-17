@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 
-import { WorkOrder } from './work-order.entity.js';
+import { WorkOrderSummary } from './work-order-summary.entity.js';
 import { IWorkOrdersRepository } from './contracts/work-order-repository.contract.js';
 
 type FetchWorkOrdersUseCaseRequest = {
   organizationId: string;
   vesselId?: string;
-  take: number;
-  skip: number;
+  // Neither given: every WorkOrder.
+  take?: number;
+  skip?: number;
 };
 
 type FetchWorkOrdersUseCaseResponse = {
-  workOrders: WorkOrder[];
+  workOrders: WorkOrderSummary[];
   total: number;
 };
 

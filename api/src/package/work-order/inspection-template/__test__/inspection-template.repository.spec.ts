@@ -57,6 +57,25 @@ describe('PrismaInspectionTemplatesRepository', () => {
     );
   });
 
+  it('work-order-ui C36 asks for every template newest first when no page is given', async () => {
+    const { prisma, sut } = fakePrisma();
+
+    await sut.findMany('org-1');
+
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.inspectionTemplate.count).toHaveBeenCalledWith({
+      where: { organizationId: 'org-1' },
+    });
+    expect(prisma.inspectionTemplate.findMany).toHaveBeenCalledWith({
+      include: { items: { orderBy: { position: 'asc' } } },
+      where: { organizationId: 'org-1' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
+    const [args] = prisma.inspectionTemplate.findMany.mock.calls[0];
+    expect(args).not.toHaveProperty('take');
+    expect(args).not.toHaveProperty('skip');
+  });
+
   it('template C9 reads a template with its items ordered by position', async () => {
     const { prisma, sut } = fakePrisma();
     prisma.inspectionTemplate.findFirst.mockResolvedValueOnce({

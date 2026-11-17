@@ -26,6 +26,7 @@ import type {
 import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { DeleteWorkOrderServiceUseCase } from '@/package/work-order/work-order-service/delete-work-order-service.use-case.js';
 import { DeleteWorkOrderUseCase } from '@/package/work-order/work-order/delete-work-order.use-case.js';
+import { FetchWorkOrdersUseCase } from '@/package/work-order/work-order/fetch-work-orders.use-case.js';
 import { WorkOrderServiceImageController } from '@/package/work-order/work-order-service-image/work-order-service-image.controller.js';
 import { WorkOrderServiceController } from '@/package/work-order/work-order-service/work-order-service.controller.js';
 import { WorkOrderController } from '@/package/work-order/work-order/work-order.controller.js';
@@ -56,10 +57,15 @@ const useCases = [
   ),
 ];
 
+// The WorkOrder list shapes each item, so its fake answers an empty list.
 const fakes = new Map(
   useCases.map((useCase) => [
     useCase,
-    { handle: vi.fn(async (_input?: unknown) => ({})) },
+    {
+      handle: vi.fn(async (_input?: unknown) =>
+        useCase === FetchWorkOrdersUseCase ? { workOrders: [], total: 0 } : {},
+      ),
+    },
   ]),
 );
 
