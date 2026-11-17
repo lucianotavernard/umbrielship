@@ -140,7 +140,7 @@ describe('InspectionTemplate form', () => {
     const created = controller.expectOne({ method: 'POST', url: '/api/inspection-templates' });
     expect(created.request.body).toEqual({
       name: 'n'.repeat(100),
-      items: [{ label: 'x'.repeat(200), type: 'CONFORMITY' }],
+      items: [{ label: 'x'.repeat(200), type: 'TEXT' }],
     });
     created.flush({ inspectionTemplate: { id: 't1' } }, { status: 201, statusText: 'Created' });
     await settle();
@@ -161,7 +161,8 @@ describe('InspectionTemplate form', () => {
       'Conforme / não conforme',
       'Nota de 0 a 10',
     ]);
-    expect(typeSelect(0).value).toBe('CONFORMITY');
+    // A new question starts at "Texto livre", as the mareos drawer (work-order-ui C39).
+    expect(typeSelect(0).value).toBe('TEXT');
 
     fill(name(), 'Misto');
     fill(questionFields(sheet)[0], 'Observações');

@@ -51,7 +51,7 @@ export type AssignmentCardRow = OrganizationInspectionAssignment & {
             </div>
             <span
               data-slot="pill"
-              class="inline-flex shrink-0 items-center rounded-full px-2 py-[5px] text-[8px] font-semibold"
+              class="inline-flex shrink-0 items-center rounded-full px-2 py-[5px] text-[9px] leading-none font-semibold whitespace-nowrap"
               [class]="pillTone(row)"
             >
               {{ pill(row) }}
@@ -61,7 +61,7 @@ export type AssignmentCardRow = OrganizationInspectionAssignment & {
                 @if (canInspect()) {
                   <button
                     type="button"
-                    class="h-[31px] rounded-[5px] bg-primary px-2.5 text-[10px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                    [class]="action + ' disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-border disabled:hover:text-foreground/75'"
                     [disabled]="row.blockedReason !== null"
                     (click)="inspected.emit(row)"
                   >
@@ -69,7 +69,7 @@ export type AssignmentCardRow = OrganizationInspectionAssignment & {
                   </button>
                 }
                 <a
-                  class="inline-flex h-[31px] items-center rounded-[5px] border border-border bg-card px-2.5 text-[10px] font-semibold text-foreground/75 hover:border-primary/40 hover:text-primary"
+                  [class]="action"
                   [routerLink]="['/work-orders', row.workOrder.id]"
                 >
                   Abrir ordem
@@ -90,6 +90,9 @@ export class InspectionAssignmentCards {
   canInspect = input(false);
   inspected = output<AssignmentCardRow>();
 
+  /** The mareos `.openAssignment`: a small outlined white button. */
+  protected readonly action =
+    'inline-flex h-[30px] shrink-0 items-center rounded-[5px] border border-border bg-card px-2.5 text-[9px] font-semibold text-foreground/75 hover:border-primary/40 hover:text-primary';
   protected readonly code = workOrderCode;
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
 

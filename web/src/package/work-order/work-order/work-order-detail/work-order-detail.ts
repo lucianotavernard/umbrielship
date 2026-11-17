@@ -17,7 +17,7 @@ import {
 } from '@ng-icons/lucide';
 
 import { formatLength } from '../../../customer/vessel/vessel-csv';
-import { VesselType, vesselTypeLabels } from '../../../customer/vessel/vessel.service';
+import { GetVesselResponse, VesselType, vesselTypeLabels } from '../../../customer/vessel/vessel.service';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
@@ -104,6 +104,11 @@ export class WorkOrderDetail {
   assignmentsResource = httpResource<GetInspectionAssignmentsResponse>(
     () => `/api/work-orders/${this.id()}/inspection-assignments`,
   );
+  // The Vessel, for its Customer in "Cliente responsável", is read only while "Editar" is open.
+  vesselResource = httpResource<GetVesselResponse>(() => {
+    const vesselId = this.workOrder()?.vessel.vesselId;
+    return this.isEditWorkOrderSheetActive() && vesselId ? `/api/vessels/${vesselId}` : undefined;
+  });
   // The templates are read only while the assignment sheet is open.
   templatesResource = httpResource<GetInspectionTemplatesResponse>(() =>
     this.isAssignSheetActive() ? '/api/inspection-templates?per_page=100' : undefined,
@@ -156,9 +161,17 @@ export class WorkOrderDetail {
       ? { vesselId: order.vessel.vesselId, startDate: order.startDate, endDate: order.endDate, status: order.status }
       : null;
   });
+  private readonly vessel = computed(() => resourceValue(this.vesselResource)?.vessel ?? null);
   formVessels = computed(() => {
     const order = this.workOrder();
-    return order ? [{ id: order.vessel.vesselId, name: order.vessel.name, customerId: '' }] : [];
+    if (!order) return [];
+    const vessel = this.vessel();
+    return [{ id: order.vessel.vesselId, name: order.vessel.name, customerId: vessel?.customerId ?? '' }];
+  });
+  /** The Vessel's Customer for the read-only "Cliente responsável", as the drawer shows it from the list. */
+  formCustomerNames = computed<ReadonlyMap<string, string>>(() => {
+    const vessel = this.vessel();
+    return new Map(vessel?.customer ? [[vessel.customerId, vessel.customer.name]] : []);
   });
 
   inspect(assignment: InspectionAssignment) {

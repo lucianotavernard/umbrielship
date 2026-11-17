@@ -69,16 +69,20 @@ const MANAGEMENT_MENU: MenuItem[] = [
   { key: 'organizations', label: 'Organizações', link: '/organizations', icon: 'lucideBuilding2' },
 ];
 
-/** The menu item a route belongs to (AD-032); a template belongs to the Inspections hub. */
-const SECTIONS: { prefix: string; key: string }[] = [
-  { prefix: '/dashboard', key: 'overview' },
-  { prefix: '/work-orders', key: 'work-orders' },
-  { prefix: '/inspections', key: 'inspections' },
-  { prefix: '/inspection-templates', key: 'inspections' },
-  { prefix: '/vessels', key: 'vessels' },
-  { prefix: '/customers', key: 'customers' },
-  { prefix: '/agenda', key: 'agenda' },
-  { prefix: '/organizations', key: 'organizations' },
+/**
+ * The menu item a route belongs to, the first match winning (AD-032): a template belongs to the
+ * Inspections hub, and so do the inspection pages under a WorkOrder (AD-048).
+ */
+const SECTIONS: { pattern: RegExp; key: string }[] = [
+  { pattern: /^\/dashboard(\/|$)/, key: 'overview' },
+  { pattern: /^\/work-orders\/[^/]+\/assignments(\/|$)/, key: 'inspections' },
+  { pattern: /^\/work-orders(\/|$)/, key: 'work-orders' },
+  { pattern: /^\/inspections(\/|$)/, key: 'inspections' },
+  { pattern: /^\/inspection-templates(\/|$)/, key: 'inspections' },
+  { pattern: /^\/vessels(\/|$)/, key: 'vessels' },
+  { pattern: /^\/customers(\/|$)/, key: 'customers' },
+  { pattern: /^\/agenda(\/|$)/, key: 'agenda' },
+  { pattern: /^\/organizations(\/|$)/, key: 'organizations' },
 ];
 
 const LABELS = Object.fromEntries(
@@ -313,7 +317,7 @@ export class InternalLayout {
 
   section = computed(() => {
     const path = this.url().split(/[?#]/)[0];
-    return SECTIONS.find(({ prefix }) => path === prefix || path.startsWith(`${prefix}/`))?.key ?? null;
+    return SECTIONS.find(({ pattern }) => pattern.test(path))?.key ?? null;
   });
   sectionLabel = computed(() => {
     const key = this.section();

@@ -94,8 +94,14 @@ describe('weekLabel', () => {
     expect(weekDays(new Date(2026, 10, 16))[0].getDate()).toBe(16);
     expect(weekDays(new Date(2026, 10, 22))[0].getDate()).toBe(16);
 
+    // The mareos `shortDate`: two-digit day, "de" and the short month (AD-049).
     const across = weekDays(new Date(2026, 10, 30));
-    expect(weekLabel(across)).toBe('30 nov — 6 dez, 2026');
-    expect(rangeLabel(across)).toBe('30 de nov — 6 de dez');
+    expect(weekLabel(across)).toBe('30 de nov — 06 de dez, 2026');
+    expect(rangeLabel(across)).toBe('30 de nov — 06 de dez');
+    const early = weekDays(new Date(2026, 10, 9));
+    expect(weekLabel(early)).toBe('Novembro 2026');
+    expect(rangeLabel(early)).toBe('09 de nov — 15 de nov');
+    // Across the year end the label carries the year of the Sunday.
+    expect(weekLabel(weekDays(new Date(2026, 11, 28)))).toBe('28 de dez — 03 de jan, 2027');
   });
 });

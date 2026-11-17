@@ -70,21 +70,24 @@ export function weekdayLabel(date: Date): string {
   return WEEKDAYS[date.getDay()];
 }
 
-/** "Novembro 2026" for a week in one month, "30 nov — 6 dez, 2026" across two. */
+/** "16 de nov": the mareos `shortDate`, two-digit day and short month. */
+function shortDate(date: Date): string {
+  return `${pad(date.getDate())} de ${MONTHS[date.getMonth()]}`;
+}
+
+/** "Novembro 2026" for a week in one month, "30 de nov — 06 de dez, 2026" across two (AD-049). */
 export function weekLabel(days: Date[]): string {
   const first = days[0];
   const last = days[days.length - 1];
   if (first.getMonth() === last.getMonth() && first.getFullYear() === last.getFullYear()) {
     return `${MONTH_NAMES[first.getMonth()]} ${first.getFullYear()}`;
   }
-  return `${first.getDate()} ${MONTHS[first.getMonth()]} — ${last.getDate()} ${MONTHS[last.getMonth()]}, ${last.getFullYear()}`;
+  return `${shortDate(first)} — ${shortDate(last)}, ${last.getFullYear()}`;
 }
 
-/** "16 de nov — 22 de nov". */
+/** "16 de nov — 22 de nov", "09 de nov — 15 de nov". */
 export function rangeLabel(days: Date[]): string {
-  const first = days[0];
-  const last = days[days.length - 1];
-  return `${first.getDate()} de ${MONTHS[first.getMonth()]} — ${last.getDate()} de ${MONTHS[last.getMonth()]}`;
+  return `${shortDate(days[0])} — ${shortDate(days[days.length - 1])}`;
 }
 
 /** "Quarta-feira, 18 de novembro". */

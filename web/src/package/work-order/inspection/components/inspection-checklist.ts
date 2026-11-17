@@ -43,7 +43,10 @@ const unanswered = (answer: Answer) => {
 };
 
 const textarea =
-  'min-h-[75px] w-full resize-y rounded-[6px] border border-input bg-card px-2.5 py-2 text-[11px] leading-[1.5] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30';
+  'min-h-[74px] w-full resize-y rounded-[5px] border border-input bg-card px-2.5 py-[9px] text-[10px] leading-[1.5] outline-none placeholder:text-muted-foreground focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15 dark:bg-input/30';
+
+const note =
+  'h-9 min-h-9 min-w-[180px] flex-1 resize-y rounded-[5px] border border-input bg-card px-2.5 py-[9px] text-[10px] leading-[1.5] outline-none focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15 dark:bg-input/30';
 
 // Answer controls are at least 40 px tall, for a finger on a phone.
 const option = (selected: boolean) =>
@@ -73,8 +76,8 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
   viewProviders: [provideIcons({ lucideCheck, lucideLoader2, lucideShieldCheck })],
   template: `
     <form class="flex flex-col" novalidate (submit)="conclude($event)">
-      <div class="flex items-start justify-between gap-3 border-b border-border pb-[15px]">
-        <div class="flex items-start gap-2.5">
+      <div class="flex items-center justify-between gap-3 border-b border-border pb-[15px]">
+        <div class="flex items-center gap-2.5">
           <span class="grid size-[32px] shrink-0 place-items-center rounded-[8px] bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
             <ng-icon name="lucideShieldCheck" class="!size-4" />
           </span>
@@ -88,13 +91,13 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
         </span>
       </div>
 
-      <ol class="mt-[15px] flex flex-col gap-[11px]">
+      <ol class="mt-3.5 flex flex-col gap-2.5">
         @for (item of items(); track item.id; let index = $index) {
           <li
             #question
             tabindex="-1"
             data-slot="question"
-            class="flex gap-3 rounded-[9px] border border-border p-[13px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            class="flex gap-3 rounded-[7px] border border-border p-3 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:p-3.5"
           >
             <span
               data-slot="question-number"
@@ -102,8 +105,12 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
             >
               {{ numberOf(index) }}
             </span>
-            <div class="flex min-w-0 flex-1 flex-col gap-2.5">
-              <p data-slot="question-label" class="text-[11px] font-semibold break-words text-foreground">{{ item.label }}</p>
+            <div class="flex min-w-0 flex-1 flex-col gap-2">
+              <!-- Every question is required (AD-019): each label carries the mareos required mark. -->
+              <p class="text-[11px] leading-[1.45] font-semibold break-words text-foreground">
+                <span data-slot="question-label">{{ item.label }}</span>
+                <span class="text-[#c47b59]" aria-hidden="true"> *</span>
+              </p>
 
               @switch (item.type) {
                 @case ('TEXT') {
@@ -174,10 +181,12 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
               }
 
               @if (item.type !== 'TEXT') {
-                <label class="flex flex-col gap-1 text-[10px]">
-                  <span class="text-muted-foreground">Observação (opcional)</span>
+                <!-- A one-row note keeps the whole checklist and "Concluir inspeção" in a laptop window. -->
+                <label class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px]">
+                  <span class="shrink-0 text-muted-foreground">Observação (opcional)</span>
                   <textarea
-                    [class]="textareaClass"
+                    rows="1"
+                    [class]="noteClass"
                     [id]="'note-' + index"
                     [formField]="checklistForm.answers[index].note"
                   ></textarea>
@@ -198,13 +207,11 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
         </p>
       }
 
-      <footer
-        class="mt-[15px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[15px]"
-      >
+      <footer class="mt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3.5">
         <span data-slot="saved-note" class="text-[9px] text-muted-foreground">
           As respostas só são gravadas ao concluir a inspeção.
         </span>
-        <button tButton type="submit" class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold" [disabled]="loading()">
+        <button tButton type="submit" class="h-[35px] gap-2 px-[13px] text-[11px] font-semibold" [disabled]="loading()">
           @if (loading()) {
             <ng-icon name="lucideLoader2" class="animate-spin" />
             Salvando...
@@ -257,6 +264,7 @@ export class InspectionChecklist {
 
   protected readonly scores = Array.from({ length: 11 }, (_, score) => score);
   protected readonly textareaClass = textarea;
+  protected readonly noteClass = note;
   protected readonly optionClass = option;
   protected readonly resultClass = resultOption;
   protected readonly numberOf = number;

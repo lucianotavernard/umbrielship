@@ -1,4 +1,8 @@
-<div class="mx-auto w-full max-w-[930px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+<!-- As the mareos page, the column fits its content: the template cards wide, the assignment list narrow. -->
+<div
+  class="mx-auto w-full px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]"
+  [class]="wide() ? 'max-w-[1120px]' : 'max-w-[802px]'"
+>
   <div class="mb-[23px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
     <div>
       <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
@@ -28,13 +32,13 @@
         <t-skeleton data-slot="metric-skeleton" class="h-[78px] rounded-lg" />
       }
     } @else {
-      <t-metric label="Modelos ativos" note="roteiros" tone="blue" [value]="metrics().templates">
+      <t-metric label="Modelos ativos" note="roteiros" notePlacement="end" tone="blue" [value]="metrics().templates">
         <ng-icon name="lucideClipboardList" class="!size-[17px]" />
       </t-metric>
-      <t-metric label="Aguardando conclusão" note="atribuições" tone="amber" [value]="metrics().waiting">
+      <t-metric label="Aguardando conclusão" note="atribuições" notePlacement="end" tone="amber" [value]="metrics().waiting">
         <ng-icon name="lucideClock3" class="!size-[17px]" />
       </t-metric>
-      <t-metric label="Concluídas" note="inspeções" tone="green" [value]="metrics().completed">
+      <t-metric label="Concluídas" note="inspeções" notePlacement="end" tone="green" [value]="metrics().completed">
         <ng-icon name="lucideClipboardCheck" class="!size-[17px]" />
       </t-metric>
     }
@@ -104,7 +108,7 @@
   closeLabel="Fechar formulário"
   title="Novo modelo"
   description="Defina as perguntas que o inspetor deverá responder em campo."
-  class="sm:w-full sm:max-w-[520px]"
+  class="bg-card sm:w-full sm:max-w-[590px]"
   [flush]="true"
   [isActive]="isTemplateSheetActive()"
   (closed)="closeTemplateSheet()"
@@ -117,7 +121,7 @@
   closeLabel="Fechar atribuição"
   title="Escolha a OS e o alvo"
   [description]="'A inspeção usará o modelo ' + (assigning()?.name ?? '') + '.'"
-  class="sm:w-full sm:max-w-[460px]"
+  class="bg-card sm:w-full sm:max-w-[500px]"
   [flush]="true"
   [isActive]="assigning() !== null"
   (closed)="closeAssign()"

@@ -1,6 +1,6 @@
 import { HttpTestingController } from '@angular/common/http/testing';
 
-import { buttons, configure, NOW, itemsIn, renderAgenda } from './testing';
+import { buttons, configure, headers, NOW, itemsIn, panel, renderAgenda, settle } from './testing';
 
 describe('Agenda as inspector', () => {
   let controller: HttpTestingController;
@@ -25,5 +25,11 @@ describe('Agenda as inspector', () => {
     expect(element.querySelectorAll('[data-slot="add-cell"]')).toHaveLength(0);
     // The week stays readable.
     expect(itemsIn(element.querySelector('[data-slot="grid"]')!)).toHaveLength(6);
+
+    // A day with no item offers no "Adicionar à agenda" either.
+    headers(element)[3].click();
+    await settle();
+    expect(panel(element).textContent).toContain('Aproveite para organizar uma nova manutenção.');
+    expect(buttons(panel(element), 'Adicionar à agenda')).toEqual([]);
   });
 });

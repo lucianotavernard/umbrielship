@@ -25,6 +25,23 @@ const workOrder = {
   vessel: { vesselId: 'v-aur', name: 'Aurora', type: 'CARGO', length: 32.5 },
 };
 
+/** `GET /api/vessels/v-aur`: the Vessel with its Customer. */
+const auroraVessel = {
+  id: 'v-aur',
+  imoNumber: '9182451',
+  name: 'Aurora',
+  type: 'CARGO',
+  length: 32.5,
+  customerId: 'c-atl',
+  customer: {
+    id: 'c-atl',
+    name: 'Pescados Atlântico',
+    email: 'ops@atl.test',
+    phone: '1',
+    address: { address: 'Rua 1', city: 'Itajaí', state: 'SC' },
+  },
+};
+
 const service = (id: string, name: string, description: string, status: string, day: number) => ({
   id,
   workOrderId: ID,
@@ -247,6 +264,9 @@ describe('WorkOrderDetail', () => {
     const element = await render();
 
     await click(buttonByText('Editar', element));
+    // The drawer reads the Vessel for its Customer (C75).
+    controller.expectOne('/api/vessels/v-aur').flush({ vessel: auroraVessel });
+    await settle();
     const sheet = drawer()!;
     expect(text(sheet, '[data-slot="sheet-title"]')).toBe('Editar ordem de serviço');
     const vessel = sheet.querySelector<HTMLSelectElement>('#wo-vessel')!;
@@ -282,6 +302,33 @@ describe('WorkOrderDetail', () => {
     expect(drawer()).toBeNull();
     expect(text(element, 'section[aria-labelledby="work-order-title"] [data-slot="status"]')).toBe('Concluído');
     expect(text(element, '[data-slot="end"]')).toContain('21 de novembro de 2026, 16:00');
+  });
+
+  it('work-order-ui C75 Editar on the detail shows the vessel\'s customer', async () => {
+    const element = await render();
+    // Nothing is read for the Customer until the drawer opens.
+    controller.expectNone('/api/vessels/v-aur');
+
+    await click(buttonByText('Editar', element));
+    const read = controller.expectOne('/api/vessels/v-aur');
+    expect(read.request.method).toBe('GET');
+    read.flush({ vessel: auroraVessel });
+    await settle();
+
+    const customer = drawer()!.querySelector<HTMLInputElement>('#wo-customer')!;
+    expect(customer.readOnly).toBe(true);
+    expect(customer.value).toBe('Pescados Atlântico');
+    expect(text(drawer()!, 'label[for="wo-customer"]')).toBe('Cliente responsável');
+
+    // Closing and opening again reads the Vessel again, and shows its Customer of now.
+    await click(buttonByText('Cancelar', drawer()!));
+    expect(drawer()).toBeNull();
+    await click(buttonByText('Editar', element));
+    controller
+      .expectOne('/api/vessels/v-aur')
+      .flush({ vessel: { ...auroraVessel, customerId: 'c-mar', customer: { ...auroraVessel.customer, id: 'c-mar', name: 'Cooperativa Mar Azul' } } });
+    await settle();
+    expect(drawer()!.querySelector<HTMLInputElement>('#wo-customer')!.value).toBe('Cooperativa Mar Azul');
   });
 
   it('work-order-ui C30 a 404 shows the not found state with the way back', async () => {
