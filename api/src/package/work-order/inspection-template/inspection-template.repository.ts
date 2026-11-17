@@ -51,17 +51,19 @@ export class PrismaInspectionTemplatesRepository implements IInspectionTemplates
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<InspectionTemplate>> {
+    // No `take` and no `skip` reads every template.
+    const page: { take?: number; skip?: number } =
+      take === undefined && skip === undefined ? {} : { take, skip };
     const [total, data] = await this.prisma.$transaction([
       this.prisma.inspectionTemplate.count({ where: { organizationId } }),
       this.prisma.inspectionTemplate.findMany({
         include: withItems,
         where: { organizationId },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take,
-        skip,
+        ...page,
       }),
     ]);
 

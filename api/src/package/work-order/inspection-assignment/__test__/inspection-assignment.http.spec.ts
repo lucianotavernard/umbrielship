@@ -19,10 +19,18 @@ import type {
 
 import { Inspection } from '@/package/work-order/inspection/inspection.entity.js';
 
-import { makeInspectionAssignment } from '@test/factory.js';
+import {
+  makeInspectionAssignment,
+  makeService,
+  makeWorkOrder,
+} from '@test/factory.js';
 import { bootHttp } from '@test/http.js';
+import { InMemoryInspectionAssignmentsRepository } from '@test/repositories/in-memory-inspection-assignments-repository.js';
+import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
+import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
 import { AssignInspectionTemplateUseCase } from '../assign-inspection-template.use-case.js';
 import { FetchInspectionAssignmentsUseCase } from '../fetch-inspection-assignments.use-case.js';
+import { FetchOrganizationInspectionAssignmentsUseCase } from '../fetch-organization-inspection-assignments.use-case.js';
 import { InspectionAssignmentController } from '../inspection-assignment.controller.js';
 import { RemoveInspectionAssignmentUseCase } from '../remove-inspection-assignment.use-case.js';
 
@@ -77,6 +85,9 @@ const fakes = {
     })),
   },
   remove: { handle: vi.fn(async (_input: unknown) => undefined) },
+  fetchAll: {
+    handle: vi.fn(async (_input: unknown) => ({ inspectionAssignments: [] })),
+  },
 };
 
 const calls = () =>
@@ -99,6 +110,10 @@ describe('InspectionAssignment routes over HTTP', () => {
         { provide: AssignInspectionTemplateUseCase, useValue: fakes.assign },
         { provide: FetchInspectionAssignmentsUseCase, useValue: fakes.fetch },
         { provide: RemoveInspectionAssignmentUseCase, useValue: fakes.remove },
+        {
+          provide: FetchOrganizationInspectionAssignmentsUseCase,
+          useValue: fakes.fetchAll,
+        },
       ],
       users,
     }));
@@ -330,5 +345,185 @@ describe('InspectionAssignment routes over HTTP', () => {
 
     expect(response.status).toBe(409);
     expect(response.body.message).toBe('Inspection assignment has inspections');
+  });
+});
+
+describe('GET /inspection-assignments', () => {
+  const OTHER_ORGANIZATION = '99999999-9999-4999-8999-999999999999';
+  const OTHER_WORK_ORDER = '66666666-6666-4666-8666-666666666666';
+  const VESSEL = '77777777-7777-4777-8777-777777777777';
+  const workOrders = new InMemoryWorkOrdersRepository();
+  const assignments = new InMemoryInspectionAssignmentsRepository(workOrders);
+  const inspections = new InMemoryInspectionsRepository(assignments);
+  const fetchAll = new FetchOrganizationInspectionAssignmentsUseCase(
+    assignments,
+  );
+  const fetchAllSpy = vi.spyOn(fetchAll, 'handle');
+  let app: INestApplication;
+  let tokens: Record<string, string>;
+
+  beforeAll(async () => {
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
+      controllers: [InspectionAssignmentController],
+      providers: [
+        { provide: AssignInspectionTemplateUseCase, useValue: fakes.assign },
+        { provide: FetchInspectionAssignmentsUseCase, useValue: fakes.fetch },
+        { provide: RemoveInspectionAssignmentUseCase, useValue: fakes.remove },
+        {
+          provide: FetchOrganizationInspectionAssignmentsUseCase,
+          useValue: fetchAll,
+        },
+      ],
+      users,
+    }));
+
+    tokens = Object.fromEntries(ROLES.map((role) => [role, sign(subs[role])]));
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('work-order-ui C34 answers every role with the assignments and 401 without a token', async () => {
+    workOrders.items.push(
+      makeWorkOrder(
+        {
+          organizationId: ORGANIZATION,
+          vesselId: VESSEL,
+          status: 'IN_PROGRESS',
+        },
+        WORK_ORDER,
+      ),
+      makeWorkOrder(
+        { organizationId: OTHER_ORGANIZATION, vesselId: VESSEL },
+        OTHER_WORK_ORDER,
+      ),
+    );
+    workOrders.services.items.push(
+      makeService(
+        {
+          organizationId: ORGANIZATION,
+          workOrderId: WORK_ORDER,
+          name: 'Pintura',
+          status: 'COMPLETED',
+        },
+        SERVICE,
+      ),
+    );
+    const inspected = assignment();
+    assignments.items.push(
+      inspected,
+      makeInspectionAssignment(
+        {
+          organizationId: ORGANIZATION,
+          workOrderId: WORK_ORDER,
+          templateName: 'Casco inteiro',
+          labels: ['C'],
+          createdAt: new Date('2026-01-02T00:00:00.000Z'),
+        },
+        'whole',
+      ),
+      makeInspectionAssignment(
+        {
+          organizationId: OTHER_ORGANIZATION,
+          workOrderId: OTHER_WORK_ORDER,
+          createdAt: new Date('2026-01-09T00:00:00.000Z'),
+        },
+        'other',
+      ),
+    );
+    inspections.items.push(
+      Inspection.restore(
+        {
+          organizationId: ORGANIZATION,
+          assignmentId: ASSIGNMENT,
+          result: 'APPROVED',
+          inspectorId: 'user-9',
+          inspectorName: 'Inês Prado',
+          completedAt: new Date('2026-11-14T10:00:00.000Z'),
+          discardedAt: null,
+          discardedBy: null,
+          answers: [],
+        },
+        'i1',
+      ),
+    );
+
+    for (const role of ROLES) {
+      const response = await request(app.getHttpServer())
+        .get('/inspection-assignments')
+        .set('Authorization', `Bearer ${tokens[role]}`);
+
+      expect(response.status, role).toBe(200);
+      expect(response.body, role).toEqual({
+        inspectionAssignments: [
+          {
+            id: 'whole',
+            templateName: 'Casco inteiro',
+            service: null,
+            createdAt: '2026-01-02T00:00:00.000Z',
+            removable: true,
+            inspections: [],
+            items: [
+              {
+                id: expect.any(String),
+                label: 'C',
+                position: 0,
+                type: 'CONFORMITY',
+              },
+            ],
+            workOrder: {
+              id: WORK_ORDER,
+              vesselId: VESSEL,
+              status: 'IN_PROGRESS',
+            },
+          },
+          {
+            id: ASSIGNMENT,
+            templateName: 'Pintura do casco',
+            service: { id: SERVICE, name: 'Pintura', status: 'COMPLETED' },
+            createdAt: '2026-01-01T00:00:00.000Z',
+            removable: false,
+            inspections: [
+              {
+                id: 'i1',
+                result: 'APPROVED',
+                inspectorName: 'Inês Prado',
+                completedAt: '2026-11-14T10:00:00.000Z',
+                answers: [],
+              },
+            ],
+            items: [
+              {
+                id: expect.any(String),
+                label: 'A',
+                position: 0,
+                type: 'CONFORMITY',
+              },
+              {
+                id: expect.any(String),
+                label: 'B',
+                position: 1,
+                type: 'CONFORMITY',
+              },
+            ],
+            workOrder: {
+              id: WORK_ORDER,
+              vesselId: VESSEL,
+              status: 'IN_PROGRESS',
+            },
+          },
+        ],
+      });
+    }
+    expect(fetchAllSpy).toHaveBeenCalledTimes(3);
+    expect(fetchAllSpy).toHaveBeenCalledWith({ organizationId: ORGANIZATION });
+
+    const anonymous = await request(app.getHttpServer()).get(
+      '/inspection-assignments',
+    );
+    expect(anonymous.status).toBe(401);
+    expect(fetchAllSpy).toHaveBeenCalledTimes(3);
   });
 });

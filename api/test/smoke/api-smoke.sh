@@ -114,6 +114,38 @@ check "customer-ui C14 vesselCount with two vessels" 2 "$(count_of "$CC")"
 req DELETE "/vessels/$VC1" "$TA"
 check "customer-ui C14 vesselCount after a vessel delete" 1 "$(count_of "$CC")"
 
+echo "work order list, create with services, templates and assignments"
+req POST /vessels "$TA" "{\"imoNumber\":\"7000003\",\"name\":\"W1\",\"type\":\"CARGO\",\"length\":10,\"customerId\":\"$CC\"}"; VW="$(echo "$BODY" | jq -r '.vessel.id')"
+PERIOD='"startDate":"2026-11-17T09:12:00.000Z","endDate":"2026-11-20T10:00:00.000Z"'
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$PERIOD,\"status\":\"PENDING\"}"; WO1="$(echo "$BODY" | jq -r '.workOrder.id')"
+services_of() { req GET /work-orders "$TA"; echo "$BODY" | jq -r --arg id "$1" '.workOrders[] | select(.id == $id) | .services | length'; }
+check "work-order-ui C3 services with no service" 0 "$(services_of "$WO1")"
+req POST "/work-orders/$WO1/services" "$TA" "{\"name\":\"Pintura\",\"description\":\"Casco\",$PERIOD,\"status\":\"PENDING\"}"; SV1="$(echo "$BODY" | jq -r '.service.id')"
+check "work-order-ui C3 services after a service create" 1 "$(services_of "$WO1")"
+req DELETE "/work-orders/$WO1/services/$SV1" "$TA"
+check "work-order-ui C3 services after a service delete" 0 "$(services_of "$WO1")"
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",\"startDate\":\"2026-12-01T08:00:00.000Z\",\"endDate\":\"2026-12-05T17:30:00.000Z\",\"status\":\"IN_PROGRESS\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\"},{\"name\":\"Motor\",\"description\":\"Revisão\"}]}"; WO2="$(echo "$BODY" | jq -r '.workOrder.id')"
+req GET "/work-orders/$WO2" "$TA"; WO2_START="$(echo "$BODY" | jq -r '.workOrder.startDate')"; WO2_END="$(echo "$BODY" | jq -r '.workOrder.endDate')"
+req GET "/work-orders/$WO2/services" "$TA"
+check "work-order-ui C22 services stored with the work order" 2 "$(echo "$BODY" | jq '.services | length')"
+check "work-order-ui C22 services take the work order period and PENDING" ok "$(echo "$BODY" | jq -r --arg s "$WO2_START" --arg e "$WO2_END" 'if (.services | length) > 0 and all(.services[]; .startDate == $s and .endDate == $e and .status == "PENDING") then "ok" else "not" end')"
+total_of() { req GET /work-orders "$TA"; echo "$BODY" | jq -r '.total'; }
+BEFORE="$(total_of)"
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$PERIOD,\"status\":\"PENDING\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\"},{\"name\":\"\",\"description\":\"Motor\"}]}"
+check "work-order-ui C22 invalid create answers 400" 400 "$STATUS"
+AFTER="$(total_of)"
+check "work-order-ui C22 invalid create stores nothing" same "$([ -n "$BEFORE" ] && [ "$BEFORE" != null ] && [ "$BEFORE" = "$AFTER" ] && echo same || echo "$BEFORE $AFTER")"
+for n in $(seq 1 12); do
+  req POST /inspection-templates "$TA" "{\"name\":\"Modelo $n\",\"items\":[{\"label\":\"Casco limpo\",\"type\":\"CONFORMITY\"}]}"
+done
+TPL="$(echo "$BODY" | jq -r '.inspectionTemplate.id')"
+req GET /inspection-templates "$TA"; check "work-order-ui C36 templates without page" 12 "$(echo "$BODY" | jq '.inspectionTemplates | length')"
+req POST "/work-orders/$WO1/inspection-assignments" "$TA" "{\"templateId\":\"$TPL\"}"; AS1="$(echo "$BODY" | jq -r '.inspectionAssignment.id')"
+work_order_status_of() { req GET /inspection-assignments "$TA"; echo "$BODY" | jq -r --arg id "$1" '.inspectionAssignments[] | select(.id == $id) | .workOrder.status'; }
+check "work-order-ui C35 assignment carries the work order status" PENDING "$(work_order_status_of "$AS1")"
+req PUT "/work-orders/$WO1" "$TA" "{$PERIOD,\"status\":\"IN_PROGRESS\"}"
+check "work-order-ui C35 assignment follows the work order edit" IN_PROGRESS "$(work_order_status_of "$AS1")"
+
 echo "authorization"
 req GET /organizations "$TA"; check "non-internal member on GET /organizations" 403 "$STATUS"
 req GET /organizations "$T"; check "internal administrator on GET /organizations" 200 "$STATUS"

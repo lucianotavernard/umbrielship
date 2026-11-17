@@ -29,16 +29,21 @@ export class InMemoryInspectionTemplatesRepository implements IInspectionTemplat
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<InspectionTemplate>> {
     const owned = [...this.of(organizationId)].sort(
       (a, b) =>
         b.createdAt.getTime() - a.createdAt.getTime() ||
         b.id.localeCompare(a.id),
     );
+    const start = skip ?? 0;
+    const data =
+      take === undefined
+        ? owned.slice(start)
+        : owned.slice(start, start + take);
 
-    return { data: owned.slice(skip, skip + take), total: owned.length };
+    return { data, total: owned.length };
   }
 
   async create(template: InspectionTemplate): Promise<void> {

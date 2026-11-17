@@ -20,6 +20,7 @@ import type {
 import { makeInspectionTemplate } from '@test/factory.js';
 import { conformity } from '@test/factory.js';
 import { bootHttp } from '@test/http.js';
+import { InMemoryInspectionTemplatesRepository } from '@test/repositories/in-memory-inspection-templates-repository.js';
 import { CreateInspectionTemplateUseCase } from '../create-inspection-template.use-case.js';
 import { DeleteInspectionTemplateUseCase } from '../delete-inspection-template.use-case.js';
 import { EditInspectionTemplateUseCase } from '../edit-inspection-template.use-case.js';
@@ -269,7 +270,7 @@ describe('InspectionTemplate routes over HTTP', () => {
         .get(`/inspection-templates${query}`)
         .set('Authorization', `Bearer ${tokens.operator}`);
 
-    expect((await list('')).status).toBe(200);
+    expect((await list('?page=1')).status).toBe(200);
     expect((await list('?per_page=1')).status).toBe(200);
     expect((await list('?page=2&per_page=100')).status).toBe(200);
     expect(fakes.fetch.handle.mock.calls.map(([input]) => input)).toEqual([
@@ -416,5 +417,89 @@ describe('InspectionTemplate routes over HTTP', () => {
         { label: 'Nota', type: 'SCORE' },
       ],
     });
+  });
+});
+
+describe('GET /inspection-templates', () => {
+  let app: INestApplication;
+  let token: string;
+  const templates = new InMemoryInspectionTemplatesRepository();
+  const fetch = new FetchInspectionTemplatesUseCase(templates);
+  const fetchSpy = vi.spyOn(fetch, 'handle');
+
+  beforeAll(async () => {
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
+      controllers: [InspectionTemplateController],
+      providers: [
+        { provide: CreateInspectionTemplateUseCase, useValue: fakes.create },
+        { provide: EditInspectionTemplateUseCase, useValue: fakes.edit },
+        { provide: DeleteInspectionTemplateUseCase, useValue: fakes.delete },
+        { provide: FetchInspectionTemplatesUseCase, useValue: fetch },
+        { provide: GetInspectionTemplateByIdUseCase, useValue: fakes.get },
+      ],
+      users,
+    }));
+
+    token = sign(subs.operator);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  const list = (query = '') =>
+    request(app.getHttpServer())
+      .get(`/inspection-templates${query}`)
+      .set('Authorization', `Bearer ${token}`);
+
+  it('work-order-ui C36 answers every template without page and 10 with page 1', async () => {
+    for (let day = 1; day <= 12; day++) {
+      templates.items.push(
+        makeInspectionTemplate({
+          organizationId: ORGANIZATION,
+          name: `Modelo ${day}`,
+          createdAt: new Date(Date.UTC(2026, 0, day)),
+        }),
+      );
+    }
+    templates.items.push(
+      makeInspectionTemplate({ organizationId: 'org-2', name: 'Outro' }),
+    );
+
+    const all = await list();
+    expect(all.status).toBe(200);
+    expect(all.body.total).toBe(12);
+    expect(
+      all.body.inspectionTemplates.map((item: { name: string }) => item.name),
+    ).toEqual(Array.from({ length: 12 }, (_, index) => `Modelo ${12 - index}`));
+    expect(all.body.inspectionTemplates[0]).toEqual({
+      id: expect.any(String),
+      name: 'Modelo 12',
+      itemCount: 2,
+      createdAt: '2026-01-12T00:00:00.000Z',
+    });
+    expect(fetchSpy).toHaveBeenLastCalledWith({ organizationId: ORGANIZATION });
+
+    const first = await list('?page=1');
+    expect(first.status).toBe(200);
+    expect(first.body.inspectionTemplates).toHaveLength(10);
+    expect(first.body.total).toBe(12);
+    expect(fetchSpy).toHaveBeenLastCalledWith({
+      organizationId: ORGANIZATION,
+      page: 1,
+      perPage: 10,
+    });
+
+    for (const query of ['?page=0', '?page=abc', '?per_page=101']) {
+      expect((await list(query)).status, query).toBe(400);
+    }
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    const anonymous = await request(app.getHttpServer()).get(
+      '/inspection-templates',
+    );
+    expect(anonymous.status).toBe(401);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 });

@@ -11,6 +11,7 @@ import { PrismaInspectionsRepository } from './inspection/inspection.repository.
 import { AssignInspectionTemplateUseCase } from './inspection-assignment/assign-inspection-template.use-case.js';
 import { IInspectionAssignmentsRepository } from './inspection-assignment/contracts/inspection-assignment-repository.contract.js';
 import { FetchInspectionAssignmentsUseCase } from './inspection-assignment/fetch-inspection-assignments.use-case.js';
+import { FetchOrganizationInspectionAssignmentsUseCase } from './inspection-assignment/fetch-organization-inspection-assignments.use-case.js';
 import { InspectionAssignmentController } from './inspection-assignment/inspection-assignment.controller.js';
 import { PrismaInspectionAssignmentsRepository } from './inspection-assignment/inspection-assignment.repository.js';
 import { RemoveInspectionAssignmentUseCase } from './inspection-assignment/remove-inspection-assignment.use-case.js';
@@ -76,6 +77,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     DeleteInspectionTemplateUseCase,
     AssignInspectionTemplateUseCase,
     FetchInspectionAssignmentsUseCase,
+    FetchOrganizationInspectionAssignmentsUseCase,
     RemoveInspectionAssignmentUseCase,
     CompleteInspectionUseCase,
     DiscardInspectionUseCase,

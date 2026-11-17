@@ -159,6 +159,7 @@ describe('acme layout', () => {
         'POST /inspection-templates',
         'PUT /inspection-templates/:id',
         'DELETE /inspection-templates/:id',
+        'GET /inspection-assignments',
         'GET /work-orders/:workOrderId/inspection-assignments',
         'POST /work-orders/:workOrderId/inspection-assignments',
         'DELETE /work-orders/:workOrderId/inspection-assignments/:id',

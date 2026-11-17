@@ -20,8 +20,10 @@ import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
 import { AssignInspectionTemplateUseCase } from './assign-inspection-template.use-case.js';
 import { FetchInspectionAssignmentsUseCase } from './fetch-inspection-assignments.use-case.js';
+import { FetchOrganizationInspectionAssignmentsUseCase } from './fetch-organization-inspection-assignments.use-case.js';
 import { presentInspection } from '../inspection/inspection.controller.js';
 import { InspectionAssignment } from './inspection-assignment.entity.js';
+import { InspectionAssignmentSummary } from './inspection-assignment-summary.entity.js';
 import { RemoveInspectionAssignmentUseCase } from './remove-inspection-assignment.use-case.js';
 
 const assignBodySchema = z.object({
@@ -54,15 +56,46 @@ const present = ({
   })),
 });
 
-@Controller('/work-orders/:workOrderId/inspection-assignments')
+// The Organization-wide list adds the WorkOrder and the target service's status.
+const presentSummary = ({
+  assignment,
+  workOrder,
+  service,
+}: InspectionAssignmentSummary) => ({
+  ...present(assignment),
+  service: service && {
+    id: service.id,
+    name: service.name,
+    status: service.status,
+  },
+  workOrder: {
+    id: workOrder.id,
+    vesselId: workOrder.vesselId,
+    status: workOrder.status,
+  },
+});
+
+// No prefix: the Organization-wide list sits outside `/work-orders/:workOrderId`.
+@Controller()
 export class InspectionAssignmentController {
   constructor(
     private assignInspectionTemplate: AssignInspectionTemplateUseCase,
     private fetchInspectionAssignments: FetchInspectionAssignmentsUseCase,
+    private fetchOrganizationInspectionAssignments: FetchOrganizationInspectionAssignmentsUseCase,
     private removeInspectionAssignment: RemoveInspectionAssignmentUseCase,
   ) {}
 
-  @Get()
+  @Get('/inspection-assignments')
+  async getAll(@CurrentUser() user: UserPayload) {
+    const { inspectionAssignments } =
+      await this.fetchOrganizationInspectionAssignments.handle({
+        organizationId: user.organizationId,
+      });
+
+    return { inspectionAssignments: inspectionAssignments.map(presentSummary) };
+  }
+
+  @Get('/work-orders/:workOrderId/inspection-assignments')
   async get(
     @CurrentUser() user: UserPayload,
     @Param('workOrderId') workOrderId: string,
@@ -85,7 +118,7 @@ export class InspectionAssignmentController {
   }
 
   @Roles('administrator')
-  @Post()
+  @Post('/work-orders/:workOrderId/inspection-assignments')
   async create(
     @CurrentUser() user: UserPayload,
     @Body(new ZodValidationPipe(assignBodySchema)) body: AssignBodySchema,
@@ -112,7 +145,7 @@ export class InspectionAssignmentController {
   }
 
   @Roles('administrator')
-  @Delete(':id')
+  @Delete('/work-orders/:workOrderId/inspection-assignments/:id')
   @HttpCode(204)
   async delete(
     @CurrentUser() user: UserPayload,

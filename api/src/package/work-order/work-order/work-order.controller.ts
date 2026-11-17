@@ -26,12 +26,18 @@ import { EditWorkOrderUseCase } from './edit-work-order.use-case.js';
 import { FetchWorkOrdersUseCase } from './fetch-work-orders.use-case.js';
 import { GetWorkOrderByIdUseCase } from './get-work-order-by-id.use-case.js';
 import { WORK_ORDER_STATUSES } from './work-order.entity.js';
+import { WorkOrderSummary } from './work-order-summary.entity.js';
 
 const createWorkOrderBodySchema = z.object({
   vesselId: z.uuid(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   status: z.enum(WORK_ORDER_STATUSES),
+  // Stored with the WorkOrder's period, PENDING, in the same transaction.
+  services: z
+    .array(z.object({ name: z.string().min(1), description: z.string() }))
+    .max(50)
+    .optional(),
 });
 
 type CreateWorkOrderBodySchema = z.infer<typeof createWorkOrderBodySchema>;
@@ -46,23 +52,44 @@ type EditWorkOrderBodySchema = z.infer<typeof editWorkOrderBodySchema>;
 
 const vesselIdQueryParamSchema = z.string().uuid().optional();
 
+// No `take` and no `skip` answers every WorkOrder; either one pages (`take` 10 and `skip` 0 by default).
 const takeQueryParamSchema = z
   .string()
   .optional()
-  .default('10')
-  .transform(Number)
-  .pipe(z.number().int().min(1).max(100));
+  .transform((take) => (take === undefined ? undefined : Number(take)))
+  .pipe(z.number().int().min(1).max(100).optional());
 
 const skipQueryParamSchema = z
   .string()
   .optional()
-  .default('0')
-  .transform(Number)
-  .pipe(z.number().int().min(0));
+  .transform((skip) => (skip === undefined ? undefined : Number(skip)))
+  .pipe(z.number().int().min(0).optional());
 
 type VesselIdQueryParamSchema = z.infer<typeof vesselIdQueryParamSchema>;
 type TakeQueryParamSchema = z.infer<typeof takeQueryParamSchema>;
 type SkipQueryParamSchema = z.infer<typeof skipQueryParamSchema>;
+
+const present = ({
+  id,
+  vesselId,
+  startDate,
+  endDate,
+  status,
+  services,
+}: WorkOrderSummary) => ({
+  id,
+  vesselId,
+  startDate,
+  endDate,
+  status,
+  services: services.map(({ id, name, startDate, endDate, status }) => ({
+    id,
+    name,
+    startDate,
+    endDate,
+    status,
+  })),
+});
 
 @Controller('/work-orders')
 export class WorkOrderController {
@@ -84,15 +111,17 @@ export class WorkOrderController {
     @Query('skip', new ZodValidationPipe(skipQueryParamSchema))
     skip: SkipQueryParamSchema,
   ) {
+    const paged = take !== undefined || skip !== undefined;
+
     const result = await this.fetchWorkOrders.handle({
       organizationId: user.organizationId,
       vesselId,
-      take,
-      skip,
+      take: paged ? (take ?? 10) : undefined,
+      skip: paged ? (skip ?? 0) : undefined,
     });
 
     return {
-      workOrders: result.workOrders,
+      workOrders: result.workOrders.map(present),
       total: result.total,
     };
   }
@@ -126,7 +155,7 @@ export class WorkOrderController {
     body: CreateWorkOrderBodySchema,
   ) {
     try {
-      const { vesselId, startDate, endDate, status } = body;
+      const { vesselId, startDate, endDate, status, services } = body;
 
       const result = await this.createWorkOrder.handle({
         organizationId: user.organizationId,
@@ -134,6 +163,7 @@ export class WorkOrderController {
         startDate,
         endDate,
         status,
+        services,
       });
 
       return { workOrder: result.workOrder };
