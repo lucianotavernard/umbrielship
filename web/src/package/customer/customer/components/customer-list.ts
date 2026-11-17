@@ -32,7 +32,7 @@ import { CustomerListItem } from '../customer.service';
     }),
   ],
   template: `
-    <div class="mt-[15px] overflow-x-auto">
+    <div class="relative mt-[15px] overflow-x-auto">
       <table class="w-full min-w-[850px] border-collapse text-left whitespace-nowrap">
         <thead class="h-[35px]">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">

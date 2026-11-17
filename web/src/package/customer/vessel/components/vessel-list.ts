@@ -17,7 +17,7 @@ export type VesselRow = Vessel & { customerName: string };
   imports: [NgIcon, RouterLink, Skeleton],
   viewProviders: [provideIcons({ lucidePencil, lucideShip, lucideTrash2 })],
   template: `
-    <div class="mt-[14px] overflow-x-auto">
+    <div class="relative mt-[14px] overflow-x-auto">
       <table class="w-full min-w-[880px] border-collapse text-left whitespace-nowrap">
         <thead class="h-[35px]">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
