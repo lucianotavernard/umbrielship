@@ -11,6 +11,7 @@ import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
 import { ICustomersRepository } from './contracts/customer-repository.contract.js';
 import { Customer } from './customer.entity.js';
+import { CustomerSummary } from './customer-summary.entity.js';
 
 @Injectable()
 export class PrismaCustomersRepository implements ICustomersRepository {
@@ -56,22 +57,29 @@ export class PrismaCustomersRepository implements ICustomersRepository {
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
-  ): Promise<Paginate<Customer>> {
+    take?: number,
+    skip?: number,
+  ): Promise<Paginate<CustomerSummary>> {
     const total = await this.prisma.customer.count({
       where: { organizationId },
     });
     const data = await this.prisma.customer.findMany({
       include: {
         address: true,
+        _count: { select: { vessels: true } },
       },
       where: { organizationId },
       take,
       skip,
     });
 
-    const customers = data.map((customer) => this.toDomain(customer));
+    const customers = data.map(({ _count, ...customer }) => {
+      const { id, ...props } = this.toDomain(customer);
+      return CustomerSummary.create(
+        { ...props, vesselCount: _count.vessels },
+        id,
+      );
+    });
 
     return {
       data: customers,

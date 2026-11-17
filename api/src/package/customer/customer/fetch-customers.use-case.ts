@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
-import { Customer } from './customer.entity.js';
+import { CustomerSummary } from './customer-summary.entity.js';
 import { ICustomersRepository } from './contracts/customer-repository.contract.js';
 
 type FetchCustomersUseCaseRequest = {
   organizationId: string;
-  skip: number;
-  take: number;
+  skip?: number;
+  take?: number;
 };
 
 type FetchCustomersUseCaseResponse = {
-  customers: Customer[];
+  customers: CustomerSummary[];
   total: number;
 };
 

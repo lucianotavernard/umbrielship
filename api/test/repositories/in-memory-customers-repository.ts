@@ -1,9 +1,14 @@
 import { Customer } from '@/package/customer/customer/customer.entity.js';
+import { CustomerSummary } from '@/package/customer/customer/customer-summary.entity.js';
+import type { Vessel } from '@/package/customer/vessel/vessel.entity.js';
 import { ICustomersRepository } from '@/package/customer/customer/contracts/customer-repository.contract.js';
 import { Paginate } from '@/package/shared/lib/type/paginate.js';
 
 export class InMemoryCustomersRepository implements ICustomersRepository {
   public items: Customer[] = [];
+
+  /** The Vessels `findMany` counts; an InMemoryVesselsRepository built on this fake links itself here. */
+  public vessels: { items: Vessel[] } = { items: [] };
 
   private of(organizationId: string) {
     return this.items.filter((item) => item.organizationId === organizationId);
@@ -28,12 +33,29 @@ export class InMemoryCustomersRepository implements ICustomersRepository {
 
   async findMany(
     organizationId: string,
-    take: number,
-    skip: number,
-  ): Promise<Paginate<Customer>> {
+    take?: number,
+    skip?: number,
+  ): Promise<Paginate<CustomerSummary>> {
     const owned = this.of(organizationId);
+    const page =
+      take === undefined ? owned : owned.slice(skip ?? 0, (skip ?? 0) + take);
 
-    return { data: owned.slice(skip, skip + take), total: owned.length };
+    return {
+      data: page.map(({ id, ...props }) =>
+        CustomerSummary.create(
+          {
+            ...props,
+            vesselCount: this.vessels.items.filter(
+              (vessel) =>
+                vessel.organizationId === organizationId &&
+                vessel.customerId === id,
+            ).length,
+          },
+          id,
+        ),
+      ),
+      total: owned.length,
+    };
   }
 
   async create(customer: Customer): Promise<void> {

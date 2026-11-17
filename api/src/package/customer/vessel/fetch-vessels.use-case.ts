@@ -6,8 +6,8 @@ import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 type FetchVesselsUseCaseRequest = {
   organizationId: string;
   customerId?: string;
-  skip: number;
-  take: number;
+  skip?: number;
+  take?: number;
 };
 
 type FetchVesselsUseCaseResponse = {

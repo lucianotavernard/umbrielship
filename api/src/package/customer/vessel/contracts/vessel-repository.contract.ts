@@ -12,16 +12,18 @@ export abstract class IVesselsRepository {
     organizationId: string,
     imoNumber: string,
   ): Promise<Vessel | null>;
+  /** Every Vessel of the Organization when `take` and `skip` are not given. */
   abstract findMany(
     organizationId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>>;
+  /** Every Vessel of the Customer when `take` and `skip` are not given. */
   abstract findManyByCustomerId(
     organizationId: string,
     customerId: string,
-    take: number,
-    skip: number,
+    take?: number,
+    skip?: number,
   ): Promise<Paginate<Vessel>>;
   abstract create(vessel: Vessel): Promise<void>;
   abstract save(vessel: Vessel): Promise<void>;
