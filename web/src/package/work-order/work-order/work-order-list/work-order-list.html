@@ -1,0 +1,197 @@
+<div class="mx-auto w-full max-w-[1044px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+  <div class="mb-[23px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
+    <div>
+      <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-5 bg-muted-foreground/60"></span>
+        OPERAÇÃO / SERVIÇOS
+      </div>
+      <h1 class="mt-[9px] mb-[5px] text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]">
+        Ordens de serviço
+      </h1>
+      <p class="text-[12px] text-muted-foreground">Gerencie os serviços e acompanhe cada embarcação da sua frota.</p>
+    </div>
+    @if (canWrite()) {
+      <button
+        tButton
+        type="button"
+        class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+        (click)="openCreate()"
+      >
+        <ng-icon name="lucidePlus" class="!size-[17px]" />
+        Nova ordem de serviço
+      </button>
+    }
+  </div>
+
+  <section aria-label="Resumo das ordens" class="mb-[17px] grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-[13px]">
+    @if (loading()) {
+      @for (slot of [1, 2, 3, 4]; track slot) {
+        <t-skeleton data-slot="metric-skeleton" class="h-[78px] rounded-lg" />
+      }
+    } @else {
+      <t-metric label="Total de ordens" tone="blue" [value]="metrics().total">
+        <ng-icon name="lucideClipboardList" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Em andamento" tone="teal" [value]="metrics().inProgress">
+        <ng-icon name="lucideWrench" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Pendentes" tone="amber" [value]="metrics().pending">
+        <ng-icon name="lucideClock3" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Concluídas" tone="green" [value]="metrics().completed">
+        <ng-icon name="lucideCheck" class="!size-[17px]" />
+      </t-metric>
+    }
+  </section>
+
+  <section aria-labelledby="work-order-list-title" class="rounded-lg border border-border bg-card px-[13px] pt-[18px] pb-0 sm:px-[18px]">
+    <div class="flex flex-col items-start gap-[15px] sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 id="work-order-list-title" class="text-[13px] font-normal text-foreground">Lista de ordens</h2>
+        <p class="mt-[5px] text-[10px] text-muted-foreground">Visualize prazos, responsáveis e andamento dos serviços.</p>
+      </div>
+      <button
+        type="button"
+        class="flex h-[29px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="selectedCount() === 0"
+        [attr.aria-label]="exportLabel()"
+        (click)="exportSelected()"
+      >
+        <ng-icon name="lucideDownload" class="!size-[15px]" />
+        Exportar{{ selectedCount() > 0 ? ' (' + selectedCount() + ')' : '' }}
+      </button>
+    </div>
+
+    <div class="mt-[17px] flex flex-col gap-[11px]">
+      <div role="tablist" aria-label="Filtrar ordens por status" class="flex items-center gap-[7px] overflow-x-auto pb-px">
+        @for (item of tabs; track item.value) {
+          <button
+            type="button"
+            role="tab"
+            class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+            [attr.aria-selected]="tab() === item.value"
+            (click)="pickTab(item.value)"
+          >
+            {{ item.label }}
+            <span
+              data-slot="tab-count"
+              class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] text-muted-foreground group-aria-selected:bg-primary/10 group-aria-selected:text-primary"
+            >
+              {{ counts()[item.value] }}
+            </span>
+          </button>
+        }
+      </div>
+      <label
+        class="flex h-[34px] w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50"
+      >
+        <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
+        <input
+          type="search"
+          aria-label="Buscar ordem, embarcação ou cliente"
+          class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+          placeholder="Buscar ordem, embarcação ou cliente..."
+          [value]="search()"
+          (input)="setSearch($any($event.target).value)"
+        />
+        @if (search()) {
+          <button type="button" aria-label="Limpar busca" class="grid place-items-center" (click)="setSearch('')">
+            <ng-icon name="lucideX" class="!size-[13px]" />
+          </button>
+        }
+      </label>
+    </div>
+
+    <work-order-table-ui
+      [canWrite]="canWrite()"
+      [loading]="loading()"
+      [rows]="shown()"
+      [selected]="selected()"
+      [emptyMessage]="emptyMessage()"
+      (toggled)="toggle($event)"
+      (toggledAll)="toggleShown()"
+      (edited)="openEdit($event)"
+      (deleted)="openDelete($event)"
+    />
+
+    <footer
+      data-slot="list-footer"
+      class="flex min-h-[49px] flex-wrap items-center justify-between gap-2 border-t border-border py-2 text-[9px] text-muted-foreground"
+    >
+      @if (loading()) {
+        <t-skeleton class="h-3 w-32 rounded" />
+      } @else {
+        <span data-slot="range">
+          Exibindo <strong class="text-foreground/80">{{ range().first }}–{{ range().last }}</strong> de
+          <strong class="text-foreground/80">{{ range().total }}</strong> ordens
+        </span>
+        <nav aria-label="Paginação" class="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Página anterior"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() <= 1"
+            (click)="goTo(currentPage() - 1)"
+          >
+            <ng-icon name="lucideChevronLeft" class="!size-[15px]" />
+          </button>
+          @for (number of pages(); track number) {
+            <button
+              type="button"
+              data-slot="page"
+              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
+              [attr.aria-current]="number === currentPage() ? 'page' : null"
+              (click)="goTo(number)"
+            >
+              {{ number }}
+            </button>
+          }
+          <button
+            type="button"
+            aria-label="Próxima página"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() >= pages().length"
+            (click)="goTo(currentPage() + 1)"
+          >
+            <ng-icon name="lucideChevronRight" class="!size-[15px]" />
+          </button>
+        </nav>
+      }
+    </footer>
+  </section>
+</div>
+
+<t-sheet
+  closeLabel="Fechar formulário"
+  class="sm:w-full sm:max-w-[580px]"
+  [kicker]="editing() ? 'ORDEM DE SERVIÇO' : 'NOVA SOLICITAÇÃO'"
+  [title]="editing() ? 'Editar ordem de serviço' : 'Nova ordem de serviço'"
+  [description]="
+    editing()
+      ? 'Atualize o período e o status da ordem de serviço.'
+      : 'Preencha os dados dos serviços para programar o atendimento da embarcação.'
+  "
+  [flush]="true"
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <work-order-form-ui
+    [loading]="submitting()"
+    [vessels]="vessels()"
+    [customerNames]="customerNames()"
+    [workOrder]="editing()"
+    (closed)="closeSheet()"
+    (submitted)="save($event)"
+  />
+</t-sheet>
+
+<t-confirmation
+  title="Excluir ordem de serviço"
+  description="Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="deleting() !== null"
+  [loading]="confirming()"
+  (closed)="closeDelete()"
+  (confirmed)="delete()"
+/>

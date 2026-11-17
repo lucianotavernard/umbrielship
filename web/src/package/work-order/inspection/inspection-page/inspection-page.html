@@ -1,0 +1,114 @@
+<div class="mx-auto w-full max-w-[480px] px-[13px] pt-[18px] pb-[21px] sm:px-0 sm:pt-[31px]">
+  <a
+    data-slot="back"
+    class="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary"
+    [routerLink]="backLink()"
+  >
+    <ng-icon name="lucideArrowLeft" class="!size-[15px]" />
+    {{ backLabel() }}
+  </a>
+
+  @if (notFound()) {
+    <section
+      data-slot="not-found"
+      class="mx-auto my-10 flex flex-col items-center gap-2.5 rounded-lg border border-border bg-card p-7 text-center"
+    >
+      <h1 class="text-[18px] font-normal text-foreground">
+        {{ inspectionId() && assignment() ? 'Inspeção não encontrada' : 'Atribuição não encontrada' }}
+      </h1>
+      <p class="text-[11px] text-muted-foreground">Esse registro não está disponível na sua organização.</p>
+      <a [routerLink]="['/work-orders', id()]" class="mt-1 text-[11px] font-semibold text-primary">Voltar à ordem de serviço</a>
+    </section>
+  } @else if (loading()) {
+    <div data-slot="page-skeleton" class="mt-[30px] grid gap-3">
+      <t-skeleton class="h-3 w-40 rounded" />
+      <t-skeleton class="h-7 w-72 rounded" />
+      <t-skeleton class="h-[60px] w-full rounded-lg" />
+      <t-skeleton class="h-[200px] w-full rounded-lg" />
+    </div>
+  } @else if (assignment(); as assignment) {
+    <header class="mt-[30px] flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <span data-slot="kicker" class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">
+          INSPEÇÃO DE CAMPO · {{ code() }}
+        </span>
+        <h1 class="mt-[11px] text-[23px] leading-tight font-normal tracking-[-0.5px] break-words text-foreground">
+          {{ assignment.templateName }}
+        </h1>
+        <p class="mt-2 text-[10px] text-muted-foreground">Responda às perguntas e registre as condições encontradas.</p>
+      </div>
+      @if (inspection(); as inspection) {
+        <span
+          data-slot="result"
+          class="inline-flex shrink-0 items-center gap-[5px] rounded-full px-2 py-[5px] text-[8px] font-semibold"
+          [class]="
+            inspection.result === 'APPROVED'
+              ? 'bg-[#eaf5ef] text-[#498b68] dark:bg-[#15291f] dark:text-[#8fcfab]'
+              : 'bg-[#fbefed] text-[#b86b61] dark:bg-[#2e1d1b] dark:text-[#e3a49b]'
+          "
+        >
+          <ng-icon name="lucideShieldCheck" class="!size-3" />
+          {{ resultLabels[inspection.result] }}
+        </span>
+      }
+    </header>
+
+    <dl class="mt-[18px] grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+      <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-vessel">
+        <dt class="text-[9px] text-muted-foreground">Embarcação</dt>
+        <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ workOrder()?.vessel?.name }}</dd>
+      </div>
+      <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-inspector">
+        <dt class="text-[9px] text-muted-foreground">Inspetor</dt>
+        <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ inspectorName() }}</dd>
+      </div>
+      @if (inspectionId()) {
+        <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-target">
+          <dt class="text-[9px] text-muted-foreground">Alvo</dt>
+          <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ target() }}</dd>
+        </div>
+      } @else {
+        <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-progress">
+          <dt class="text-[9px] text-muted-foreground">Progresso</dt>
+          <dd class="mt-1.5 text-[11px] font-semibold text-foreground">{{ answered() }} de {{ items().length }} respondidas</dd>
+        </div>
+      }
+    </dl>
+
+    <section class="mt-[15px] rounded-lg border border-border bg-card px-[18px] py-[19px]">
+      @if (inspection(); as inspection) {
+        <inspection-view-ui [inspection]="inspection" [items]="items()" />
+        <footer class="mt-[15px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[15px]">
+          <span data-slot="completed-at" class="text-[9px] text-muted-foreground">
+            Concluída em {{ inspection.completedAt | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+          @if (isInspector()) {
+            <button
+              type="button"
+              class="inline-flex h-10 items-center gap-[7px] rounded-[5px] border border-border bg-card px-3 text-[11px] text-foreground/75 hover:border-destructive/40 hover:text-destructive"
+              (click)="isDiscardDialogActive.set(true)"
+            >
+              <ng-icon name="lucideTrash2" class="!size-3.5" />
+              Descartar
+            </button>
+          }
+        </footer>
+      } @else if (blockedReason(); as reason) {
+        <p data-slot="blocked" class="text-[11px] text-muted-foreground">{{ reason }}</p>
+      } @else {
+        <inspection-checklist-ui [items]="items()" [loading]="completing()" (submitted)="complete($event)" />
+      }
+    </section>
+  }
+</div>
+
+<t-confirmation
+  title="Descartar inspeção"
+  description="Tem certeza que deseja descartar esta inspeção? Ela deixará de aparecer no app."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="isDiscardDialogActive()"
+  [loading]="discarding()"
+  (closed)="isDiscardDialogActive.set(false)"
+  (confirmed)="discard()"
+/>

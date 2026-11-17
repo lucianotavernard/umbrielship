@@ -186,27 +186,47 @@ describe('VesselDetail', () => {
     expect(element.querySelector('[data-slot="work-order-row"]')).toBeNull();
   });
 
-  it('customer-ui C50 Nova ordem posts the work order and lists it', async () => {
+  it('work-order-ui C24 Nova ordem opens the drawer with the vessel locked and lists the new order', async () => {
     const success = vi.spyOn(toast, 'success');
     const element = await render(aurora, []);
 
     await click(buttonByText('Nova ordem', element));
     const sheet = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
+    // The drawer of the "Ordens de serviço" list (AD-042).
+    expect(text(sheet, '[data-slot="sheet-title"]')).toBe('Nova ordem de serviço');
+    expect(sheet.textContent).toContain('Serviços a realizar');
+    expect(sheet.textContent).toContain('Planejamento');
+    const vessel = sheet.querySelector<HTMLSelectElement>('#wo-vessel')!;
+    expect(vessel.disabled).toBe(true);
+    expect(vessel.value).toBe('vessel-1');
+    expect(vessel.selectedOptions[0]?.textContent?.trim()).toBe('Santa Maria');
+    expect(sheet.querySelector<HTMLInputElement>('#wo-customer')!.value).toBe('Pescados Atlântico');
+
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão geral do motor');
     await type('#wo-start', '2026-11-10T09:00');
     await type('#wo-end', '2026-11-15T18:00');
-    await type('#wo-status', 'PENDING');
-    await click(buttonByText('Salvar', sheet));
+    await click(buttonByText('Criar ordem', sheet));
 
     const post = controller.expectOne('/api/work-orders');
     expect(post.request.method).toBe('POST');
-    expect(post.request.body).toMatchObject({ vesselId: 'vessel-1', status: 'PENDING' });
-    post.flush({ workOrder: {} });
+    expect(post.request.body).toEqual({
+      vesselId: 'vessel-1',
+      startDate: new Date(2026, 10, 10, 9, 0).toISOString(),
+      endDate: new Date(2026, 10, 15, 18, 0).toISOString(),
+      status: 'PENDING',
+      services: [{ name: 'Motor', description: 'Revisão geral do motor' }],
+    });
+    post.flush({ workOrder: {} }, { status: 201, statusText: 'Created' });
     await settle();
     controller.expectOne(page(0)).flush({ workOrders: [workOrder], total: 1 });
     await settle();
 
     expect(success).toHaveBeenCalledWith('Ordem de serviço criada com sucesso', expect.anything());
-    expect(element.querySelectorAll('[data-slot="work-order-row"]')).toHaveLength(1);
+    expect(document.querySelector('[data-slot="sheet-content"]')).toBeNull();
+    const rows = element.querySelectorAll('[data-slot="work-order-row"]');
+    expect(rows.length).toBe(1);
+    expect(rows[0].querySelector('a')?.textContent?.trim()).toBe('#5FBE9F04');
   });
 
   it('customer-ui C51 deletes a work order only after Confirmar and drops the row', async () => {

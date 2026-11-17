@@ -1,60 +1,54 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideTrash } from '@ng-icons/lucide';
+import { lucideShieldCheck } from '@ng-icons/lucide';
 
-import { Button } from '../../../shared/components/ui/button';
 import type { InspectionAssignmentItem } from '../../inspection-assignment/inspection-assignment.service';
-import { answerLabel, Inspection, inspectionResultLabels } from '../inspection.service';
+import { answerLabel, Inspection } from '../inspection.service';
 
+/** A completed Inspection read on its page (AD-045): each question with its answer and note. */
 @Component({
   selector: 'inspection-view-ui',
-  imports: [DatePipe, NgIcon, Button],
-  viewProviders: [provideIcons({ lucideTrash })],
+  imports: [NgIcon],
+  viewProviders: [provideIcons({ lucideShieldCheck })],
   template: `
-    <div class="flex flex-col gap-4">
-      <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-        <dt class="text-muted-foreground">Resultado</dt>
-        <dd class="font-medium" data-slot="result">{{ resultLabels[inspection().result] }}</dd>
-        <dt class="text-muted-foreground">Inspetor</dt>
-        <dd class="break-words" data-slot="inspector">{{ inspection().inspectorName }}</dd>
-        <dt class="text-muted-foreground">Data</dt>
-        <dd data-slot="date">{{ inspection().completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
-      </dl>
-
-      <ol class="flex flex-col divide-y rounded-lg border">
-        @for (row of rows(); track row.id; let index = $index) {
-          <li class="flex flex-col gap-1 px-3 py-2 text-sm" data-slot="answer">
-            <span class="break-words">
-              <span class="tabular-nums text-muted-foreground">{{ index + 1 }}.</span> {{ row.label }}
-            </span>
-            <span class="font-medium break-words" data-slot="value">{{ row.answer }}</span>
-            @if (row.note) {
-              <span class="text-muted-foreground break-words" data-slot="note">{{ row.note }}</span>
-            }
-          </li>
-        }
-      </ol>
-
-      @if (canDiscard()) {
-        <div class="flex justify-end">
-          <button tButton type="button" variant="outline" class="h-10" (click)="discarded.emit()">
-            <ng-icon name="lucideTrash" class="size-4" />
-            Descartar
-          </button>
+    <div class="flex items-start justify-between gap-3 border-b border-border pb-[15px]">
+      <div class="flex items-start gap-2.5">
+        <span class="grid size-[32px] shrink-0 place-items-center rounded-[8px] bg-[#e3f0ef] text-primary dark:bg-[#17302f]">
+          <ng-icon name="lucideShieldCheck" class="!size-4" />
+        </span>
+        <div>
+          <h2 class="text-[13px] font-normal text-foreground">Roteiro de inspeção</h2>
+          <p class="mt-[3px] text-[10px] text-muted-foreground">Respostas registradas pelo inspetor.</p>
         </div>
-      }
+      </div>
+      <span class="text-[9px] whitespace-nowrap text-muted-foreground">
+        {{ rows().length }} {{ rows().length === 1 ? 'pergunta' : 'perguntas' }}
+      </span>
     </div>
+    <ol class="mt-[15px] flex flex-col gap-[11px]">
+      @for (row of rows(); track row.id; let index = $index) {
+        <li data-slot="answer" class="flex gap-3 rounded-[9px] border border-border p-[13px]">
+          <span class="grid size-[27px] shrink-0 place-items-center rounded-[6px] bg-muted text-[9px] font-bold text-muted-foreground">
+            {{ number(index) }}
+          </span>
+          <div class="flex min-w-0 flex-col gap-1.5">
+            <span data-slot="label" class="text-[11px] font-semibold break-words text-foreground">{{ row.label }}</span>
+            <span data-slot="value" class="text-[11px] break-words text-foreground/80">{{ row.answer }}</span>
+            @if (row.note) {
+              <span data-slot="note" class="text-[10px] break-words text-muted-foreground">{{ row.note }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ol>
   `,
 })
 export class InspectionView {
   inspection = input.required<Inspection>();
   items = input.required<InspectionAssignmentItem[]>();
-  canDiscard = input.required<boolean>();
-  discarded = output<void>();
 
-  protected readonly resultLabels = inspectionResultLabels;
+  protected readonly number = (index: number) => String(index + 1).padStart(2, '0');
 
   // Each question in `position` order with how its answer reads.
   protected readonly rows = computed(() => {

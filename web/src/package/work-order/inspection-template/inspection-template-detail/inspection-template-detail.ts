@@ -8,7 +8,6 @@ import { lucideArrowLeft, lucidePencil, lucideTrash } from '@ng-icons/lucide';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
-import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
@@ -25,7 +24,7 @@ import {
 
 @Component({
   selector: 'inspection-template-detail',
-  imports: [DatePipe, NgIcon, RouterLink, Button, Confirmation, Sheet, Skeleton, InspectionTemplateForm],
+  imports: [DatePipe, NgIcon, RouterLink, Confirmation, Sheet, Skeleton, InspectionTemplateForm],
   viewProviders: [provideIcons({ lucideArrowLeft, lucidePencil, lucideTrash })],
   templateUrl: './inspection-template-detail.html',
 })
@@ -35,6 +34,7 @@ export class InspectionTemplateDetail {
   private readonly router = inject(Router);
 
   protected readonly typeLabels = questionTypeLabels;
+  protected readonly number = (index: number) => String(index + 1).padStart(2, '0');
 
   id = input.required<string>();
 
@@ -111,7 +111,7 @@ export class InspectionTemplateDetail {
         toast.success('Modelo de inspeção excluído com sucesso', {
           description: 'O modelo de inspeção foi excluído com sucesso.',
         });
-        this.router.navigate(['/inspection-templates']);
+        this.router.navigate(['/inspections']);
       },
       error: (response) => {
         this.confirming.set(false);

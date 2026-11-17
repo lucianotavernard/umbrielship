@@ -23,7 +23,6 @@ import {
   MAX_QUESTIONS,
   QUESTION_TYPES,
   QuestionType,
-  questionTypeLabels,
 } from '../inspection-template.service';
 
 type Model = { name: string; items: { label: string; type: QuestionType }[] };
@@ -54,52 +53,50 @@ const longerThan = (limit: number, message: string) => ({ value }: { value: () =
       lucideX,
     }),
   ],
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
   template: `
-    <form class="flex flex-col gap-6" novalidate (submit)="submitForm($event)">
-      <section class="overflow-hidden rounded-2xl border shadow-xs">
-        <div class="flex items-center gap-3 border-b bg-muted px-4 py-4 sm:px-6">
-          <div class="flex rounded-lg bg-background p-3 shadow-xs">
-            <ng-icon name="lucideClipboardList" class="size-3" />
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Modelo</h3>
-            <p class="text-xs text-muted-foreground">Nome e perguntas, na ordem em que serão feitas</p>
-          </div>
-        </div>
-        <div class="flex flex-col gap-5 p-4 sm:p-6">
-          <t-form-group>
-            <label tLabel for="template-name">Nome</label>
-            <input
-              tInput
-              id="template-name"
-              type="text"
-              placeholder="Pintura do casco"
-              [formField]="templateForm.name"
-            />
-          </t-form-group>
+    <form class="flex min-h-0 flex-1 flex-col" novalidate (submit)="submitForm($event)">
+      <div class="flex min-h-0 flex-1 flex-col gap-[15px] overflow-y-auto overscroll-y-contain px-[18px] py-[18px] sm:px-[25px]">
+        <t-form-group class="gap-[7px]">
+          <label tLabel for="template-name" class="text-[10px] font-semibold">Nome do modelo</label>
+          <input
+            tInput
+            id="template-name"
+            type="text"
+            class="text-[11px] md:text-[11px]"
+            placeholder="Ex.: Inspeção do casco"
+            [formField]="templateForm.name"
+          />
+        </t-form-group>
 
-          <ol class="flex flex-col gap-4">
-            @for (item of model().items; track $index; let index = $index, first = $first, last = $last) {
-              <li class="flex flex-col gap-2">
-                <t-form-group>
-                  <label tLabel [for]="'question-' + index">Pergunta {{ index + 1 }}</label>
-                  <input
-                    tInput
-                    type="text"
-                    [id]="'question-' + index"
-                    placeholder="O casco está limpo?"
-                    [formField]="templateForm.items[index].label"
-                  />
-                </t-form-group>
-                <t-form-group>
-                  <label tLabel [for]="'question-type-' + index">Tipo</label>
-                  <select tSelect [id]="'question-type-' + index" [formField]="templateForm.items[index].type">
-                    @for (type of questionTypes; track type) {
-                      <option [value]="type">{{ questionTypeLabels[type] }}</option>
-                    }
-                  </select>
-                </t-form-group>
-                <div class="flex items-center justify-end gap-1">
+        <div class="flex items-end justify-between gap-3">
+          <div>
+            <h3 class="text-[12px] font-semibold text-foreground">Perguntas</h3>
+            <p class="mt-1 text-[10px] text-muted-foreground">
+              Todas as perguntas precisam ser respondidas; “Não se aplica” vale como resposta.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex h-[29px] shrink-0 items-center gap-1.5 rounded-[5px] border border-border bg-card px-2.5 text-[10px] font-semibold text-primary hover:bg-primary/5 disabled:opacity-50"
+            [disabled]="model().items.length >= maxQuestions"
+            (click)="add()"
+          >
+            <ng-icon name="lucidePlus" class="!size-3.5" />
+            Adicionar
+          </button>
+        </div>
+
+        <ol class="flex flex-col gap-[11px]">
+          @for (item of model().items; track $index; let index = $index, first = $first, last = $last) {
+            <li
+              data-slot="question-editor"
+              class="flex flex-col gap-[11px] rounded-[9px] border border-border bg-muted/40 p-[13px]"
+              [attr.aria-label]="'Pergunta ' + (index + 1)"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <strong class="text-[11px] font-semibold text-foreground">Pergunta {{ number(index) }}</strong>
+                <div class="flex items-center gap-1">
                   <button
                     tButton
                     type="button"
@@ -124,47 +121,63 @@ const longerThan = (limit: number, message: string) => ({ value }: { value: () =
                   >
                     <ng-icon name="lucideArrowDown" class="size-4" />
                   </button>
-                  <button
-                    tButton
-                    type="button"
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label="Remover"
-                    title="Remover"
-                    [disabled]="model().items.length === 1"
-                    (click)="remove(index)"
-                  >
-                    <ng-icon name="lucideTrash" class="size-4" />
-                  </button>
+                  @if (model().items.length > 1) {
+                    <button
+                      tButton
+                      type="button"
+                      size="icon-sm"
+                      variant="ghost"
+                      class="hover:text-destructive"
+                      [attr.aria-label]="'Remover pergunta ' + (index + 1)"
+                      [title]="'Remover pergunta ' + (index + 1)"
+                      (click)="remove(index)"
+                    >
+                      <ng-icon name="lucideTrash" class="size-4" />
+                    </button>
+                  }
                 </div>
-              </li>
-            }
-          </ol>
+              </div>
+              <t-form-group class="gap-[7px]">
+                <label tLabel [for]="'question-' + index" class="text-[10px] font-semibold">Enunciado</label>
+                <input
+                  tInput
+                  type="text"
+                  class="bg-card text-[11px] md:text-[11px]"
+                  [id]="'question-' + index"
+                  placeholder="Digite a pergunta"
+                  [formField]="templateForm.items[index].label"
+                />
+              </t-form-group>
+              <t-form-group class="gap-[7px]">
+                <label tLabel [for]="'question-type-' + index" class="text-[10px] font-semibold">Tipo de resposta</label>
+                <select
+                  tSelect
+                  class="bg-card text-[11px]"
+                  [id]="'question-type-' + index"
+                  [formField]="templateForm.items[index].type"
+                >
+                  @for (type of questionTypes; track type) {
+                    <option [value]="type">{{ optionLabels[type] }}</option>
+                  }
+                </select>
+              </t-form-group>
+            </li>
+          }
+        </ol>
+      </div>
 
-          <button
-            tButton
-            type="button"
-            variant="outline"
-            [disabled]="model().items.length >= maxQuestions"
-            (click)="add()"
-          >
-            <ng-icon name="lucidePlus" class="size-4" />
-            Adicionar pergunta
-          </button>
-        </div>
-      </section>
-      <footer class="flex items-center justify-end gap-3">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">
-          <ng-icon name="lucideX" class="size-4" />
+      <footer class="flex min-h-[70px] shrink-0 items-center justify-end gap-2 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px]">
+        <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">
+          <ng-icon name="lucideX" class="!size-3.5" />
           Cancelar
         </button>
-        <button tButton type="submit" [disabled]="loading()">
+        <button tButton type="submit" class="h-[35px] px-[13px] text-[11px] font-semibold" [disabled]="loading()">
           @if (loading()) {
             <ng-icon name="lucideLoader2" class="animate-spin" />
             Salvando...
           } @else {
-            <ng-icon name="lucideCheck" class="size-4" />
-            Salvar
+            <ng-icon name="lucidePlus" class="!size-[15px]" />
+            {{ inspectionTemplate() ? 'Salvar alterações' : 'Criar modelo' }}
           }
         </button>
       </footer>
@@ -180,7 +193,14 @@ export class InspectionTemplateForm {
 
   protected readonly maxQuestions = MAX_QUESTIONS;
   protected readonly questionTypes = QUESTION_TYPES;
-  protected readonly questionTypeLabels = questionTypeLabels;
+  /** The mareos "Tipo de resposta" options, plus the score the umbrielship also asks (AD-019). */
+  protected readonly optionLabels: Record<QuestionType, string> = {
+    TEXT: 'Texto livre',
+    YES_NO: 'Sim ou não',
+    CONFORMITY: 'Conforme / não conforme',
+    SCORE: 'Nota de 0 a 10',
+  };
+  protected readonly number = (index: number) => String(index + 1).padStart(2, '0');
 
   model = signal<Model>(empty());
 

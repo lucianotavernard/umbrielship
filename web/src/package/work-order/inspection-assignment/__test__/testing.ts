@@ -1,5 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
+import { provideLocationMocks } from '@angular/common/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
@@ -14,9 +16,24 @@ export async function settle() {
   TestBed.tick();
 }
 
+@Component({ template: '' })
+class Stub {}
+
 export function configure() {
   TestBed.configureTestingModule({
-    providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    providers: [
+      provideHttpClient(),
+      provideHttpClientTesting(),
+      // The inspection pages the section opens, so `Router.url` tells where it went.
+      provideRouter([
+        { path: 'work-orders/:id/assignments/:assignmentId/inspect', component: Stub },
+        {
+          path: 'work-orders/:id/assignments/:assignmentId/inspections/:inspectionId',
+          component: Stub,
+        },
+      ]),
+      provideLocationMocks(),
+    ],
   });
   return TestBed.inject(HttpTestingController);
 }
@@ -79,6 +96,7 @@ export async function render(
   controller: HttpTestingController,
   role: Role | null,
   list: object[] = assignments,
+  { workOrderStatus = 'IN_PROGRESS' } = {},
 ) {
   TestBed.inject(AuthenticationService).role.set(role);
   const fixture = TestBed.createComponent(WorkOrderDetail);
@@ -89,7 +107,7 @@ export async function render(
       id: 'wo-1',
       startDate: '2026-01-01T00:00:00.000Z',
       endDate: '2026-01-02T00:00:00.000Z',
-      status: 'IN_PROGRESS',
+      status: workOrderStatus,
       vessel: { vesselId: 'vessel-1', name: 'Aurora', type: 'CARGO', length: 12 },
     },
   });

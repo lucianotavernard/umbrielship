@@ -93,7 +93,8 @@ export const writeControlsOf: Record<Page, string[]> = {
   'customers/:id': ['Excluir Aurora'],
   vessels: ['Nova embarcação', 'Editar embarcação Aurora', 'Excluir embarcação Aurora'],
   'vessels/:id': ['Editar', 'Nova ordem', 'Excluir'],
-  'work-orders/:id': ['Editar ordem de serviço', 'Novo serviço', 'Enviar foto de Pintura'],
+  // The WorkOrder detail's "Editar" opens the "Editar ordem de serviço" drawer (work-order-ui AC 25).
+  'work-orders/:id': ['Editar', 'Novo serviço', 'Enviar foto de Pintura'],
 };
 
 const labels = [
@@ -101,7 +102,6 @@ const labels = [
   'Nova embarcação',
   'Nova ordem',
   'Novo serviço',
-  'Editar ordem de serviço',
   'Editar',
 ];
 

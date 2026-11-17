@@ -9,6 +9,7 @@ import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { questionTypeLabels } from '../../inspection-template/inspection-template.service';
 import { Inspection, inspectionResultLabels } from '../../inspection/inspection.service';
 import { InspectionAssignment, WHOLE_WORK_ORDER } from '../inspection-assignment.service';
+import { inspectionBlockedReason } from '../inspection-availability';
 
 @Component({
   selector: 'inspection-assignment-list-ui',
@@ -155,11 +156,12 @@ export class InspectionAssignmentList {
 
   // Why "Inspecionar" is off, or null when the work is in progress.
   protected blockedReason(assignment: InspectionAssignment): string | null {
-    if (this.workOrderStatus() !== 'IN_PROGRESS') return 'Disponível com a ordem em andamento';
-    if (assignment.service && this.serviceStatuses()[assignment.service.id] !== 'IN_PROGRESS') {
-      return 'Disponível com o serviço em andamento';
-    }
-    return null;
+    const service = assignment.service;
+    return inspectionBlockedReason(
+      this.workOrderStatus(),
+      service ? this.serviceStatuses()[service.id] : null,
+      service !== null,
+    );
   }
 
   protected isOpen(id: string) {

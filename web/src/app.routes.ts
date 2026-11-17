@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { customerDetailResources } from './package/customer/customer/customer-detail/customer-detail.resources';
 import { authGuard } from './package/shared/components/lib/auth.guard';
+import { inspectorGuard } from './package/shared/components/lib/inspector.guard';
 import { internalAdministratorGuard } from './package/shared/components/lib/internal-administrator.guard';
 
 export const routes: Routes = [
@@ -60,6 +61,12 @@ export const routes: Routes = [
           import('./package/customer/vessel/vessel-detail/vessel-detail').then((m) => m.VesselDetail),
       },
       {
+        path: 'work-orders',
+        title: 'Ordens de serviço',
+        loadComponent: () =>
+          import('./package/work-order/work-order/work-order-list/work-order-list').then((m) => m.WorkOrderList),
+      },
+      {
         path: 'work-orders/:id',
         title: 'Ordem de serviço',
         loadComponent: () =>
@@ -68,13 +75,25 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'inspection-templates',
-        title: 'Modelos de inspeção',
+        path: 'work-orders/:id/assignments/:assignmentId/inspect',
+        title: 'Inspeção',
+        canActivate: [inspectorGuard],
         loadComponent: () =>
-          import('./package/work-order/inspection-template/inspection-template-list/inspection-template-list').then(
-            (m) => m.InspectionTemplateList,
-          ),
+          import('./package/work-order/inspection/inspection-page/inspection-page').then((m) => m.InspectionPage),
       },
+      {
+        path: 'work-orders/:id/assignments/:assignmentId/inspections/:inspectionId',
+        title: 'Inspeção',
+        loadComponent: () =>
+          import('./package/work-order/inspection/inspection-page/inspection-page').then((m) => m.InspectionPage),
+      },
+      {
+        path: 'inspections',
+        title: 'Inspeções',
+        loadComponent: () =>
+          import('./package/work-order/inspection/inspections-hub/inspections-hub').then((m) => m.InspectionsHub),
+      },
+      { path: 'inspection-templates', pathMatch: 'full', redirectTo: 'inspections' },
       {
         path: 'inspection-templates/:id',
         title: 'Modelo de inspeção',
@@ -82,6 +101,11 @@ export const routes: Routes = [
           import('./package/work-order/inspection-template/inspection-template-detail/inspection-template-detail').then(
             (m) => m.InspectionTemplateDetail,
           ),
+      },
+      {
+        path: 'agenda',
+        title: 'Agenda',
+        loadComponent: () => import('./package/work-order/agenda/agenda-page/agenda').then((m) => m.Agenda),
       },
       {
         path: 'organizations',

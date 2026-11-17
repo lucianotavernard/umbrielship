@@ -1,22 +1,30 @@
 import { httpResource } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideCalendarDays,
+  lucideChevronRight,
+  lucideClipboardCheck,
+  lucideClipboardList,
+  lucidePencil,
+  lucidePlus,
+  lucideRuler,
+  lucideShip,
+  lucideWrench,
+} from '@ng-icons/lucide';
+
+import { formatLength } from '../../../customer/vessel/vessel-csv';
+import { VesselType, vesselTypeLabels } from '../../../customer/vessel/vessel.service';
+import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
-import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
 import { Sheet } from '../../../shared/components/ui/sheet';
+import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
-import { WorkOrderServiceForm } from '../../work-order-service/components/work-order-service-form';
-import { WorkOrderServiceList } from '../../work-order-service/components/work-order-service-list';
-import {
-  CreateWorkOrderServiceRequest,
-  GetWorkOrderServicesResponse,
-  WorkOrderServiceService,
-} from '../../work-order-service/work-order-service.service';
-import { WorkOrderServiceImageService } from '../../work-order-service-image/work-order-service-image.service';
 import { InspectionAssignmentForm } from '../../inspection-assignment/components/inspection-assignment-form';
 import { InspectionAssignmentList } from '../../inspection-assignment/components/inspection-assignment-list';
 import {
@@ -26,43 +34,54 @@ import {
   InspectionAssignmentService,
 } from '../../inspection-assignment/inspection-assignment.service';
 import { GetInspectionTemplatesResponse } from '../../inspection-template/inspection-template.service';
-import { InspectionChecklist } from '../../inspection/components/inspection-checklist';
-import { InspectionView } from '../../inspection/components/inspection-view';
+import { Inspection } from '../../inspection/inspection.service';
+import { WorkOrderServiceForm } from '../../work-order-service/components/work-order-service-form';
+import { WorkOrderServiceList } from '../../work-order-service/components/work-order-service-list';
 import {
-  CompleteInspectionRequest,
-  Inspection,
-  InspectionService,
-} from '../../inspection/inspection.service';
-import { WorkOrderForm } from '../components/work-order-form';
+  CreateWorkOrderServiceRequest,
+  GetWorkOrderServicesResponse,
+  WorkOrderServiceService,
+} from '../../work-order-service/work-order-service.service';
+import { WorkOrderServiceImageService } from '../../work-order-service-image/work-order-service-image.service';
+import { WorkOrderForm, WorkOrderFormValue } from '../components/work-order-form';
 import {
+  CreateWorkOrderRequest,
   GetWorkOrderResponse,
-  UpdateWorkOrderRequest,
+  workOrderCode,
   WorkOrderService,
   workOrderStatusLabels,
+  workOrderStatusTones,
 } from '../work-order.service';
-import { lucideArrowLeft, lucideClipboardCheck, lucidePlus, lucideWrench } from '@ng-icons/lucide';
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { WorkOrderDetail as WorkOrderDetailUI } from '../components/work-order-detail';
-import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 
+/** A WorkOrder in the mareos look (AD-033): its Vessel, period, services and inspections. */
 @Component({
   selector: 'work-order-detail',
   imports: [
     NgIcon,
     DatePipe,
-    Button,
+    RouterLink,
     Confirmation,
     Sheet,
+    Skeleton,
     WorkOrderForm,
     WorkOrderServiceList,
     WorkOrderServiceForm,
-    WorkOrderDetailUI,
     InspectionAssignmentForm,
     InspectionAssignmentList,
-    InspectionChecklist,
-    InspectionView,
   ],
-  viewProviders: [provideIcons({ lucideArrowLeft, lucideClipboardCheck, lucideWrench, lucidePlus })],
+  viewProviders: [
+    provideIcons({
+      lucideCalendarDays,
+      lucideChevronRight,
+      lucideClipboardCheck,
+      lucideClipboardList,
+      lucidePencil,
+      lucidePlus,
+      lucideRuler,
+      lucideShip,
+      lucideWrench,
+    }),
+  ],
   templateUrl: './work-order-detail.html',
 })
 export class WorkOrderDetail {
@@ -70,17 +89,18 @@ export class WorkOrderDetail {
   protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
   private readonly role = inject(AuthenticationService).role;
   protected readonly isInspector = computed(() => this.role() === 'inspector');
-  private readonly inspectionService = inject(InspectionService);
+  private readonly router = inject(Router);
   private readonly inspectionAssignmentService = inject(InspectionAssignmentService);
   private readonly workOrderService = inject(WorkOrderService);
   private readonly workOrderServiceService = inject(WorkOrderServiceService);
   private readonly imageService = inject(WorkOrderServiceImageService);
+  private readonly workOrderForm = viewChild(WorkOrderForm);
+  private readonly serviceForm = viewChild(WorkOrderServiceForm);
 
   id = input.required<string>();
 
   workOrderResource = httpResource<GetWorkOrderResponse>(() => `/api/work-orders/${this.id()}`);
   servicesResource = httpResource<GetWorkOrderServicesResponse>(() => `/api/work-orders/${this.id()}/services`);
-
   assignmentsResource = httpResource<GetInspectionAssignmentsResponse>(
     () => `/api/work-orders/${this.id()}/inspection-assignments`,
   );
@@ -94,21 +114,15 @@ export class WorkOrderDetail {
   removing = signal(false);
   isAssignSheetActive = signal(false);
   selectedAssignment = signal<InspectionAssignment | null>(null);
-  // The assignment being answered in the "Inspecionar" sheet.
-  inspecting = signal<InspectionAssignment | null>(null);
-  completing = signal(false);
-  // The Inspection open in the "Inspeção" sheet, and whether its discard is being confirmed.
-  viewing = signal<{ assignment: InspectionAssignment; inspection: Inspection } | null>(null);
-  isDiscardDialogActive = signal(false);
-  discarding = signal(false);
   isEditWorkOrderSheetActive = signal(false);
   isCreateServiceSheetActive = signal(false);
 
-  workOrder = computed(() => this.workOrderResource.hasValue() ? this.workOrderResource.value()?.workOrder ?? null : null);
-  loadingWorkOrder = computed(() => this.workOrderResource.isLoading());
+  workOrder = computed(() => resourceValue(this.workOrderResource)?.workOrder ?? null);
+  notFound = computed(() => (this.workOrderResource.error() as { status?: number } | undefined)?.status === 404);
+  code = computed(() => workOrderCode(this.id()));
 
-  loading = computed(() => this.servicesResource.isLoading());
-  services = computed(() => this.servicesResource.hasValue() ? this.servicesResource.value()?.services ?? [] : []);
+  services = computed(() => resourceValue(this.servicesResource)?.services ?? []);
+  loadingServices = computed(() => this.servicesResource.isLoading());
 
   loadingAssignments = computed(() => this.assignmentsResource.isLoading());
   assignments = computed(() => resourceValue(this.assignmentsResource)?.inspectionAssignments ?? []);
@@ -122,75 +136,44 @@ export class WorkOrderDetail {
   });
 
   protected readonly statusLabels = workOrderStatusLabels;
+  protected readonly statusTones = workOrderStatusTones;
+  protected readonly length = formatLength;
+
+  vesselType = computed(() => {
+    const type = this.workOrder()?.vessel.type;
+    return type ? (vesselTypeLabels[type as VesselType] ?? type) : '';
+  });
 
   workOrderStatus = computed(() => this.workOrder()?.status ?? null);
   serviceStatuses = computed(() =>
     Object.fromEntries(this.services().map((service) => [service.id, service.status])),
   );
 
-  openChecklist(assignment: InspectionAssignment) {
-    this.inspecting.set(assignment);
-  }
+  /** The drawer edits this WorkOrder with its Vessel locked. */
+  formValue = computed<WorkOrderFormValue | null>(() => {
+    const order = this.workOrder();
+    return order
+      ? { vesselId: order.vessel.vesselId, startDate: order.startDate, endDate: order.endDate, status: order.status }
+      : null;
+  });
+  formVessels = computed(() => {
+    const order = this.workOrder();
+    return order ? [{ id: order.vessel.vesselId, name: order.vessel.name, customerId: '' }] : [];
+  });
 
-  closeChecklist() {
-    this.inspecting.set(null);
-  }
-
-  completeInspection(request: CompleteInspectionRequest) {
-    const assignment = this.inspecting();
-    if (!assignment) return;
-
-    this.completing.set(true);
-    this.inspectionService.complete(this.id(), assignment.id, request).subscribe({
-      next: () => {
-        toast.success('Inspeção registrada com sucesso', {
-          description: 'A inspeção foi registrada no histórico da atribuição.',
-        });
-        this.completing.set(false);
-        this.closeChecklist();
-        this.assignmentsResource.reload();
-      },
-      error: (response) => {
-        // The sheet stays open with the answers as typed.
-        toast.error('Erro ao registrar inspeção', {
-          description: apiErrorMessage(response, 'Ocorreu um erro ao registrar a inspeção.'),
-        });
-        this.completing.set(false);
-      },
-    });
+  inspect(assignment: InspectionAssignment) {
+    void this.router.navigate(['/work-orders', this.id(), 'assignments', assignment.id, 'inspect']);
   }
 
   openInspection(selection: { assignment: InspectionAssignment; inspection: Inspection }) {
-    this.viewing.set(selection);
-  }
-
-  closeInspection() {
-    this.viewing.set(null);
-    this.isDiscardDialogActive.set(false);
-  }
-
-  discardInspection() {
-    const selection = this.viewing();
-    if (!selection) return;
-
-    this.discarding.set(true);
-    this.inspectionService.discard(this.id(), selection.assignment.id, selection.inspection.id).subscribe({
-      next: () => {
-        toast.success('Inspeção descartada com sucesso', {
-          description: 'A inspeção deixou de aparecer no app.',
-        });
-        this.discarding.set(false);
-        this.closeInspection();
-        this.assignmentsResource.reload();
-      },
-      error: (response) => {
-        toast.error('Erro ao descartar inspeção', {
-          description: apiErrorMessage(response, 'Ocorreu um erro ao descartar a inspeção.'),
-        });
-        this.discarding.set(false);
-        this.isDiscardDialogActive.set(false);
-      },
-    });
+    void this.router.navigate([
+      '/work-orders',
+      this.id(),
+      'assignments',
+      selection.assignment.id,
+      'inspections',
+      selection.inspection.id,
+    ]);
   }
 
   openAssignSheet() {
@@ -254,6 +237,8 @@ export class WorkOrderDetail {
   }
 
   openEditWorkOrderSheet() {
+    const value = this.formValue();
+    if (value) this.workOrderForm()?.load(value);
     this.isEditWorkOrderSheetActive.set(true);
   }
 
@@ -262,6 +247,7 @@ export class WorkOrderDetail {
   }
 
   openCreateServiceSheet() {
+    this.serviceForm()?.reset();
     this.isCreateServiceSheetActive.set(true);
   }
 
@@ -269,34 +255,41 @@ export class WorkOrderDetail {
     this.isCreateServiceSheetActive.set(false);
   }
 
-  editWorkOrder(workOrder: UpdateWorkOrderRequest) {
+  editWorkOrder(request: CreateWorkOrderRequest) {
     this.submitting.set(true);
-    this.workOrderService.updateWorkOrder(this.id(), workOrder).subscribe({
-      next: () => {
-        toast.success('Ordem atualizada com sucesso', {
-          description: 'A ordem de serviço foi atualizada com sucesso.',
-        });
-        this.closeEditWorkOrderSheet();
-        this.workOrderResource.reload();
-      },
-      error: (response) => {
-        toast.error('Erro ao atualizar ordem', {
-          description: apiErrorMessage(response, 'Ocorreu um erro ao atualizar a ordem de serviço.'),
-        });
-      },
-    });
+    this.workOrderService
+      .updateWorkOrder(this.id(), { startDate: request.startDate, endDate: request.endDate, status: request.status })
+      .subscribe({
+        next: () => {
+          toast.success('Ordem atualizada com sucesso', {
+            description: 'A ordem de serviço foi atualizada com sucesso.',
+          });
+          this.submitting.set(false);
+          this.closeEditWorkOrderSheet();
+          this.workOrderResource.reload();
+        },
+        error: (response) => {
+          this.submitting.set(false);
+          toast.error('Erro ao atualizar ordem', {
+            description: apiErrorMessage(response, 'Ocorreu um erro ao atualizar a ordem de serviço.'),
+          });
+        },
+      });
   }
 
   createWorkOrderService(service: CreateWorkOrderServiceRequest) {
+    this.submitting.set(true);
     this.workOrderServiceService.create(this.id(), service).subscribe({
       next: () => {
         toast.success('Serviço criado com sucesso', {
           description: 'O serviço foi criado com sucesso.',
         });
+        this.submitting.set(false);
         this.closeCreateServiceSheet();
         this.servicesResource.reload();
       },
       error: (response) => {
+        this.submitting.set(false);
         toast.error('Erro ao criar serviço', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar o serviço.'),
         });
@@ -306,8 +299,8 @@ export class WorkOrderDetail {
 
   upload(event: { serviceId: string; file: File }) {
     this.imageService.upload(this.id(), event.serviceId, event.file).subscribe({
-      next: ({ image }) => {
-        toast.success('Foto enviada', { description: image.url });
+      next: () => {
+        toast.success('Foto enviada', { description: 'A foto foi anexada ao serviço.' });
       },
       error: (response) => {
         toast.error('Erro ao enviar foto', {
