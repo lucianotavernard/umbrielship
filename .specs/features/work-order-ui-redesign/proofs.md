@@ -1,6 +1,6 @@
 # work-order-ui-redesign proofs
 
-**HEAD**: ef3837b
+**HEAD**: 0e56cc1
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 123 pass, 1 fail
@@ -137,41 +137,41 @@
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C65 the day panel names the day, counts it and lists its items 97ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C66 an item opens its work order 45ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 163ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 36ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 69ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 43ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 65ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 71ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 29ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 60ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C65 the day panel names the day, counts it and lists its items 75ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C66 an item opens its work order 44ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 66ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 160ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 35ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 73ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 36ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 64ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 26ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 54ms
 
  Test Files  45 passed (45)
       Tests  225 passed (225)
-   Start at  16:08:27
-   Duration  4.31s (transform 4.29s, setup 7.15s, import 13.66s, tests 31.67s, environment 28.69s)
+   Start at  16:09:42
+   Duration  4.22s (transform 4.44s, setup 6.77s, import 14.06s, tests 30.61s, environment 27.92s)
 ```
 
 `Run api` - exit 0
 
 ```
- ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns null for an unknown id and for a Vessel of another Organization 0ms
- ✓ src/package/identity/user/__test__/fetch-users.use-case.spec.ts > FetchUsersUseCase > [C61] returns only the Users with no Membership in the Organization, paged, with the total 3ms
- ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for an unknown email 2ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for an unknown email 1ms
  ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for a wrong password 0ms
  ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] returns an access token encrypted from { sub: user id } 0ms
- ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 2ms
+ ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns plain vessel data for a Vessel of the Organization 1ms
+ ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns null for an unknown id and for a Vessel of another Organization 0ms
  ✓ src/package/work-order/work-order-service/__test__/work-order-service.repository.spec.ts > PrismaWorkOrderServicesRepository > inspection C35 turns the database refusal into ConflictDomainException 3ms
+ ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 2ms
 
  Test Files  81 passed (81)
       Tests  313 passed (313)
-   Start at  16:08:32
-   Duration  2.25s (transform 6.16s, setup 0ms, import 24.98s, tests 2.17s, environment 9ms)
+   Start at  16:09:47
+   Duration  2.18s (transform 6.21s, setup 0ms, import 24.64s, tests 2.01s, environment 9ms)
 
-[Nest] 449586  - 17/11/2026, 16:08:33   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"7ca9cb73-0bf6-498a-9f53-c82814cdd3a4","message":"redis down"}
-[Nest] 449714  - 17/11/2026, 16:08:33   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"c0a4758e-d11b-4d54-b7e0-de88644d5f59","message":"redis down"}
+[Nest] 453310  - 17/11/2026, 16:09:47   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"7ed52f06-968c-44e3-b8c5-bafc5430a655","message":"redis down"}
+[Nest] 453355  - 17/11/2026, 16:09:47   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"d0a08401-64e3-409a-a999-cf5609226977","message":"redis down"}
 ```
 
 `Run smoke` - exit 0
