@@ -210,6 +210,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 4, C23 (web)
 - last seen: 2026-11-14T15:13:52Z
 
+### L-034 - Test an edit drawer by opening, typing, cancelling and opening the same record again; one opening cannot catch typed values that survive Cancelar.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 1; C22, C42, C48 (web)
+- last seen: 2026-11-17T16:05:50Z
+
+### L-035 - After deleting the last row of a page, assert the list lands on the last page that still has rows.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 2; C52 (web)
+- last seen: 2026-11-17T16:05:50Z
+
+### L-036 - Test a displayed date with a fixture near local midnight; a midday UTC fixture shows the same day in every time zone.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 3; C49 (web)
+- last seen: 2026-11-17T16:05:50Z
+
+### L-037 - Test picking the menu item of the page already open; navigating to the same URL emits no NavigationEnd.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 4; C9 (web)
+- last seen: 2026-11-17T16:05:50Z
+
+### L-038 - A proof of design tokens checks every token of the literal shape inside its own selector block, not a sample anywhere in the file.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 5; C3, C4 (web)
+- last seen: 2026-11-17T16:05:50Z
+
+### L-039 - A spec deleted with the markup it tested is replaced by one that holds the same rule on the new markup.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: customer-ui-redesign
+- evidence: verification.md finding 6; C57 (web)
+- last seen: 2026-11-17T16:05:50Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

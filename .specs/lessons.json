@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 34,
+  "next_id": 40,
   "lessons": [
     {
       "id": "L-001",
@@ -601,6 +601,114 @@
       ],
       "created": "2026-11-14T15:13:52Z",
       "last_seen": "2026-11-14T15:13:52Z"
+    },
+    {
+      "id": "L-034",
+      "key": "weak_test::test an edit drawer by opening typing cancelling and opening the same record again one opening cannot catch typed values that survive cancelar",
+      "text": "Test an edit drawer by opening, typing, cancelling and opening the same record again; one opening cannot catch typed values that survive Cancelar.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1; C22, C42, C48 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-035",
+      "key": "ac_gap::after deleting the last row of a page assert the list lands on the last page that still has rows",
+      "text": "After deleting the last row of a page, assert the list lands on the last page that still has rows.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2; C52 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-036",
+      "key": "ac_gap::test a displayed date with a fixture near local midnight a midday utc fixture shows the same day in every time zone",
+      "text": "Test a displayed date with a fixture near local midnight; a midday UTC fixture shows the same day in every time zone.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3; C49 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-037",
+      "key": "ac_gap::test picking the menu item of the page already open navigating to the same url emits no navigationend",
+      "text": "Test picking the menu item of the page already open; navigating to the same URL emits no NavigationEnd.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 4; C9 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-038",
+      "key": "weak_test::a proof of design tokens checks every token of the literal shape inside its own selector block not a sample anywhere in the file",
+      "text": "A proof of design tokens checks every token of the literal shape inside its own selector block, not a sample anywhere in the file.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 5; C3, C4 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
+    },
+    {
+      "id": "L-039",
+      "key": "weak_test::a spec deleted with the markup it tested is replaced by one that holds the same rule on the new markup",
+      "text": "A spec deleted with the markup it tested is replaced by one that holds the same rule on the new markup.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "customer-ui-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 6; C57 (web)"
+      ],
+      "created": "2026-11-17T16:05:50Z",
+      "last_seen": "2026-11-17T16:05:50Z"
     }
   ]
 }

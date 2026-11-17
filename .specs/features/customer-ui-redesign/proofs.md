@@ -1,6 +1,6 @@
 # customer-ui-redesign proofs
 
-**HEAD**: a8d7779
+**HEAD**: 7bf1b4b
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 86 pass, 1 fail
@@ -120,21 +120,21 @@ No icon named lucideHistory was found. You may need to import it using the withI
 `Run api` - exit 0
 
 ```
- ✓ src/package/customer/vessel/__test__/vessel-tenancy.spec.ts > Vessel tenancy > [C36] rejects an IMO number repeated in another letter case in one Organization 2ms
- ✓ src/package/customer/vessel/__test__/vessel-tenancy.spec.ts > Vessel tenancy > [C36] CreateVesselUseCase answers customer not found for a Customer of another Organization 1ms
- ✓ src/package/customer/vessel/__test__/vessel-tenancy.spec.ts > Vessel tenancy > [C36] get, edit and delete answer vessel not found for a Vessel of another Organization 1ms
+ ✓ src/package/customer/vessel/__test__/vessel-tenancy.spec.ts > Vessel tenancy > [C36] get, edit and delete answer vessel not found for a Vessel of another Organization 2ms
  ✓ src/package/customer/vessel/__test__/vessel-tenancy.spec.ts > Vessel tenancy > [C36] FetchVesselsUseCase lists only the Organization vessels, with and without customerId 1ms
- ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 2ms
+ ✓ src/package/customer/vessel/__test__/delete-vessel.use-case.spec.ts > DeleteVesselUseCase > [C11] throws NotFoundDomainException for an unknown id 4ms
+ ✓ src/package/customer/vessel/__test__/delete-vessel.use-case.spec.ts > DeleteVesselUseCase > [C11] removes exactly that vessel 1ms
+ ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 4ms
  ✓ src/package/customer/customer/__test__/customer.repository.spec.ts > PrismaCustomersRepository > customer-ui C13 asks for every customer with its vessel count when no page is given 4ms
- ✓ src/package/customer/vessel/__test__/vessel.http.spec.ts > GET /vessels > customer-ui C35 answers every vessel without page and 10 with page 1 16ms
- ✓ src/package/customer/vessel/__test__/vessel.http.spec.ts > GET /vessels > customer-ui C35 answers 401 without a token 1ms
- ✓ src/package/customer/customer/__test__/customer.http.spec.ts > GET /customers > customer-ui C13 answers every customer with vesselCount without page and 10 with page 1 16ms
+ ✓ src/package/customer/vessel/__test__/vessel.http.spec.ts > GET /vessels > customer-ui C35 answers every vessel without page and 10 with page 1 21ms
+ ✓ src/package/customer/vessel/__test__/vessel.http.spec.ts > GET /vessels > customer-ui C35 answers 401 without a token 2ms
+ ✓ src/package/customer/customer/__test__/customer.http.spec.ts > GET /customers > customer-ui C13 answers every customer with vesselCount without page and 10 with page 1 18ms
  ✓ src/package/customer/customer/__test__/customer.http.spec.ts > GET /customers > customer-ui C13 answers 401 without a token 2ms
 
  Test Files  17 passed (17)
       Tests  52 passed (52)
-   Start at  13:01:00
-   Duration  658ms (transform 1.36s, setup 0ms, import 4.86s, tests 233ms, environment 2ms)
+   Start at  13:05:19
+   Duration  738ms (transform 1.65s, setup 0ms, import 5.82s, tests 285ms, environment 2ms)
 ```
 
 `Run smoke` - exit 0
