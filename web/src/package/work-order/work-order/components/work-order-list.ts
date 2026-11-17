@@ -22,7 +22,7 @@ import { WorkOrder, WorkOrderStatus, workOrderStatusLabels } from '../work-order
         <p class="mt-[5px] text-[9px] text-muted-foreground">As ordens de serviço desta embarcação aparecerão aqui.</p>
       </div>
     } @else {
-      <div class="overflow-x-auto">
+      <div class="relative overflow-x-auto">
         <table class="w-full min-w-[570px] border-collapse text-left whitespace-nowrap">
           <thead>
             <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">

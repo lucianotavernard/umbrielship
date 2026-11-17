@@ -98,7 +98,10 @@
             [workOrders]="workOrders()"
             (deleted)="openDeleteWorkOrderDialog($event)"
           >
-            <t-pagination [page]="page()" [total]="totalWorkOrders()" (changed)="page.set($event)" />
+            <!-- One page needs no pager; the mareos draws none. -->
+            @if (totalWorkOrders() > 10) {
+              <t-pagination [page]="page()" [total]="totalWorkOrders()" (changed)="page.set($event)" />
+            }
           </work-order-list-ui>
         </section>
       </div>
