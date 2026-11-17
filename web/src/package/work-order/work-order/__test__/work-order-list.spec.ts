@@ -11,6 +11,7 @@ import {
   buttonByText,
   click,
   code,
+  customers,
   fleet,
   generated,
   orderA,
@@ -20,6 +21,7 @@ import {
   orderE,
   settle,
   squash,
+  vessels,
   WorkOrderListPage,
 } from './work-order-list.harness';
 
@@ -335,26 +337,41 @@ describe('WorkOrderList', () => {
 
   it('work-order-ui C11 shows skeleton rows while loading and a toast when a request fails', async () => {
     const error = vi.spyOn(toast, 'error');
-    const page = await WorkOrderListPage.pending();
+    const answers = {
+      workOrders: { workOrders: fleet, total: fleet.length },
+      vessels: { vessels, total: vessels.length },
+      customers: { customers, total: customers.length },
+    };
+    // Each read fails in turn, with a message of its own; the other two answer.
+    const failures = [
+      ['workOrders', 'Work order not found', 'Ordem de serviço não encontrada.'],
+      ['vessels', 'Vessel not found', 'Embarcação não encontrada.'],
+      ['customers', 'Customer not found', 'Cliente não encontrado.'],
+    ] as const;
 
-    expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length).toBeGreaterThan(0);
-    expect(page.rows().length).toBe(0);
-    expect(page.empty()).toBeUndefined();
+    for (const [failing, message, description] of failures) {
+      error.mockClear();
+      const page = await WorkOrderListPage.pending();
 
-    const requests = page.reads();
-    requests.workOrders.flush({ workOrders: fleet, total: fleet.length });
-    requests.customers.flush({ customers: [], total: 0 });
-    // Still waiting for the vessels: the rows are not drawn yet.
-    await settle();
-    expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length).toBeGreaterThan(0);
-    expect(error).not.toHaveBeenCalled();
+      expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length, failing).toBeGreaterThan(0);
+      expect(page.rows().length, failing).toBe(0);
+      expect(page.empty(), failing).toBeUndefined();
 
-    requests.vessels.flush({ message: 'Validation failed' }, { status: 400, statusText: 'Bad Request' });
-    await settle();
+      const requests = page.reads();
+      const others = (Object.keys(requests) as (keyof typeof requests)[]).filter((read) => read !== failing);
+      // Still waiting for the failing read: the rows are not drawn yet and nothing is said.
+      for (const read of others) requests[read].flush(answers[read]);
+      await settle();
+      expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length, failing).toBeGreaterThan(0);
+      expect(error, failing).not.toHaveBeenCalled();
 
-    expect(error).toHaveBeenCalledTimes(1);
-    expect(error).toHaveBeenCalledWith(expect.any(String), { description: 'Verifique os campos preenchidos.' });
-    expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length).toBe(0);
+      requests[failing].flush({ statusCode: 404, message }, { status: 404, statusText: 'Not Found' });
+      await settle();
+
+      expect(error.mock.calls, failing).toEqual([[expect.any(String), { description }]]);
+      expect(page.element.querySelectorAll('[data-slot="skeleton-row"]').length, failing).toBe(0);
+      page.fixture.destroy();
+    }
   });
 
   it('work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection', async () => {

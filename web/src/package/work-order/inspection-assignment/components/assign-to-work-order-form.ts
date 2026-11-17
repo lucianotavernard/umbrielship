@@ -12,39 +12,42 @@ import { WHOLE_WORK_ORDER } from '../inspection-assignment.service';
 
 export type AssignToWorkOrderRequest = { workOrderId: string; serviceId?: string };
 
+const field = 'h-9 bg-card text-[11px] focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15';
+
 /** The mareos "Atribuir inspeção" drawer with "Alvo" for "Inspetor responsável" (AD-046). */
 @Component({
   selector: 'assign-to-work-order-form-ui',
   imports: [NgIcon, FormField, FormGroup, Label, Select, Button],
   viewProviders: [provideIcons({ lucideLoader2, lucidePlus })],
-  host: { class: 'flex min-h-0 flex-1 flex-col' },
+  host: { class: 'block' },
   template: `
-    <form class="flex min-h-0 flex-1 flex-col" novalidate (submit)="submitForm($event)">
-      <div class="flex min-h-0 flex-1 flex-col gap-[15px] overflow-y-auto px-[18px] py-[18px] sm:px-[25px]">
-        <t-form-group class="gap-[7px]">
-          <label tLabel for="assign-work-order" class="text-[10px] font-semibold">Ordem de serviço</label>
-          <select tSelect id="assign-work-order" class="text-[11px]" [formField]="assignForm.workOrderId">
-            <option value="">Selecione uma ordem</option>
-            @for (order of workOrders(); track order.id) {
-              <option [value]="order.id">{{ optionLabel(order) }}</option>
-            }
-          </select>
-        </t-form-group>
-        <t-form-group class="gap-[7px]">
-          <label tLabel for="assign-target" class="text-[10px] font-semibold">Alvo</label>
-          <select tSelect id="assign-target" class="text-[11px]" [formField]="assignForm.serviceId">
-            <option value="">{{ wholeWorkOrder }}</option>
-            @for (service of services(); track service.id) {
-              <option [value]="service.id">{{ service.name }}</option>
-            }
-          </select>
-        </t-form-group>
-        <div data-slot="summary" class="rounded-[8px] border border-border bg-muted/50 px-[13px] py-2.5 text-[10px]">
-          <strong class="font-semibold text-foreground">{{ questionCount() }} {{ questionCount() === 1 ? 'pergunta' : 'perguntas' }}</strong>
-        </div>
+    <!-- The mareos assignment drawer: a white form whose actions follow the fields. -->
+    <form class="flex flex-col gap-[15px] px-4 pt-[17px] pb-[22px] sm:px-[27px] sm:pt-5 sm:pb-[26px]" novalidate (submit)="submitForm($event)">
+      <t-form-group class="gap-1.5">
+        <label tLabel for="assign-work-order" class="text-[10px] font-semibold">Ordem de serviço</label>
+        <select tSelect id="assign-work-order" [class]="field" [formField]="assignForm.workOrderId">
+          <option value="">Selecione uma ordem</option>
+          @for (order of workOrders(); track order.id) {
+            <option [value]="order.id">{{ optionLabel(order) }}</option>
+          }
+        </select>
+      </t-form-group>
+      <t-form-group class="gap-1.5">
+        <label tLabel for="assign-target" class="text-[10px] font-semibold">Alvo</label>
+        <select tSelect id="assign-target" [class]="field" [formField]="assignForm.serviceId">
+          <option value="">{{ wholeWorkOrder }}</option>
+          @for (service of services(); track service.id) {
+            <option [value]="service.id">{{ service.name }}</option>
+          }
+        </select>
+      </t-form-group>
+      <div data-slot="summary" class="rounded-[6px] border border-border bg-muted/50 p-3 text-[10px]">
+        <strong class="font-semibold text-foreground">{{ questionCount() }} {{ questionCount() === 1 ? 'pergunta' : 'perguntas' }}</strong>
       </div>
-      <footer class="flex min-h-[70px] shrink-0 items-center justify-end gap-2 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px]">
-        <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">Cancelar</button>
+      <footer class="mt-[5px] flex items-center justify-end gap-[9px] border-t border-border pt-[15px]">
+        <button tButton type="button" variant="outline" class="h-[35px] bg-card px-[13px] text-[10px] text-muted-foreground" (click)="closed.emit()">
+          Cancelar
+        </button>
         <button tButton type="submit" class="h-[35px] px-[13px] text-[11px] font-semibold" [disabled]="loading()">
           @if (loading()) {
             <ng-icon name="lucideLoader2" class="animate-spin" />
@@ -66,6 +69,7 @@ export class AssignToWorkOrderForm {
   closed = output<void>();
 
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
+  protected readonly field = field;
 
   model = signal({ workOrderId: '', serviceId: '' });
   assignForm = form(this.model, (path) => {

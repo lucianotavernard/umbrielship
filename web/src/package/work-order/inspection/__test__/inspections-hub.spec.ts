@@ -221,9 +221,16 @@ describe('InspectionsHub', () => {
       'Conforme / não conforme',
       'Nota de 0 a 10',
     ]);
-    expect(buttons(drawer, 'Subir')).toHaveLength(1);
-    expect(buttons(drawer, 'Descer')).toHaveLength(1);
+    // A new question starts at "Texto livre", as the mareos `makeQuestion`.
+    expect(drawer.querySelector<HTMLSelectElement>('#question-type-0')!.value).toBe('TEXT');
+    // "Nome do modelo" has the focus as the drawer opens.
+    expect(document.activeElement).toBe(drawer.querySelector('#template-name'));
+    // With one question there is nothing to reorder or remove (AD-051).
+    expect(buttons(drawer, 'Subir')).toEqual([]);
+    expect(buttons(drawer, 'Descer')).toEqual([]);
     expect(buttons(drawer, 'Remover pergunta 1')).toEqual([]);
+    // "Cancelar" is a text button, with no icon.
+    expect(button(drawer, 'Cancelar').querySelector('ng-icon')).toBeNull();
 
     button(drawer, 'Adicionar').click();
     await settle();
@@ -231,6 +238,9 @@ describe('InspectionsHub', () => {
       'Pergunta 01',
       'Pergunta 02',
     ]);
+    expect(drawer.querySelector<HTMLSelectElement>('#question-type-1')!.value).toBe('TEXT');
+    expect(buttons(drawer, 'Subir')).toHaveLength(2);
+    expect(buttons(drawer, 'Descer')).toHaveLength(2);
     expect(buttons(drawer, 'Remover pergunta 1')).toHaveLength(1);
     expect(buttons(drawer, 'Remover pergunta 2')).toHaveLength(1);
 
@@ -484,33 +494,44 @@ describe('InspectionsHub', () => {
   it('work-order-ui C46 shows skeletons while loading and a toast when a request fails', async () => {
     const error = vi.spyOn(toast, 'error');
     TestBed.inject(AuthenticationService).role.set('administrator');
-    const fixture = TestBed.createComponent(InspectionsHub);
-    await settle();
-    const element = fixture.nativeElement as HTMLElement;
+    const answers: Record<string, object> = {
+      '/api/inspection-templates': { inspectionTemplates: [casco], total: 1 },
+      '/api/inspection-assignments': { inspectionAssignments: [] },
+      '/api/work-orders': { workOrders: [], total: 0 },
+      '/api/vessels': { vessels: [], total: 0 },
+    };
+    // Each read fails in turn, with a message of its own; the other three answer.
+    const failures: [string, string, string][] = [
+      ['/api/inspection-templates', 'Inspection template not found', 'Modelo de inspeção não encontrado.'],
+      ['/api/inspection-assignments', 'Inspection assignment not found', 'Atribuição não encontrada.'],
+      ['/api/work-orders', 'Work order not found', 'Ordem de serviço não encontrada.'],
+      ['/api/vessels', 'Vessel not found', 'Embarcação não encontrada.'],
+    ];
 
-    expect(element.querySelectorAll('[data-slot="metric-skeleton"]')).toHaveLength(3);
-    expect(element.querySelectorAll('[data-slot="metric"]')).toHaveLength(0);
-    expect(element.querySelectorAll('[data-slot="card-skeleton"]')).toHaveLength(3);
-    expect(cards(element)).toEqual([]);
+    for (const [failing, message, description] of failures) {
+      error.mockClear();
+      const fixture = TestBed.createComponent(InspectionsHub);
+      await settle();
+      const element = fixture.nativeElement as HTMLElement;
 
-    controller
-      .expectOne({ method: 'GET', url: '/api/inspection-templates' })
-      .flush({ inspectionTemplates: [casco], total: 1 });
-    controller
-      .expectOne({ method: 'GET', url: '/api/inspection-assignments' })
-      .flush(
-        { statusCode: 400, message: 'Validation failed' },
-        { status: 400, statusText: 'Bad Request' },
-      );
-    controller
-      .expectOne({ method: 'GET', url: '/api/work-orders' })
-      .flush({ workOrders: [], total: 0 });
-    controller.expectOne({ method: 'GET', url: '/api/vessels' }).flush({ vessels: [], total: 0 });
-    await settle();
+      expect(element.querySelectorAll('[data-slot="metric-skeleton"]'), failing).toHaveLength(3);
+      expect(element.querySelectorAll('[data-slot="metric"]'), failing).toHaveLength(0);
+      expect(element.querySelectorAll('[data-slot="card-skeleton"]'), failing).toHaveLength(3);
+      expect(cards(element), failing).toEqual([]);
 
-    expect(error).toHaveBeenCalledWith('Erro ao carregar inspeções', {
-      description: 'Verifique os campos preenchidos.',
-    });
-    expect(element.querySelectorAll('[data-slot="metric-skeleton"]')).toHaveLength(0);
+      for (const url of Object.keys(answers)) {
+        const request = controller.expectOne({ method: 'GET', url });
+        if (url === failing) {
+          request.flush({ statusCode: 404, message }, { status: 404, statusText: 'Not Found' });
+        } else {
+          request.flush(answers[url]);
+        }
+      }
+      await settle();
+
+      expect(error.mock.calls, failing).toEqual([['Erro ao carregar inspeções', { description }]]);
+      expect(element.querySelectorAll('[data-slot="metric-skeleton"]'), failing).toHaveLength(0);
+      fixture.destroy();
+    }
   });
 });

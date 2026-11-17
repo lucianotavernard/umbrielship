@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 
-import { MeOrganization } from '../../../identity/authentication/authentication.service';
+import { AuthenticationService, MeOrganization } from '../../../identity/authentication/authentication.service';
 import { Role } from '../../../identity/user/user.service';
 import { InternalLayout } from '../internal-layout';
 import { PAGE_RELOAD } from '../lib/page-reload';
@@ -24,6 +24,7 @@ const ROUTES = [
   'work-orders',
   'work-orders/:id',
   'work-orders/:id/assignments/:assignmentId/inspect',
+  'work-orders/:id/assignments/:assignmentId/inspections/:inspectionId',
   'inspections',
   'inspection-templates/:id',
   'agenda',
@@ -187,7 +188,10 @@ describe('Shell', () => {
     const cases: [string, string][] = [
       ['/work-orders', 'Ordens de serviço'],
       ['/work-orders/wo-1', 'Ordens de serviço'],
-      ['/work-orders/wo-1/assignments/a1/inspect', 'Ordens de serviço'],
+      // The inspection pages under a WorkOrder belong to the Inspections hub (AD-048).
+      ['/work-orders/wo-1/assignments/a1/inspect', 'Inspeções'],
+      ['/work-orders/wo-1/assignments/a1/inspections/i1', 'Inspeções'],
+      ['/work-orders/wo-1?from=inspections', 'Ordens de serviço'],
       ['/inspections', 'Inspeções'],
       ['/inspection-templates/t1', 'Inspeções'],
       ['/agenda', 'Agenda'],
@@ -218,6 +222,22 @@ describe('Shell', () => {
       ]);
       expect(current, url).toEqual([[label, LINKS[label]]]);
     }
+  });
+
+  it('work-order-ui C72 the layout keeps the signed-in name for the inspection page', async () => {
+    const authentication = TestBed.inject(AuthenticationService);
+    expect(authentication.name()).toBeNull();
+
+    const fixture = TestBed.createComponent(InternalLayout);
+    await settle();
+    // Nothing is known before GET /me answers.
+    expect(authentication.name()).toBeNull();
+    controller.expectOne('/api/me').flush(profile([atlantic('inspector')], 'org-a', 'Camila Rocha'));
+    await settle();
+
+    expect(authentication.name()).toBe('Camila Rocha');
+    expect(authentication.role()).toBe('inspector');
+    fixture.destroy();
   });
 
   it('customer-ui C6 the Organization menu lists each Membership with its initials, name and Role and checks the active one', async () => {

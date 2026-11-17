@@ -135,6 +135,13 @@ req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$PERIOD,\"status\":\"PENDING\
 check "work-order-ui C22 invalid create answers 400" 400 "$STATUS"
 AFTER="$(total_of)"
 check "work-order-ui C22 invalid create stores nothing" same "$([ -n "$BEFORE" ] && [ "$BEFORE" != null ] && [ "$BEFORE" = "$AFTER" ] && echo same || echo "$BEFORE $AFTER")"
+# Zod accepts a NUL in the second service's name and PostgreSQL refuses it: the WorkOrder written
+# first in the same transaction must not stay (AD-035).
+BEFORE="$(total_of)"
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$PERIOD,\"status\":\"PENDING\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\"},{\"name\":\"Motor\\u0000\",\"description\":\"Revisão\"}]}"
+check "work-order-ui C73 refused service write fails" 500 "$STATUS"
+AFTER="$(total_of)"
+check "work-order-ui C73 refused service write stores no work order" same "$([ -n "$BEFORE" ] && [ "$BEFORE" != null ] && [ "$BEFORE" = "$AFTER" ] && echo same || echo "$BEFORE $AFTER")"
 for n in $(seq 1 12); do
   req POST /inspection-templates "$TA" "{\"name\":\"Modelo $n\",\"items\":[{\"label\":\"Casco limpo\",\"type\":\"CONFORMITY\"}]}"
 done

@@ -74,6 +74,8 @@ export class InspectionsHub {
   vesselResource = httpResource<GetVesselsResponse>(() => '/api/vessels');
 
   tab = signal<Tab>('templates');
+  /** The template cards take the wide column; the assignment list, for any Role, the narrow one. */
+  wide = computed(() => !this.isInspector() && this.tab() === 'templates');
   submitting = signal(false);
   isTemplateSheetActive = signal(false);
   assigning = signal<InspectionTemplateSummary | null>(null);
@@ -138,6 +140,7 @@ export class InspectionsHub {
   openTemplateSheet() {
     this.templateForm()?.reset();
     this.isTemplateSheetActive.set(true);
+    this.templateForm()?.focusFirst();
   }
 
   closeTemplateSheet() {

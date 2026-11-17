@@ -27,7 +27,7 @@
       <t-skeleton class="h-[200px] w-full rounded-lg" />
     </div>
   } @else if (assignment(); as assignment) {
-    <header class="mt-[30px] flex items-start justify-between gap-3">
+    <header class="mt-6 flex items-start justify-between gap-3">
       <div class="min-w-0">
         <span data-slot="kicker" class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">
           INSPEÇÃO DE CAMPO · {{ code() }}
@@ -53,29 +53,29 @@
       }
     </header>
 
-    <dl class="mt-[18px] grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-      <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-vessel">
+    <dl class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+      <div class="rounded-[7px] border border-border bg-card px-3.5 py-3" data-slot="meta-vessel">
         <dt class="text-[9px] text-muted-foreground">Embarcação</dt>
         <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ workOrder()?.vessel?.name }}</dd>
       </div>
-      <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-inspector">
+      <div class="rounded-[7px] border border-border bg-card px-3.5 py-3" data-slot="meta-inspector">
         <dt class="text-[9px] text-muted-foreground">Inspetor</dt>
         <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ inspectorName() }}</dd>
       </div>
       @if (inspectionId()) {
-        <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-target">
+        <div class="rounded-[7px] border border-border bg-card px-3.5 py-3" data-slot="meta-target">
           <dt class="text-[9px] text-muted-foreground">Alvo</dt>
           <dd class="mt-1.5 truncate text-[11px] font-semibold text-foreground">{{ target() }}</dd>
         </div>
       } @else {
-        <div class="rounded-lg border border-border bg-card px-[15px] py-[13px]" data-slot="meta-progress">
+        <div class="rounded-[7px] border border-border bg-card px-3.5 py-3" data-slot="meta-progress">
           <dt class="text-[9px] text-muted-foreground">Progresso</dt>
           <dd class="mt-1.5 text-[11px] font-semibold text-foreground">{{ answered() }} de {{ items().length }} respondidas</dd>
         </div>
       }
     </dl>
 
-    <section class="mt-[15px] rounded-lg border border-border bg-card px-[18px] py-[19px]">
+    <section class="mt-3.5 rounded-lg border border-border bg-card p-[13px] sm:p-[18px]">
       @if (inspection(); as inspection) {
         <inspection-view-ui [inspection]="inspection" [items]="items()" />
         <footer class="mt-[15px] flex flex-wrap items-center justify-between gap-3 border-t border-border pt-[15px]">

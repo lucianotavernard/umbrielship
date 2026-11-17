@@ -193,6 +193,7 @@
   <work-order-form-ui
     [loading]="submitting()"
     [vessels]="formVessels()"
+    [customerNames]="formCustomerNames()"
     [workOrder]="formValue()"
     (closed)="closeEditWorkOrderSheet()"
     (submitted)="editWorkOrder($event)"

@@ -5,11 +5,16 @@ import { Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideAnchor,
+  lucideArrowUpRight,
   lucideCalendarDays,
   lucideChevronLeft,
   lucideChevronRight,
+  lucideClock3,
   lucidePlus,
   lucideSearch,
+  lucideShip,
+  lucideSlidersHorizontal,
+  lucideWrench,
   lucideX,
 } from '@ng-icons/lucide';
 
@@ -56,6 +61,13 @@ const dotTones: Record<AgendaKind, string> = {
   UNDOCKING: 'bg-[#8a72a7]',
 };
 
+/** The colour of a day panel item's circle on the timeline rail. */
+const railTones: Record<AgendaKind, string> = {
+  SERVICE: 'text-[#608ebd]',
+  DOCKING: 'text-[#c78753]',
+  UNDOCKING: 'text-[#8a72a7]',
+};
+
 /** The mareos "Agenda" (AD-036, AD-047): a week of services, dockings and undockings. */
 @Component({
   selector: 'agenda',
@@ -63,11 +75,16 @@ const dotTones: Record<AgendaKind, string> = {
   viewProviders: [
     provideIcons({
       lucideAnchor,
+      lucideArrowUpRight,
       lucideCalendarDays,
       lucideChevronLeft,
       lucideChevronRight,
+      lucideClock3,
       lucidePlus,
       lucideSearch,
+      lucideShip,
+      lucideSlidersHorizontal,
+      lucideWrench,
       lucideX,
     }),
   ],
@@ -87,6 +104,7 @@ export class Agenda {
   protected readonly kindLabels = agendaKindLabels;
   protected readonly kindTones = kindTones;
   protected readonly dotTones = dotTones;
+  protected readonly railTones = railTones;
   protected readonly weekday = weekdayLabel;
   protected readonly countLabel = itemCountLabel;
   protected readonly longDay = longDayLabel;

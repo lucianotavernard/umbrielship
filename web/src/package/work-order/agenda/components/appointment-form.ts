@@ -84,7 +84,7 @@ const blank = (start = '') => ({ workOrderId: '', name: '', description: '', sta
             Salvando...
           } @else {
             <ng-icon name="lucidePlus" class="!size-[15px]" />
-            Adicionar à agenda
+            Agendar serviço
           }
         </button>
       </footer>

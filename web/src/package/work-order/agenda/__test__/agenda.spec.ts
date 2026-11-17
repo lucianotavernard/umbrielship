@@ -182,7 +182,7 @@ describe('Agenda', () => {
     expect(itemsIn(cell(element, 4, 2))).toEqual([['12:00', 'Boreal', 'Desdocagem', '#EF56AB78']]);
 
     await click(button(element, 'Próxima semana'));
-    expect(label(element)).toEqual(['30 nov — 6 dez, 2026', '30 de nov — 6 de dez']);
+    expect(label(element)).toEqual(['30 de nov — 06 de dez, 2026', '30 de nov — 06 de dez']);
     expect(days()).toEqual(['30', '1', '2', '3', '4', '5', '6']);
 
     await click(button(element, 'Hoje'));
@@ -191,21 +191,28 @@ describe('Agenda', () => {
     expect(headers(element)[WED].getAttribute('aria-current')).toBe('date');
 
     await click(button(element, 'Semana anterior'));
-    expect(label(element)).toEqual(['Novembro 2026', '9 de nov — 15 de nov']);
+    expect(label(element)).toEqual(['Novembro 2026', '09 de nov — 15 de nov']);
     expect(gridItems(element)).toEqual([
       ['10:00', 'Delfim', 'Docagem', '#DD00DD00'],
       ['16:00', 'Delfim', 'Desdocagem', '#DD00DD00'],
     ]);
 
-    // In the "Dia" view the arrows move one day.
+    // In the "Dia" view the arrows read "Dia anterior" / "Próximo dia" and move one day (AD-049).
     await click(button(element, 'Hoje'));
     await click(button(element, 'Dia'));
     expect(headerTexts(element).map(([weekday, day]) => `${weekday} ${day}`)).toEqual(['QUA 18']);
-    await click(button(element, 'Próxima semana'));
+    expect(buttons(element, 'Semana anterior')).toEqual([]);
+    expect(buttons(element, 'Próxima semana')).toEqual([]);
+    await click(button(element, 'Próximo dia'));
     expect(headerTexts(element).map(([weekday, day]) => `${weekday} ${day}`)).toEqual(['QUI 19']);
-    await click(button(element, 'Semana anterior'));
-    await click(button(element, 'Semana anterior'));
+    await click(button(element, 'Dia anterior'));
+    await click(button(element, 'Dia anterior'));
     expect(headerTexts(element).map(([weekday, day]) => `${weekday} ${day}`)).toEqual(['TER 17']);
+    // Back in the week view they move the week again, from the day reached.
+    await click(button(element, 'Semana'));
+    expect(buttons(element, 'Dia anterior')).toEqual([]);
+    await click(button(element, 'Próxima semana'));
+    expect(label(element)).toEqual(['Novembro 2026', '23 de nov — 29 de nov']);
   });
 
   it('work-order-ui C62 Dia shows the selected day and a header selects it', async () => {
@@ -253,7 +260,7 @@ describe('Agenda', () => {
     expect(button(chips(element), 'Docagem').getAttribute('aria-pressed')).toBe('true');
     expect(titles()).toEqual(['Aurora Docagem', 'Boreal Docagem']);
     expect(values()).toEqual(['02', '02']);
-    expect(panelItems(element)).toEqual([['08:00', 'Boreal', 'Docagem · #EF56AB78']]);
+    expect(panelItems(element)).toEqual([['08:00', 'Boreal', 'Docagem', '#EF56AB78']]);
 
     await click(button(chips(element), 'Desdocagem'));
     expect(titles()).toEqual(['Aurora Desdocagem']);
@@ -337,22 +344,34 @@ describe('Agenda', () => {
     expect(panel(element).textContent).toContain('SELEÇÃO DO DIA');
     expect(text(panel(element).querySelector('h2'))).toBe('Quarta-feira, 18 de novembro');
     expect(summary(element)).toEqual(['3 compromissos', 'Dia produtivo']);
+    // Each item: time, Vessel, name and, on its own line, the code.
     expect(panelItems(element)).toEqual([
-      ['08:00', 'Boreal', 'Docagem · #EF56AB78'],
-      ['09:45', 'Aurora', 'Revisão do motor · #AB12CD34'],
-      ['14:15', 'Boreal', 'Solda do leme · #EF56AB78'],
+      ['08:00', 'Boreal', 'Docagem', '#EF56AB78'],
+      ['09:45', 'Aurora', 'Revisão do motor', '#AB12CD34'],
+      ['14:15', 'Boreal', 'Solda do leme', '#EF56AB78'],
     ]);
+    // A day with items offers no "Adicionar à agenda" in the panel.
+    expect(buttons(panel(element), 'Adicionar à agenda')).toEqual([]);
 
     await click(headers(element)[TUE]);
     expect(text(panel(element).querySelector('h2'))).toBe('Terça-feira, 17 de novembro');
     expect(summary(element)).toEqual(['1 compromisso', 'Dia produtivo']);
-    expect(panelItems(element)).toEqual([['09:30', 'Aurora', 'Pintura do casco · #AB12CD34']]);
+    expect(panelItems(element)).toEqual([['09:30', 'Aurora', 'Pintura do casco', '#AB12CD34']]);
 
     await click(headers(element)[3]);
     expect(text(panel(element).querySelector('h2'))).toBe('Quinta-feira, 19 de novembro');
     expect(summary(element)).toEqual(['0 compromissos', 'Dia sem compromissos']);
     expect(panel(element).textContent).toContain('Aproveite para organizar uma nova manutenção.');
     expect(panelItems(element)).toEqual([]);
+
+    // A day with no item offers "Adicionar à agenda", which opens the drawer at that day 08:00 (AD-049).
+    await click(button(panel(element), 'Adicionar à agenda'));
+    const sheet = element.querySelector<HTMLElement>('[role="dialog"]')!;
+    expect(text(sheet.querySelector('h2'))).toBe('Adicionar à agenda');
+    expect(sheet.querySelector<HTMLInputElement>('#appointment-start')!.value).toBe('2026-11-19T08:00');
+    await click(button(sheet, 'Cancelar'));
+    expect(element.querySelector('[role="dialog"]')).toBeNull();
+    expect(controller.match(() => true)).toEqual([]);
   });
 
   it('work-order-ui C66 an item opens its work order', async () => {
@@ -380,7 +399,7 @@ describe('Agenda', () => {
 
     const sheet = drawer(element)!;
     expect(text(sheet.querySelector('[data-slot="sheet-kicker"]'))).toBe('NOVO COMPROMISSO');
-    expect(text(sheet.querySelector('h2'))).toBe('Novo compromisso');
+    expect(text(sheet.querySelector('h2'))).toBe('Adicionar à agenda');
     expect(text(sheet.querySelector('[data-slot="sheet-description"]'))).toBe(
       'Reserve um horário para um serviço da ordem.',
     );
@@ -410,7 +429,8 @@ describe('Agenda', () => {
     fill(sheet.querySelector<HTMLInputElement>('#appointment-description')!, 'Anodos da popa');
     fill(sheet.querySelector<HTMLInputElement>('#appointment-end')!, '2026-11-18T12:00');
     await settle();
-    await click(button(sheet, 'Adicionar à agenda'));
+    expect(buttons(sheet, 'Adicionar à agenda')).toEqual([]);
+    await click(button(sheet, 'Agendar serviço'));
 
     const created = controller.expectOne(`/api/work-orders/${AURORA}/services`);
     expect(created.request.method).toBe('POST');
@@ -496,27 +516,38 @@ describe('Agenda', () => {
   it('work-order-ui C70 shows skeletons while loading and a toast when a request fails', async () => {
     const error = vi.spyOn(toast, 'error');
     TestBed.inject(AuthenticationService).role.set('operator');
-    const fixture = TestBed.createComponent(Agenda);
-    await settle();
-    const element = fixture.nativeElement as HTMLElement;
+    const answers: Record<string, object> = {
+      '/api/work-orders': { workOrders: workOrders(), total: 4 },
+      '/api/vessels': { vessels, total: vessels.length },
+    };
+    // Each read fails in turn, with a message of its own; the other one answers.
+    const failures: [string, string, string][] = [
+      ['/api/work-orders', 'Work order not found', 'Ordem de serviço não encontrada.'],
+      ['/api/vessels', 'Vessel not found', 'Embarcação não encontrada.'],
+    ];
 
-    expect(element.querySelectorAll('[data-slot="cell-skeleton"]')).toHaveLength(42);
-    expect(gridItems(element)).toEqual([]);
+    for (const [failing, message, description] of failures) {
+      error.mockClear();
+      const fixture = TestBed.createComponent(Agenda);
+      await settle();
+      const element = fixture.nativeElement as HTMLElement;
 
-    controller
-      .expectOne({ method: 'GET', url: '/api/work-orders' })
-      .flush(
-        { statusCode: 400, message: 'Validation failed' },
-        { status: 400, statusText: 'Bad Request' },
-      );
-    controller
-      .expectOne({ method: 'GET', url: '/api/vessels' })
-      .flush({ vessels, total: vessels.length });
-    await settle();
+      expect(element.querySelectorAll('[data-slot="cell-skeleton"]'), failing).toHaveLength(42);
+      expect(gridItems(element), failing).toEqual([]);
 
-    expect(error).toHaveBeenCalledWith('Erro ao carregar a agenda', {
-      description: 'Verifique os campos preenchidos.',
-    });
-    expect(element.querySelectorAll('[data-slot="cell-skeleton"]')).toHaveLength(0);
+      for (const url of Object.keys(answers)) {
+        const request = controller.expectOne({ method: 'GET', url });
+        if (url === failing) {
+          request.flush({ statusCode: 404, message }, { status: 404, statusText: 'Not Found' });
+        } else {
+          request.flush(answers[url]);
+        }
+      }
+      await settle();
+
+      expect(error.mock.calls, failing).toEqual([['Erro ao carregar a agenda', { description }]]);
+      expect(element.querySelectorAll('[data-slot="cell-skeleton"]'), failing).toHaveLength(0);
+      fixture.destroy();
+    }
   });
 });

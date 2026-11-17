@@ -1,4 +1,4 @@
-<div class="mx-auto w-full max-w-[1100px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+<div class="mx-auto w-full max-w-[1164px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
   <div class="mb-[20px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
     <div>
       <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
@@ -21,11 +21,19 @@
   </div>
 
   <section aria-label="Resumo da agenda" class="mb-[15px] grid grid-cols-1 gap-2 sm:grid-cols-2 lg:gap-[13px]">
-    <t-metric label="Compromissos na semana" note="na programação" tone="blue" [value]="metrics().week">
+    <t-metric label="Compromissos na semana" note="na programação" notePlacement="below" tone="blue" [value]="metrics().week">
       <ng-icon name="lucideCalendarDays" class="!size-[17px]" />
+      <ng-icon metric-end name="lucideArrowUpRight" class="!size-4 shrink-0 text-[#80a8a5]" aria-hidden="true" />
     </t-metric>
-    <t-metric label="Docagens programadas" note="berço e área técnica" tone="amber" [value]="metrics().dockings">
-      <ng-icon name="lucideAnchor" class="!size-[17px]" />
+    <t-metric label="Docagens programadas" note="berço e área técnica" notePlacement="below" tone="teal" [value]="metrics().dockings">
+      <ng-icon name="lucideShip" class="!size-[17px]" />
+      <span
+        metric-end
+        class="grid size-[29px] shrink-0 place-items-center rounded-full border border-border text-[#80a8a5]"
+        aria-hidden="true"
+      >
+        <ng-icon name="lucideAnchor" class="!size-4" />
+      </span>
     </t-metric>
   </section>
 
@@ -43,7 +51,7 @@
           <div class="flex">
             <button
               type="button"
-              aria-label="Semana anterior"
+              [attr.aria-label]="view() === 'day' ? 'Dia anterior' : 'Semana anterior'"
               class="grid size-[29px] place-items-center rounded-l-[5px] border border-border text-muted-foreground hover:text-foreground"
               (click)="move(-1)"
             >
@@ -51,7 +59,7 @@
             </button>
             <button
               type="button"
-              aria-label="Próxima semana"
+              [attr.aria-label]="view() === 'day' ? 'Próximo dia' : 'Próxima semana'"
               class="-ml-px grid size-[29px] place-items-center rounded-r-[5px] border border-border text-muted-foreground hover:text-foreground"
               (click)="move(1)"
             >
@@ -102,7 +110,10 @@
       </div>
 
       <div role="group" aria-label="Filtrar por tipo de serviço" class="flex flex-wrap items-center gap-1.5 border-b border-border px-[15px] py-2.5 text-[9px] text-muted-foreground">
-        <span class="mr-1">Tipo:</span>
+        <span class="mr-1 inline-flex items-center gap-[5px]">
+          <ng-icon name="lucideSlidersHorizontal" class="!size-[13px]" />
+          Tipo:
+        </span>
         <button
           type="button"
           class="group flex h-[25px] items-center gap-1.5 rounded-[5px] px-2 aria-pressed:bg-primary/10 aria-pressed:font-semibold aria-pressed:text-primary"
@@ -131,12 +142,14 @@
           [style.grid-template-columns]="'46px repeat(' + shownDays().length + ', minmax(0, 1fr))'"
           [class.min-w-0]="view() === 'day'"
         >
-          <div class="border-b border-border"></div>
+          <div class="grid h-[57px] place-items-center border-b border-border text-muted-foreground/70">
+            <ng-icon name="lucideClock3" class="!size-[13px]" />
+          </div>
           @for (day of shownDays(); track day.getTime()) {
             <button
               type="button"
               data-slot="day-header"
-              class="flex flex-col items-center gap-0.5 border-b border-l border-border py-2 data-[focused]:bg-primary/5"
+              class="flex h-[57px] flex-col items-center justify-center gap-px border-b border-l border-border data-[focused]:bg-primary/5"
               [attr.data-focused]="isFocused(day) ? '' : null"
               [attr.aria-current]="isToday(day) ? 'date' : null"
               (click)="pickDay(day)"
@@ -153,42 +166,52 @@
             </button>
           }
 
+          <!-- Rows keep the mareos 73 px: a busy cell scrolls instead of pushing the week down. -->
           @for (time of rows; track time; let row = $index) {
-            <div class="border-b border-border px-1.5 pt-2 text-[8px] text-muted-foreground">{{ time }}</div>
+            <div class="h-[73px] border-b border-border px-1.5 pt-[9px] text-center text-[8px] text-muted-foreground [border-bottom-style:dashed]">
+              {{ time }}
+            </div>
             @for (day of shownDays(); track day.getTime()) {
+              @let items = cell(day, row);
               <div
                 data-slot="cell"
-                class="flex min-h-[73px] flex-col gap-1 border-b border-l border-border p-1"
+                class="flex h-[73px] flex-col gap-[3px] overflow-y-auto overscroll-y-contain border-b border-l border-border px-[3px] py-1 [border-bottom-style:dashed] [scrollbar-width:thin]"
                 [class.bg-primary/[0.03]]="isFocused(day)"
               >
                 @if (loading()) {
-                  <t-skeleton data-slot="cell-skeleton" class="h-[60px] rounded-[5px]" />
+                  <t-skeleton data-slot="cell-skeleton" class="h-[60px] shrink-0 rounded-[5px]" />
                 } @else {
-                  @for (item of cell(day, row); track item.key) {
+                  @for (item of items; track item.key) {
+                    <!-- Several items in a cell draw compact, as the mareos overlapping events. -->
                     <button
                       type="button"
                       data-slot="agenda-item"
-                      class="flex flex-col items-start rounded-[5px] border-l-2 px-[7px] py-[5px] text-left"
-                      [class]="kindTones[item.kind]"
+                      class="flex w-full shrink-0 flex-col items-start overflow-hidden rounded-[4px] border-l-2 text-left"
+                      [class]="kindTones[item.kind] + (items.length > 1 ? ' h-[30px] justify-center px-[5px] py-0.5' : ' min-h-[63px] px-1.5 py-[5px]')"
                       [attr.aria-label]="itemLabel(item)"
                       (click)="openItem(item)"
                     >
-                      <span class="flex items-center gap-1 text-[8px] font-semibold text-foreground/70">
+                      <span class="flex items-center gap-1 text-[8px] leading-tight font-semibold text-foreground/70">
                         {{ item.time }} <i class="size-[5px] rounded-full" [class]="dotTones[item.kind]"></i>
                       </span>
-                      <strong class="mt-0.5 text-[9px] font-semibold text-foreground">{{ item.vesselName }}</strong>
-                      <span class="text-[8px] text-muted-foreground">{{ item.title }}</span>
-                      <span class="text-[8px] text-muted-foreground/80">{{ item.code }}</span>
+                      <strong class="mt-0.5 max-w-full truncate text-[9px] leading-tight font-semibold text-foreground">{{ item.vesselName }}</strong>
+                      <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground" [class.hidden]="items.length > 1">
+                        {{ item.title }}
+                      </span>
+                      <span class="max-w-full truncate text-[8px] leading-snug text-muted-foreground/80" [class.hidden]="items.length > 1">
+                        {{ item.code }}
+                      </span>
                     </button>
                   } @empty {
                     @if (canWrite()) {
                       <button
                         type="button"
                         data-slot="add-cell"
-                        class="min-h-[60px] flex-1 rounded-[5px] text-[8px] text-transparent hover:bg-primary/5 hover:text-primary focus-visible:text-primary"
+                        class="flex flex-1 items-center justify-center gap-[5px] rounded-[4px] text-[8px] text-transparent hover:bg-primary/5 hover:text-primary focus-visible:text-primary"
                         [attr.aria-label]="cellLabel(day, row)"
                         (click)="openAppointment(day, row)"
                       >
+                        <ng-icon name="lucidePlus" class="!size-3.5" />
                         Adicionar horário
                       </button>
                     }
@@ -200,7 +223,7 @@
         </div>
       </div>
 
-      <footer class="flex flex-wrap items-center gap-3 px-[15px] py-2.5 text-[8px] text-muted-foreground">
+      <footer class="flex min-h-[38px] flex-wrap items-center gap-[13px] px-[13px] py-2 text-[8px] text-muted-foreground">
         @for (option of kinds; track option) {
           <span class="inline-flex items-center gap-1.5">
             <i class="size-[7px] rounded-[2px]" [class]="dotTones[option]"></i>
@@ -227,28 +250,64 @@
           </button>
         }
       </div>
-      <p data-slot="day-summary" class="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-b border-border pb-2.5 text-[9px] text-muted-foreground">
-        <span>{{ dayItems().length === 1 ? '1 compromisso' : dayItems().length + ' compromissos' }}</span>
-        <span>{{ dayItems().length ? 'Dia produtivo' : 'Dia sem compromissos' }}</span>
+      <p data-slot="day-summary" class="mt-[11px] flex flex-wrap gap-x-3 gap-y-1 border-b border-border pb-[7px] text-[8px] text-muted-foreground">
+        <span class="inline-flex items-center gap-1">
+          <ng-icon name="lucideCalendarDays" class="!size-3.5 text-[#7ca4a2]" />
+          {{ dayItems().length === 1 ? '1 compromisso' : dayItems().length + ' compromissos' }}
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <ng-icon name="lucideClock3" class="!size-3.5 text-[#7ca4a2]" />
+          {{ dayItems().length ? 'Dia produtivo' : 'Dia sem compromissos' }}
+        </span>
       </p>
       @if (dayItems().length === 0) {
-        <p data-slot="day-empty" class="mt-2.5 text-[10px] text-muted-foreground">Aproveite para organizar uma nova manutenção.</p>
+        <div data-slot="day-empty" class="flex flex-col items-center gap-[7px] px-2.5 pt-6 pb-5 text-center">
+          <ng-icon name="lucideCalendarDays" class="!size-5 text-[#83aaa8]" />
+          <span class="max-w-[190px] text-[9px] leading-[1.5] text-muted-foreground">
+            Aproveite para organizar uma nova manutenção.
+          </span>
+          @if (canWrite()) {
+            <button
+              type="button"
+              class="mt-[3px] text-[9px] font-semibold text-primary hover:underline"
+              (click)="openAppointment(focus(), null)"
+            >
+              Adicionar à agenda
+            </button>
+          }
+        </div>
       } @else {
-        <ul class="mt-2.5 flex flex-col gap-1.5">
-          @for (item of dayItems(); track item.key) {
+        <!-- The mareos timeline: time, a rail with the type's circle, the item, an arrow. -->
+        <ul class="flex flex-col">
+          @for (item of dayItems(); track item.key; let last = $last) {
             <li>
               <button
                 type="button"
                 data-slot="day-item"
-                class="flex w-full items-start gap-2.5 rounded-[6px] p-1.5 text-left hover:bg-muted"
+                class="group grid min-h-[70px] w-full grid-cols-[34px_13px_minmax(0,1fr)_14px] items-start gap-[7px] pt-3 pb-2 text-left"
                 [attr.aria-label]="itemLabel(item)"
                 (click)="openItem(item)"
               >
-                <span class="w-[30px] shrink-0 text-[9px] font-semibold text-foreground">{{ item.time }}</span>
-                <span class="min-w-0">
-                  <strong class="block truncate text-[10px] font-semibold text-foreground">{{ item.vesselName }}</strong>
-                  <span class="block text-[9px] text-muted-foreground">{{ item.title }} · {{ item.code }}</span>
+                <span class="pt-0.5 text-[8px] font-semibold text-foreground/75">{{ item.time }}</span>
+                <span class="relative flex justify-center self-stretch" aria-hidden="true" [class]="railTones[item.kind]">
+                  <i class="relative z-[1] mt-[3px] size-[11px] rounded-full border-2 border-card bg-current ring-1 ring-current"></i>
+                  @if (!last) {
+                    <span class="absolute top-3 -bottom-[23px] w-px bg-border"></span>
+                  }
                 </span>
+                <span class="flex min-w-0 flex-col gap-[3px]">
+                  <strong class="truncate text-[9px] font-semibold text-foreground">{{ item.vesselName }}</strong>
+                  <small class="text-[8px] leading-[1.35] text-muted-foreground">{{ item.title }}</small>
+                  <span class="inline-flex items-center gap-1 text-[7px] text-muted-foreground/80">
+                    <ng-icon name="lucideWrench" class="!size-[11px]" />
+                    {{ item.code }}
+                  </span>
+                </span>
+                <ng-icon
+                  name="lucideChevronRight"
+                  class="mt-0.5 !size-3.5 text-muted-foreground/50 group-hover:text-primary"
+                  aria-hidden="true"
+                />
               </button>
             </li>
           }
@@ -261,7 +320,7 @@
 <t-sheet
   kicker="NOVO COMPROMISSO"
   closeLabel="Fechar"
-  title="Novo compromisso"
+  title="Adicionar à agenda"
   description="Reserve um horário para um serviço da ordem."
   class="sm:w-full sm:max-w-[460px]"
   [flush]="true"

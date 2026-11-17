@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
 import { applyEach, disabled, form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -53,16 +53,18 @@ type Model = {
 
 const blankService = () => ({ name: '', description: '' });
 
-const card =
-  'overflow-hidden rounded-[11px] border border-border bg-card';
+// A card keeps its height and the drawer body scrolls, as the mareos `.drawer-sections > .form-card`.
+const card = 'shrink-0 overflow-hidden rounded-[11px] border border-border bg-card';
 const cardHeader =
   'flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted';
 const cardIcon =
   'grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]';
 const fieldLabel = 'text-[10px] font-semibold';
-const field = 'bg-card text-[11px] md:text-[11px]';
+// The mareos fields show their focus on any focus, a click or the drawer opening included.
+const field =
+  'bg-card text-[11px] md:text-[11px] focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15';
 const textarea =
-  'min-h-[75px] w-full resize-y rounded-md border border-input bg-card px-3 py-2 text-[11px] leading-[1.5] shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30';
+  'min-h-[75px] w-full resize-y rounded-md border border-input bg-card px-3 py-2 text-[11px] leading-[1.5] shadow-xs outline-none placeholder:text-muted-foreground focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15 dark:bg-input/30';
 
 /**
  * The mareos "Nova ordem de serviço" drawer (AD-035, AD-044): Embarcação with its Customer read only,
@@ -251,7 +253,7 @@ const textarea =
       >
         <span class="text-[10px] text-muted-foreground"><span class="text-destructive">*</span> Campos obrigatórios</span>
         <div class="flex items-center gap-1.5 sm:gap-2">
-          <button tButton type="button" variant="outline" class="h-[35px] text-[11px]" (click)="closed.emit()">
+          <button tButton type="button" variant="outline" class="h-[35px] bg-card text-[11px]" (click)="closed.emit()">
             <ng-icon name="lucideX" class="!size-3.5" />
             Cancelar
           </button>
@@ -284,6 +286,7 @@ export class WorkOrderForm {
   closed = output<void>();
 
   private readonly vesselSelect = viewChild<ElementRef<HTMLSelectElement>>('vesselSelect');
+  private readonly injector = inject(Injector);
 
   protected readonly statuses = WORK_ORDER_STATUSES;
   protected readonly labels = workOrderStatusLabels;
@@ -349,8 +352,9 @@ export class WorkOrderForm {
     });
   }
 
+  /** Focuses "Embarcação" once the drawer that opens is drawn, as the mareos drawer opens. */
   focusFirst() {
-    setTimeout(() => this.vesselSelect()?.nativeElement.focus());
+    afterNextRender(() => this.vesselSelect()?.nativeElement.focus(), { injector: this.injector });
   }
 
   addService() {

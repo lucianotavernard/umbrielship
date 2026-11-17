@@ -190,9 +190,9 @@ export const metrics = (element: HTMLElement) =>
 export const panel = (element: HTMLElement) =>
   element.querySelector<HTMLElement>('[data-slot="day-panel"]')!;
 
+/** Each day panel item as time, Vessel, name and code: the time, the rail, the copy, the arrow. */
 export const panelItems = (element: HTMLElement) =>
   [...panel(element).querySelectorAll('[data-slot="day-item"]')].map((item) => [
     text(item.children[0]),
-    text(item.children[1]?.children[0]),
-    text(item.children[1]?.children[1]),
+    ...[...(item.children[2]?.children ?? [])].map((part) => text(part)),
   ]);
