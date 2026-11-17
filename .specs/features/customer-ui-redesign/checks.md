@@ -3,10 +3,10 @@
 Build: `cd api && npm run lint`; `cd api && npm run build`; `cd web && npm run build`
 Run api: `cd api && npx vitest run --reporter=verbose src/package/customer`
 Run smoke: `bash api/test/smoke/api-smoke.sh`
-Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/customer/**/*.spec.ts' --include='**/shared/**/*.spec.ts' --include='**/identity/authentication/**/*.spec.ts' --include='**/work-order/inspection/__test__/inspection-layout.spec.ts' --include='**/work-order/inspection-template/__test__/inspection-template-menu.spec.ts'`
+Run web: `cd web && npx ng test --watch=false --reporters=verbose --include='**/customer/**/*.spec.ts' --include='**/shared/**/*.spec.ts' --include='**/identity/authentication/**/*.spec.ts' --include='**/work-order/inspection-template/__test__/inspection-template-menu.spec.ts'`
 Plan: `.specs/features/customer-ui-redesign/plan.md`
 
-56 checks in 5 slices · 3 one-way doors · 0 open, of which 0 block
+56 checks in 5 slices (C1-C55, C57; C56 withdrawn, AD-031) · 3 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -19,13 +19,13 @@ Proof: browser - open `/customers` at 1440x1250 as an operator, save `captures/c
 **C2** - The sidebar shows the brand "UMBRIELSHIP", "MENU PRINCIPAL" with Visão geral, Embarcações, Clientes, Modelos de inspeção linking to `/dashboard`, `/vessels`, `/customers`, `/inspection-templates`, and "GESTÃO" with Organizações only for an internal Administrator (AC 2)
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C2 lists four items for an operator and Organizações under GESTÃO only for the internal Administrator
 
-**C3** - `styles.css` sets the light tokens of Landing door 3 and Arial 13px on the body (AC 3)
-Proof: `cd web/src && for t in '--background: #f7f8fa' '--foreground: #17283b' '--primary: #087f8c' '--primary-foreground: #fff' '--secondary: #edf4f5' '--muted: #f2f5f7' '--muted-foreground: #7b8794' '--accent: #edf4f5' '--destructive: #bd5550' '--border: #e9edf0' '--ring: #087f8c' '--radius: 0.65rem' '--sidebar: #fff' '--sidebar-accent: #eaf4f4' '--sidebar-accent-foreground: #087f8c' '--font-sans: Arial, Helvetica, sans-serif'; do grep -qF -- "$t;" styles.css || { echo "missing $t"; exit 1; }; done && grep -qF 'font-size: 13px;' styles.css`
+**C3** - `styles.css` sets every light token of Landing door 3 inside `:root`, Arial on `--font-sans` and 13px on the body (AC 3)
+Proof: `cd web/src && awk '/^:root \{/,/^\}/' styles.css > /tmp/light-$$.css && for t in '--background: #f7f8fa' '--foreground: #17283b' '--card: #fff' '--popover: #fff' '--primary: #087f8c' '--primary-foreground: #fff' '--secondary: #edf4f5' '--secondary-foreground: #1c5961' '--muted: #f2f5f7' '--muted-foreground: #7b8794' '--accent: #edf4f5' '--accent-foreground: #1c5961' '--destructive: #bd5550' '--border: #e9edf0' '--input: #e9edf0' '--ring: #087f8c' '--radius: 0.65rem' '--sidebar: #fff' '--sidebar-accent: #eaf4f4' '--sidebar-accent-foreground: #087f8c' '--sidebar-border: #e9edf0'; do grep -qF -- "$t;" /tmp/light-$$.css || { echo "missing $t"; exit 1; }; done && grep -qF -- '--font-sans: Arial, Helvetica, sans-serif;' styles.css && awk '/^  body \{/,/^  \}/' styles.css | grep -qF 'font-size: 13px;'`
 
 **C4** - The theme button toggles the dark tokens, writes `@umbriel:theme`, the saved choice is applied before the app boots, and the dark sidebar and names follow AD-030, matching `.specs/features/customer-ui-redesign/captures/customer-list-dark.jpg` except `## Differences from the source` (AC 4)
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C4 the theme button switches to dark, says Ativar tema claro and keeps the choice
 Proof: run web | ✓ theme.spec.ts > restoreTheme > customer-ui C4 applies the saved theme before boot
-Proof: `cd web/src && awk '/^\.dark \{/,/^\}/' styles.css > /tmp/dark-$$.css && for t in '--background: #0c131b' '--foreground: #e5edf4' '--card: #141e29' '--primary: #2da9ad' '--muted-foreground: #9aaab8' '--border: #293847' '--sidebar: #141e29' '--sidebar-accent: #1b343a' '--sidebar-accent-foreground: #65d0c7' '--sidebar-border: #293847'; do grep -qF -- "$t;" /tmp/dark-$$.css || { echo "missing $t"; exit 1; }; done`
+Proof: `cd web/src && awk '/^\.dark \{/,/^\}/' styles.css > /tmp/dark-$$.css && for t in '--background: #0c131b' '--foreground: #e5edf4' '--card: #141e29' '--popover: #141e29' '--primary: #2da9ad' '--primary-foreground: #071216' '--secondary: #1b2c37' '--secondary-foreground: #b7e5e0' '--muted: #1a2632' '--muted-foreground: #9aaab8' '--accent: #1b2c37' '--accent-foreground: #b7e5e0' '--destructive: #e17670' '--border: #293847' '--input: #293847' '--ring: #2da9ad' '--sidebar: #141e29' '--sidebar-accent: #1b343a' '--sidebar-accent-foreground: #65d0c7' '--sidebar-border: #293847'; do grep -qF -- "$t;" /tmp/dark-$$.css || { echo "missing $t"; exit 1; }; done`
 Proof: browser - open `/customers` at 1440x1000 in the dark theme, save `captures/customer-list-dark.running.png`
 
 **C5** - The topbar reads "Operação" > the section of each route and the matching menu item carries `aria-current="page"` (AC 5)
@@ -44,6 +44,7 @@ Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C8 the profile show
 
 **C9** - On a narrow window the sidebar is hidden, "Abrir menu" slides it in, and picking a menu item closes it and navigates (AC 9)
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C9 on a phone Abrir menu opens the sidebar and a menu item closes it
+Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C9 picking the open page item closes the panel too
 
 **C10** - The shell shows none of "Oficina em operação", a help button, a notifications bell or the MARÉOS footer (AC 10)
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C10 shows no workshop status, help, notifications or MARÉOS footer
@@ -51,8 +52,8 @@ Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C10 shows no worksh
 **C11** - At 640, 768, 1024, 1280 and 1536px wide, `/customers`, `/customers/:id`, `/vessels` and `/vessels/:id` have `scrollWidth` equal to the window width - unlike the overflow `.specs/features/customer-ui-redesign/captures/customer-list-375.jpg` shows (AC 11)
 Proof: walk - at each of the five widths open the four pages and read `document.documentElement.scrollWidth` against `innerWidth`
 
-**C56** - "Recolher menu" in the sidebar header collapses the desktop sidebar and keeps the choice in `@umbriel:sidebar` (source control)
-Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C56 Recolher menu collapses the sidebar and keeps the choice
+**C57** - The topbar scrolls with the page: no unprefixed `sticky` or `fixed`, so below 640 px it never covers the page (inspection AC 32, whose spec left with the old header; appended from Verifier finding 6)
+Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C57 the topbar scrolls with the page below 640 px
 
 ### S2 - Customers on one page, searched as the user types
 
@@ -204,6 +205,7 @@ Proof: run web | ✓ vessel-detail.spec.ts > VesselDetail > customer-ui C51 dele
 
 **C52** - With 11 WorkOrders the table requests `take=10&skip=0` then `take=10&skip=10` (AC 52)
 Proof: run web | ✓ vessel-detail.spec.ts > VesselDetail > customer-ui C52 pages the work orders ten at a time
+Proof: run web | ✓ vessel-detail.spec.ts > VesselDetail > customer-ui C52 deleting the only order of page 2 goes back to page 1
 
 **C53** - "CLIENTE RESPONSÁVEL" shows the initials, name, "Cliente", email, phone or "Não informado", and "Ver cliente" to `/customers/:customerId`, no "Ver ordens de serviço" (AC 53)
 Proof: run web | ✓ vessel-detail.spec.ts > VesselDetail > customer-ui C53 the customer panel shows the contact and Ver cliente
@@ -224,7 +226,7 @@ Proof: run web | ✓ vessel-detail.inspector.spec.ts > VesselDetail for an inspe
 | menu items by Role (5) | Visão geral C2 · Embarcações C2 · Clientes C2 · Modelos de inspeção C2 · Organizações (internal Administrator only) C2 | - |
 | topbar sections (8 routes) | `/customers` · `/customers/:id` · `/vessels` · `/vessels/:id` · `/work-orders/:id` · `/dashboard` · `/inspection-templates` · `/organizations`, C5 table-driven over all 8 | - |
 | widths (5) | 640 C11 · 768 C11 · 1024 C11 · 1280 C11 · 1536 C11 | - |
-| source controls: shell (7) | Recolher menu C56 · Selecionar organização C6 · an Organization item C7 · a menu item C2, C9 · "..." / Sair C8 · Ativar tema escuro/claro C4 · Abrir menu C9 | - |
+| source controls: shell, without "Recolher menu" (AD-031) (6) | Selecionar organização C6 · an Organization item C7 · a menu item C2, C9 · "..." / Sair C8 · Ativar tema escuro/claro C4 · Abrir menu C9 | - |
 | source controls: Customer list (5) | Novo cliente C21 · search C17 · name link C18 · Ver detalhes C25 · Editar C22 | - |
 | source controls: Customer drawer (4) | Cadastrar cliente C21 · Salvar alterações C22 · Cancelar C21 · Fechar cadastro C21 | - |
 | source controls: Customer detail (2) | Clientes breadcrumb C28 · Vessel row link C30 | - |
@@ -255,8 +257,8 @@ Proof: run web | ✓ vessel-detail.inspector.spec.ts > VesselDetail for an inspe
 
 ## Handoff
 
-- **Settled mid-build:** none
-- **Dispatched:** Verifier at `2c92fae` (diff `34f79a9..2c92fae`); screens round 1 at `2c92fae` (pictures taken at `325531a`, no code commit since)
+- **Settled mid-build:** 2026-11-17, screens round 1, Q "Recolher menu: remover o botão / manter o botão" -> user: "Remover o botão (Recomendado)" (AD-031): C56 withdrawn, the brand button removed
+- **Dispatched:** Verifier at `2c92fae` (diff `34f79a9..2c92fae`) - returned FAIL, 6 findings; screens round 1 at `2c92fae` (pictures taken at `325531a`) - returned, 8 of 8 diverge
 - **Boundary:** C13, C14, C35 closed at `6d8faeb`; C1-C10, C56 at `962e85d`; C12, C15-C34, C36-C55 at `0ee5961`; C11 and the pictures at `325531a`
 - **Abandoned:** the plan's example under AC 15 read "anchor co", "Ágata Pesca", "Barco Azul"; `localeCompare(…, 'pt-BR')`, the rule AC 15 and the mareos both name, gives "Ágata Pesca", "anchor co", "Barco Azul" (checked with node). The example was miscomputed when the plan was written; it is corrected in the plan and the rule is unchanged
 - **Walked:** an isolated stack started for the walk (PostgreSQL, Redis and Mailpit in new containers `cui-pg`, `cui-redis`, `cui-mailpit`; the API built from this checkout on 3334; `ng serve` on 4300 with a proxy to 3334), seeded through the API with eight fictional Customers, eight Vessels and one WorkOrder `IN_PROGRESS` on Santa Maria, and the seed Administrator given two more Memberships (operator in "Marina Serviços Navais", inspector in "Oceano Azul Reparos") in that database only. Headless Chrome over the DevTools protocol, signed in as the seed Administrator, saved every `*.running.png` at the capture's size: `/customers` and `/vessels` at 1440x1250; the Customer detail (Marcos Oliveira), the Vessel detail (Santa Maria), "Novo cliente", "Nova embarcação", the Organization menu (region 0,0-720,500) and the dark `/customers` at 1440x1000. Dark theme: sidebar `rgb(20, 30, 41)`, Customer name `rgb(229, 237, 244)` on `rgb(20, 30, 41)`, contrast 14.23:1. C11: `/customers`, `/customers/:id`, `/vessels` and `/vessels/:id` at 640, 768, 1024, 1280 and 1536 px; first run the lists overflowed at 640, 768 and 1024 (740, 996, 778, 1034, 1047) and the Vessel detail at 768 (832) because the `sr-only` header cells escaped their scroll wrappers; fixed in `325531a`, rewalked: `scrollWidth` equals `innerWidth` in all 20. Also seen in the walk and fixed in `325531a`: the lists were narrower than the capture (934 px against 970), and the Vessel detail drew a lone "1" pager. A user reaches the states from the sidebar (Clientes, Embarcações), a Customer name, a Vessel name, "Novo cliente", "Nova embarcação", "Selecionar organização" and the theme button. Outside the plan, surfaced not fixed: `POST /customers` with `"phone": null` answers 500 (the column is NOT NULL while the body schema accepts null)

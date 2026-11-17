@@ -90,21 +90,21 @@ import { CustomerListItem } from '../customer.service';
                 <td>
                   <div class="grid gap-[5px] text-[9px]">
                     <span data-slot="email" class="flex items-center gap-1.5">
-                      <ng-icon name="lucideMail" class="size-[13px] shrink-0" />{{ customer.email || 'E-mail não informado' }}
+                      <ng-icon name="lucideMail" class="!size-[13px] shrink-0" />{{ customer.email || 'E-mail não informado' }}
                     </span>
                     <span data-slot="phone" class="flex items-center gap-1.5">
-                      <ng-icon name="lucidePhone" class="size-[13px] shrink-0" />{{ customer.phone || 'Telefone não informado' }}
+                      <ng-icon name="lucidePhone" class="!size-[13px] shrink-0" />{{ customer.phone || 'Telefone não informado' }}
                     </span>
                   </div>
                 </td>
                 <td>
                   <span data-slot="location" class="flex items-center gap-1.5 text-[9px]">
-                    <ng-icon name="lucideMapPin" class="size-[13px] shrink-0" />{{ location(customer) }}
+                    <ng-icon name="lucideMapPin" class="!size-[13px] shrink-0" />{{ location(customer) }}
                   </span>
                 </td>
                 <td>
                   <span data-slot="vessel-count" class="flex items-center gap-1.5 text-[9px] text-foreground/75">
-                    <ng-icon name="lucideShip" class="size-3.5 shrink-0" />{{ customer.vesselCount }}
+                    <ng-icon name="lucideShip" class="!size-3.5 shrink-0" />{{ customer.vesselCount }}
                     {{ customer.vesselCount === 1 ? 'embarcação' : 'embarcações' }}
                   </span>
                 </td>
@@ -115,7 +115,7 @@ import { CustomerListItem } from '../customer.service';
                       [routerLink]="['/customers', customer.id]"
                       [attr.aria-label]="'Ver detalhes de ' + customer.name"
                     >
-                      <ng-icon name="lucideArrowUpRight" class="size-3.5" />
+                      <ng-icon name="lucideArrowUpRight" class="!size-3.5" />
                     </a>
                     @if (canWrite()) {
                       <button
@@ -124,7 +124,7 @@ import { CustomerListItem } from '../customer.service';
                         [attr.aria-label]="'Editar ' + customer.name"
                         (click)="edited.emit(customer)"
                       >
-                        <ng-icon name="lucidePencil" class="size-3.5" />
+                        <ng-icon name="lucidePencil" class="!size-3.5" />
                       </button>
                       <button
                         type="button"
@@ -132,7 +132,7 @@ import { CustomerListItem } from '../customer.service';
                         [attr.aria-label]="'Excluir ' + customer.name"
                         (click)="deleted.emit(customer)"
                       >
-                        <ng-icon name="lucideTrash2" class="size-3.5" />
+                        <ng-icon name="lucideTrash2" class="!size-3.5" />
                       </button>
                     }
                   </div>

@@ -133,9 +133,16 @@ describe('VesselDetail', () => {
     const sheet = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
     expect(text(sheet, '[data-slot="sheet-title"]')).toBe('Editar embarcação');
     expect(sheet.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Santa Maria');
+    // What is typed and cancelled never comes back on the next Editar.
+    await type('#vessel-name', 'Digitado e cancelado');
+    await click(buttonByText('Cancelar', sheet));
+    await click(buttonByText('Editar', element));
+    const again = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
+    expect(again.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Santa Maria');
+
     await type('#vessel-name', 'Santa Maria II');
     await type('#length', '33.5');
-    await click(buttonByText('Salvar alterações', sheet));
+    await click(buttonByText('Salvar alterações', again));
 
     const put = controller.expectOne('/api/customers/c-atl/vessels/vessel-1');
     expect(put.request.method).toBe('PUT');
@@ -151,7 +158,13 @@ describe('VesselDetail', () => {
   });
 
   it('customer-ui C49 lists the work orders with the code and the long dates', async () => {
-    const element = await render();
+    // 22:00 local on 10 November: the day the user typed, not the UTC day after it.
+    const lateEvening = {
+      ...workOrder,
+      startDate: new Date(2026, 10, 10, 22, 0).toISOString(),
+      endDate: new Date(2026, 10, 15, 23, 30).toISOString(),
+    };
+    const element = await render(aurora, [lateEvening]);
 
     const headers = [...element.querySelectorAll('thead th')].map((header) => header.textContent?.trim());
     expect(headers.slice(0, 4)).toEqual(['Ordem', 'Docagem', 'Desdocagem', 'Status']);
@@ -232,6 +245,28 @@ describe('VesselDetail', () => {
     await settle();
 
     expect(element.querySelectorAll('[data-slot="work-order-row"]')).toHaveLength(1);
+  });
+
+  it('customer-ui C52 deleting the only order of page 2 goes back to page 1', async () => {
+    const ten = Array.from({ length: 10 }, (_, index) => ({ ...workOrder, id: `wo-${index}` }));
+    const element = await render(aurora, ten, 11);
+    const pager = () => element.querySelector('t-pagination');
+
+    await click([...element.querySelectorAll<HTMLAnchorElement>('t-pagination a')].find((link) => link.textContent?.trim() === '2'));
+    controller.expectOne(page(10)).flush({ workOrders: [{ ...workOrder, id: 'wo-10' }], total: 11 });
+    await settle();
+
+    await click(element.querySelector('[data-slot="work-order-row"] button[aria-label="Excluir"]'));
+    await click(buttonByText('Confirmar', document.querySelector('[data-slot="dialog-content"]')!));
+    controller.expectOne('/api/work-orders/wo-10').flush(null, { status: 204, statusText: 'No Content' });
+    await settle();
+    controller.expectOne(page(0)).flush({ workOrders: ten, total: 10 });
+    await settle();
+
+    expect(element.querySelectorAll('[data-slot="work-order-row"]')).toHaveLength(10);
+    expect(element.querySelector('[data-slot="orders-empty"]')).toBeNull();
+    // Ten WorkOrders fit one page: no pager.
+    expect(pager()).toBeNull();
   });
 
   it('customer-ui C53 the customer panel shows the contact and Ver cliente', async () => {

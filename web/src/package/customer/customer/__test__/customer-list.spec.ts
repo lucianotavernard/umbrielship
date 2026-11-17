@@ -336,9 +336,15 @@ describe('CustomerList', () => {
       'SP',
     ]);
 
+    // What is typed and cancelled never comes back on the next Editar.
+    await type('#name', 'Digitado e cancelado');
+    await click(buttonByText('Cancelar', drawer));
+    await click(byLabel('Editar Atlantic'));
+    expect(dialog()!.querySelector<HTMLInputElement>('#name')!.value).toBe('Atlantic');
+
     await type('#name', 'Atlantic Pesca');
     await type('#city', 'Guarujá');
-    await click(buttonByText('Salvar alterações', drawer));
+    await click(buttonByText('Salvar alterações', dialog()!));
 
     const put = controller.expectOne('/api/customers/c-atl');
     expect(put.request.method).toBe('PUT');

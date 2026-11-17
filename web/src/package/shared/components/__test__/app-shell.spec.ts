@@ -306,6 +306,44 @@ describe('Shell', () => {
     expect(panel.hasAttribute('inert')).toBe(true);
   });
 
+  it('customer-ui C9 picking the open page item closes the panel too', async () => {
+    const { fixture, element } = await open([atlantic()], 'org-a');
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/customers');
+    await settle();
+    const sidebar = fixture.debugElement
+      .query(By.directive(SidebarProvider))
+      .injector.get(SidebarProvider);
+    sidebar.isMobile.set(true);
+    await settle();
+    fixture.detectChanges();
+
+    byLabel<HTMLButtonElement>(element, 'Abrir menu')!.click();
+    fixture.detectChanges();
+    expect(sidebar.openMobile()).toBe(true);
+
+    const panel = element.querySelector<HTMLElement>('[data-mobile="true"]')!;
+    [...panel.querySelectorAll<HTMLAnchorElement>('nav a')]
+      .find((link) => link.textContent?.trim() === 'Clientes')!
+      .click();
+    await settle();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/customers');
+    expect(sidebar.openMobile()).toBe(false);
+  });
+
+  it('customer-ui C57 the topbar scrolls with the page below 640 px', async () => {
+    const { element } = await open([atlantic()], 'org-a');
+
+    const topbar = element.querySelector('main[data-slot="sidebar-inset"] > header')!;
+    const classes = [...topbar.classList];
+    // Unprefixed, sticky or fixed would pin it on a phone too (inspection AC 32).
+    expect(classes).not.toContain('sticky');
+    expect(classes).not.toContain('fixed');
+    expect(getComputedStyle(topbar).position).not.toBe('sticky');
+  });
+
   it('customer-ui C10 shows no workshop status, help, notifications or MARÉOS footer', async () => {
     const { element } = await open([atlantic()], 'org-a');
 
@@ -315,20 +353,5 @@ describe('Shell', () => {
     expect(element.textContent).not.toContain('Operação com rumo certo.');
     expect(byLabel(element, 'Ajuda')).toBeNull();
     expect(byLabel(element, 'Notificações')).toBeNull();
-  });
-
-  it('customer-ui C56 Recolher menu collapses the sidebar and keeps the choice', async () => {
-    const { fixture, element } = await open([atlantic()], 'org-a');
-    const sidebar = element.querySelector('t-sidebar')!;
-    expect(sidebar.getAttribute('data-state')).toBe('expanded');
-    expect(byLabel(element, 'Abrir menu')).toBeNull();
-
-    byLabel<HTMLButtonElement>(element, 'Recolher menu')!.click();
-    fixture.detectChanges();
-
-    expect(sidebar.getAttribute('data-state')).toBe('collapsed');
-    expect(localStorage.getItem('@umbriel:sidebar')).toBe('false');
-    // Collapsed on a desktop, the topbar gives the way back.
-    expect(byLabel(element, 'Abrir menu')).not.toBeNull();
   });
 });
