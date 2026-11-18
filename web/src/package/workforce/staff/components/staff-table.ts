@@ -24,10 +24,11 @@ import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { StaffRow } from '../staff-filters';
 import { statusTones } from '../staff-status';
 
+// The mareos tones: blue, green, purple, in turn.
 const AVATAR_TONES = [
-  'bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]',
-  'bg-[#e9f3f3] text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]',
-  'bg-[#f3eefa] text-[#8a6bb5] dark:bg-[#271f33] dark:text-[#c3a8e6]',
+  'bg-[#edf3fa] text-[#5889bc] dark:bg-[#18283a] dark:text-[#8db4dc]',
+  'bg-[#eaf5f1] text-[#4f917b] dark:bg-[#17302f] dark:text-[#7cc7c2]',
+  'bg-[#f4eff8] text-[#9275a6] dark:bg-[#271f33] dark:text-[#c3a8e6]',
 ];
 
 /** The mareos "Profissionais" table, with the row menu of AD-069. The page filters; this draws. */
@@ -102,7 +103,7 @@ const AVATAR_TONES = [
                   <div class="flex items-center gap-2.5">
                     <span
                       aria-hidden="true"
-                      class="grid size-[30px] shrink-0 place-items-center rounded-full text-[9px] font-bold"
+                      class="grid size-[33px] shrink-0 place-items-center rounded-[9px] text-[9px] font-bold"
                       [class]="tones[index % 3]"
                     >
                       {{ initialsOf(person.name) }}

@@ -23,7 +23,7 @@ import { toast } from '../../../shared/components/ui/toaster';
 import { GetWorkOrdersResponse } from '../../../work-order/work-order/work-order.service';
 import { openAllocations } from '../staff-allocations';
 import { NO_TEAM } from '../staff-filters';
-import { servicesInProgress, staffStatus, statusTones, teamStatus } from '../staff-status';
+import { servicesInProgress, staffStatus, statusTones } from '../staff-status';
 import { GetAssignmentsResponse, GetStaffResponse, GetTeamsResponse } from '../staff.service';
 
 const card = 'rounded-lg border border-border bg-card';
@@ -71,7 +71,7 @@ const card = 'rounded-lg border border-border bg-card';
         <section aria-labelledby="staff-title" [class]="card + ' mb-4 flex items-center gap-4 px-6 py-7'">
           <span
             aria-hidden="true"
-            class="grid size-[58px] shrink-0 place-items-center rounded-xl bg-[#e9f3f3] text-[16px] font-bold text-[#408384] dark:bg-[#17302f] dark:text-[#7cc7c2]"
+            class="grid size-[58px] shrink-0 place-items-center rounded-[15px] bg-[#e8f5f3] text-[16px] font-bold text-[#287f76] dark:bg-[#17302f] dark:text-[#7cc7c2]"
           >
             {{ initialsOf(person.name) }}
           </span>
@@ -84,7 +84,7 @@ const card = 'rounded-lg border border-border bg-card';
           </div>
           <span
             data-slot="profile-status"
-            class="inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-1 text-[8px] font-bold"
+            class="inline-flex items-center gap-1.5 self-center rounded-full px-2.5 py-1.5 text-[8px] font-bold"
             [class]="tones[status()]"
           >
             <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ status() }}
@@ -170,11 +170,13 @@ const card = 'rounded-lg border border-border bg-card';
                 <strong class="block truncate text-[10px] text-foreground">{{ teamName() }}</strong>
                 <span class="text-[8px] text-muted-foreground">Equipe técnica</span>
               </div>
-              @if (teamTone(); as tone) {
-                <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[8px] font-bold" [class]="tone.className">
-                  <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ tone.label }}
-                </span>
-              }
+              <span
+                data-slot="allocation-status"
+                class="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[8px] font-bold"
+                [class]="tones[status()]"
+              >
+                <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ status() }}
+              </span>
             </div>
 
             <ul data-slot="allocations" class="mt-3 grid gap-2">
@@ -244,14 +246,6 @@ export class StaffDetail {
   status = computed(() => {
     const staff = this.staff();
     return staff ? staffStatus(staff, this.assignments(), this.inProgress()) : 'Disponível';
-  });
-
-  /** The Team's own status, beside its name; none for a Staff with no Team. */
-  teamTone = computed(() => {
-    const team = this.team();
-    if (!team) return null;
-    const label = teamStatus(team.id, this.assignments(), this.inProgress());
-    return { label, className: statusTones[label] };
   });
 
   /** Only digits and "+" in the `tel:` link. */

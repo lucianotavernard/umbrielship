@@ -262,6 +262,7 @@ service's Responsável.
 | "Equipe vinculada" always a team | "Sem equipe" when there is none | y - AD-070 |
 | "Oficina em operação", help, notifications | nothing | y - AD-025 |
 | Menu items without a screen ("Estoque e peças", "Relatórios") | omitted | y - AD-024 |
+| E-mail placeholder "nome@mareos.com.br" | "nome@empresa.com.br", as the Customer drawer | y - AD-025 |
 
 ## Sources
 

@@ -55,6 +55,8 @@ describe('StaffDetail', () => {
     expect(text(element, 'profile-team')).toBe('Sem equipe');
     expect(text(element, 'profile-situation')).toBe('Disponível');
     expect(text(element, 'profile-status')).toBe('Disponível');
+    // The block of "Alocação na oficina" carries the professional's status, as the mareos draws it.
+    expect(text(element, 'allocation-status')).toBe('Disponível');
     expect(element.querySelector('[data-slot="profile-email"]')?.getAttribute('href')).toBe(
       'mailto:pedro.nascimento@umbriel.test',
     );
@@ -72,6 +74,7 @@ describe('StaffDetail', () => {
 
     expect(text(element, 'profile-team')).toBe('Equipe Alfa');
     expect(text(element, 'profile-situation')).toBe('Em serviço');
+    expect(text(element, 'allocation-status')).toBe('Em serviço');
   });
 
   it('workforce C32 lists the allocations and opens their work order', async () => {
