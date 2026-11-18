@@ -896,33 +896,33 @@ describe('Dashboard', () => {
   });
 
   it('dashboard C27 falls back to the last page left after a delete or an edit', async () => {
-    const page = await DashboardPage.open({ workOrders: generated(7) });
-    const sixth = generated(7)[5];
-    const seventh = generated(7)[6];
-
+    // A delete of the only row of page 2: the table shows page 1, never an empty page.
+    let page = await DashboardPage.open({ workOrders: generated(6) });
+    const sixth = generated(6)[5];
     await page.goToPage(2);
-    expect(page.codes()).toEqual(codes(6, 7));
-
-    // An edit that closes #00000007: page 2 still holds #00000006.
-    await click(buttonByText('Editar', await page.openMenu(code(7))));
-    await type('#wo-status', 'COMPLETED');
-    await click(buttonByText('Salvar alterações', drawer()!));
-    controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${seventh.id}`).flush(null);
-    await settle();
-    const closed = generated(7).map((order) => (order.id === seventh.id ? { ...order, status: 'COMPLETED' as const } : order));
-    await page.reload(closed);
-    expect(page.currentPage()).toBe('2');
     expect(page.codes()).toEqual([code(6)]);
 
-    // A delete of the only row of page 2: the table shows page 1, never an empty page.
     await click(buttonByText('Excluir', await page.openMenu(code(6))));
     await click(buttonByText('Confirmar', document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!));
     controller.expectOne(`/api/work-orders/${sixth.id}`).flush(null, { status: 204, statusText: 'No Content' });
     await settle();
-    await page.reload(
-      closed.filter((order) => order.id !== sixth.id),
-      assignments,
-    );
+    await page.reload(generated(5), assignments);
+    expect(page.currentPage()).toBe('1');
+    expect(page.codes()).toEqual(codes(1, 5));
+    expect(page.range()).toBe('Exibindo 1–5 de 5 ordens');
+    expect(page.pageButtons().map((button) => squash(button.textContent))).toEqual(['1']);
+    expect(page.empty()).toBeUndefined();
+    page.fixture.destroy();
+
+    // An edit that closes the only row of page 2 does the same.
+    page = await DashboardPage.open({ workOrders: generated(6) });
+    await page.goToPage(2);
+    await click(buttonByText('Editar', await page.openMenu(code(6))));
+    await type('#wo-status', 'COMPLETED');
+    await click(buttonByText('Salvar alterações', drawer()!));
+    controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${sixth.id}`).flush(null);
+    await settle();
+    await page.reload(generated(6).map((order) => (order.id === sixth.id ? { ...order, status: 'COMPLETED' as const } : order)));
     expect(page.currentPage()).toBe('1');
     expect(page.codes()).toEqual(codes(1, 5));
     expect(page.range()).toBe('Exibindo 1–5 de 5 ordens');
@@ -931,11 +931,14 @@ describe('Dashboard', () => {
   });
 
   it('dashboard C27 shows every open order after a create', async () => {
-    const page = await DashboardPage.open();
+    const page = await DashboardPage.open({ workOrders: [...fleet, ...generated(7)] });
 
+    // "Pendentes", a search and page 2: #CD56EF78 and the seven "Revisão" WorkOrders, over two pages.
     await click(page.tab('Pendentes'));
-    await page.search('vento');
-    expect(page.codes()).toEqual(['#CD56EF78']);
+    await page.search('revis');
+    await page.goToPage(2);
+    expect(page.currentPage()).toBe('2');
+    expect(page.codes()).toEqual(codes(5, 7));
 
     await click(buttonByText('Nova ordem de serviço', page.element));
     await type('#wo-vessel', 'v-lul');
@@ -955,13 +958,13 @@ describe('Dashboard', () => {
     };
     controller.expectOne((req) => req.method === 'POST' && req.url === '/api/work-orders').flush({ workOrder: created });
     await settle();
-    await page.reload([...fleet, created]);
+    await page.reload([...fleet, ...generated(7), created]);
 
-    // The new WorkOrder is in progress and Lula Branca's: it shows only with the tab and search reset.
+    // The new WorkOrder is in progress and Lula Branca's: it shows on page 1 of every open order.
     expect(page.selectedTabs()).toEqual(['Todas as ordens']);
     expect(page.searchField().value).toBe('');
     expect(page.currentPage()).toBe('1');
-    expect(page.codes()).toEqual(['#CD56EF78', '#AA000001', '#AB12CD34', '#FF001122']);
+    expect(page.codes()).toEqual(['#CD56EF78', '#AA000001', '#AB12CD34', '#FF001122', code(1)]);
   });
 
   it('dashboard C24 says when no work order is open', async () => {
