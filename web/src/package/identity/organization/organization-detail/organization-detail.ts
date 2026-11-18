@@ -68,6 +68,7 @@ export class OrganizationDetail {
   usersPage = signal(1);
   invitationsPage = signal(1);
   isUserSheetActive = signal(false);
+  submitting = signal(false);
   isInvitationSheetActive = signal(false);
   resending = signal<string | null>(null);
 
@@ -94,12 +95,16 @@ export class OrganizationDetail {
   }
 
   createUser(user: UserFormValue) {
+    this.submitting.set(true);
     this.userService.createUser({ ...user, organizationId: this.id() }).subscribe({
       next: () => {
+        this.submitting.set(false);
         toast.success('Usuário criado com sucesso');
         this.closeUserSheet();
       },
       error: (response) => {
+        // The drawer stays open with what was typed.
+        this.submitting.set(false);
         toast.error('Erro ao criar usuário', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar o usuário.'),
         });
@@ -119,14 +124,18 @@ export class OrganizationDetail {
   }
 
   sendInvitation(invitation: InvitationFormValue) {
+    this.submitting.set(true);
     this.invitationService
       .sendInvitation({ ...invitation, organizationId: this.id() })
       .subscribe({
         next: () => {
+          this.submitting.set(false);
           toast.success('Convite enviado');
           this.closeInvitationSheet();
         },
         error: (response) => {
+          // The drawer stays open with what was typed.
+          this.submitting.set(false);
           toast.error('Erro ao enviar convite', {
             description: apiErrorMessage(response, 'Ocorreu um erro ao enviar o convite.'),
           });

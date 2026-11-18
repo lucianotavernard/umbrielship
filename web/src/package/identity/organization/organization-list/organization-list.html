@@ -15,11 +15,11 @@
 </section>
 
 <t-sheet
+  kicker="GESTÃO / ORGANIZAÇÕES"
   title="Nova organização"
-  class="sm:max-w-md"
   description="Preencha os campos abaixo para criar uma nova organização"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >
-  <organization-form-ui (closed)="closeSheet()" (submitted)="createOrganization($event)" />
+  <organization-form-ui [loading]="submitting()" (closed)="closeSheet()" (submitted)="createOrganization($event)" />
 </t-sheet>

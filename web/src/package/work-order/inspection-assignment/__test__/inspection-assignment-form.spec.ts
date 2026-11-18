@@ -40,6 +40,26 @@ describe('Atribuir modelo de inspeção', () => {
     await settle();
   };
 
+  /**
+   * With nothing to assign the drawer offers no field: its message sits in a drawer card and the
+   * footer holds only "Cancelar", with no "* Campos obrigatórios" and no "Atribuir inspeção" (AD-058).
+   */
+  const nothingToAssign = (sheet: HTMLElement) => {
+    const footer = sheet.querySelector<HTMLElement>('footer[data-slot="drawer-footer"]')!;
+    return {
+      message: sheet
+        .querySelector('section[data-slot="drawer-card"] [data-slot="assignment-message"]')
+        ?.textContent?.trim(),
+      fields: sheet.querySelectorAll('input, select, textarea').length,
+      hint: footer.querySelector('[data-slot="required-hint"]'),
+      buttons: [...footer.querySelectorAll('button')].map((control) => [
+        control.firstElementChild?.getAttribute('name'),
+        control.textContent?.trim(),
+      ]),
+      submit: sheet.querySelector('button[type="submit"]'),
+    };
+  };
+
   it('assignment C21 opens the sheet with the templates and the targets', async () => {
     const sheet = await open();
 
@@ -61,7 +81,14 @@ describe('Atribuir modelo de inspeção', () => {
     const sheet = await open([]);
 
     expect(sheet.textContent).toContain('Nenhum modelo de inspeção cadastrado');
-    expect(sheet.querySelector('form')).toBeNull();
+    expect(nothingToAssign(sheet)).toEqual({
+      message: 'Nenhum modelo de inspeção cadastrado',
+      fields: 0,
+      hint: null,
+      buttons: [['lucideX', 'Cancelar']],
+      submit: null,
+    });
+    await submit(sheet);
     controller.expectNone((request) => request.method === 'POST');
   });
 
@@ -76,7 +103,14 @@ describe('Atribuir modelo de inspeção', () => {
 
     expect(sheet.textContent).toContain('Não foi possível carregar os modelos de inspeção.');
     expect(sheet.textContent).not.toContain('Nenhum modelo de inspeção cadastrado');
-    expect(sheet.querySelector('form')).toBeNull();
+    expect(nothingToAssign(sheet)).toEqual({
+      message: 'Não foi possível carregar os modelos de inspeção.',
+      fields: 0,
+      hint: null,
+      buttons: [['lucideX', 'Cancelar']],
+      submit: null,
+    });
+    await submit(sheet);
     controller.expectNone((request) => request.method === 'POST');
   });
 

@@ -92,6 +92,65 @@ describe('VesselList', () => {
   const exportButton = () =>
     [...element.querySelectorAll<HTMLButtonElement>('button')].find((button) => button.textContent?.includes('Exportar'))!;
 
+  const squash = (node: Element | null | undefined) => node?.textContent?.replace(/\s+/g, ' ').trim();
+
+  /** A label as it reads: its own text, then " *" only when it carries the required mark. */
+  function labelText(label: Element) {
+    const copy = label.cloneNode(true) as Element;
+    const marks = [...copy.querySelectorAll('[data-slot="required-mark"]')];
+    marks.forEach((mark) => mark.remove());
+    return `${squash(copy)}${marks.length ? ' *' : ''}`;
+  }
+
+  /** A footer button as it reads: its type, its first child, its text and whether it is disabled. */
+  function readButton(button: HTMLButtonElement | null | undefined) {
+    const first = button?.firstElementChild;
+    return {
+      type: button?.type,
+      first: first ? `${first.tagName.toLowerCase()}[name="${first.getAttribute('name')}"]` : null,
+      label: squash(button),
+      disabled: button?.disabled,
+    };
+  }
+
+  /** The frame of the open drawer: header, width, cards with their labels, footer. */
+  function readFrame(sheet: HTMLElement) {
+    const footer = sheet.querySelector('footer[data-slot="drawer-footer"]');
+    return {
+      kicker: squash(sheet.querySelector('[data-slot="sheet-kicker"]')),
+      title: squash(sheet.querySelector('[data-slot="sheet-title"]')),
+      description: squash(sheet.querySelector('[data-slot="sheet-description"]')),
+      closeLabel: sheet.querySelector('header button')?.getAttribute('aria-label'),
+      widths: sheet.className.split(/\s+/).filter((token) => token.startsWith('sm:max-w-')),
+      cards: [...sheet.querySelectorAll('section[data-slot="drawer-card"]')].map((card) => ({
+        title: squash(card.querySelector('[data-slot="drawer-card-title"]')),
+        subtitle: squash(card.querySelector('[data-slot="drawer-card-subtitle"]')),
+        icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+        labels: [...card.querySelectorAll('label')].map(labelText),
+      })),
+      hint: squash(footer?.querySelector('[data-slot="required-hint"]')),
+      buttons: [...(footer?.querySelectorAll<HTMLButtonElement>('button') ?? [])].map(readButton),
+    };
+  }
+
+  const submitButton = (sheet: HTMLElement) =>
+    sheet.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]');
+
+  /** The messages shown in the drawer, by the id of the field whose group shows them. */
+  function messages(sheet: HTMLElement) {
+    const shown: Record<string, string[]> = {};
+    for (const group of sheet.querySelectorAll('t-form-group')) {
+      const errors = [...group.querySelectorAll('[data-slot="error"]')].map((error) => squash(error) ?? '');
+      if (errors.length) shown[group.querySelector('input, select, textarea')?.id ?? 'no field'] = errors;
+    }
+    return shown;
+  }
+
+  const errorCount = (sheet: HTMLElement) => sheet.querySelectorAll('[data-slot="error"], t-input-error').length;
+  const invalidFields = (sheet: HTMLElement) => [...sheet.querySelectorAll('[data-invalid]')].map((field) => field.id);
+  const pending = () => controller.match(() => true).map(({ request }) => `${request.method} ${request.urlWithParams}`);
+  const value = (selector: string) => document.querySelector<HTMLInputElement | HTMLSelectElement>(selector)?.value;
+
   it('customer-ui C34 requests vessels and customers with no page and shows Total na frota', async () => {
     const { vesselRequest, customerRequest } = await open();
 
@@ -284,7 +343,7 @@ describe('VesselList', () => {
     await type('#imoNumber', '9073412');
     await type('#type', 'FISHING');
     await type('#length', '24.8');
-    await click(buttonByText('Salvar embarcação', sheet));
+    await click(buttonByText('Criar embarcação', sheet));
 
     const post = controller.expectOne('/api/vessels');
     expect(post.request.method).toBe('POST');
@@ -394,7 +453,7 @@ describe('VesselList', () => {
     await type('#imoNumber', '9182451');
     await type('#type', 'CARGO');
     await type('#length', '10');
-    await click(buttonByText('Salvar embarcação', drawer()!));
+    await click(buttonByText('Criar embarcação', drawer()!));
     controller
       .expectOne('/api/vessels')
       .flush({ message: 'Vessel already exists' }, { status: 409, statusText: 'Conflict' });
@@ -406,5 +465,190 @@ describe('VesselList', () => {
     expect(drawer()).not.toBeNull();
     expect(drawer()!.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Repetida');
     expect(drawer()!.querySelector<HTMLInputElement>('#imoNumber')!.value).toBe('9182451');
+  });
+
+  it('drawer-standard D7 Nova embarcação opens in the standard frame and posts once', async () => {
+    const success = vi.spyOn(toast, 'success');
+    await open([aurora]);
+
+    await click(buttonByText('Nova embarcação'));
+    const sheet = drawer()!;
+    expect(readFrame(sheet)).toEqual({
+      kicker: 'FROTA / EMBARCAÇÕES',
+      title: 'Nova embarcação',
+      description: 'Preencha os dados abaixo para registrar uma embarcação na frota.',
+      closeLabel: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+      cards: [
+        {
+          title: 'Detalhes da embarcação',
+          subtitle: 'Informações básicas sobre a embarcação',
+          icon: 'lucideShip',
+          labels: ['Nome *', 'Cliente responsável *'],
+        },
+        {
+          title: 'Tipo e comprimento',
+          subtitle: 'Identificação e dimensões da embarcação',
+          icon: 'lucideRuler',
+          labels: ['Número IMO *', 'Tipo de embarcação *', 'Comprimento (m) *'],
+        },
+      ],
+      hint: '* Campos obrigatórios',
+      buttons: [
+        { type: 'button', first: 'ng-icon[name="lucideX"]', label: 'Cancelar', disabled: false },
+        { type: 'submit', first: 'ng-icon[name="lucideCheck"]', label: 'Criar embarcação', disabled: false },
+      ],
+    });
+    expect(document.activeElement?.id).toBe('vessel-name');
+    expect(messages(sheet)).toEqual({});
+    expect(invalidFields(sheet)).toEqual([]);
+
+    // Saving the empty form sends nothing and speaks under each field.
+    await click(submitButton(sheet));
+    expect(pending()).toEqual([]);
+    expect(messages(sheet)).toEqual({
+      'vessel-name': ['Nome é obrigatório'],
+      customerId: ['Cliente é obrigatório'],
+      imoNumber: ['Número IMO é obrigatório'],
+      type: ['Tipo é obrigatório'],
+      length: ['Comprimento é obrigatório'],
+    });
+    expect(errorCount(sheet)).toBe(5);
+    expect(invalidFields(sheet)).toEqual(['vessel-name', 'customerId', 'imoNumber', 'type', 'length']);
+
+    // Cancelar closes with no request, and the next opening starts clean.
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(pending()).toEqual([]);
+    await click(buttonByText('Nova embarcação'));
+    expect(messages(drawer()!)).toEqual({});
+    expect(errorCount(drawer()!)).toBe(0);
+    expect(invalidFields(drawer()!)).toEqual([]);
+
+    await type('#vessel-name', 'Maré Alta');
+    await type('#customerId', 'c-atl');
+    await type('#imoNumber', '9073412');
+    await type('#type', 'FISHING');
+    await type('#length', '24.8');
+    await click(submitButton(drawer()!));
+
+    expect(readButton(submitButton(drawer()!))).toEqual({
+      type: 'submit',
+      first: 'ng-icon[name="lucideLoader2"]',
+      label: 'Salvando...',
+      disabled: true,
+    });
+    const requests = controller.match(() => true);
+    expect(requests.map(({ request }) => `${request.method} ${request.urlWithParams}`)).toEqual(['POST /api/vessels']);
+    expect(requests[0].request.body).toEqual({
+      name: 'Maré Alta',
+      customerId: 'c-atl',
+      imoNumber: '9073412',
+      type: 'FISHING',
+      length: 24.8,
+    });
+    requests[0].flush({ vessel: {} });
+    await settle();
+    controller.expectOne('/api/vessels').flush({
+      vessels: [aurora, { ...aurora, id: 'v-mar', name: 'Maré Alta', imoNumber: '9073412' }],
+      total: 2,
+    });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Embarcação criada com sucesso', expect.anything());
+    expect(drawer()).toBeNull();
+    expect(pending()).toEqual([]);
+  });
+
+  it('drawer-standard D8 Editar embarcação opens in the standard frame and puts once', async () => {
+    const success = vi.spyOn(toast, 'success');
+    await open();
+
+    await click(byLabel('Editar embarcação Aurora'));
+    const sheet = drawer()!;
+    expect(readFrame(sheet)).toEqual({
+      kicker: 'FROTA / EMBARCAÇÕES',
+      title: 'Editar embarcação',
+      description: 'Atualize as informações cadastrais e operacionais desta embarcação.',
+      closeLabel: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+      cards: [
+        {
+          title: 'Detalhes da embarcação',
+          subtitle: 'Informações básicas sobre a embarcação',
+          icon: 'lucideShip',
+          labels: ['Nome *'],
+        },
+        {
+          title: 'Tipo e comprimento',
+          subtitle: 'Identificação e dimensões da embarcação',
+          icon: 'lucideRuler',
+          labels: ['Tipo de embarcação *', 'Comprimento (m) *'],
+        },
+      ],
+      hint: '* Campos obrigatórios',
+      buttons: [
+        { type: 'button', first: 'ng-icon[name="lucideX"]', label: 'Cancelar', disabled: false },
+        { type: 'submit', first: 'ng-icon[name="lucideCheck"]', label: 'Salvar alterações', disabled: false },
+      ],
+    });
+    expect(sheet.querySelector('#customerId')).toBeNull();
+    expect(sheet.querySelector('#imoNumber')).toBeNull();
+    expect(sheet.textContent).not.toContain('Cliente responsável');
+    expect(sheet.textContent).not.toContain('Número IMO');
+    expect(document.activeElement?.id).toBe('vessel-name');
+    expect([value('#vessel-name'), value('#type'), value('#length')]).toEqual(['Aurora', 'CARGO', '32.5']);
+
+    // Emptied fields stay quiet until the save button is used, which then sends nothing.
+    await type('#vessel-name', '');
+    await type('#length', '');
+    expect(messages(sheet)).toEqual({});
+    expect(invalidFields(sheet)).toEqual([]);
+    await click(submitButton(sheet));
+    expect(pending()).toEqual([]);
+    expect(messages(sheet)).toEqual({
+      'vessel-name': ['Nome é obrigatório'],
+      length: ['Comprimento é obrigatório'],
+    });
+    expect(errorCount(sheet)).toBe(2);
+    expect(invalidFields(sheet)).toEqual(['vessel-name', 'length']);
+
+    // Cancelar closes with no request; the same Vessel opens again with its stored values, clean.
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(pending()).toEqual([]);
+    await click(byLabel('Editar embarcação Aurora'));
+    expect([value('#vessel-name'), value('#type'), value('#length')]).toEqual(['Aurora', 'CARGO', '32.5']);
+    expect(messages(drawer()!)).toEqual({});
+    expect(errorCount(drawer()!)).toBe(0);
+    expect(invalidFields(drawer()!)).toEqual([]);
+
+    await type('#vessel-name', 'Aurora II');
+    await type('#type', 'TANKER');
+    await type('#length', '33');
+    await click(submitButton(drawer()!));
+
+    expect(readButton(submitButton(drawer()!))).toEqual({
+      type: 'submit',
+      first: 'ng-icon[name="lucideLoader2"]',
+      label: 'Salvando...',
+      disabled: true,
+    });
+    const requests = controller.match(() => true);
+    expect(requests.map(({ request }) => `${request.method} ${request.urlWithParams}`)).toEqual([
+      'PUT /api/customers/c-atl/vessels/v-aur',
+    ]);
+    expect(requests[0].request.body).toEqual({ customerId: 'c-atl', name: 'Aurora II', type: 'TANKER', length: 33 });
+    requests[0].flush({ vessel: {} });
+    await settle();
+    controller.expectOne('/api/vessels').flush({
+      vessels: [{ ...aurora, name: 'Aurora II', type: 'TANKER', length: 33 }, lula, vento],
+      total: 3,
+    });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Embarcação atualizada com sucesso', expect.anything());
+    expect(drawer()).toBeNull();
+    expect(pending()).toEqual([]);
   });
 });

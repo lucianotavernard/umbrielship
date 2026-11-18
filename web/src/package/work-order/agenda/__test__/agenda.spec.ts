@@ -66,6 +66,60 @@ describe('Agenda', () => {
     );
   const drawer = (element: HTMLElement) => element.querySelector<HTMLElement>('[role="dialog"]');
 
+  // ---------------------------------------------------------------- the drawer standard (AD-053)
+
+  /** The header of a drawer, its close label and its `sm:` widths. */
+  const frame = (sheet: HTMLElement) => ({
+    kicker: text(sheet.querySelector('[data-slot="sheet-kicker"]')),
+    title: text(sheet.querySelector('[data-slot="sheet-title"]')),
+    description: text(sheet.querySelector('[data-slot="sheet-description"]')),
+    close: sheet.querySelector(':scope > header button')?.getAttribute('aria-label'),
+    widths: sheet.className.split(/\s+/).filter((token) => token.startsWith('sm:max-w-')),
+  });
+
+  /** A label as read, its `*` only when it is the required mark. */
+  const labelOf = (field: Element) => {
+    const copy = field.cloneNode(true) as Element;
+    const mark = copy.querySelector('[data-slot="required-mark"]');
+    mark?.remove();
+    return mark ? `${text(copy)} ${text(mark)}` : text(copy);
+  };
+
+  const drawerCards = (sheet: HTMLElement) =>
+    [...sheet.querySelectorAll<HTMLElement>('section[data-slot="drawer-card"]')].map((card) => ({
+      title: text(card.querySelector('[data-slot="drawer-card-title"]')),
+      subtitle: text(card.querySelector('[data-slot="drawer-card-subtitle"]')),
+      icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+      labels: [...card.querySelectorAll('label')].map(labelOf),
+    }));
+
+  const saveButton = (sheet: HTMLElement) =>
+    sheet.querySelector<HTMLButtonElement>(
+      'footer[data-slot="drawer-footer"] button[type="submit"]',
+    )!;
+
+  /** The footer: its hint, "Cancelar" (first icon, text) and the save button (type, first icon, text, disabled). */
+  const footer = (sheet: HTMLElement) => {
+    const bar = sheet.querySelector<HTMLElement>('footer[data-slot="drawer-footer"]')!;
+    const [cancel, save] = [...bar.querySelectorAll<HTMLButtonElement>('button')];
+    return {
+      hint: text(bar.querySelector('[data-slot="required-hint"]')),
+      cancel: [cancel.firstElementChild?.getAttribute('name'), text(cancel)],
+      save: [save.type, save.firstElementChild?.getAttribute('name'), text(save), save.disabled],
+    };
+  };
+
+  /** Each field: its control's id, whether it is marked invalid, and the messages under it. */
+  const fieldStates = (sheet: HTMLElement) =>
+    [...sheet.querySelectorAll('t-form-group')].map((group) => {
+      const control = group.querySelector('input, select, textarea')!;
+      return [
+        control.id,
+        control.hasAttribute('data-invalid'),
+        [...group.querySelectorAll('[data-slot="error"]')].map((error) => text(error)),
+      ];
+    });
+
   async function click(target: HTMLElement) {
     target.click();
     await settle();
@@ -490,7 +544,8 @@ describe('Agenda', () => {
     await click(headers(element)[TUE]);
     await click(button(element, 'Adicionar compromisso neste dia'));
     expect(start()).toBe('2026-11-17T08:00');
-    await click(button(drawer(element)!, 'Fechar'));
+    // The close button of every drawer reads "Fechar formulário" (drawer-standard AD-053).
+    await click(button(drawer(element)!, 'Fechar formulário'));
     expect(drawer(element)).toBeNull();
     expect(controller.match(() => true)).toEqual([]);
   });
@@ -549,5 +604,148 @@ describe('Agenda', () => {
       expect(element.querySelectorAll('[data-slot="cell-skeleton"]'), failing).toHaveLength(0);
       fixture.destroy();
     }
+  });
+
+  it('drawer-standard D12 Adicionar à agenda opens with the Serviço and Planejamento cards and posts once', async () => {
+    const success = vi.spyOn(toast, 'success');
+    const element = await renderAgenda(controller, 'operator');
+
+    await click(button(element, 'Novo compromisso'));
+    let sheet = drawer(element)!;
+
+    expect(frame(sheet)).toEqual({
+      kicker: 'NOVO COMPROMISSO',
+      title: 'Adicionar à agenda',
+      description: 'Reserve um horário para um serviço da ordem.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(drawerCards(sheet)).toEqual([
+      {
+        title: 'Serviço',
+        subtitle: 'Escolha a ordem e descreva o serviço',
+        icon: 'lucideWrench',
+        labels: ['Ordem de serviço *', 'Serviço *', 'Descrição *'],
+      },
+      {
+        title: 'Planejamento',
+        subtitle: 'Defina o início e o fim do serviço',
+        icon: 'lucideCalendarDays',
+        labels: ['Início *', 'Fim *'],
+      },
+    ]);
+    // "Descrição" is a multi-line field with no length limit.
+    const description = sheet.querySelector('#appointment-description')!;
+    expect(description.tagName).toBe('TEXTAREA');
+    expect(description.hasAttribute('maxlength')).toBe(false);
+    expect(document.activeElement?.id).toBe('appointment-work-order');
+    expect(footer(sheet)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: ['lucideX', 'Cancelar'],
+      save: ['submit', 'lucideCheck', 'Agendar serviço', false],
+    });
+
+    // Saved empty ("Início" emptied too): nothing sent, five messages each under its field.
+    expect(sheet.querySelector<HTMLInputElement>('#appointment-start')!.value).toBe(
+      '2026-11-18T08:00',
+    );
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-start')!, '');
+    await settle();
+    await click(saveButton(sheet));
+    expect(controller.match(() => true)).toEqual([]);
+    const messages = [
+      'Ordem de serviço é obrigatória',
+      'Serviço é obrigatório',
+      'Descrição é obrigatória',
+      'Início é obrigatório',
+      'Fim é obrigatório',
+    ];
+    expect(fieldStates(sheet)).toEqual([
+      ['appointment-work-order', true, [messages[0]]],
+      ['appointment-name', true, [messages[1]]],
+      ['appointment-description', true, [messages[2]]],
+      ['appointment-start', true, [messages[3]]],
+      ['appointment-end', true, [messages[4]]],
+    ]);
+    // None at the end of the form: no other error, each message once, nothing after the last card.
+    expect(sheet.querySelectorAll('[data-slot="error"]')).toHaveLength(5);
+    expect(messages.map((message) => sheet.textContent!.split(message).length - 1)).toEqual([
+      1, 1, 1, 1, 1,
+    ]);
+    const form = sheet.querySelector('form')!;
+    expect([...form.children].map((part) => part.getAttribute('data-slot'))).toEqual([
+      'drawer-body',
+      'drawer-footer',
+    ]);
+    expect(
+      text(
+        form.querySelector('[data-slot="drawer-body"]')!.lastElementChild!.querySelector(
+          '[data-slot="drawer-card-title"]',
+        ),
+      ),
+    ).toBe('Planejamento');
+
+    await click(button(sheet, 'Cancelar'));
+    expect(drawer(element)).toBeNull();
+    expect(controller.match(() => true)).toEqual([]);
+
+    // Opened again from a cell: that cell's day and hour in "Início", nothing red, no message.
+    await click(
+      button(cell(element, WED, 1), 'Criar compromisso em Quarta-feira, 18 de novembro às 10:00'),
+    );
+    sheet = drawer(element)!;
+    expect(sheet.querySelector<HTMLInputElement>('#appointment-start')!.value).toBe(
+      '2026-11-18T10:00',
+    );
+    expect(fieldStates(sheet)).toEqual([
+      ['appointment-work-order', false, []],
+      ['appointment-name', false, []],
+      ['appointment-description', false, []],
+      ['appointment-start', false, []],
+      ['appointment-end', false, []],
+    ]);
+    expect(sheet.querySelectorAll('[data-slot="error"], [data-invalid]')).toHaveLength(0);
+
+    choose(sheet.querySelector<HTMLSelectElement>('#appointment-work-order')!, AURORA);
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-name')!, 'Troca de anodos');
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-description')!, 'Anodos da popa');
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-end')!, '2026-11-18T12:00');
+    await settle();
+    await click(saveButton(sheet));
+
+    expect(footer(sheet).save).toEqual(['submit', 'lucideLoader2', 'Salvando...', true]);
+    const sent = controller.match(() => true);
+    expect(
+      sent.map(({ request }) => [request.method, request.urlWithParams, request.body]),
+    ).toEqual([
+      [
+        'POST',
+        `/api/work-orders/${AURORA}/services`,
+        {
+          name: 'Troca de anodos',
+          description: 'Anodos da popa',
+          startDate: new Date(2026, 10, 18, 10, 0).toISOString(),
+          endDate: new Date(2026, 10, 18, 12, 0).toISOString(),
+          status: 'PENDING',
+        },
+      ],
+    ]);
+    sent[0].flush(
+      {
+        id: 'svc-new',
+        workOrderId: AURORA,
+        name: 'Troca de anodos',
+        description: 'Anodos da popa',
+        status: 'PENDING',
+      },
+      { status: 201, statusText: 'Created' },
+    );
+    await settle();
+    expect(success.mock.calls.map(([title]) => title)).toEqual(['Serviço criado com sucesso']);
+    expect(drawer(element)).toBeNull();
+    controller
+      .expectOne({ method: 'GET', url: '/api/work-orders' })
+      .flush({ workOrders: workOrders(), total: 4 });
+    await settle();
   });
 });

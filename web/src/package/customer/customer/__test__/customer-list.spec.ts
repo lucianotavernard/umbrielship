@@ -79,6 +79,83 @@ describe('CustomerList', () => {
     [...root.querySelectorAll<HTMLButtonElement>('button')].find((button) => button.textContent?.trim() === text);
   const dialog = () => document.querySelector<HTMLElement>('[data-slot="sheet-content"]');
 
+  const squash = (node: Element | null | undefined) => node?.textContent?.replace(/\s+/g, ' ').trim();
+
+  /** A label as it reads: its own text, then " *" only when it carries the required mark. */
+  function labelText(label: Element) {
+    const copy = label.cloneNode(true) as Element;
+    const marks = [...copy.querySelectorAll('[data-slot="required-mark"]')];
+    marks.forEach((mark) => mark.remove());
+    return `${squash(copy)}${marks.length ? ' *' : ''}`;
+  }
+
+  /** A footer button as it reads: its type, its first child, its text and whether it is disabled. */
+  function readButton(button: HTMLButtonElement | null | undefined) {
+    const first = button?.firstElementChild;
+    return {
+      type: button?.type,
+      first: first ? `${first.tagName.toLowerCase()}[name="${first.getAttribute('name')}"]` : null,
+      label: squash(button),
+      disabled: button?.disabled,
+    };
+  }
+
+  /** The frame of the open drawer: header, width, cards with their labels, footer. */
+  function readFrame(sheet: HTMLElement) {
+    const footer = sheet.querySelector('footer[data-slot="drawer-footer"]');
+    return {
+      kicker: squash(sheet.querySelector('[data-slot="sheet-kicker"]')),
+      title: squash(sheet.querySelector('[data-slot="sheet-title"]')),
+      description: squash(sheet.querySelector('[data-slot="sheet-description"]')),
+      closeLabel: sheet.querySelector('header button')?.getAttribute('aria-label'),
+      widths: sheet.className.split(/\s+/).filter((token) => token.startsWith('sm:max-w-')),
+      cards: [...sheet.querySelectorAll('section[data-slot="drawer-card"]')].map((card) => ({
+        title: squash(card.querySelector('[data-slot="drawer-card-title"]')),
+        subtitle: squash(card.querySelector('[data-slot="drawer-card-subtitle"]')),
+        icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+        labels: [...card.querySelectorAll('label')].map(labelText),
+      })),
+      hint: squash(footer?.querySelector('[data-slot="required-hint"]')),
+      buttons: [...(footer?.querySelectorAll<HTMLButtonElement>('button') ?? [])].map(readButton),
+    };
+  }
+
+  const submitButton = (sheet: HTMLElement) =>
+    sheet.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]');
+
+  /** The messages shown in the drawer, by the id of the field whose group shows them. */
+  function messages(sheet: HTMLElement) {
+    const shown: Record<string, string[]> = {};
+    for (const group of sheet.querySelectorAll('t-form-group')) {
+      const errors = [...group.querySelectorAll('[data-slot="error"]')].map((error) => squash(error) ?? '');
+      if (errors.length) shown[group.querySelector('input, select, textarea')?.id ?? 'no field'] = errors;
+    }
+    return shown;
+  }
+
+  const errorCount = (sheet: HTMLElement) => sheet.querySelectorAll('[data-slot="error"], t-input-error').length;
+  const invalidFields = (sheet: HTMLElement) => [...sheet.querySelectorAll('[data-invalid]')].map((field) => field.id);
+  const pending = () => controller.match(() => true).map(({ request }) => `${request.method} ${request.urlWithParams}`);
+  const values = () =>
+    ['#name', '#email', '#phone', '#address', '#city', '#state'].map(
+      (selector) => dialog()?.querySelector<HTMLInputElement | HTMLSelectElement>(selector)?.value,
+    );
+
+  const customerCards = [
+    {
+      title: 'Dados do cliente',
+      subtitle: 'Identificação e formas de contato',
+      icon: 'lucideBuilding2',
+      labels: ['Nome do cliente *', 'E-mail *', 'Telefone para contato *'],
+    },
+    {
+      title: 'Endereço',
+      subtitle: 'Localização do cliente',
+      icon: 'lucideMapPin',
+      labels: ['Rua e número *', 'Cidade *', 'Estado (UF) *'],
+    },
+  ];
+
   async function click(target: HTMLElement | null | undefined) {
     if (!target) throw new Error('nothing to click');
     target.click();
@@ -262,7 +339,7 @@ describe('CustomerList', () => {
     expect(drawer.querySelector('[data-slot="sheet-title"]')?.textContent?.trim()).toBe('Novo cliente');
     expect(drawer.textContent).toContain('Cadastre os dados de contato do proprietário da embarcação.');
     expect(drawer.textContent).not.toContain('Logo (URL da imagem)');
-    expect(drawer.textContent).toContain('Campos com * são obrigatórios');
+    expect(drawer.textContent).toContain('* Campos obrigatórios');
     const state = drawer.querySelector<HTMLSelectElement>('select#state')!;
     expect(state.options[0].textContent?.trim()).toBe('Selecione o estado');
     expect([...state.options].map((option) => option.value)).toContain('SP');
@@ -274,7 +351,7 @@ describe('CustomerList', () => {
     await type('#address', 'Av. Portuária, 890');
     await type('#city', 'Santos');
     await type('#state', 'SP');
-    await click(buttonByText('Cadastrar cliente', drawer));
+    await click(buttonByText('Criar cliente', drawer));
 
     const post = controller.expectOne('/api/customers');
     expect(post.request.method).toBe('POST');
@@ -306,7 +383,7 @@ describe('CustomerList', () => {
     expect(dialog()).toBeNull();
 
     await click(buttonByText('Novo cliente'));
-    await click(dialog()!.querySelector<HTMLButtonElement>('[aria-label="Fechar cadastro"]'));
+    await click(dialog()!.querySelector<HTMLButtonElement>('[aria-label="Fechar formulário"]'));
     expect(dialog()).toBeNull();
     // afterEach verifies that nothing was posted.
   });
@@ -387,7 +464,7 @@ describe('CustomerList', () => {
     await type('#address', 'Rua');
     await type('#city', 'Santos');
     await type('#state', 'SP');
-    await click(buttonByText('Cadastrar cliente', dialog()!));
+    await click(buttonByText('Criar cliente', dialog()!));
     controller
       .expectOne('/api/customers')
       .flush({ message: 'Customer already exists' }, { status: 409, statusText: 'Conflict' });
@@ -459,5 +536,178 @@ describe('CustomerList', () => {
     await open([customer({ id: 'c-atl', name: 'Atlantic' })]);
 
     expect(byLabel('Ver detalhes de Atlantic')?.getAttribute('href')).toBe('/customers/c-atl');
+  });
+
+  it('drawer-standard D10 Novo cliente opens with the Dados do cliente and Endereço cards and posts once', async () => {
+    const success = vi.spyOn(toast, 'success');
+    await open([customer({ name: 'Atlantic' })]);
+
+    await click(buttonByText('Novo cliente'));
+    const sheet = dialog()!;
+    expect(readFrame(sheet)).toEqual({
+      kicker: 'RELACIONAMENTO / CLIENTES',
+      title: 'Novo cliente',
+      description: 'Cadastre os dados de contato do proprietário da embarcação.',
+      closeLabel: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+      cards: customerCards,
+      hint: '* Campos obrigatórios',
+      buttons: [
+        { type: 'button', first: 'ng-icon[name="lucideX"]', label: 'Cancelar', disabled: false },
+        { type: 'submit', first: 'ng-icon[name="lucideCheck"]', label: 'Criar cliente', disabled: false },
+      ],
+    });
+    // The header at the reference's size, not the compact one.
+    expect(sheet.querySelector('[data-slot="sheet-title"]')?.classList).toContain('text-[20px]');
+    expect(sheet.textContent).not.toContain('Campos com * são obrigatórios');
+    expect(document.activeElement?.id).toBe('name');
+    expect(messages(sheet)).toEqual({});
+    expect(invalidFields(sheet)).toEqual([]);
+
+    // Saving the empty form sends nothing and speaks under each field.
+    await click(submitButton(sheet));
+    expect(pending()).toEqual([]);
+    expect(messages(sheet)).toEqual({
+      name: ['Nome é obrigatório'],
+      email: ['E-mail é obrigatório'],
+      phone: ['Telefone é obrigatório'],
+      address: ['Endereço é obrigatório'],
+      city: ['Cidade é obrigatório'],
+      state: ['Estado é obrigatório'],
+    });
+    expect(errorCount(sheet)).toBe(6);
+    expect(invalidFields(sheet)).toEqual(['name', 'email', 'phone', 'address', 'city', 'state']);
+
+    // Cancelar closes with no request, and the next opening starts clean.
+    await click(buttonByText('Cancelar', sheet));
+    expect(dialog()).toBeNull();
+    expect(pending()).toEqual([]);
+    await click(buttonByText('Novo cliente'));
+    expect(values()).toEqual(['', '', '', '', '', '']);
+    expect(messages(dialog()!)).toEqual({});
+    expect(errorCount(dialog()!)).toBe(0);
+    expect(invalidFields(dialog()!)).toEqual([]);
+
+    await type('#name', 'Náutica Costa Sul');
+    await type('#email', 'contato@costasul.test');
+    await type('#phone', '13977776666');
+    await type('#address', 'Av. Portuária, 890');
+    await type('#city', 'Santos');
+    await type('#state', 'SP');
+    await click(submitButton(dialog()!));
+
+    expect(readButton(submitButton(dialog()!))).toEqual({
+      type: 'submit',
+      first: 'ng-icon[name="lucideLoader2"]',
+      label: 'Salvando...',
+      disabled: true,
+    });
+    const requests = controller.match(() => true);
+    expect(requests.map(({ request }) => `${request.method} ${request.urlWithParams}`)).toEqual(['POST /api/customers']);
+    expect(requests[0].request.body).toEqual({
+      name: 'Náutica Costa Sul',
+      email: 'contato@costasul.test',
+      phone: '13977776666',
+      address: { address: 'Av. Portuária, 890', city: 'Santos', state: 'SP' },
+    });
+    requests[0].flush({ customer: customer({ name: 'Náutica Costa Sul' }) });
+    await settle();
+    controller.expectOne('/api/customers').flush({
+      customers: [customer({ name: 'Atlantic' }), customer({ name: 'Náutica Costa Sul' })],
+      total: 2,
+    });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Cliente criado com sucesso', expect.anything());
+    expect(dialog()).toBeNull();
+    expect(pending()).toEqual([]);
+  });
+
+  it('drawer-standard D11 Editar cliente reopens clean on the same customer and puts once', async () => {
+    const success = vi.spyOn(toast, 'success');
+    await open([
+      customer({
+        id: 'c-atl',
+        name: 'Atlantic',
+        email: 'ops@atlantic.test',
+        phone: '11999999999',
+        address: { address: 'Rua 1', city: 'Santos', state: 'SP' },
+      }),
+      customer({ name: 'Bravo' }),
+    ]);
+
+    await click(byLabel('Editar Atlantic'));
+    const sheet = dialog()!;
+    expect(readFrame(sheet)).toEqual({
+      kicker: 'RELACIONAMENTO / CLIENTES',
+      title: 'Editar cliente',
+      description: 'Cadastre os dados de contato do proprietário da embarcação.',
+      closeLabel: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+      cards: customerCards,
+      hint: '* Campos obrigatórios',
+      buttons: [
+        { type: 'button', first: 'ng-icon[name="lucideX"]', label: 'Cancelar', disabled: false },
+        { type: 'submit', first: 'ng-icon[name="lucideCheck"]', label: 'Salvar alterações', disabled: false },
+      ],
+    });
+    expect(document.activeElement?.id).toBe('name');
+    expect(values()).toEqual(['Atlantic', 'ops@atlantic.test', '11999999999', 'Rua 1', 'Santos', 'SP']);
+
+    // Typed invalid values stay quiet until the save button is used, which then sends nothing.
+    await type('#name', '');
+    await type('#email', 'ana@');
+    expect(messages(sheet)).toEqual({});
+    expect(invalidFields(sheet)).toEqual([]);
+    await click(submitButton(sheet));
+    expect(pending()).toEqual([]);
+    expect(messages(sheet)).toEqual({ name: ['Nome é obrigatório'], email: ['E-mail inválido'] });
+    expect(errorCount(sheet)).toBe(2);
+    expect(invalidFields(sheet)).toEqual(['name', 'email']);
+
+    // Cancelar closes with no request; the same Customer opens again with its stored values, clean.
+    await click(buttonByText('Cancelar', sheet));
+    expect(dialog()).toBeNull();
+    expect(pending()).toEqual([]);
+    await click(byLabel('Editar Atlantic'));
+    expect(values()).toEqual(['Atlantic', 'ops@atlantic.test', '11999999999', 'Rua 1', 'Santos', 'SP']);
+    expect(messages(dialog()!)).toEqual({});
+    expect(errorCount(dialog()!)).toBe(0);
+    expect(invalidFields(dialog()!)).toEqual([]);
+
+    await type('#name', 'Atlantic Pesca');
+    await type('#city', 'Guarujá');
+    await click(submitButton(dialog()!));
+
+    expect(readButton(submitButton(dialog()!))).toEqual({
+      type: 'submit',
+      first: 'ng-icon[name="lucideLoader2"]',
+      label: 'Salvando...',
+      disabled: true,
+    });
+    const requests = controller.match(() => true);
+    expect(requests.map(({ request }) => `${request.method} ${request.urlWithParams}`)).toEqual([
+      'PUT /api/customers/c-atl',
+    ]);
+    expect(requests[0].request.body).toEqual({
+      name: 'Atlantic Pesca',
+      email: 'ops@atlantic.test',
+      phone: '11999999999',
+      address: { address: 'Rua 1', city: 'Guarujá', state: 'SP' },
+    });
+    requests[0].flush({ customer: {} });
+    await settle();
+    controller.expectOne('/api/customers').flush({
+      customers: [
+        customer({ id: 'c-atl', name: 'Atlantic Pesca', address: { address: 'Rua 1', city: 'Guarujá', state: 'SP' } }),
+        customer({ name: 'Bravo' }),
+      ],
+      total: 2,
+    });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Cliente atualizado com sucesso', expect.anything());
+    expect(dialog()).toBeNull();
+    expect(pending()).toEqual([]);
   });
 });

@@ -105,11 +105,8 @@
 
 <t-sheet
   kicker="BIBLIOTECA DE INSPEÇÕES"
-  closeLabel="Fechar formulário"
   title="Novo modelo"
   description="Defina as perguntas que o inspetor deverá responder em campo."
-  class="bg-card sm:w-full sm:max-w-[590px]"
-  [flush]="true"
   [isActive]="isTemplateSheetActive()"
   (closed)="closeTemplateSheet()"
 >
@@ -118,11 +115,8 @@
 
 <t-sheet
   kicker="ATRIBUIR INSPEÇÃO"
-  closeLabel="Fechar atribuição"
   title="Escolha a OS e o alvo"
   [description]="'A inspeção usará o modelo ' + (assigning()?.name ?? '') + '.'"
-  class="bg-card sm:w-full sm:max-w-[500px]"
-  [flush]="true"
   [isActive]="assigning() !== null"
   (closed)="closeAssign()"
 >

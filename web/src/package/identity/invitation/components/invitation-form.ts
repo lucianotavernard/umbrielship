@@ -1,9 +1,11 @@
 import { Component, input, output, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 
-import { Button } from '../../../shared/components/ui/button';
+import { provideIcons } from '@ng-icons/core';
+import { lucideSend } from '@ng-icons/lucide';
+
+import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '../../../shared/components/ui/drawer';
 import { FormGroup, Label, Select } from '../../../shared/components/ui/form';
-import { Icon } from '../../../shared/components/ui/icon';
 import { Role, UserCandidate } from '../../user/user.service';
 import { SendInvitationRequest } from '../invitation.service';
 
@@ -11,22 +13,15 @@ export type InvitationFormValue = Omit<SendInvitationRequest, 'organizationId'>;
 
 @Component({
   selector: 'invitation-form-ui',
-  imports: [FormField, FormGroup, Label, Select, Button, Icon],
+  imports: [FormField, FormGroup, Label, Select, DrawerForm, DrawerBody, DrawerCard, DrawerFooter, RequiredMark],
+  viewProviders: [provideIcons({ lucideSend })],
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
   template: `
-    <form class="flex flex-col gap-6" (submit)="submitForm($event)">
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <div class="flex items-center gap-3 border-b bg-muted px-6 py-4">
-          <div class="flex rounded-lg bg-background p-3 shadow-xs">
-            <svg tIcon name="send" />
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Convite</h3>
-            <p class="text-xs text-muted-foreground">Quem será convidado e com qual papel</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 gap-x-6 gap-y-5 p-6 sm:grid-cols-6">
-          <t-form-group class="sm:col-span-full">
-            <label tLabel for="invitation-user">Usuário</label>
+    <form [tDrawerForm]="shownErrors()" novalidate (submit)="submitForm($event)">
+      <t-drawer-body>
+        <section tDrawerCard heading="Convite" subheading="Quem será convidado e com qual papel" icon="lucideSend">
+          <t-form-group>
+            <label tLabel for="invitation-user">Usuário <t-required /></label>
             <select tSelect id="invitation-user" [formField]="invitationForm.userId">
               <option value="">Selecione o usuário</option>
               @for (user of users(); track user.id) {
@@ -34,7 +29,7 @@ export type InvitationFormValue = Omit<SendInvitationRequest, 'organizationId'>;
               }
             </select>
           </t-form-group>
-          <t-form-group class="sm:col-span-full">
+          <t-form-group>
             <label tLabel for="invitation-role">Papel</label>
             <select tSelect id="invitation-role" [formField]="invitationForm.role">
               <option value="administrator">Administrador</option>
@@ -42,19 +37,21 @@ export type InvitationFormValue = Omit<SendInvitationRequest, 'organizationId'>;
               <option value="inspector">Inspetor</option>
             </select>
           </t-form-group>
-        </div>
-      </section>
-      <footer class="flex items-center justify-end gap-3">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">Cancelar</button>
-        <button tButton type="submit">Enviar</button>
-      </footer>
+        </section>
+      </t-drawer-body>
+
+      <footer tDrawerFooter submitLabel="Enviar convite" [loading]="loading()" (cancelled)="closed.emit()"></footer>
     </form>
   `,
 })
 export class InvitationForm {
   users = input<UserCandidate[]>([]);
+  loading = input(false);
   submitted = output<InvitationFormValue>();
   closed = output<void>();
+
+  /** Errors show once the save button was used (AD-057). */
+  protected readonly shownErrors = signal(false);
 
   model = signal<InvitationFormValue>({ userId: '', role: 'operator' });
 
@@ -64,11 +61,14 @@ export class InvitationForm {
   });
 
   reset() {
+    this.shownErrors.set(false);
     this.invitationForm().reset({ userId: '', role: 'operator' });
   }
 
   submitForm(event: Event) {
     event.preventDefault();
+    this.shownErrors.set(true);
+    if (this.invitationForm().invalid()) return;
     const value = this.invitationForm().value();
     this.submitted.emit({ userId: value.userId, role: value.role as Role });
   }

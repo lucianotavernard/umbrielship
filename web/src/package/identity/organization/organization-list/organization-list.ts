@@ -31,6 +31,7 @@ export class OrganizationList {
 
   page = signal(1);
   isSheetActive = signal(false);
+  submitting = signal(false);
 
   loading = computed(() => this.organizationResource.isLoading());
   organizations = computed(() => resourceValue(this.organizationResource)?.organizations ?? []);
@@ -41,6 +42,7 @@ export class OrganizationList {
   }
 
   openSheet() {
+    this.organizationForm()?.reset();
     this.isSheetActive.set(true);
   }
 
@@ -49,13 +51,17 @@ export class OrganizationList {
   }
 
   createOrganization(organization: { name: string; email: string }) {
+    this.submitting.set(true);
     this.organizationService.createOrganization(organization).subscribe({
       next: () => {
+        this.submitting.set(false);
         toast.success('Organização criada com sucesso');
         this.closeSheet();
         this.organizationResource.reload();
       },
       error: (response) => {
+        // The drawer stays open with what was typed.
+        this.submitting.set(false);
         toast.error('Erro ao criar organização', {
           description: apiErrorMessage(response, 'Ocorreu um erro ao criar a organização.'),
         });

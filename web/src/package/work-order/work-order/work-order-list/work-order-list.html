@@ -162,8 +162,6 @@
 </div>
 
 <t-sheet
-  closeLabel="Fechar formulário"
-  class="sm:w-full sm:max-w-[580px]"
   [kicker]="editing() ? 'ORDEM DE SERVIÇO' : 'NOVA SOLICITAÇÃO'"
   [title]="editing() ? 'Editar ordem de serviço' : 'Nova ordem de serviço'"
   [description]="
@@ -171,7 +169,6 @@
       ? 'Atualize o período e o status da ordem de serviço.'
       : 'Preencha os dados dos serviços para programar o atendimento da embarcação.'
   "
-  [flush]="true"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >

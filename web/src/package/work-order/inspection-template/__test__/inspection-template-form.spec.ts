@@ -30,9 +30,14 @@ describe('InspectionTemplate form', () => {
       .expectOne({ method: 'GET', url: '/api/inspection-templates' })
       .flush({ inspectionTemplates: [], total: 0 });
 
+  // The dashed "Adicionar pergunta" under the questions replaces "Adicionar" above them (AD-056).
+  const ADD = 'Adicionar pergunta';
+  const editors = () => [...sheet.querySelectorAll<HTMLElement>('div[data-slot="question-editor"]')];
+  const titles = () => editors().map((editor) => editor.querySelector('strong')?.textContent?.trim());
+
   async function add(...labels: string[]) {
     for (const label of labels) {
-      button(sheet, 'Adicionar').click();
+      button(sheet, ADD).click();
       await settle();
       fill(questionFields(sheet).at(-1)!, label);
     }
@@ -49,7 +54,7 @@ describe('InspectionTemplate form', () => {
   it('template C21 Adicionar appends an empty question', async () => {
     fill(questionFields(sheet)[0], 'A');
     await settle();
-    button(sheet, 'Adicionar').click();
+    button(sheet, ADD).click();
     await settle();
 
     expect(questions(sheet)).toEqual(['A', '']);
@@ -100,11 +105,11 @@ describe('InspectionTemplate form', () => {
     expect(questions(sheet)).toEqual(['A', 'C']);
 
     for (let count = 2; count < 100; count++) {
-      button(sheet, 'Adicionar').click();
+      button(sheet, ADD).click();
     }
     await settle();
     expect(questionFields(sheet)).toHaveLength(100);
-    expect(button(sheet, 'Adicionar').disabled).toBe(true);
+    expect(button(sheet, ADD).disabled).toBe(true);
   });
 
   it('template C24 shows the field errors and sends nothing', async () => {
@@ -153,7 +158,10 @@ describe('InspectionTemplate form', () => {
     expect(sheet.querySelector('label[for="question-type-0"]')?.textContent?.trim()).toBe(
       'Tipo de resposta',
     );
-    expect(sheet.querySelector('label[for="question-0"]')?.textContent?.trim()).toBe('Enunciado');
+    // "Enunciado" is required and opens empty: the red mark (AD-053).
+    expect(
+      sheet.querySelector('label[for="question-0"]')?.textContent?.replace(/\s+/g, ' ').trim(),
+    ).toBe('Enunciado *');
     const optionLabels = [...typeSelect(0).options].map((option) => option.textContent?.trim());
     expect(optionLabels).toEqual([
       'Texto livre',
@@ -189,5 +197,85 @@ describe('InspectionTemplate form', () => {
     created.flush({ inspectionTemplate: { id: 't1' } }, { status: 201, statusText: 'Created' });
     await settle();
     reloaded();
+  });
+
+  it('drawer-standard C32 Adicionar pergunta adds the next block with Texto livre and stops at 100', async () => {
+    const addButton = () => sheet.querySelector<HTMLButtonElement>('button[data-slot="drawer-add"]')!;
+    const typeSelect = (index: number) =>
+      sheet.querySelector<HTMLSelectElement>(`#question-type-${index}`)!;
+    const typeLabel = (index: number) => typeSelect(index).selectedOptions[0]?.textContent?.trim();
+
+    expect(addButton().textContent?.trim()).toBe('Adicionar pergunta');
+    fill(questionFields(sheet)[0], 'A');
+    await settle();
+
+    // 1 question → "Pergunta 02" at the end, its "Enunciado" empty and "Texto livre".
+    addButton().click();
+    await settle();
+    expect(titles()).toEqual(['Pergunta 01', 'Pergunta 02']);
+    expect(editors().map((editor) => editor.getAttribute('aria-label'))).toEqual([
+      'Pergunta 01',
+      'Pergunta 02',
+    ]);
+    expect(questions(sheet)).toEqual(['A', '']);
+    expect([typeSelect(1).value, typeLabel(1)]).toEqual(['TEXT', 'Texto livre']);
+    expect(
+      editors().at(-1)!.compareDocumentPosition(addButton()) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    for (let count = 2; count < 99; count++) {
+      addButton().click();
+    }
+    await settle();
+    expect(editors()).toHaveLength(99);
+    expect(addButton().disabled).toBe(false);
+
+    // 99 questions → the 100th, numbered after the last, then the button is disabled.
+    addButton().click();
+    await settle();
+    expect(editors()).toHaveLength(100);
+    expect(titles().slice(-2)).toEqual(['Pergunta 99', 'Pergunta 100']);
+    expect(questions(sheet).at(-1)).toBe('');
+    expect([typeSelect(99).value, typeLabel(99)]).toEqual(['TEXT', 'Texto livre']);
+    expect(addButton().disabled).toBe(true);
+
+    // At 100 a use adds nothing.
+    addButton().click();
+    await settle();
+    expect(editors()).toHaveLength(100);
+    expect(questionFields(sheet)).toHaveLength(100);
+    controller.expectNone(() => true);
+  });
+
+  it('drawer-standard C33 Subir, Descer and Remover pergunta show from two questions with the trash icon', async () => {
+    const controls = (editor: HTMLElement) =>
+      [...editor.querySelectorAll('button')].map((control) => control.getAttribute('aria-label'));
+
+    // One question: no "Subir", "Descer" or "Remover pergunta 1".
+    expect(editors()).toHaveLength(1);
+    expect(controls(editors()[0])).toEqual([]);
+    expect(buttons(sheet, 'Subir')).toEqual([]);
+    expect(buttons(sheet, 'Descer')).toEqual([]);
+    expect(buttons(sheet, 'Remover pergunta 1')).toEqual([]);
+
+    // Two: each block shows them, "Remover pergunta <n>" with the trash icon.
+    button(sheet, ADD).click();
+    await settle();
+    expect(editors().map(controls)).toEqual([
+      ['Subir', 'Descer', 'Remover pergunta 1'],
+      ['Subir', 'Descer', 'Remover pergunta 2'],
+    ]);
+    expect(
+      editors().map((editor, index) =>
+        buttons(editor, `Remover pergunta ${index + 1}`)[0]
+          .firstElementChild?.getAttribute('name'),
+      ),
+    ).toEqual(['lucideTrash', 'lucideTrash']);
+
+    // Back to one: none of them.
+    button(sheet, 'Remover pergunta 2').click();
+    await settle();
+    expect(editors()).toHaveLength(1);
+    expect(controls(editors()[0])).toEqual([]);
   });
 });

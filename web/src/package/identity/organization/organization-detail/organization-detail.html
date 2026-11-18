@@ -50,24 +50,25 @@
 </section>
 
 <t-sheet
+  kicker="ORGANIZAÇÃO / USUÁRIOS"
   title="Novo usuário"
-  class="sm:max-w-md"
   description="Crie um usuário nesta organização"
   [isActive]="isUserSheetActive()"
   (closed)="closeUserSheet()"
 >
-  <user-form-ui (closed)="closeUserSheet()" (submitted)="createUser($event)" />
+  <user-form-ui [loading]="submitting()" (closed)="closeUserSheet()" (submitted)="createUser($event)" />
 </t-sheet>
 
 <t-sheet
+  kicker="ORGANIZAÇÃO / CONVITES"
   title="Novo convite"
-  class="sm:max-w-md"
   description="Convide um usuário que já existe para esta organização"
   [isActive]="isInvitationSheetActive()"
   (closed)="closeInvitationSheet()"
 >
   <invitation-form-ui
     [users]="candidates()"
+    [loading]="submitting()"
     (closed)="closeInvitationSheet()"
     (submitted)="sendInvitation($event)"
   />

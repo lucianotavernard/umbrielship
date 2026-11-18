@@ -129,7 +129,6 @@ export class VesselDetail {
   openEditVesselSheet() {
     this.vesselForm()?.load(this.vessel());
     this.isEditVesselSheetActive.set(true);
-    this.vesselForm()?.focusName();
   }
 
   closeEditVesselSheet() {

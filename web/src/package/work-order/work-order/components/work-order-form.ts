@@ -1,19 +1,19 @@
-import { afterNextRender, Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { applyEach, disabled, form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {
-  lucideCalendarDays,
-  lucideCheck,
-  lucideLoader2,
-  lucidePlus,
-  lucideShip,
-  lucideWrench,
-  lucideX,
-} from '@ng-icons/lucide';
+import { lucideCalendarDays, lucidePlus, lucideShip, lucideWrench, lucideX } from '@ng-icons/lucide';
 
-import { Button } from '../../../shared/components/ui/button';
-import { FormGroup, Input, Label, Select } from '../../../shared/components/ui/form';
+import {
+  DrawerAddButton,
+  DrawerBody,
+  DrawerCard,
+  DrawerEntry,
+  DrawerFooter,
+  DrawerForm,
+  RequiredMark,
+} from '../../../shared/components/ui/drawer';
+import { FormGroup, Input, Label, Select, Textarea } from '../../../shared/components/ui/form';
 import {
   CreateWorkOrderRequest,
   WORK_ORDER_STATUSES,
@@ -53,19 +53,6 @@ type Model = {
 
 const blankService = () => ({ name: '', description: '' });
 
-// A card keeps its height and the drawer body scrolls, as the mareos `.drawer-sections > .form-card`.
-const card = 'shrink-0 overflow-hidden rounded-[11px] border border-border bg-card';
-const cardHeader =
-  'flex min-h-[62px] items-center gap-[11px] border-b border-border bg-[#f3f7f8] px-[15px] py-[11px] dark:bg-muted';
-const cardIcon =
-  'grid size-[34px] shrink-0 place-items-center rounded-lg bg-[#e3f0ef] text-primary dark:bg-[#17302f]';
-const fieldLabel = 'text-[10px] font-semibold';
-// The mareos fields show their focus on any focus, a click or the drawer opening included.
-const field =
-  'bg-card text-[11px] md:text-[11px] focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15';
-const textarea =
-  'min-h-[75px] w-full resize-y rounded-md border border-input bg-card px-3 py-2 text-[11px] leading-[1.5] shadow-xs outline-none placeholder:text-muted-foreground focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15 dark:bg-input/30';
-
 /**
  * The mareos "Nova ordem de serviço" drawer (AD-035, AD-044): Embarcação with its Customer read only,
  * "Serviços a realizar" (name and description each) and "Planejamento" (Docagem, Desdocagem, Status).
@@ -73,201 +60,131 @@ const textarea =
  */
 @Component({
   selector: 'work-order-form-ui',
-  imports: [NgIcon, FormField, FormGroup, Label, Input, Select, Button],
-  viewProviders: [
-    provideIcons({ lucideCalendarDays, lucideCheck, lucideLoader2, lucidePlus, lucideShip, lucideWrench, lucideX }),
+  imports: [
+    NgIcon,
+    FormField,
+    FormGroup,
+    Label,
+    Input,
+    Select,
+    Textarea,
+    DrawerForm,
+    DrawerBody,
+    DrawerCard,
+    DrawerEntry,
+    DrawerAddButton,
+    DrawerFooter,
+    RequiredMark,
   ],
+  viewProviders: [provideIcons({ lucideCalendarDays, lucidePlus, lucideShip, lucideWrench, lucideX })],
   template: `
-    <form class="flex min-h-0 flex-1 flex-col" novalidate (submit)="submitForm($event)">
-      <div
-        class="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto overscroll-y-contain bg-muted/60 px-[13px] py-[14px] sm:gap-[13px] sm:px-[25px] sm:py-[19px]"
-      >
-        <section [class]="card">
-          <header [class]="cardHeader">
-            <span [class]="cardIcon"><ng-icon name="lucideShip" class="!size-[17px]" /></span>
-            <span>
-              <strong class="block text-[12px] font-semibold text-foreground">Embarcação e cliente</strong>
-              <small class="mt-0.5 block text-[10px] text-muted-foreground">Identifique a embarcação atendida</small>
-            </span>
-          </header>
-          <div class="grid grid-cols-1 gap-[14px] px-[18px] pt-4 pb-[18px]">
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="wo-vessel" [class]="fieldLabel">
-                Embarcação <span class="text-destructive">*</span>
-              </label>
-              <select
-                #vesselSelect
-                tSelect
-                id="wo-vessel"
-                [class]="field"
-                [formField]="workOrderForm.vesselId"
-              >
-                <option value="">Selecione uma embarcação</option>
-                @for (vessel of sortedVessels(); track vessel.id) {
-                  <option [value]="vessel.id">{{ vessel.name }}</option>
-                }
-              </select>
-              @if (shownErrors()) {
-                @for (error of workOrderForm.vesselId().errors(); track $index) {
-                  <p data-slot="error" class="text-[10px] font-medium text-destructive">{{ error.message }}</p>
-                }
+    <form [tDrawerForm]="shownErrors()" novalidate (submit)="submitForm($event)">
+      <t-drawer-body>
+        <section tDrawerCard heading="Embarcação e cliente" subheading="Identifique a embarcação atendida" icon="lucideShip">
+          <t-form-group>
+            <label tLabel for="wo-vessel">Embarcação <t-required /></label>
+            <select tSelect id="wo-vessel" [formField]="workOrderForm.vesselId">
+              <option value="">Selecione uma embarcação</option>
+              @for (vessel of sortedVessels(); track vessel.id) {
+                <option [value]="vessel.id">{{ vessel.name }}</option>
               }
-            </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="wo-customer" [class]="fieldLabel">Cliente responsável</label>
-              <input
-                tInput
-                id="wo-customer"
-                type="text"
-                readonly
-                [class]="field + ' text-muted-foreground'"
-                placeholder="Definido pela embarcação"
-                [value]="customerName()"
-              />
-            </t-form-group>
-          </div>
+            </select>
+          </t-form-group>
+          <t-form-group>
+            <label tLabel for="wo-customer">Cliente responsável</label>
+            <input
+              tInput
+              id="wo-customer"
+              type="text"
+              readonly
+              class="text-muted-foreground"
+              placeholder="Definido pela embarcação"
+              [value]="customerName()"
+            />
+          </t-form-group>
         </section>
 
         @if (!workOrder()) {
-          <section [class]="card">
-            <header [class]="cardHeader">
-              <span [class]="cardIcon"><ng-icon name="lucideWrench" class="!size-[17px]" /></span>
-              <span>
-                <strong class="block text-[12px] font-semibold text-foreground">Serviços a realizar</strong>
-                <small class="mt-0.5 block text-[10px] text-muted-foreground">
-                  Adicione um ou mais serviços para esta embarcação
-                </small>
-              </span>
-            </header>
-            <div class="flex flex-col gap-[14px] px-[18px] pt-4 pb-[18px]">
-              @for (service of model().services; track $index; let index = $index) {
-                <div
-                  data-slot="service-entry"
-                  class="flex flex-col gap-[12px] rounded-[9px] border border-border p-[13px]"
-                  [attr.aria-label]="'Serviço ' + (index + 1)"
-                  role="group"
-                >
-                  <div class="flex items-center justify-between">
-                    <strong class="text-[11px] font-semibold text-foreground">Serviço {{ index + 1 }}</strong>
-                    @if (model().services.length > 1) {
-                      <button
-                        type="button"
-                        class="grid size-[26px] place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-destructive"
-                        [attr.aria-label]="'Remover serviço ' + (index + 1)"
-                        (click)="removeService(index)"
-                      >
-                        <ng-icon name="lucideX" class="!size-3.5" />
-                      </button>
-                    }
-                  </div>
-                  <t-form-group class="gap-[7px]">
-                    <label tLabel [for]="'wo-service-name-' + index" [class]="fieldLabel">
-                      Nome do serviço <span class="text-destructive">*</span>
-                    </label>
-                    <input
-                      tInput
-                      type="text"
-                      [id]="'wo-service-name-' + index"
-                      [class]="field"
-                      placeholder="Ex.: Revisão do motor principal"
-                      [formField]="workOrderForm.services[index].name"
-                    />
-                    @if (shownErrors()) {
-                      @for (error of workOrderForm.services[index].name().errors(); track $index) {
-                        <p data-slot="error" class="text-[10px] font-medium text-destructive">{{ error.message }}</p>
-                      }
-                    }
-                  </t-form-group>
-                  <t-form-group class="gap-[7px]">
-                    <label tLabel [for]="'wo-service-description-' + index" [class]="fieldLabel">
-                      Descrição do serviço <span class="text-destructive">*</span>
-                    </label>
-                    <textarea
-                      rows="3"
-                      [id]="'wo-service-description-' + index"
-                      [class]="textarea"
-                      placeholder="Ex.: Revisão do motor principal e troca de filtros"
-                      [formField]="workOrderForm.services[index].description"
-                    ></textarea>
-                    @if (shownErrors()) {
-                      @for (error of workOrderForm.services[index].description().errors(); track $index) {
-                        <p data-slot="error" class="text-[10px] font-medium text-destructive">{{ error.message }}</p>
-                      }
-                    }
-                  </t-form-group>
-                </div>
-              }
-              <button
-                type="button"
-                class="flex h-[31px] w-fit items-center gap-[7px] rounded-[6px] border border-dashed border-primary/50 bg-primary/5 px-[11px] text-[10px] font-semibold text-primary hover:bg-primary/10"
-                (click)="addService()"
-              >
-                <ng-icon name="lucidePlus" class="!size-3.5" />
-                Adicionar serviço
-              </button>
-            </div>
+          <section
+            tDrawerCard
+            heading="Serviços a realizar"
+            subheading="Adicione um ou mais serviços para esta embarcação"
+            icon="lucideWrench"
+          >
+            @for (service of model().services; track $index; let index = $index) {
+              <div tDrawerEntry data-slot="service-entry" [heading]="'Serviço ' + (index + 1)">
+                @if (model().services.length > 1) {
+                  <button
+                    tDrawerEntryActions
+                    type="button"
+                    class="grid size-[26px] place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-destructive"
+                    [attr.aria-label]="'Remover serviço ' + (index + 1)"
+                    (click)="removeService(index)"
+                  >
+                    <ng-icon name="lucideX" class="!size-3.5" />
+                  </button>
+                }
+                <t-form-group>
+                  <label tLabel [for]="'wo-service-name-' + index">Nome do serviço <t-required /></label>
+                  <input
+                    tInput
+                    type="text"
+                    [id]="'wo-service-name-' + index"
+                    placeholder="Ex.: Revisão do motor principal"
+                    [formField]="workOrderForm.services[index].name"
+                  />
+                </t-form-group>
+                <t-form-group>
+                  <label tLabel [for]="'wo-service-description-' + index">Descrição do serviço <t-required /></label>
+                  <textarea
+                    tTextarea
+                    rows="3"
+                    [id]="'wo-service-description-' + index"
+                    placeholder="Ex.: Revisão do motor principal e troca de filtros"
+                    [formField]="workOrderForm.services[index].description"
+                  ></textarea>
+                </t-form-group>
+              </div>
+            }
+            <button tDrawerAdd type="button" (click)="addService()">
+              <ng-icon name="lucidePlus" class="!size-3.5" />
+              Adicionar serviço
+            </button>
           </section>
         }
 
-        <section [class]="card">
-          <header [class]="cardHeader">
-            <span [class]="cardIcon"><ng-icon name="lucideCalendarDays" class="!size-[17px]" /></span>
-            <span>
-              <strong class="block text-[12px] font-semibold text-foreground">Planejamento</strong>
-              <small class="mt-0.5 block text-[10px] text-muted-foreground">Defina o período e o status da ordem</small>
-            </span>
-          </header>
-          <div class="grid grid-cols-1 gap-[14px] px-[18px] pt-4 pb-[18px] sm:grid-cols-2">
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="wo-start" [class]="fieldLabel">Docagem <span class="text-destructive">*</span></label>
-              <input tInput id="wo-start" type="datetime-local" [class]="field" [formField]="workOrderForm.startDate" />
-              @if (shownErrors()) {
-                @for (error of workOrderForm.startDate().errors(); track $index) {
-                  <p data-slot="error" class="text-[10px] font-medium text-destructive">{{ error.message }}</p>
-                }
+        <section
+          tDrawerCard
+          heading="Planejamento"
+          subheading="Defina o período e o status da ordem"
+          icon="lucideCalendarDays"
+          [columns]="2"
+        >
+          <t-form-group>
+            <label tLabel for="wo-start">Docagem <t-required /></label>
+            <input tInput id="wo-start" type="datetime-local" [formField]="workOrderForm.startDate" />
+          </t-form-group>
+          <t-form-group>
+            <label tLabel for="wo-end">Desdocagem <t-required /></label>
+            <input tInput id="wo-end" type="datetime-local" [formField]="workOrderForm.endDate" />
+          </t-form-group>
+          <t-form-group>
+            <label tLabel for="wo-status">Status</label>
+            <select tSelect id="wo-status" [formField]="workOrderForm.status">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ labels[status] }}</option>
               }
-            </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="wo-end" [class]="fieldLabel">Desdocagem <span class="text-destructive">*</span></label>
-              <input tInput id="wo-end" type="datetime-local" [class]="field" [formField]="workOrderForm.endDate" />
-              @if (shownErrors()) {
-                @for (error of workOrderForm.endDate().errors(); track $index) {
-                  <p data-slot="error" class="text-[10px] font-medium text-destructive">{{ error.message }}</p>
-                }
-              }
-            </t-form-group>
-            <t-form-group class="gap-[7px]">
-              <label tLabel for="wo-status" [class]="fieldLabel">Status</label>
-              <select tSelect id="wo-status" [class]="field" [formField]="workOrderForm.status">
-                @for (status of statuses; track status) {
-                  <option [value]="status">{{ labels[status] }}</option>
-                }
-              </select>
-            </t-form-group>
-          </div>
+            </select>
+          </t-form-group>
         </section>
-      </div>
+      </t-drawer-body>
 
       <footer
-        class="flex min-h-[70px] shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border bg-card px-[14px] py-[11px] sm:px-[25px] sm:py-3"
-      >
-        <span class="text-[10px] text-muted-foreground"><span class="text-destructive">*</span> Campos obrigatórios</span>
-        <div class="flex items-center gap-1.5 sm:gap-2">
-          <button tButton type="button" variant="outline" class="h-[35px] bg-card text-[11px]" (click)="closed.emit()">
-            <ng-icon name="lucideX" class="!size-3.5" />
-            Cancelar
-          </button>
-          <button tButton type="submit" class="h-[35px] px-[13px] text-[11px] font-semibold" [disabled]="loading()">
-            @if (loading()) {
-              <ng-icon name="lucideLoader2" class="animate-spin" />
-              Salvando...
-            } @else {
-              <ng-icon name="lucideCheck" class="!size-[15px]" />
-              {{ workOrder() ? 'Salvar alterações' : 'Criar ordem' }}
-            }
-          </button>
-        </div>
-      </footer>
+        tDrawerFooter
+        [submitLabel]="workOrder() ? 'Salvar alterações' : 'Criar ordem'"
+        [loading]="loading()"
+        (cancelled)="closed.emit()"
+      ></footer>
     </form>
   `,
   host: { class: 'flex min-h-0 flex-1 flex-col' },
@@ -285,19 +202,10 @@ export class WorkOrderForm {
   submitted = output<CreateWorkOrderRequest>();
   closed = output<void>();
 
-  private readonly vesselSelect = viewChild<ElementRef<HTMLSelectElement>>('vesselSelect');
-  private readonly injector = inject(Injector);
-
   protected readonly statuses = WORK_ORDER_STATUSES;
   protected readonly labels = workOrderStatusLabels;
-  protected readonly card = card;
-  protected readonly cardHeader = cardHeader;
-  protected readonly cardIcon = cardIcon;
-  protected readonly fieldLabel = fieldLabel;
-  protected readonly field = field;
-  protected readonly textarea = textarea;
 
-  /** Errors show once "Criar ordem" was used, as the fields start empty. */
+  /** Errors show once the save button was used, as the fields start empty (AD-057). */
   protected readonly shownErrors = signal(false);
 
   protected readonly sortedVessels = computed(() =>
@@ -350,11 +258,6 @@ export class WorkOrderForm {
       status: workOrder.status,
       services: [],
     });
-  }
-
-  /** Focuses "Embarcação" once the drawer that opens is drawn, as the mareos drawer opens. */
-  focusFirst() {
-    afterNextRender(() => this.vesselSelect()?.nativeElement.focus(), { injector: this.injector });
   }
 
   addService() {

@@ -65,6 +65,62 @@ describe('WorkOrderDrawer', () => {
       squash(error.textContent),
     );
 
+  // drawer-standard: what every drawer shows, read the same way in each test (AD-053, AD-056, AD-057).
+  const frameOf = (sheet: HTMLElement) => ({
+    kicker: squash(sheet.querySelector('[data-slot="sheet-kicker"]')?.textContent),
+    title: squash(sheet.querySelector('[data-slot="sheet-title"]')?.textContent),
+    description: squash(sheet.querySelector('[data-slot="sheet-description"]')?.textContent),
+    close: sheet.querySelector(':scope > header button')?.getAttribute('aria-label'),
+    // The width the sheet takes from `sm`, and no other a page could add.
+    widths: [...sheet.classList].filter((token) => token.startsWith('sm:max-w-')),
+  });
+  /** A label as read: its text, then its red required mark when it has one. */
+  const labelOf = (label: Element) => {
+    const marks = [...label.querySelectorAll('[data-slot="required-mark"]')].map((mark) => squash(mark.textContent));
+    const bare = label.cloneNode(true) as Element;
+    bare.querySelectorAll('[data-slot="required-mark"]').forEach((mark) => mark.remove());
+    return [squash(bare.textContent), ...marks].join(' ');
+  };
+  const cardsOf = (sheet: HTMLElement) =>
+    [...sheet.querySelectorAll<HTMLElement>('section[data-slot="drawer-card"]')].map((card) => ({
+      title: squash(card.querySelector('[data-slot="drawer-card-title"]')?.textContent),
+      subtitle: squash(card.querySelector('[data-slot="drawer-card-subtitle"]')?.textContent),
+      icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+      labels: [...card.querySelectorAll('label')].map(labelOf),
+    }));
+  /** The footer's sentence and its buttons: the icon that comes first, the text, the type and the state. */
+  const footerOf = (sheet: HTMLElement) => {
+    const footer = sheet.querySelector<HTMLElement>('footer[data-slot="drawer-footer"]')!;
+    const button = (target: HTMLButtonElement | undefined) =>
+      target
+        ? {
+            icon: target.firstElementChild?.matches('ng-icon') ? target.firstElementChild.getAttribute('name') : null,
+            text: squash(target.textContent),
+            type: target.type,
+            disabled: target.disabled,
+          }
+        : null;
+    const [cancel, save, ...more] = [...footer.querySelectorAll<HTMLButtonElement>('button')];
+    return {
+      hint: squash(footer.querySelector('[data-slot="required-hint"]')?.textContent) ?? null,
+      cancel: button(cancel),
+      save: button(save),
+      more: more.length,
+    };
+  };
+  const saveButton = () => drawer()!.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]')!;
+  /** Each field of the drawer by id, with the messages under it. */
+  const messagesIn = (sheet: HTMLElement) =>
+    Object.fromEntries(
+      [...sheet.querySelectorAll('t-form-group')].map((group) => [
+        group.querySelector('input, select, textarea')!.id,
+        [...group.querySelectorAll('[data-slot="error"]')].map((error) => squash(error.textContent)),
+      ]),
+    );
+  const invalidIn = (sheet: HTMLElement) => [...sheet.querySelectorAll('[data-invalid]')].map((element) => element.id);
+  /** How many times `text` shows in the drawer: a message under its field and in no list elsewhere. */
+  const timesIn = (sheet: HTMLElement, text: string) => (sheet.textContent ?? '').split(text).length - 1;
+
   async function fillService(index: number, name: string, description: string) {
     await type(`#wo-service-name-${index}`, name);
     await type(`#wo-service-description-${index}`, description);
@@ -349,5 +405,202 @@ describe('WorkOrderDrawer', () => {
     expect(drawer()).toBeNull();
 
     expect(sent()).toEqual([]);
+  });
+
+  it('drawer-standard D1 Nova ordem de serviço keeps the standard frame, focuses Embarcação and posts once', async () => {
+    const page = await WorkOrderListPage.open();
+    await click(buttonByText('Nova ordem de serviço', page.element));
+    await settle();
+    let sheet = drawer()!;
+
+    expect(frameOf(sheet)).toEqual({
+      kicker: 'NOVA SOLICITAÇÃO',
+      title: 'Nova ordem de serviço',
+      description: 'Preencha os dados dos serviços para programar o atendimento da embarcação.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(cardsOf(sheet)).toEqual([
+      {
+        title: 'Embarcação e cliente',
+        subtitle: 'Identifique a embarcação atendida',
+        icon: 'lucideShip',
+        labels: ['Embarcação *', 'Cliente responsável'],
+      },
+      {
+        title: 'Serviços a realizar',
+        subtitle: 'Adicione um ou mais serviços para esta embarcação',
+        icon: 'lucideWrench',
+        labels: ['Nome do serviço *', 'Descrição do serviço *'],
+      },
+      {
+        title: 'Planejamento',
+        subtitle: 'Defina o período e o status da ordem',
+        icon: 'lucideCalendarDays',
+        labels: ['Docagem *', 'Desdocagem *', 'Status'],
+      },
+    ]);
+    expect(document.activeElement?.id).toBe('wo-vessel');
+    expect(footerOf(sheet)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: { icon: 'lucideX', text: 'Cancelar', type: 'button', disabled: false },
+      save: { icon: 'lucideCheck', text: 'Criar ordem', type: 'submit', disabled: false },
+      more: 0,
+    });
+    // Nothing is red before the first save attempt.
+    expect(invalidIn(sheet)).toEqual([]);
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+
+    // Saved empty: nothing is sent, and each required field speaks once, under itself.
+    await click(saveButton());
+    expect(sent()).toEqual([]);
+    expect(messagesIn(sheet)).toEqual({
+      'wo-vessel': ['Embarcação é obrigatória'],
+      'wo-customer': [],
+      'wo-service-name-0': ['Nome do serviço é obrigatório'],
+      'wo-service-description-0': ['Descrição do serviço é obrigatória'],
+      'wo-start': ['Data de início é obrigatória'],
+      'wo-end': ['Data de fim é obrigatória'],
+      'wo-status': [],
+    });
+    expect(invalidIn(sheet)).toEqual(['wo-vessel', 'wo-service-name-0', 'wo-service-description-0', 'wo-start', 'wo-end']);
+    for (const message of [
+      'Embarcação é obrigatória',
+      'Nome do serviço é obrigatório',
+      'Descrição do serviço é obrigatória',
+      'Data de início é obrigatória',
+      'Data de fim é obrigatória',
+    ]) {
+      expect(timesIn(sheet, message), message).toBe(1);
+    }
+    expect(saveButton().disabled).toBe(false);
+
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(sent()).toEqual([]);
+
+    // Opened again: clean.
+    await click(buttonByText('Nova ordem de serviço', page.element));
+    await settle();
+    sheet = drawer()!;
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    expect(invalidIn(sheet)).toEqual([]);
+
+    await fillAll();
+    await click(saveButton());
+    // While the request runs the button is disabled and says so.
+    expect(footerOf(drawer()!).save).toEqual({ icon: 'lucideLoader2', text: 'Salvando...', type: 'submit', disabled: true });
+
+    const post = controller.expectOne({ method: 'POST', url: '/api/work-orders' });
+    expect(post.request.body).toEqual({
+      vesselId: 'v-lul',
+      startDate: local(2026, 11, 21, 8, 0),
+      endDate: local(2026, 11, 25, 17, 30),
+      status: 'IN_PROGRESS',
+      services: [
+        { name: 'Motor', description: 'Revisão geral do motor' },
+        { name: 'Pintura', description: 'Casco completo' },
+      ],
+    });
+    const created: WorkOrder = { ...orderA, id: 'ff001122-5e6f-4a7b-8c9d-0e1f2a3b4c5d', vesselId: 'v-lul' };
+    post.flush({ workOrder: created }, { status: 201, statusText: 'Created' });
+    await settle();
+    await page.reload([...fleet, created]);
+    expect(drawer()).toBeNull();
+  });
+
+  it('drawer-standard D2 Editar ordem de serviço keeps the standard frame, focuses Docagem and puts once', async () => {
+    const page = await WorkOrderListPage.open();
+    const openEdit = async () => {
+      await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+      await settle();
+      return drawer()!;
+    };
+    let sheet = await openEdit();
+
+    expect(frameOf(sheet)).toEqual({
+      kicker: 'ORDEM DE SERVIÇO',
+      title: 'Editar ordem de serviço',
+      description: 'Atualize o período e o status da ordem de serviço.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(cardsOf(sheet)).toEqual([
+      {
+        title: 'Embarcação e cliente',
+        subtitle: 'Identifique a embarcação atendida',
+        icon: 'lucideShip',
+        labels: ['Embarcação *', 'Cliente responsável'],
+      },
+      {
+        title: 'Planejamento',
+        subtitle: 'Defina o período e o status da ordem',
+        icon: 'lucideCalendarDays',
+        labels: ['Docagem *', 'Desdocagem *', 'Status'],
+      },
+    ]);
+    // The Vessel is locked, so the first field that takes input is Docagem.
+    expect(field<HTMLSelectElement>('#wo-vessel').disabled).toBe(true);
+    expect(field<HTMLSelectElement>('#wo-vessel').value).toBe('v-aur');
+    expect(field('#wo-customer').value).toBe('Pescados Atlântico');
+    expect(document.activeElement?.id).toBe('wo-start');
+    expect(footerOf(sheet)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: { icon: 'lucideX', text: 'Cancelar', type: 'button', disabled: false },
+      save: { icon: 'lucideCheck', text: 'Salvar alterações', type: 'submit', disabled: false },
+      more: 0,
+    });
+    expect(invalidIn(sheet)).toEqual([]);
+
+    // Docagem and Desdocagem cleared: nothing is sent, each speaks under itself.
+    await type('#wo-start', '');
+    await type('#wo-end', '');
+    await type('#wo-status', 'COMPLETED');
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    await click(saveButton());
+    expect(sent()).toEqual([]);
+    expect(messagesIn(sheet)).toEqual({
+      'wo-vessel': [],
+      'wo-customer': [],
+      'wo-start': ['Data de início é obrigatória'],
+      'wo-end': ['Data de fim é obrigatória'],
+      'wo-status': [],
+    });
+    expect(invalidIn(sheet)).toEqual(['wo-start', 'wo-end']);
+    for (const message of ['Data de início é obrigatória', 'Data de fim é obrigatória']) {
+      expect(timesIn(sheet, message), message).toBe(1);
+    }
+
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(sent()).toEqual([]);
+
+    // The same WorkOrder again: its stored values, nothing red.
+    sheet = await openEdit();
+    expect(field('#wo-start').value).toBe('2026-11-17T09:12');
+    expect(field('#wo-end').value).toBe('2026-11-20T10:00');
+    expect(field<HTMLSelectElement>('#wo-status').value).toBe('IN_PROGRESS');
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    expect(invalidIn(sheet)).toEqual([]);
+
+    await type('#wo-end', '2026-11-22T18:00');
+    await type('#wo-status', 'COMPLETED');
+    await click(saveButton());
+    expect(footerOf(drawer()!).save).toEqual({ icon: 'lucideLoader2', text: 'Salvando...', type: 'submit', disabled: true });
+
+    const put = controller.expectOne({ method: 'PUT', url: `/api/work-orders/${orderA.id}` });
+    expect(put.request.body).toEqual({
+      startDate: local(2026, 11, 17, 9, 12),
+      endDate: local(2026, 11, 22, 18, 0),
+      status: 'COMPLETED',
+    });
+    put.flush(null);
+    await settle();
+    await page.reload(
+      fleet.map((order) =>
+        order.id === orderA.id ? { ...order, endDate: local(2026, 11, 22, 18, 0), status: 'COMPLETED' as const } : order,
+      ),
+    );
+    expect(drawer()).toBeNull();
   });
 });

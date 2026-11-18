@@ -182,11 +182,8 @@
 
 <t-sheet
   kicker="ORDEM DE SERVIÇO"
-  closeLabel="Fechar formulário"
   title="Editar ordem de serviço"
   description="Atualize o período e o status da ordem de serviço."
-  class="sm:w-full sm:max-w-[580px]"
-  [flush]="true"
   [isActive]="isEditWorkOrderSheetActive()"
   (closed)="closeEditWorkOrderSheet()"
 >
@@ -202,11 +199,8 @@
 
 <t-sheet
   kicker="ORDEM DE SERVIÇO"
-  closeLabel="Fechar formulário"
   title="Novo serviço"
   description="Preencha os campos abaixo para criar um novo serviço"
-  class="sm:w-full sm:max-w-[520px]"
-  [flush]="true"
   [isActive]="isCreateServiceSheetActive()"
   (closed)="closeCreateServiceSheet()"
 >
@@ -218,9 +212,9 @@
 </t-sheet>
 
 <t-sheet
+  kicker="ATRIBUIR INSPEÇÃO"
   title="Atribuir modelo de inspeção"
   description="Escolha o modelo e o alvo; as perguntas do modelo são copiadas para esta ordem"
-  class="sm:max-w-md"
   [isActive]="isAssignSheetActive()"
   (closed)="closeAssignSheet()"
 >

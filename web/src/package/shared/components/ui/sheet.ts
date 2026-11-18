@@ -1,7 +1,12 @@
 import {
   Component,
+  ElementRef,
   HostListener,
+  Injector,
+  afterNextRender,
   computed,
+  effect,
+  inject,
   input,
   output,
 } from '@angular/core';
@@ -30,28 +35,17 @@ import { cn } from '../lib/cn';
         [class]="computedClass()"
         (keydown.escape)="close()"
       >
-        <header
-          class="flex items-start justify-between gap-5 border-b border-border bg-card"
-          [class]="compact() ? 'px-[22px] pt-[22px] pb-[17px]' : 'px-[27px] pt-[25px] pb-[19px]'"
-        >
+        <header class="flex items-start justify-between gap-5 border-b border-border bg-card px-[27px] pt-[25px] pb-[19px]">
           <div class="min-w-0">
             @if (kicker()) {
               <div data-slot="sheet-kicker" class="mb-2 text-[9px] font-bold tracking-[1.1px] text-primary">
                 {{ kicker() }}
               </div>
             }
-            <h2
-              data-slot="sheet-title"
-              class="leading-tight font-normal tracking-[-0.4px] text-foreground"
-              [class]="compact() ? 'text-[17px]' : 'text-[20px]'"
-            >
+            <h2 data-slot="sheet-title" class="text-[20px] leading-tight font-normal tracking-[-0.4px] text-foreground">
               {{ title() }}
             </h2>
-            <p
-              data-slot="sheet-description"
-              class="mt-1.5 max-w-[430px] leading-[1.55] text-muted-foreground"
-              [class]="compact() ? 'text-[10px]' : 'text-[11px]'"
-            >
+            <p data-slot="sheet-description" class="mt-1.5 max-w-[430px] text-[11px] leading-[1.55] text-muted-foreground">
               {{ description() }}
             </p>
           </div>
@@ -81,14 +75,8 @@ import { cn } from '../lib/cn';
           </button>
         </header>
 
-        <!-- flush: the content lays out its own sections, scroll and footer, as the mareos drawers do. -->
-        <div
-          [class]="
-            flush()
-              ? 'flex min-h-0 flex-1 flex-col overflow-y-auto'
-              : 'grid min-h-0 flex-1 auto-rows-min grid-cols-1 gap-6 overflow-y-auto px-4 pt-4 pb-4'
-          "
-        >
+        <!-- The form lays out its own grey body of cards and its pinned footer (AD-053). -->
+        <div class="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <ng-content />
         </div>
       </div>
@@ -106,21 +94,38 @@ export class Sheet {
   readonly isActive = input(false);
   /** The small uppercase line above the title (mareos drawers: "RELACIONAMENTO / CLIENTES"). */
   readonly kicker = input('');
-  readonly closeLabel = input('Fechar');
-  /** True when the content brings its own padding, scroll and footer. */
-  readonly flush = input(false);
-  /** The smaller header of the mareos client drawer. */
-  readonly compact = input(false);
+  readonly closeLabel = input('Fechar formulário');
 
   readonly closed = output<boolean>();
 
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
+
   protected readonly computedClass = computed(() =>
     cn(
-      // Full width on a phone, where a quarter of the screen beside the sheet is wasted.
-      'fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-hidden border-l bg-background shadow-[-16px_0_45px_rgba(21,44,59,0.16)] sm:w-3/4 sm:max-w-sm',
+      // Full width on a phone, 580px from `sm` as the "Nova ordem de serviço" drawer (AD-053).
+      'fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-hidden border-l bg-background shadow-[-16px_0_45px_rgba(21,44,59,0.16)] sm:w-full sm:max-w-[580px]',
       this.class(),
     ),
   );
+
+  constructor() {
+    // An opening drawer focuses its first field that accepts input, as the reference drawer opens.
+    effect(() => {
+      if (this.isActive()) {
+        afterNextRender(() => this.focusFirstField(), { injector: this.injector });
+      }
+    });
+  }
+
+  private focusFirstField() {
+    const content = this.host.nativeElement.querySelector('[data-slot="sheet-content"]');
+    content
+      ?.querySelector<HTMLElement>(
+        'input:not([disabled]):not([readonly]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]):not([readonly])',
+      )
+      ?.focus();
+  }
 
   protected close() {
     this.closed.emit(true);

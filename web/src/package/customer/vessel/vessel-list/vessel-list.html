@@ -97,15 +97,12 @@
 
 <t-sheet
   kicker="FROTA / EMBARCAÇÕES"
-  closeLabel="Fechar formulário"
-  class="sm:w-full sm:max-w-[560px]"
   [title]="editing() ? 'Editar embarcação' : 'Nova embarcação'"
   [description]="
     editing()
       ? 'Atualize as informações cadastrais e operacionais desta embarcação.'
       : 'Preencha os dados abaixo para registrar uma embarcação na frota.'
   "
-  [flush]="true"
   [isActive]="isSheetActive()"
   (closed)="closeSheet()"
 >

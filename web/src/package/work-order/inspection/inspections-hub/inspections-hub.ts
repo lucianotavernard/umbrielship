@@ -140,7 +140,6 @@ export class InspectionsHub {
   openTemplateSheet() {
     this.templateForm()?.reset();
     this.isTemplateSheetActive.set(true);
-    this.templateForm()?.focusFirst();
   }
 
   closeTemplateSheet() {

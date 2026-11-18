@@ -1,10 +1,10 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 
-import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideLoader2, lucideX } from '@ng-icons/lucide';
+import { provideIcons } from '@ng-icons/core';
+import { lucideClipboardCheck } from '@ng-icons/lucide';
 
-import { Button } from '../../../shared/components/ui/button';
+import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '../../../shared/components/ui/drawer';
 import { FormGroup, Label, Select } from '../../../shared/components/ui/form';
 import { InspectionTemplateSummary } from '../../inspection-template/inspection-template.service';
 import { WorkOrderServiceItem } from '../../work-order-service/work-order-service.service';
@@ -12,64 +12,48 @@ import { AssignInspectionTemplateRequest, WHOLE_WORK_ORDER } from '../inspection
 
 @Component({
   selector: 'inspection-assignment-form-ui',
-  imports: [NgIcon, FormField, FormGroup, Label, Select, Button],
-  viewProviders: [provideIcons({ lucideCheck, lucideLoader2, lucideX })],
+  imports: [FormField, FormGroup, Label, Select, DrawerForm, DrawerBody, DrawerCard, DrawerFooter, RequiredMark],
+  viewProviders: [provideIcons({ lucideClipboardCheck })],
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
   template: `
-    @if (failed(); as message) {
-      <p class="rounded-lg border border-destructive/40 p-4 text-sm text-destructive" role="alert">{{ message }}</p>
-      <footer class="mt-6 flex justify-end">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">
-          <ng-icon name="lucideX" class="size-4" />
-          Cancelar
-        </button>
-      </footer>
-    } @else if (!loadingTemplates() && templates().length === 0) {
-      <p class="rounded-lg border p-4 text-sm text-muted-foreground">Nenhum modelo de inspeção cadastrado</p>
-      <footer class="mt-6 flex justify-end">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">
-          <ng-icon name="lucideX" class="size-4" />
-          Cancelar
-        </button>
-      </footer>
-    } @else {
-      <form class="flex flex-col gap-6" novalidate (submit)="submitForm($event)">
-        <div class="flex flex-col gap-5">
-          <t-form-group>
-            <label tLabel for="assignment-template">Modelo</label>
-            <select tSelect id="assignment-template" [formField]="assignmentForm.templateId">
-              <option value="">Selecione um modelo</option>
-              @for (template of templates(); track template.id) {
-                <option [value]="template.id">{{ template.name }}</option>
-              }
-            </select>
-          </t-form-group>
-          <t-form-group>
-            <label tLabel for="assignment-target">Alvo</label>
-            <select tSelect id="assignment-target" [formField]="assignmentForm.serviceId">
-              <option value="">{{ wholeWorkOrder }}</option>
-              @for (service of services(); track service.id) {
-                <option [value]="service.id">{{ service.name }}</option>
-              }
-            </select>
-          </t-form-group>
-        </div>
-        <footer class="flex items-center justify-end gap-3">
-          <button tButton type="button" variant="outline" (click)="closed.emit()">
-            <ng-icon name="lucideX" class="size-4" />
-            Cancelar
-          </button>
-          <button tButton type="submit" [disabled]="loading()">
-            @if (loading()) {
-              <ng-icon name="lucideLoader2" class="animate-spin" />
-              Salvando...
-            } @else {
-              <ng-icon name="lucideCheck" class="size-4" />
-              Atribuir
-            }
-          </button>
-        </footer>
-      </form>
-    }
+    <form [tDrawerForm]="shownErrors()" novalidate (submit)="submitForm($event)">
+      <t-drawer-body>
+        <section tDrawerCard heading="Atribuição" subheading="Escolha o modelo e o alvo" icon="lucideClipboardCheck">
+          @if (failed(); as message) {
+            <p data-slot="assignment-message" class="text-[11px] text-destructive" role="alert">{{ message }}</p>
+          } @else if (empty()) {
+            <p data-slot="assignment-message" class="text-[11px] text-muted-foreground">Nenhum modelo de inspeção cadastrado</p>
+          } @else {
+            <t-form-group>
+              <label tLabel for="assignment-template">Modelo <t-required /></label>
+              <select tSelect id="assignment-template" [formField]="assignmentForm.templateId">
+                <option value="">Selecione um modelo</option>
+                @for (template of templates(); track template.id) {
+                  <option [value]="template.id">{{ template.name }}</option>
+                }
+              </select>
+            </t-form-group>
+            <t-form-group>
+              <label tLabel for="assignment-target">Alvo</label>
+              <select tSelect id="assignment-target" [formField]="assignmentForm.serviceId">
+                <option value="">{{ wholeWorkOrder }}</option>
+                @for (service of services(); track service.id) {
+                  <option [value]="service.id">{{ service.name }}</option>
+                }
+              </select>
+            </t-form-group>
+          }
+        </section>
+      </t-drawer-body>
+
+      <!-- With nothing to assign the footer offers only Cancelar (AD-058). -->
+      <footer
+        tDrawerFooter
+        [submitLabel]="failed() || empty() ? '' : 'Atribuir inspeção'"
+        [loading]="loading()"
+        (cancelled)="closed.emit()"
+      ></footer>
+    </form>
   `,
 })
 export class InspectionAssignmentForm {
@@ -84,6 +68,10 @@ export class InspectionAssignmentForm {
   closed = output<void>();
 
   protected readonly wholeWorkOrder = WHOLE_WORK_ORDER;
+  /** Errors show once the save button was used (AD-057). */
+  protected readonly shownErrors = signal(false);
+  /** Read, and the Organization has no template to assign. */
+  protected readonly empty = computed(() => !this.loadingTemplates() && this.templates().length === 0);
 
   // An empty serviceId is the WorkOrder as a whole.
   model = signal({ templateId: '', serviceId: '' });
@@ -94,7 +82,8 @@ export class InspectionAssignmentForm {
 
   submitForm(event: Event) {
     event.preventDefault();
-    this.assignmentForm().markAsTouched();
+    if (this.failed() || this.empty()) return;
+    this.shownErrors.set(true);
 
     if (this.assignmentForm().invalid()) {
       return;

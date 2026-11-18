@@ -1,28 +1,28 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { email, form, FormField, maxLength, required } from '@angular/forms/signals';
 
-import { Button } from '../../../shared/components/ui/button';
+import { provideIcons } from '@ng-icons/core';
+import { lucideBuilding2 } from '@ng-icons/lucide';
+
+import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '../../../shared/components/ui/drawer';
 import { FormGroup, Input, Label } from '../../../shared/components/ui/form';
-import { Icon } from '../../../shared/components/ui/icon';
 
 @Component({
   selector: 'organization-form-ui',
-  imports: [FormField, FormGroup, Label, Input, Button, Icon],
+  imports: [FormField, FormGroup, Label, Input, DrawerForm, DrawerBody, DrawerCard, DrawerFooter, RequiredMark],
+  viewProviders: [provideIcons({ lucideBuilding2 })],
+  host: { class: 'flex min-h-0 flex-1 flex-col' },
   template: `
-    <form class="flex flex-col gap-6" (submit)="submitForm($event)">
-      <section class="rounded-2xl shadow-xs border overflow-hidden">
-        <div class="flex items-center gap-3 border-b bg-muted px-6 py-4">
-          <div class="flex rounded-lg bg-background p-3 shadow-xs">
-            <svg tIcon name="building-2" />
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold">Detalhes da Organização</h3>
-            <p class="text-xs text-muted-foreground">Informações básicas sobre a organização</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 gap-x-6 gap-y-5 p-6 sm:grid-cols-6">
-          <t-form-group class="sm:col-span-full">
-            <label tLabel for="organization-name">Nome</label>
+    <form [tDrawerForm]="shownErrors()" novalidate (submit)="submitForm($event)">
+      <t-drawer-body>
+        <section
+          tDrawerCard
+          heading="Detalhes da organização"
+          subheading="Informações básicas sobre a organização"
+          icon="lucideBuilding2"
+        >
+          <t-form-group>
+            <label tLabel for="organization-name">Nome <t-required /></label>
             <input
               tInput
               id="organization-name"
@@ -31,8 +31,8 @@ import { Icon } from '../../../shared/components/ui/icon';
               [formField]="organizationForm.name"
             />
           </t-form-group>
-          <t-form-group class="sm:col-span-full">
-            <label tLabel for="organization-email">E-mail</label>
+          <t-form-group>
+            <label tLabel for="organization-email">E-mail <t-required /></label>
             <input
               tInput
               id="organization-email"
@@ -41,18 +41,21 @@ import { Icon } from '../../../shared/components/ui/icon';
               [formField]="organizationForm.email"
             />
           </t-form-group>
-        </div>
-      </section>
-      <footer class="flex items-center justify-end gap-3">
-        <button tButton type="button" variant="outline" (click)="closed.emit()">Cancelar</button>
-        <button tButton type="submit" [disabled]="organizationForm().invalid()">Salvar</button>
-      </footer>
+        </section>
+      </t-drawer-body>
+
+      <footer tDrawerFooter submitLabel="Criar organização" [loading]="loading()" (cancelled)="closed.emit()"></footer>
     </form>
   `,
 })
 export class OrganizationForm {
+  loading = input(false);
+
   submitted = output<{ name: string; email: string }>();
   closed = output<void>();
+
+  /** Errors show once the save button was used (AD-057). */
+  protected readonly shownErrors = signal(false);
 
   model = signal({ name: '', email: '' });
 
@@ -64,11 +67,13 @@ export class OrganizationForm {
   });
 
   reset() {
+    this.shownErrors.set(false);
     this.organizationForm().reset({ name: '', email: '' });
   }
 
   submitForm(event: Event) {
     event.preventDefault();
+    this.shownErrors.set(true);
     if (this.organizationForm().invalid()) return;
     this.submitted.emit(this.organizationForm().value());
   }

@@ -198,7 +198,6 @@ export class WorkOrderList {
     this.editingId.set(null);
     this.workOrderForm()?.reset();
     this.isSheetActive.set(true);
-    this.workOrderForm()?.focusFirst();
   }
 
   openEdit(order: WorkOrderRow) {

@@ -28,6 +28,58 @@ import {
 const casco = templateSummary('t1', 'Casco', 1);
 const pintura = templateSummary('t2', 'Pintura', 3, '2026-11-12T15:00:00.000Z');
 
+// ---------------------------------------------------------------- the drawer standard (AD-053)
+
+/** The header of a drawer, its close label and its `sm:` widths. */
+const frame = (drawer: HTMLElement) => ({
+  kicker: text(drawer.querySelector('[data-slot="sheet-kicker"]')),
+  title: text(drawer.querySelector('[data-slot="sheet-title"]')),
+  description: text(drawer.querySelector('[data-slot="sheet-description"]')),
+  close: drawer.querySelector(':scope > header button')?.getAttribute('aria-label'),
+  widths: drawer.className.split(/\s+/).filter((token) => token.startsWith('sm:max-w-')),
+});
+
+/** A label as read, its `*` only when it is the required mark. */
+const labelOf = (label: Element) => {
+  const copy = label.cloneNode(true) as Element;
+  const mark = copy.querySelector('[data-slot="required-mark"]');
+  mark?.remove();
+  return mark ? `${text(copy)} ${text(mark)}` : text(copy);
+};
+
+const drawerCards = (drawer: HTMLElement) =>
+  [...drawer.querySelectorAll<HTMLElement>('section[data-slot="drawer-card"]')].map((card) => ({
+    title: text(card.querySelector('[data-slot="drawer-card-title"]')),
+    subtitle: text(card.querySelector('[data-slot="drawer-card-subtitle"]')),
+    icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+    labels: [...card.querySelectorAll('label')].map(labelOf),
+  }));
+
+const saveButton = (drawer: HTMLElement) =>
+  drawer.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]')!;
+
+/** The footer: its hint, "Cancelar" (first icon, text) and the save button (type, first icon, text, disabled). */
+const footer = (drawer: HTMLElement) => {
+  const bar = drawer.querySelector<HTMLElement>('footer[data-slot="drawer-footer"]')!;
+  const [cancel, save] = [...bar.querySelectorAll<HTMLButtonElement>('button')];
+  return {
+    hint: text(bar.querySelector('[data-slot="required-hint"]')),
+    cancel: [cancel.firstElementChild?.getAttribute('name'), text(cancel)],
+    save: [save.type, save.firstElementChild?.getAttribute('name'), text(save), save.disabled],
+  };
+};
+
+/** Each field: its control's id, whether it is marked invalid, and the messages under it. */
+const fieldStates = (drawer: HTMLElement) =>
+  [...drawer.querySelectorAll('t-form-group')].map((group) => {
+    const control = group.querySelector('input, select, textarea')!;
+    return [
+      control.id,
+      control.hasAttribute('data-invalid'),
+      [...group.querySelectorAll('[data-slot="error"]')].map((error) => text(error)),
+    ];
+  });
+
 describe('InspectionsHub', () => {
   let controller: HttpTestingController;
 
@@ -202,8 +254,9 @@ describe('InspectionsHub', () => {
     expect(text(drawer.querySelector('[data-slot="sheet-description"]'))).toBe(
       'Defina as perguntas que o inspetor deverá responder em campo.',
     );
-    expect(text(drawer.querySelector('label[for="template-name"]'))).toBe('Nome do modelo');
-    expect(text(drawer.querySelector('h3'))).toBe('Perguntas');
+    // The required mark and the "Perguntas" card of the drawer standard (AD-053, AD-056).
+    expect(text(drawer.querySelector('label[for="template-name"]'))).toBe('Nome do modelo *');
+    expect(text(drawer.querySelectorAll('[data-slot="drawer-card-title"]')[1])).toBe('Perguntas');
     expect(drawer.textContent).toContain(
       'Todas as perguntas precisam ser respondidas; “Não se aplica” vale como resposta.',
     );
@@ -211,7 +264,7 @@ describe('InspectionsHub', () => {
       ...drawer.querySelectorAll<HTMLElement>('[data-slot="question-editor"]'),
     ];
     expect(text(editors()[0].querySelector('strong'))).toBe('Pergunta 01');
-    expect(text(editors()[0].querySelector('label[for="question-0"]'))).toBe('Enunciado');
+    expect(text(editors()[0].querySelector('label[for="question-0"]'))).toBe('Enunciado *');
     expect(text(editors()[0].querySelector('label[for="question-type-0"]'))).toBe(
       'Tipo de resposta',
     );
@@ -229,10 +282,11 @@ describe('InspectionsHub', () => {
     expect(buttons(drawer, 'Subir')).toEqual([]);
     expect(buttons(drawer, 'Descer')).toEqual([]);
     expect(buttons(drawer, 'Remover pergunta 1')).toEqual([]);
-    // "Cancelar" is a text button, with no icon.
-    expect(button(drawer, 'Cancelar').querySelector('ng-icon')).toBeNull();
+    // "Cancelar" carries the X of the drawer standard (AD-053).
+    expect(button(drawer, 'Cancelar').querySelector('ng-icon')?.getAttribute('name')).toBe('lucideX');
 
-    button(drawer, 'Adicionar').click();
+    // The dashed "Adicionar pergunta" under the questions replaces "Adicionar" (AD-056).
+    button(drawer, 'Adicionar pergunta').click();
     await settle();
     expect(editors().map((editor) => text(editor.querySelector('strong')))).toEqual([
       'Pergunta 01',
@@ -332,7 +386,8 @@ describe('InspectionsHub', () => {
     expect(text(drawer.querySelector('[data-slot="sheet-description"]'))).toBe(
       'A inspeção usará o modelo Pintura.',
     );
-    expect(text(drawer.querySelector('label[for="assign-work-order"]'))).toBe('Ordem de serviço');
+    // The required mark of the drawer standard (AD-053).
+    expect(text(drawer.querySelector('label[for="assign-work-order"]'))).toBe('Ordem de serviço *');
     expect(text(drawer.querySelector('label[for="assign-target"]'))).toBe('Alvo');
     const workOrder = drawer.querySelector<HTMLSelectElement>('#assign-work-order')!;
     const target = drawer.querySelector<HTMLSelectElement>('#assign-target')!;
@@ -533,5 +588,224 @@ describe('InspectionsHub', () => {
       expect(element.querySelectorAll('[data-slot="metric-skeleton"]'), failing).toHaveLength(0);
       fixture.destroy();
     }
+  });
+
+  it('drawer-standard D13 Novo modelo opens with the Modelo and Perguntas cards and posts once', async () => {
+    const element = await renderHub(controller, 'administrator', { templates: [casco, pintura] });
+
+    button(element, 'Novo modelo').click();
+    await settle();
+    let drawer = sheet(element);
+
+    expect(frame(drawer)).toEqual({
+      kicker: 'BIBLIOTECA DE INSPEÇÕES',
+      title: 'Novo modelo',
+      description: 'Defina as perguntas que o inspetor deverá responder em campo.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(drawerCards(drawer)).toEqual([
+      {
+        title: 'Modelo',
+        subtitle: 'Identifique o modelo de inspeção',
+        icon: 'lucideClipboardList',
+        labels: ['Nome do modelo *'],
+      },
+      {
+        title: 'Perguntas',
+        subtitle: 'Todas as perguntas precisam ser respondidas; “Não se aplica” vale como resposta.',
+        icon: 'lucideListChecks',
+        labels: ['Enunciado *', 'Tipo de resposta'],
+      },
+    ]);
+    // One bordered block "Pergunta 01" in "Perguntas", the dashed "Adicionar pergunta" under it.
+    const questionsCard = drawer.querySelectorAll<HTMLElement>('section[data-slot="drawer-card"]')[1];
+    const editors = [...questionsCard.querySelectorAll<HTMLElement>('div[data-slot="question-editor"]')];
+    expect(
+      editors.map((editor) => [
+        editor.getAttribute('role'),
+        editor.getAttribute('aria-label'),
+        text(editor.querySelector('strong')),
+      ]),
+    ).toEqual([['group', 'Pergunta 01', 'Pergunta 01']]);
+    const add = questionsCard.querySelector<HTMLButtonElement>('button[data-slot="drawer-add"]')!;
+    expect(text(add)).toBe('Adicionar pergunta');
+    expect(editors[0].contains(add)).toBe(false);
+    expect(editors[0].compareDocumentPosition(add) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // No "Adicionar" above the questions.
+    expect(buttons(drawer, 'Adicionar')).toEqual([]);
+    expect(
+      [...questionsCard.querySelectorAll('button')].filter(
+        (control) => control.compareDocumentPosition(editors[0]) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    ).toEqual([]);
+    expect(document.activeElement?.id).toBe('template-name');
+    expect(footer(drawer)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: ['lucideX', 'Cancelar'],
+      save: ['submit', 'lucideCheck', 'Criar modelo', false],
+    });
+
+    // Saved empty: nothing sent, each invalid field red with its message.
+    saveButton(drawer).click();
+    await settle();
+    controller.expectNone(() => true);
+    expect(fieldStates(drawer)).toEqual([
+      ['template-name', true, ['Nome é obrigatório']],
+      ['question-0', true, ['Pergunta é obrigatória']],
+      ['question-type-0', false, []],
+    ]);
+    expect(drawer.querySelectorAll('[data-slot="error"]')).toHaveLength(2);
+
+    button(drawer, 'Cancelar').click();
+    await settle();
+    expect(dialogs(element)).toEqual([]);
+    controller.expectNone(() => true);
+
+    // Opened again: nothing red, no message.
+    button(element, 'Novo modelo').click();
+    await settle();
+    drawer = sheet(element);
+    expect(fieldStates(drawer)).toEqual([
+      ['template-name', false, []],
+      ['question-0', false, []],
+      ['question-type-0', false, []],
+    ]);
+    expect(drawer.querySelectorAll('[data-slot="error"], [data-invalid]')).toHaveLength(0);
+
+    fill(drawer.querySelector<HTMLInputElement>('#template-name')!, 'Inspeção do casco');
+    fill(drawer.querySelector<HTMLInputElement>('#question-0')!, 'Casco limpo?');
+    choose(drawer.querySelector<HTMLSelectElement>('#question-type-0')!, 'YES_NO');
+    await settle();
+    saveButton(drawer).click();
+    await settle();
+
+    expect(footer(drawer).save).toEqual(['submit', 'lucideLoader2', 'Salvando...', true]);
+    const sent = controller.match(() => true);
+    expect(
+      sent.map(({ request }) => [request.method, request.urlWithParams, request.body]),
+    ).toEqual([
+      [
+        'POST',
+        '/api/inspection-templates',
+        { name: 'Inspeção do casco', items: [{ label: 'Casco limpo?', type: 'YES_NO' }] },
+      ],
+    ]);
+    sent[0].flush(
+      {
+        inspectionTemplate: {
+          id: 't3',
+          name: 'Inspeção do casco',
+          createdAt: '2026-11-18T16:00:00.000Z',
+          items: [],
+        },
+      },
+      { status: 201, statusText: 'Created' },
+    );
+    await settle();
+    expect(dialogs(element)).toEqual([]);
+    controller
+      .expectOne({ method: 'GET', url: '/api/inspection-templates' })
+      .flush({ inspectionTemplates: [casco, pintura], total: 2 });
+  });
+
+  it('drawer-standard D15 Atribuir à OS opens with the Atribuição card and posts once', async () => {
+    const element = await renderHub(controller, 'administrator', {
+      templates: [casco, pintura],
+      assignments: [],
+    });
+    const open = async (card: number) => {
+      buttons(cards(element)[card], 'Atribuir à OS')[0].click();
+      await settle();
+      return sheet(element);
+    };
+
+    let drawer = await open(1);
+
+    expect(frame(drawer)).toEqual({
+      kicker: 'ATRIBUIR INSPEÇÃO',
+      title: 'Escolha a OS e o alvo',
+      description: 'A inspeção usará o modelo Pintura.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(drawerCards(drawer)).toEqual([
+      {
+        title: 'Atribuição',
+        subtitle: 'Escolha a ordem de serviço e o alvo',
+        icon: 'lucideClipboardCheck',
+        labels: ['Ordem de serviço *', 'Alvo'],
+      },
+    ]);
+    // The question count inside the same card.
+    expect(
+      text(drawer.querySelector('section[data-slot="drawer-card"] [data-slot="summary"]')),
+    ).toBe('3 perguntas');
+    expect(document.activeElement?.id).toBe('assign-work-order');
+    expect(footer(drawer)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: ['lucideX', 'Cancelar'],
+      save: ['submit', 'lucideCheck', 'Atribuir inspeção', false],
+    });
+
+    // Saved with no WorkOrder: nothing sent, the message under "Ordem de serviço".
+    saveButton(drawer).click();
+    await settle();
+    controller.expectNone(() => true);
+    expect(fieldStates(drawer)).toEqual([
+      ['assign-work-order', true, ['Ordem de serviço é obrigatória']],
+      ['assign-target', false, []],
+    ]);
+    expect(drawer.querySelectorAll('[data-slot="error"]')).toHaveLength(1);
+
+    button(drawer, 'Cancelar').click();
+    await settle();
+    expect(dialogs(element)).toEqual([]);
+    controller.expectNone(() => true);
+
+    // Opened again: nothing red, no message.
+    drawer = await open(1);
+    expect(fieldStates(drawer)).toEqual([
+      ['assign-work-order', false, []],
+      ['assign-target', false, []],
+    ]);
+    expect(drawer.querySelectorAll('[data-slot="error"], [data-invalid]')).toHaveLength(0);
+
+    choose(drawer.querySelector<HTMLSelectElement>('#assign-work-order')!, WO_AURORA);
+    await settle();
+    choose(drawer.querySelector<HTMLSelectElement>('#assign-target')!, 'svc-2');
+    await settle();
+    saveButton(drawer).click();
+    await settle();
+
+    expect(footer(drawer).save).toEqual(['submit', 'lucideLoader2', 'Salvando...', true]);
+    const sent = controller.match(() => true);
+    expect(
+      sent.map(({ request }) => [request.method, request.urlWithParams, request.body]),
+    ).toEqual([
+      [
+        'POST',
+        `/api/work-orders/${WO_AURORA}/inspection-assignments`,
+        { templateId: 't2', serviceId: 'svc-2' },
+      ],
+    ]);
+    sent[0].flush({ inspectionAssignment: { id: 'a2' } }, { status: 201, statusText: 'Created' });
+    await settle();
+    expect(dialogs(element)).toEqual([]);
+    controller
+      .expectOne({ method: 'GET', url: '/api/inspection-assignments' })
+      .flush({ inspectionAssignments: [] });
+    await settle();
+
+    // A one-question template counts "1 pergunta".
+    button(element, 'Modelos 2').click();
+    await settle();
+    drawer = await open(0);
+    expect(
+      text(drawer.querySelector('section[data-slot="drawer-card"] [data-slot="summary"]')),
+    ).toBe('1 pergunta');
+    button(drawer, 'Cancelar').click();
+    await settle();
+    controller.expectNone(() => true);
   });
 });

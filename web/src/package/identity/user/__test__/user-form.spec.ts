@@ -16,6 +16,22 @@ describe('UserForm', () => {
     field.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  /** The messages shown in the group of the field. */
+  function messagesUnder(element: ParentNode, selector: string) {
+    const group = element.querySelector(selector)?.closest('t-form-group');
+    if (!group) throw new Error(selector);
+    return [...group.querySelectorAll('[data-slot="error"]')].map((error) => error.textContent?.trim());
+  }
+
+  /** An invalid form no longer disables the save button (AD-057): using it sends nothing and speaks under the field. */
+  async function saveInvalid(element: HTMLElement) {
+    const button = submitButton(element);
+    expect(button.disabled).toBe(false);
+    expect(button.textContent?.trim()).toBe('Criar usuário');
+    button.click();
+    await settle();
+  }
+
   async function render() {
     const fixture = TestBed.createComponent(UserForm);
     const emitted: unknown[] = [];
@@ -41,28 +57,28 @@ describe('UserForm', () => {
   it('[C97] does not emit a name of 81 characters', async () => {
     const { element, emitted } = await render();
     await fillValid(element, { name: 'A'.repeat(81) });
-    expect(submitButton(element).disabled).toBe(true);
-    element.querySelector('form')?.requestSubmit();
-    await settle();
+    await saveInvalid(element);
     expect(emitted).toEqual([]);
+    expect(messagesUnder(element, '#user-name')).toEqual(['Nome deve ter no máximo 80 caracteres']);
+    expect(element.querySelectorAll('[data-slot="error"]')).toHaveLength(1);
   });
 
   it('[C97] does not emit a password of 7 characters', async () => {
     const { element, emitted } = await render();
     await fillValid(element, { password: '1234567' });
-    expect(submitButton(element).disabled).toBe(true);
-    element.querySelector('form')?.requestSubmit();
-    await settle();
+    await saveInvalid(element);
     expect(emitted).toEqual([]);
+    expect(messagesUnder(element, '#user-password')).toEqual(['Senha deve ter no mínimo 8 caracteres']);
+    expect(element.querySelectorAll('[data-slot="error"]')).toHaveLength(1);
   });
 
   it('[C97] does not emit a password of 73 characters', async () => {
     const { element, emitted } = await render();
     await fillValid(element, { password: 'p'.repeat(73) });
-    expect(submitButton(element).disabled).toBe(true);
-    element.querySelector('form')?.requestSubmit();
-    await settle();
+    await saveInvalid(element);
     expect(emitted).toEqual([]);
+    expect(messagesUnder(element, '#user-password')).toEqual(['Senha deve ter no máximo 72 caracteres']);
+    expect(element.querySelectorAll('[data-slot="error"]')).toHaveLength(1);
   });
 
   it('[C97] emits Ana and secret-pass', async () => {

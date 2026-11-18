@@ -98,6 +98,62 @@ describe('VesselDetail', () => {
   const text = (root: ParentNode, selector: string) =>
     root.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();
 
+  // drawer-standard: what every drawer shows, read the same way in each test (AD-053, AD-056, AD-057).
+  const squash = (value: string | null | undefined) => value?.replace(/\s+/g, ' ').trim();
+  const drawer = () => document.querySelector<HTMLElement>('[data-slot="sheet-content"]');
+  const frameOf = (sheet: HTMLElement) => ({
+    kicker: text(sheet, '[data-slot="sheet-kicker"]'),
+    title: text(sheet, '[data-slot="sheet-title"]'),
+    description: text(sheet, '[data-slot="sheet-description"]'),
+    close: sheet.querySelector(':scope > header button')?.getAttribute('aria-label'),
+    // The width the sheet takes from `sm`, and no other a page could add.
+    widths: [...sheet.classList].filter((token) => token.startsWith('sm:max-w-')),
+  });
+  /** A label as read: its text, then its red required mark when it has one. */
+  const labelOf = (label: Element) => {
+    const marks = [...label.querySelectorAll('[data-slot="required-mark"]')].map((mark) => squash(mark.textContent));
+    const bare = label.cloneNode(true) as Element;
+    bare.querySelectorAll('[data-slot="required-mark"]').forEach((mark) => mark.remove());
+    return [squash(bare.textContent), ...marks].join(' ');
+  };
+  const cardsOf = (sheet: HTMLElement) =>
+    [...sheet.querySelectorAll<HTMLElement>('section[data-slot="drawer-card"]')].map((card) => ({
+      title: text(card, '[data-slot="drawer-card-title"]'),
+      subtitle: text(card, '[data-slot="drawer-card-subtitle"]'),
+      icon: card.querySelector('[data-slot="drawer-card-icon"]')?.getAttribute('data-icon'),
+      labels: [...card.querySelectorAll('label')].map(labelOf),
+    }));
+  /** The footer's sentence and its buttons: the icon that comes first, the text, the type and the state. */
+  const footerOf = (sheet: HTMLElement) => {
+    const footer = sheet.querySelector<HTMLElement>('footer[data-slot="drawer-footer"]')!;
+    const button = (target: HTMLButtonElement | undefined) =>
+      target
+        ? {
+            icon: target.firstElementChild?.matches('ng-icon') ? target.firstElementChild.getAttribute('name') : null,
+            text: squash(target.textContent),
+            type: target.type,
+            disabled: target.disabled,
+          }
+        : null;
+    const [cancel, save, ...more] = [...footer.querySelectorAll<HTMLButtonElement>('button')];
+    return { hint: text(footer, '[data-slot="required-hint"]') ?? null, cancel: button(cancel), save: button(save), more: more.length };
+  };
+  const saving = { icon: 'lucideLoader2', text: 'Salvando...', type: 'submit', disabled: true };
+  const saveButton = () => drawer()!.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]')!;
+  /** Each field of the drawer by id, with the messages under it. */
+  const messagesIn = (sheet: HTMLElement) =>
+    Object.fromEntries(
+      [...sheet.querySelectorAll('t-form-group')].map((group) => [
+        group.querySelector('input, select, textarea')!.id,
+        [...group.querySelectorAll('[data-slot="error"]')].map((error) => squash(error.textContent)),
+      ]),
+    );
+  const invalidIn = (sheet: HTMLElement) => [...sheet.querySelectorAll('[data-invalid]')].map((element) => element.id);
+  /** How many times `message` shows in the drawer: under its field and in no list elsewhere. */
+  const timesIn = (sheet: HTMLElement, message: string) => (sheet.textContent ?? '').split(message).length - 1;
+  /** Every request still open, as "METHOD url" (match() takes them). */
+  const sent = () => controller.match(() => true).map((request) => `${request.request.method} ${request.request.urlWithParams}`);
+
   it('customer-ui C46 shows the FROTA profile and Voltar à frota links to /vessels', async () => {
     const element = await render();
 
@@ -324,5 +380,202 @@ describe('VesselDetail', () => {
     expect(element.textContent).toContain('Esse registro não está disponível na sua organização.');
     const links = [...element.querySelectorAll('a')].filter((link) => link.textContent?.trim() === 'Voltar à frota');
     expect(links.map((link) => link.getAttribute('href'))).toContain('/vessels');
+  });
+
+  it('drawer-standard D3 Nova ordem focuses Nome do serviço with the Vessel locked and posts once', async () => {
+    const element = await render(aurora, []);
+    const open = async () => {
+      await click(buttonByText('Nova ordem', element));
+      await settle();
+      return drawer()!;
+    };
+    let sheet = await open();
+
+    expect(frameOf(sheet)).toEqual({
+      kicker: 'NOVA SOLICITAÇÃO',
+      title: 'Nova ordem de serviço',
+      description: 'Preencha os dados dos serviços para programar o atendimento da embarcação.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    expect(cardsOf(sheet)).toEqual([
+      {
+        title: 'Embarcação e cliente',
+        subtitle: 'Identifique a embarcação atendida',
+        icon: 'lucideShip',
+        labels: ['Embarcação *', 'Cliente responsável'],
+      },
+      {
+        title: 'Serviços a realizar',
+        subtitle: 'Adicione um ou mais serviços para esta embarcação',
+        icon: 'lucideWrench',
+        labels: ['Nome do serviço *', 'Descrição do serviço *'],
+      },
+      {
+        title: 'Planejamento',
+        subtitle: 'Defina o período e o status da ordem',
+        icon: 'lucideCalendarDays',
+        labels: ['Docagem *', 'Desdocagem *', 'Status'],
+      },
+    ]);
+    // This Vessel, chosen and locked: the first field that takes input is the service's name.
+    const vessel = sheet.querySelector<HTMLSelectElement>('#wo-vessel')!;
+    expect(vessel.disabled).toBe(true);
+    expect(vessel.value).toBe('vessel-1');
+    expect(squash(vessel.selectedOptions[0]?.textContent)).toBe('Santa Maria');
+    expect(sheet.querySelector<HTMLInputElement>('#wo-customer')!.value).toBe('Pescados Atlântico');
+    expect(document.activeElement?.id).toBe('wo-service-name-0');
+    expect(footerOf(sheet)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: { icon: 'lucideX', text: 'Cancelar', type: 'button', disabled: false },
+      save: { icon: 'lucideCheck', text: 'Criar ordem', type: 'submit', disabled: false },
+      more: 0,
+    });
+    expect(invalidIn(sheet)).toEqual([]);
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+
+    // Saved empty: nothing is sent, each required field left empty speaks under itself.
+    await click(saveButton());
+    expect(sent()).toEqual([]);
+    expect(messagesIn(sheet)).toEqual({
+      'wo-vessel': [],
+      'wo-customer': [],
+      'wo-service-name-0': ['Nome do serviço é obrigatório'],
+      'wo-service-description-0': ['Descrição do serviço é obrigatória'],
+      'wo-start': ['Data de início é obrigatória'],
+      'wo-end': ['Data de fim é obrigatória'],
+      'wo-status': [],
+    });
+    expect(invalidIn(sheet)).toEqual(['wo-service-name-0', 'wo-service-description-0', 'wo-start', 'wo-end']);
+    for (const message of [
+      'Nome do serviço é obrigatório',
+      'Descrição do serviço é obrigatória',
+      'Data de início é obrigatória',
+      'Data de fim é obrigatória',
+    ]) {
+      expect(timesIn(sheet, message), message).toBe(1);
+    }
+    expect(saveButton().disabled).toBe(false);
+
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(sent()).toEqual([]);
+
+    // Opened again: clean, with the Vessel still chosen and locked.
+    sheet = await open();
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    expect(invalidIn(sheet)).toEqual([]);
+    expect(sheet.querySelector<HTMLSelectElement>('#wo-vessel')!.value).toBe('vessel-1');
+    expect(sheet.querySelector<HTMLSelectElement>('#wo-vessel')!.disabled).toBe(true);
+
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão geral do motor');
+    await type('#wo-start', '2026-11-10T09:00');
+    await type('#wo-end', '2026-11-15T18:00');
+    await click(saveButton());
+    expect(footerOf(drawer()!).save).toEqual(saving);
+
+    const post = controller.expectOne({ method: 'POST', url: '/api/work-orders' });
+    expect(post.request.body).toEqual({
+      vesselId: 'vessel-1',
+      startDate: new Date(2026, 10, 10, 9, 0).toISOString(),
+      endDate: new Date(2026, 10, 15, 18, 0).toISOString(),
+      status: 'PENDING',
+      services: [{ name: 'Motor', description: 'Revisão geral do motor' }],
+    });
+    post.flush({ workOrder }, { status: 201, statusText: 'Created' });
+    await settle();
+    controller.expectOne({ method: 'GET', url: page(0) }).flush({ workOrders: [workOrder], total: 1 });
+    await settle();
+    expect(drawer()).toBeNull();
+  });
+
+  it('drawer-standard D9 Editar embarcação opens in the standard frame and puts once', async () => {
+    const element = await render();
+    const open = async () => {
+      await click(buttonByText('Editar', element));
+      await settle();
+      return drawer()!;
+    };
+    let sheet = await open();
+
+    expect(frameOf(sheet)).toEqual({
+      kicker: 'FROTA / EMBARCAÇÕES',
+      title: 'Editar embarcação',
+      description: 'Atualize as informações cadastrais e operacionais desta embarcação.',
+      close: 'Fechar formulário',
+      widths: ['sm:max-w-[580px]'],
+    });
+    // Today's fields and rules (AD-028): no Customer and no IMO number when editing.
+    expect(cardsOf(sheet)).toEqual([
+      {
+        title: 'Detalhes da embarcação',
+        subtitle: 'Informações básicas sobre a embarcação',
+        icon: 'lucideShip',
+        labels: ['Nome *'],
+      },
+      {
+        title: 'Tipo e comprimento',
+        subtitle: 'Identificação e dimensões da embarcação',
+        icon: 'lucideRuler',
+        labels: ['Tipo de embarcação *', 'Comprimento (m) *'],
+      },
+    ]);
+    expect(sheet.querySelector('#customerId')).toBeNull();
+    expect(sheet.querySelector('#imoNumber')).toBeNull();
+    expect(document.activeElement?.id).toBe('vessel-name');
+    expect(footerOf(sheet)).toEqual({
+      hint: '* Campos obrigatórios',
+      cancel: { icon: 'lucideX', text: 'Cancelar', type: 'button', disabled: false },
+      save: { icon: 'lucideCheck', text: 'Salvar alterações', type: 'submit', disabled: false },
+      more: 0,
+    });
+    expect(invalidIn(sheet)).toEqual([]);
+
+    // Nome and Comprimento cleared: nothing is sent, each speaks under itself.
+    await type('#vessel-name', '');
+    await type('#length', '');
+    await type('#type', 'CARGO');
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    await click(saveButton());
+    expect(sent()).toEqual([]);
+    expect(messagesIn(sheet)).toEqual({
+      'vessel-name': ['Nome é obrigatório'],
+      type: [],
+      length: ['Comprimento é obrigatório'],
+    });
+    expect(invalidIn(sheet)).toEqual(['vessel-name', 'length']);
+    for (const message of ['Nome é obrigatório', 'Comprimento é obrigatório']) {
+      expect(timesIn(sheet, message), message).toBe(1);
+    }
+    expect(saveButton().disabled).toBe(false);
+
+    await click(buttonByText('Cancelar', sheet));
+    expect(drawer()).toBeNull();
+    expect(sent()).toEqual([]);
+
+    // The same Vessel again: its stored values, nothing red.
+    sheet = await open();
+    expect(sheet.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Santa Maria');
+    expect(sheet.querySelector<HTMLSelectElement>('#type')!.value).toBe('FISHING');
+    expect(sheet.querySelector<HTMLInputElement>('#length')!.value).toBe('32.5');
+    expect(sheet.querySelectorAll('[data-slot="error"]').length).toBe(0);
+    expect(invalidIn(sheet)).toEqual([]);
+
+    await type('#vessel-name', 'Santa Maria II');
+    await type('#length', '33.5');
+    await click(saveButton());
+    expect(footerOf(drawer()!).save).toEqual(saving);
+
+    // The route the drawer calls today (AC 29): the Vessel under its Customer.
+    const put = controller.expectOne({ method: 'PUT', url: '/api/customers/c-atl/vessels/vessel-1' });
+    expect(put.request.body).toEqual({ customerId: 'c-atl', name: 'Santa Maria II', type: 'FISHING', length: 33.5 });
+    put.flush({ vessel: {} });
+    await settle();
+    controller
+      .expectOne({ method: 'GET', url: '/api/vessels/vessel-1' })
+      .flush({ vessel: { ...aurora, name: 'Santa Maria II', length: 33.5 } });
+    await settle();
+    expect(drawer()).toBeNull();
   });
 });

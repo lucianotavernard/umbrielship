@@ -156,11 +156,8 @@
 
 <t-sheet
   kicker="NOVA SOLICITAÇÃO"
-  closeLabel="Fechar formulário"
   title="Nova ordem de serviço"
   description="Preencha os dados dos serviços para programar o atendimento da embarcação."
-  class="sm:w-full sm:max-w-[580px]"
-  [flush]="true"
   [isActive]="isCreateWorkOrderSheetActive()"
   (closed)="closeCreateWorkOrderSheet()"
 >
@@ -176,11 +173,8 @@
 
 <t-sheet
   kicker="FROTA / EMBARCAÇÕES"
-  closeLabel="Fechar formulário"
   title="Editar embarcação"
   description="Atualize as informações cadastrais e operacionais desta embarcação."
-  class="sm:w-full sm:max-w-[560px]"
-  [flush]="true"
   [isActive]="isEditVesselSheetActive()"
   (closed)="closeEditVesselSheet()"
 >
