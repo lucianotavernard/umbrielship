@@ -1,14 +1,14 @@
 # dashboard-redesign proofs
 
-**HEAD**: dad6e21
+**HEAD**: 38b964d
 **Tree**: clean
 **Shell**: /bin/sh
-**Result**: 50 pass, 5 fail
+**Result**: 55 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
 | C1 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C1 requests the six reads once with no paging for every ` | pass |
-| C1 | `browser - open /dashboard at 1440x1114 as an operator, save captures/dashboard.running.png` | **diverges** (screens.md) |
+| C1 | `browser - open /dashboard at 1440x1114 as an operator, save captures/dashboard.running.png` | pass |
 | C1 | `walk - open / signed in and land on /dashboard` | pass (Walked) |
 | C2 | `run web / ✓ dashboard-summary.spec.ts > greeting > dashboard C2 greets by the hour with the sun or the moon` | pass |
 | C2 | `run web / ✓ dashboard-summary.spec.ts > firstName > dashboard C2 takes the first word of the name` | pass |
@@ -23,7 +23,7 @@
 | C5 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C5 draws each day and item of the agenda panel` | pass |
 | C6 | `run web / ✓ dashboard-summary.spec.ts > periodItems > dashboard C6 keeps monday to sunday for the week and tod` | pass |
 | C6 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C6 alternates esta semana and hoje` | pass |
-| C6 | `browser - use the period button once at 1440x1114, save captures/dashboard-period-today.running.png` | **diverges** (screens.md) |
+| C6 | `browser - use the period button once at 1440x1114, save captures/dashboard-period-today.running.png` | pass |
 | C7 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C7 tells an empty today from an empty week` | pass |
 | C7 | `walk - with more items this week than the panel shows, read the agenda list's scrollHeight above its clientHei` | pass (Walked) |
 | C8 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C8 opens the work order of an agenda item` | pass |
@@ -38,8 +38,8 @@
 | C14 | `run web / ✓ dashboard-summary.spec.ts > openOrders > dashboard C14 keeps the open orders nearest desdocagem fi` | pass |
 | C14 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C14 pages the open orders by 5 within each tab` | pass |
 | C15 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C15 searches within the tab and goes back to page 1` | pass |
-| C15 | `browser - pick the tab "Em andamento" at 1440x1000, save captures/dashboard-tab-em-andamento.running.png` | **diverges** (screens.md) |
-| C15 | `browser - search "zzz" at 1440x1000, save captures/dashboard-search-empty.running.png` | **diverges** (screens.md) |
+| C15 | `browser - pick the tab "Em andamento" at 1440x1000, save captures/dashboard-tab-em-andamento.running.png` | pass |
+| C15 | `browser - search "zzz" at 1440x1000, save captures/dashboard-search-empty.running.png` | pass |
 | C16 | `run web / ✓ dashboard-summary.spec.ts > responsavelOf > dashboard C16 names the responsável of the first servi` | pass |
 | C16 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C16 shows vessel, code, service, responsável, prazo and ` | pass |
 | C17 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C17 offers ver detalhes to every role and editar and exc` | pass |
@@ -56,7 +56,7 @@
 | C23 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C23 toasts once and keeps the skeletons when a read fail` | pass |
 | C23 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C23 toasts once when several reads fail at once or one a` | pass |
 | C24 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C24 says when no work order is open` | pass |
-| C25 | `browser - open /dashboard at 1440x1114 in the dark theme, save captures/dashboard-dark.running.png` | **diverges** (screens.md) |
+| C25 | `browser - open /dashboard at 1440x1114 in the dark theme, save captures/dashboard-dark.running.png` | pass |
 | C25 | `walk - in the dark theme read the contrast of a card value, a Vessel name, an Agenda item title and a Team nam` | pass (Walked) |
 | C26 | `walk - open /dashboard at the five widths, compare scrollWidth with innerWidth, and read the panels' boxes at ` | pass (Walked) |
 | C27 | `run web / ✓ dashboard.spec.ts > Dashboard > dashboard C27 falls back to the last page left after a delete or a` | pass |
@@ -68,19 +68,19 @@
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/workforce/staff/__test__/staff-filters.spec.ts > specialtyChips > workforce C12 counts each specialty in pt-BR order 0ms
- ✓  web  src/package/work-order/inspection-assignment/__test__/inspection-availability.spec.ts > inspectionBlockedReason > work-order-ui C42 blocks on the work order and then on the target service 0ms
- ✓  web  src/package/shared/components/lib/__test__/theme.spec.ts > restoreTheme > customer-ui C4 applies the saved theme before boot 1ms
+ ✓  web  src/package/workforce/staff/__test__/staff-status.spec.ts > teamStatus > workforce C30 derives em serviço from its own service in progress only 0ms
  ✓  web  src/package/customer/vessel/__test__/vessel-csv.spec.ts > vesselsCsv > customer-ui C40 writes the header and one quoted line per vessel with BOM and CRLF 1ms
  ✓  web  src/package/customer/vessel/__test__/vessel-csv.spec.ts > vesselsCsv > customer-ui C40 guards formulas and doubles quotes 0ms
+ ✓  web  src/package/workforce/staff/__test__/staff-allocations.spec.ts > openAllocations > workforce C32 lists the open services of the staff and its team by start 1ms
  ✓  web  src/package/work-order/agenda/__test__/agenda-week.spec.ts > agendaItems > work-order-ui C59 places services and dockings, clamps the rows and hides cancelled orders 0ms
  ✓  web  src/package/work-order/agenda/__test__/agenda-week.spec.ts > weekLabel > work-order-ui C61 reads one month or the cross month range 0ms
- ✓  web  src/package/workforce/staff/__test__/staff-allocations.spec.ts > openAllocations > workforce C32 lists the open services of the staff and its team by start 1ms
+ ✓  web  src/package/shared/components/lib/__test__/theme.spec.ts > restoreTheme > customer-ui C4 applies the saved theme before boot 0ms
  ✓  web  src/package/workforce/staff/__test__/staff-csv.spec.ts > staffCsv > workforce C13 writes the header and one line per staff with sem equipe 0ms
+ ✓  web  src/package/work-order/inspection-assignment/__test__/inspection-availability.spec.ts > inspectionBlockedReason > work-order-ui C42 blocks on the work order and then on the target service 0ms
  ✓  web  src/package/work-order/work-order/__test__/work-order-csv.spec.ts > workOrderCsv > work-order-ui C13 writes the header, the Aurora line, a guarded formula and doubled quotes 0ms
 
  Test Files  62 passed (62)
       Tests  406 passed (406)
-   Start at  09:19:54
-   Duration  10.33s (transform 5.67s, setup 1.36s, import 7.10s, tests 27.36s, environment 28.31s)
+   Start at  09:21:23
+   Duration  6.42s (transform 1.75s, setup 1.05s, import 2.88s, tests 19.29s, environment 28.06s)
 ```
