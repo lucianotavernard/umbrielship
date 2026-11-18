@@ -859,6 +859,30 @@ describe('WorkOrderDetail', () => {
     expect(assignees(element)).toEqual([]);
   });
 
+  it('workforce C41 shows no responsável and edits no services while the staff read failed', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const element = await renderReads('administrator');
+    controller.expectOne('/api/assignments').flush({ assignments: onMotor });
+    controller.expectOne('/api/teams').flush({ teams: [alfa] });
+    controller.expectOne('/api/staff').flush({ message: 'Staff not found' }, { status: 500, statusText: 'Server Error' });
+    await settle();
+
+    // Rafael answers for "Motor", but without the Staff read nothing reads "Sem responsável" either.
+    expect(assignees(element)).toEqual([]);
+    expect(error).toHaveBeenCalledWith('Erro ao carregar os responsáveis', { description: 'Profissional não encontrado.' });
+    await click(buttonByText('Editar', element));
+    controller.expectOne('/api/vessels/v-aur').flush({ vessel: auroraVessel });
+    await settle();
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    await click(buttonByText('Salvar alterações', drawer()!));
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === BASE);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+    await settle();
+  });
+
   it('workforce C41 edits the responsável from the detail once the reads answered', async () => {
     const element = await renderReads('administrator');
     answerWorkforce(controller, { staff: [rafael], teams: [alfa], assignments: onMotor });

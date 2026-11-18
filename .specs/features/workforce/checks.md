@@ -240,6 +240,8 @@ Proof: run api | ✓ create-work-order.use-case.spec.ts > CreateWorkOrderUseCase
 Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the assignments are not loaded and toasts a failure
 Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C41 shows no responsável until the workforce reads answer and toasts a failure
 Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C41 edits the responsável from the detail once the reads answered
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C41 shows no responsável and edits no services while the staff read failed
+Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the teams read is pending
 
 ## Coverage
 
