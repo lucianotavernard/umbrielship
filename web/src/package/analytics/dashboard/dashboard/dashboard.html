@@ -11,9 +11,12 @@
       >
         {{ greeting.text }}, {{ firstName() }}
         @if (greeting.icon === 'sun') {
-          <span data-slot="greeting-icon" data-icon="sun" class="grid place-items-center text-[#d9a247]" aria-hidden="true">
-            <ng-icon name="lucideSun" class="!size-[17px]" />
-          </span>
+          <span
+            data-slot="greeting-icon"
+            data-icon="sun"
+            class="text-[18px] leading-none text-[#d9a247] before:content-['☀']"
+            aria-hidden="true"
+          ></span>
         } @else {
           <span data-slot="greeting-icon" data-icon="moon" class="grid place-items-center text-[#8a9bc0]" aria-hidden="true">
             <ng-icon name="lucideMoon" class="!size-[17px]" />
@@ -337,7 +340,7 @@
           <button
             type="button"
             aria-label="Página anterior"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted"
             [disabled]="currentPage() <= 1"
             (click)="goTo(currentPage() - 1)"
           >
@@ -347,7 +350,7 @@
             <button
               type="button"
               data-slot="page"
-              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
+              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground dark:border-border dark:bg-muted aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
               [attr.aria-current]="number === currentPage() ? 'page' : null"
               (click)="goTo(number)"
             >
@@ -357,7 +360,7 @@
           <button
             type="button"
             aria-label="Próxima página"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted"
             [disabled]="currentPage() >= pages().length"
             (click)="goTo(currentPage() + 1)"
           >

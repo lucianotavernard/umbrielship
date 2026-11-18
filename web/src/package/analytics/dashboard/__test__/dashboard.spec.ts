@@ -285,9 +285,9 @@ describe('Dashboard', () => {
     expect(page.text('h2', panel)).toBe('Equipes em campo');
     expect(page.text('h2 + p', panel)).toBe('Disponibilidade das equipes');
     expect(page.teamRows()).toEqual([
-      ['Alfa', 'Motor · 2 técnicos', 'Disponível'],
-      ['Bravo', 'Hidráulica · 3 técnicos', 'Em serviço'],
-      ['Charlie', 'Elétrica · 2 técnicos', 'Disponível'],
+      ['Equipe Alfa', 'Motor · 2 técnicos', 'Disponível'],
+      ['Equipe Bravo', 'Hidráulica · 3 técnicos', 'Em serviço'],
+      ['Equipe Charlie', 'Elétrica · 2 técnicos', 'Disponível'],
     ]);
     const list = panel.querySelector('[data-slot="team-list"]')!;
     expect(list.classList).toContain('overflow-y-auto');
@@ -531,7 +531,7 @@ describe('Dashboard', () => {
     const before = assignments.filter((item) => item.id !== 'a3');
     const page = await DashboardPage.open({ assignments: before });
     expect(page.notes()).toEqual(['0 equipes mobilizadas']);
-    expect(page.teamRows()[0]).toEqual(['Alfa', 'Motor · 2 técnicos', 'Disponível']);
+    expect(page.teamRows()[0]).toEqual(['Equipe Alfa', 'Motor · 2 técnicos', 'Disponível']);
 
     await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
     const select = (id: string) => drawer()!.querySelector<HTMLSelectElement>(id)!;
@@ -553,7 +553,7 @@ describe('Dashboard', () => {
     const row = page.rowOf('#AB12CD34')!;
     expect(page.text('[data-slot="responsavel-name"]', row)).toBe('Equipe Alfa');
     expect(page.text('[data-slot="responsavel-initials"]', row)).toBe('A');
-    expect(page.teamRows()[0]).toEqual(['Alfa', 'Motor · 2 técnicos', 'Em serviço']);
+    expect(page.teamRows()[0]).toEqual(['Equipe Alfa', 'Motor · 2 técnicos', 'Em serviço']);
     expect(page.notes()).toEqual(['1 equipe mobilizada']);
     expect(page.agendaItems()).toContainEqual(['08:30', 'Aurora', 'Serviço', 'Motor · Equipe Alfa']);
   });
@@ -589,7 +589,7 @@ describe('Dashboard', () => {
   it('dashboard C19 deletes after the confirmation and drops the order and its assignments', async () => {
     const success = vi.spyOn(toast, 'success');
     const page = await DashboardPage.open();
-    expect(page.teamRows()[1]).toEqual(['Bravo', 'Hidráulica · 3 técnicos', 'Em serviço']);
+    expect(page.teamRows()[1]).toEqual(['Equipe Bravo', 'Hidráulica · 3 técnicos', 'Em serviço']);
 
     await click(buttonByText('Excluir', await page.openMenu('#AA000001')));
     const confirmation = document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!;
@@ -618,7 +618,7 @@ describe('Dashboard', () => {
       ['Concluídas no mês', '01'],
     ]);
     expect(page.agendaItems()).not.toContainEqual(['09:00', 'Vento Leste', 'Desdocagem', 'Desdocagem · #AA000001']);
-    expect(page.teamRows()[1]).toEqual(['Bravo', 'Hidráulica · 3 técnicos', 'Disponível']);
+    expect(page.teamRows()[1]).toEqual(['Equipe Bravo', 'Hidráulica · 3 técnicos', 'Disponível']);
     expect(page.notes()).toEqual(['0 equipes mobilizadas']);
   });
 
@@ -855,6 +855,113 @@ describe('Dashboard', () => {
       if (waiting.includes('cards')) expect(page.cards(), failing).toEqual([]);
       page.fixture.destroy();
     }
+  });
+
+  it('dashboard C23 toasts once when several reads fail at once or one after another', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const failAll = (requests: Reads, order: (keyof Reads)[]) =>
+      order.map((read) => async () => {
+        requests[read].flush({ statusCode: 404, message: 'Vessel not found' }, { status: 404, statusText: 'Not Found' });
+        await settle();
+      });
+
+    // The six fail in one tick.
+    let page = await DashboardPage.pending();
+    let requests = page.reads();
+    for (const read of Object.keys(requests) as (keyof Reads)[]) {
+      requests[read].flush({ statusCode: 404, message: 'Vessel not found' }, { status: 404, statusText: 'Not Found' });
+    }
+    await settle();
+    expect(error.mock.calls).toEqual([['Erro ao carregar a visão geral', { description: 'Embarcação não encontrada.' }]]);
+    page.fixture.destroy();
+
+    // The six fail one after another, each settled before the next.
+    error.mockClear();
+    page = await DashboardPage.pending();
+    requests = page.reads();
+    for (const fail of failAll(requests, ['staff', 'workOrders', 'teams', 'vessels', 'assignments', 'customers'])) {
+      await fail();
+    }
+    expect(error).toHaveBeenCalledTimes(1);
+    page.fixture.destroy();
+
+    // Two of six fail in turn and the rest answer.
+    error.mockClear();
+    page = await DashboardPage.pending();
+    requests = page.reads();
+    page.answer(requests, { workOrders: fleet, vessels, customers, staff });
+    await settle();
+    for (const fail of failAll(requests, ['teams', 'assignments'])) await fail();
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+
+  it('dashboard C27 falls back to the last page left after a delete or an edit', async () => {
+    const page = await DashboardPage.open({ workOrders: generated(7) });
+    const sixth = generated(7)[5];
+    const seventh = generated(7)[6];
+
+    await page.goToPage(2);
+    expect(page.codes()).toEqual(codes(6, 7));
+
+    // An edit that closes #00000007: page 2 still holds #00000006.
+    await click(buttonByText('Editar', await page.openMenu(code(7))));
+    await type('#wo-status', 'COMPLETED');
+    await click(buttonByText('Salvar alterações', drawer()!));
+    controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${seventh.id}`).flush(null);
+    await settle();
+    const closed = generated(7).map((order) => (order.id === seventh.id ? { ...order, status: 'COMPLETED' as const } : order));
+    await page.reload(closed);
+    expect(page.currentPage()).toBe('2');
+    expect(page.codes()).toEqual([code(6)]);
+
+    // A delete of the only row of page 2: the table shows page 1, never an empty page.
+    await click(buttonByText('Excluir', await page.openMenu(code(6))));
+    await click(buttonByText('Confirmar', document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!));
+    controller.expectOne(`/api/work-orders/${sixth.id}`).flush(null, { status: 204, statusText: 'No Content' });
+    await settle();
+    await page.reload(
+      closed.filter((order) => order.id !== sixth.id),
+      assignments,
+    );
+    expect(page.currentPage()).toBe('1');
+    expect(page.codes()).toEqual(codes(1, 5));
+    expect(page.range()).toBe('Exibindo 1–5 de 5 ordens');
+    expect(page.pageButtons().map((button) => squash(button.textContent))).toEqual(['1']);
+    expect(page.empty()).toBeUndefined();
+  });
+
+  it('dashboard C27 shows every open order after a create', async () => {
+    const page = await DashboardPage.open();
+
+    await click(page.tab('Pendentes'));
+    await page.search('vento');
+    expect(page.codes()).toEqual(['#CD56EF78']);
+
+    await click(buttonByText('Nova ordem de serviço', page.element));
+    await type('#wo-vessel', 'v-lul');
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão geral');
+    await type('#wo-start', '2026-11-19T08:00');
+    await type('#wo-end', '2026-11-21T17:30');
+    await type('#wo-status', 'IN_PROGRESS');
+    await click(buttonByText('Criar ordem', drawer()!));
+    const created: WorkOrder = {
+      id: 'ff001122-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
+      vesselId: 'v-lul',
+      startDate: local(2026, 11, 19, 8, 0),
+      endDate: local(2026, 11, 21, 17, 30),
+      status: 'IN_PROGRESS',
+      services: [],
+    };
+    controller.expectOne((req) => req.method === 'POST' && req.url === '/api/work-orders').flush({ workOrder: created });
+    await settle();
+    await page.reload([...fleet, created]);
+
+    // The new WorkOrder is in progress and Lula Branca's: it shows only with the tab and search reset.
+    expect(page.selectedTabs()).toEqual(['Todas as ordens']);
+    expect(page.searchField().value).toBe('');
+    expect(page.currentPage()).toBe('1');
+    expect(page.codes()).toEqual(['#CD56EF78', '#AA000001', '#AB12CD34', '#FF001122']);
   });
 
   it('dashboard C24 says when no work order is open', async () => {

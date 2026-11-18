@@ -4,7 +4,7 @@ Build: `cd web && npm run build`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose`
 Plan: `.specs/features/dashboard-redesign/plan.md`
 
-26 checks in 1 slice · 0 one-way doors · 0 open, of which 0 block
+27 checks in 1 slice (C27 appended from the Verifier) · 0 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -49,7 +49,7 @@ Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C8 opens the work
 **C9** - "Ver agenda completa" opens `/agenda` (AC 9)
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C9 opens the agenda from ver agenda completa
 
-**C10** - "Equipes em campo" ("Disponibilidade das equipes") lists every Team by name in `pt-BR`, each with its name, "<especialidade> · <n> técnicos" ("1 técnico", "0 técnicos") and "Em serviço" or "Disponível" by AD-084; the list scrolls inside the panel when the Teams are more than the panel's height in `.specs/features/dashboard-redesign/captures/dashboard.png` shows (AC 10)
+**C10** - "Equipes em campo" ("Disponibilidade das equipes") lists every Team by name in `pt-BR`, each as "Equipe <nome>" with "<especialidade> · <n> técnicos" ("1 técnico", "0 técnicos") and "Em serviço" or "Disponível" by AD-084; the list scrolls inside the panel when the Teams are more than the panel's height in `.specs/features/dashboard-redesign/captures/dashboard.png` shows (AC 10)
 Proof: run web | ✓ dashboard-summary.spec.ts > teamRows > dashboard C10 lists every team by name with specialty, count and status
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C10 shows each team of the organization in equipes em campo
 Proof: walk - with more Teams than the panel shows, read the team list's `scrollHeight` above its `clientHeight`
@@ -102,6 +102,7 @@ Proof: run web | ✓ dashboard.inspector.spec.ts > Dashboard as an inspector > d
 **C23** - While a read loads, the parts that read it show skeletons and no Responsável reads "Sem responsável" before the Staff, Teams and Assignments answer; a failed read toasts once "Erro ao carregar a visão geral" with the API message or "Não foi possível carregar a visão geral." and its parts keep their skeletons instead of "00", "0 equipes mobilizadas", "Sem responsável" or an empty sentence (AC 23)
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C23 shows skeletons and no sem responsável until the reads answer
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C23 toasts once and keeps the skeletons when a read fails
+Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C23 toasts once when several reads fail at once or one after another
 
 **C24** - With no open WorkOrder the table reads "Nenhuma ordem de serviço em aberto." and "Exibindo 0–0 de 0 ordens" with no page button (AC 24)
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C24 says when no work order is open
@@ -112,6 +113,10 @@ Proof: walk - in the dark theme read the contrast of a card value, a Vessel name
 
 **C26** - At 640, 768, 1024, 1280 and 1536px `/dashboard` has no horizontal page scroll, only the table scrolling inside its panel, unlike `.specs/features/dashboard-redesign/captures/dashboard-375.png`; from 1024px "Agenda de serviços" and "Equipes em campo" sit side by side, below it the cards go two per row and the panels stack Agenda, Equipes, Ordens (AC 26)
 Proof: walk - open `/dashboard` at the five widths, compare `scrollWidth` with `innerWidth`, and read the panels' boxes at 1024 and 768
+
+**C27** - When a delete or an edit empties the last page of the orders table, the table shows the last page left ("Exibindo 1–5 de 5 ordens", page "1"), never an empty page; after "Criar ordem" it goes back to "Todas as ordens", an empty search and page 1, where the new WorkOrder shows (AC 14, 19, 21; appended from Verifier finding 5)
+Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C27 falls back to the last page left after a delete or an edit
+Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C27 shows every open order after a create
 
 ## Coverage
 
@@ -124,7 +129,7 @@ Proof: walk - open `/dashboard` at the five widths, compare `scrollWidth` with `
 | mobilised Teams rule, AC 4 (4 examples) | Alfa on `IN_PROGRESS` C4 · Bravo on `PENDING` C4 · Charlie on a `CANCELLED` WorkOrder C4 · a member's own Assignment C4 | - |
 | Agenda items rule, AC 5 (3 examples) | Docagem, service, Desdocagem under SEG, QUA, SEX C5 · service with no Responsável C5 · `CANCELLED` C5 | - |
 | period boundary, AC 6 (3 examples) | Sunday 23:00 C6 · next Monday 00:00 C6 · today 00:00 in "Hoje" C6 | - |
-| Team rows rule, AC 10 (3 examples) | Alfa "Motor · 2 técnicos" "Em serviço" C10 · Charlie "1 técnico" "Disponível" C10 · no Staff "0 técnicos" C10 | - |
+| Team rows rule, AC 10 (3 examples) | "Equipe Alfa" "Motor · 2 técnicos" "Em serviço" C10 · Charlie "1 técnico" "Disponível" C10 · no Staff "0 técnicos" C10 | - |
 | footer rule, AC 11 (4 examples) | 7 Staff C11 · 2 C11 · 1 C11 · 0 C11 | - |
 | open orders rule, AC 14 (3 examples) | 7 open on two pages C14 · 3 `PENDING` C14 · `COMPLETED` and `CANCELLED` on no tab C14 | - |
 | search rule, AC 15 (2 examples) | "#ab12" C15 · "pintura" C15 | - |
@@ -141,7 +146,7 @@ Proof: walk - open `/dashboard` at the five widths, compare `scrollWidth` with `
 ## Swept
 
 - validation: existing - the drawer's validation is the WorkOrder list's (`work-order-ui` C14-C16, `workforce` C25); the page sends nothing new
-- failure modes: C23, C18 (an edit before the workforce reads answer)
+- failure modes: C23, C18 (an edit before the workforce reads answer), C27 (a write that empties the last page)
 - idempotency: n/a - no new write; the drawer and the confirmation call the existing routes
 - authorization: C17, C21, C22; existing - `RolesGuard` on the WorkOrder writes and the administrator gate on the Responsável (`workforce` C21)
 - concurrency: n/a - the page writes through existing routes and reloads the reads after each write, the last answer wins as on the WorkOrder list
@@ -152,8 +157,8 @@ Proof: walk - open `/dashboard` at the five widths, compare `scrollWidth` with `
 
 ## Handoff
 
-- **Settled mid-build:** none
-- **Dispatched:** at `96e4288` (diff `334e15a..96e4288`, `proofs.md` at `96e4288`, 47 pass and the 5 pictures awaiting judgement, taken at `6bd121d`, the last code commit): the Verifier (fresh sub-agent); screens round 1 (fresh sub-agent, the 5 pictures against their captures)
+- **Settled mid-build:** after the Verifier's findings 2-4, to "Como o painel deve escrever o nome da equipe?" the user answered "\"Equipe <nome>\" (Recomendado)" (AD-093, AC 10 and C10 restated, their tests changed with them); to "Qual nome usar?" for the row menu, "\"Ações para <#código>\" (Recomendado)" (AD-094, a row in `## Differences from the source`); to "Qual total mostrar?" for the orders footer, "Total da aba e da busca (Recomendado)" (AD-095, a row in `## Differences from the source`, AC 14 says so)
+- **Dispatched:** at `96e4288` (diff `334e15a..96e4288`, `proofs.md` at `96e4288`, 47 pass and the 5 pictures awaiting judgement, taken at `6bd121d`, the last code commit): the Verifier (fresh sub-agent) - returned, FAIL with 5 findings (repeated load-error toasts, three departures from the captures with no Differences row, two rules with no check); screens round 1 (fresh sub-agent, the 5 pictures against their captures) - returned, all 5 diverge on 3 faults: the greeting's sun drawn as an outline (5 pictures), a rule under the column headers of the empty table, the page controls not boxed in the dark theme
 - **Boundary:** C1-C26 closed at `6bd121d` (`3a1d6e5` the build, `6bd121d` two fixes the walk found)
 - **Abandoned:** none. The `Run web` line is run with `VITEST_MAX_WORKERS=4` in the environment: on this machine (14 GB, swap full, the user's `ng serve` and API in watch on 4200 and 3333) the default 19 workers ran out of memory twice and 31-35 tests of every module timed out at 5 s and cascaded through `TestBed`; with 4 workers the same command passes 403 of 403 in 5 s. The variable only limits Vitest's parallelism; the command and the tests are the project's own
 - **Walked:** at `3a1d6e5`, then the pictures again at `6bd121d`, on an isolated stack started for the walk (PostgreSQL, Redis and Mailpit in new containers `dash-walk-pg`, `dash-walk-redis`, `dash-walk-mailpit` on ports 55800, 56800, 51800/58800; the API built from this checkout on 3337; the web production build served on 4303 by a small static server with the dev proxy's rules), seeded through the API with fictional data only, in the week of Monday 16 November 2026 (the walk ran on Wednesday 18 at 08:45, -03): the Teams "Alfa" (Motor), "Bravo" (Hidráulica) and "Charlie" (Elétrica) with 2, 3 and 2 of seven professionals; five Customers and Vessels after the capture's (Santa Maria, Lula Branca, Maré Alta, Estrela do Sul, São Pedro II); six open WorkOrders and one completed on 6 November - Santa Maria in progress until today 14:30 with "Revisão do motor principal" (Alfa, in progress) at 08:30, Lula Branca pending until 16:00 with "Troca do sistema hidráulico" (Bravo, in progress) at 10:00, Maré Alta pending until tomorrow 09:00 with "Inspeção elétrica e sonar" (Rafael Mendes), Estrela do Sul in progress until tomorrow 11:30 with "Manutenção do guincho de rede" (Charlie, pending) at 13:30, São Pedro II and a second Lula Branca next week; the operator "Lucas Costa" and the inspector "Camila Rocha". Headless Chrome (Playwright on `/usr/bin/google-chrome`, the session token in `localStorage`, light theme unless dark) saved each picture at its capture's size, full page: C1 `captures/dashboard.running.png` (1440x1114, operator: "Bom dia, Lucas", "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026", cards 06 / 02 with "2 equipes mobilizadas" / 04 / 01, QUA 18 with the three services and their Teams, Alfa and Bravo "Em serviço", Charlie "Disponível", "7 técnicos ativos" JP RM +5, five rows of six with "Equipe Alfa", "Equipe Bravo", "Rafael Mendes", "Equipe Charlie"), C6 `captures/dashboard-period-today.running.png` (the period button once: "Hoje", today's five items), C15 `captures/dashboard-tab-em-andamento.running.png` (1440x1000, Santa Maria and Estrela do Sul) and `captures/dashboard-search-empty.running.png` (1440x1000, "zzz": "Nenhuma ordem encontrada."), C25 `captures/dashboard-dark.running.png` (1440x1114, dark). The flows, with clicks and typing: `/` landed on `/dashboard` (C1); the Agenda list measured `scrollHeight` 384 over `clientHeight` 144 and the panel 271.5 px on "Esta semana" and on "Hoje" (C7); the first Agenda item opened `/work-orders/<Santa Maria>` (C8), "Ver agenda completa" `/agenda` (C9), the Teams' "Mais opções" `/staff?tab=equipes` (C13); the tabs read "Todas as ordens 6", "Em andamento", "Pendentes", the pages "Exibindo 1–5 de 6 ordens" then "Exibindo 6–6 de 6 ordens", "Pendentes" "Exibindo 1–4 de 4 ordens" (C14); "Exportar" downloaded `ordens-de-servico.csv` of 7 lines (C20); as the administrator, "Editar" on Santa Maria showed its service's Responsável "Alfa", changed to "Charlie" and saved ("Ordem atualizada com sucesso"): the row read "Equipe Charlie", Alfa turned "Disponível" and Charlie "Em serviço", the note stayed "2 equipes mobilizadas" (C18); "Excluir" with "Confirmar" on the second Lula Branca took "Todas as ordens" from 6 to 5 ("Ordem de serviço excluída com sucesso", C19); "Nova ordem de serviço" opened with no Vessel chosen and created one on Maré Alta with "Limpeza do casco" for Bravo ("Ordem de serviço criada com sucesso"): the cards read 06 / 02 / 04 / 01 and the Agenda "Limpeza do casco · Equipe Bravo" (C21); the row menu read "Ver detalhes Editar Excluir" for the administrator and the operator and "Ver detalhes" for the inspector, the operator's drawer had no "Responsável", the inspector had no "Nova ordem de serviço", and both read the same Responsáveis (C17, C21, C22); with two more Teams the Teams list measured `scrollHeight` 245 over `clientHeight` 147 (C10); in the dark theme a card value, a Vessel name, an Agenda item's Vessel and a Team name each read `rgb(229,237,244)` on `rgb(20,30,41)`, 14.23:1 (C25); at 640, 768, 1024, 1280 and 1536 px `scrollWidth` equals `innerWidth`; at 640 and 768 the cards take two rows and the panels stack Agenda (y 446 / 464), Equipes (717 / 735), Ordens (1005 / 1023); from 1024 the cards take one row and Agenda and Equipes share y 323 (C26). A user reaches the states from the sidebar "Visão geral" (or `/`), the period button, a tab, the search, a row's "Ações para #…", "Nova ordem de serviço" and the theme button. Seen in the walk and fixed at `6bd121d`: the greeting's sun was drawn in the text colour (the icon took no colour from its own class), and a fourth Agenda item showed cut at the bottom of the list; every picture was retaken after the fix. The stack was stopped and its containers removed after the walk
