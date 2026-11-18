@@ -24,36 +24,53 @@ describe('staffStatus', () => {
     const pedro = { id: 'pedro', teamId: null };
 
     // Its own Assignment on a PENDING service.
-    let progress = servicesInProgress([{ services: [service('s1', 'PENDING')] }]);
+    let progress = servicesInProgress([{ status: 'IN_PROGRESS', services: [service('s1', 'PENDING')] }]);
     expect(staffStatus(rafael, [assignment({ staffId: 'rafael' })], progress)).toBe('Disponível');
 
     // Its Team responsible for an IN_PROGRESS service.
-    progress = servicesInProgress([{ services: [service('s1', 'PENDING'), service('s2', 'IN_PROGRESS')] }]);
+    progress = servicesInProgress([{ status: 'IN_PROGRESS', services: [service('s1', 'PENDING'), service('s2', 'IN_PROGRESS')] }]);
     const teamOn = [assignment({ workOrderServiceId: 's2', teamId: 'alfa' })];
     expect(staffStatus(rafael, teamOn, progress)).toBe('Em serviço');
 
     // That service turned COMPLETED.
-    progress = servicesInProgress([{ services: [service('s2', 'COMPLETED')] }]);
+    progress = servicesInProgress([{ status: 'IN_PROGRESS', services: [service('s2', 'COMPLETED')] }]);
     expect(staffStatus(rafael, teamOn, progress)).toBe('Disponível');
 
     // No Team and no Assignment.
-    progress = servicesInProgress([{ services: [service('s2', 'IN_PROGRESS')] }]);
+    progress = servicesInProgress([{ status: 'IN_PROGRESS', services: [service('s2', 'IN_PROGRESS')] }]);
     expect(staffStatus(pedro, teamOn, progress)).toBe('Disponível');
 
     // Its own Assignment on an IN_PROGRESS service, and another's does not count.
     expect(staffStatus(pedro, [assignment({ workOrderServiceId: 's2', staffId: 'pedro' })], progress)).toBe('Em serviço');
     expect(staffStatus(pedro, [assignment({ workOrderServiceId: 's2', staffId: 'rafael' })], progress)).toBe('Disponível');
+
+    // A PENDING WorkOrder is open; a service left IN_PROGRESS on a CANCELLED or COMPLETED one is not work being done.
+    const own = [assignment({ workOrderServiceId: 's2', staffId: 'pedro' })];
+    for (const [status, expected] of [
+      ['PENDING', 'Em serviço'],
+      ['IN_PROGRESS', 'Em serviço'],
+      ['CANCELLED', 'Disponível'],
+      ['COMPLETED', 'Disponível'],
+    ] as const) {
+      progress = servicesInProgress([{ status, services: [service('s2', 'IN_PROGRESS')] }]);
+      expect(staffStatus(pedro, own, progress), status).toBe(expected);
+      expect(staffStatus(rafael, teamOn, progress), `team on ${status}`).toBe(expected);
+    }
   });
 });
 
 describe('teamStatus', () => {
   it('workforce C30 derives em serviço from its own service in progress only', () => {
-    const progress = servicesInProgress([{ services: [service('s1', 'IN_PROGRESS'), service('s2', 'PENDING')] }]);
+    const progress = servicesInProgress([{ status: 'IN_PROGRESS', services: [service('s1', 'IN_PROGRESS'), service('s2', 'PENDING')] }]);
 
     expect(teamStatus('alfa', [assignment({ workOrderServiceId: 's1', teamId: 'alfa' })], progress)).toBe('Em serviço');
     expect(teamStatus('alfa', [assignment({ workOrderServiceId: 's2', teamId: 'alfa' })], progress)).toBe('Disponível');
     // A member's own Assignment on a service in progress does not count.
     expect(teamStatus('alfa', [assignment({ workOrderServiceId: 's1', staffId: 'rafael' })], progress)).toBe('Disponível');
     expect(teamStatus('alfa', [], progress)).toBe('Disponível');
+
+    // Its service left IN_PROGRESS on a CANCELLED WorkOrder does not count.
+    const closed = servicesInProgress([{ status: 'CANCELLED', services: [service('s1', 'IN_PROGRESS')] }]);
+    expect(teamStatus('alfa', [assignment({ workOrderServiceId: 's1', teamId: 'alfa' })], closed)).toBe('Disponível');
   });
 });
