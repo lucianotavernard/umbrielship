@@ -25,7 +25,7 @@ import { Responsavel } from '../dashboard-summary';
   imports: [NgIcon, RouterLink, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem],
   viewProviders: [provideIcons({ lucideClock3, lucideEllipsis, lucideEye, lucidePencil, lucideShip, lucideTrash2 })],
   template: `
-    <div class="relative w-full overflow-x-auto">
+    <div class="relative mt-[9px] w-full overflow-x-auto">
       <table class="w-full min-w-[720px] border-collapse text-left whitespace-nowrap">
         <thead class="h-[35px]">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
