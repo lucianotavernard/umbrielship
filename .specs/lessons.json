@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 59,
+  "next_id": 65,
   "lessons": [
     {
       "id": "L-001",
@@ -1056,6 +1056,114 @@
       ],
       "created": "2026-11-18T05:16:36Z",
       "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-059",
+      "key": "ac_gap::a page that toasts a load error over several reads toasts on the change to any failure and its test fails several reads at once and one after another",
+      "text": "A page that toasts a load error over several reads toasts on the change to any failure, and its test fails several reads at once and one after another.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1; dashboard.ts failed (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
+    },
+    {
+      "id": "L-060",
+      "key": "spec_deviation::before a plan fixes how a screen writes stored data compare it with the capture and with how the same page writes that data elsewhere",
+      "text": "Before a plan fixes how a screen writes stored data, compare it with the capture and with how the same page writes that data elsewhere.",
+      "signal": "spec_deviation",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2; AD-093 (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
+    },
+    {
+      "id": "L-061",
+      "key": "spec_deviation::an accessible name in the capture s aria tree is a label copy it or list the departure in differences from the source",
+      "text": "An accessible name in the capture's aria tree is a label: copy it, or list the departure in Differences from the source.",
+      "signal": "spec_deviation",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3; AD-094 (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
+    },
+    {
+      "id": "L-062",
+      "key": "spec_deviation::a total the capture prints in a table footer is matched or listed in differences from the source before a criterion fixes another one",
+      "text": "A total the capture prints in a table footer is matched, or listed in Differences from the source, before a criterion fixes another one.",
+      "signal": "spec_deviation",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 4; AD-095 (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
+    },
+    {
+      "id": "L-063",
+      "key": "spec_precision_gap::a paged table s fallback to the last page left after a write and its reset after a create each get a check",
+      "text": "A paged table's fallback to the last page left after a write, and its reset after a create, each get a check.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 5; C27 (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
+    },
+    {
+      "id": "L-064",
+      "key": "weak_test::a test for a claim with several triggers exercises each trigger from the state the claim names",
+      "text": "A test for a claim with several triggers exercises each trigger from the state the claim names.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "dashboard-redesign"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 6; dashboard.spec.ts C27 (web)"
+      ],
+      "created": "2026-11-18T12:25:58Z",
+      "last_seen": "2026-11-18T12:25:58Z"
     }
   ]
 }
