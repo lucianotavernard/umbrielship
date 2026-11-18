@@ -47,13 +47,18 @@ const card = 'rounded-lg border border-border bg-card';
   template: `
     <div class="mx-auto w-full max-w-[560px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[31px]">
       @if (notFound()) {
-        <section data-slot="not-found" [class]="card + ' grid justify-items-center gap-2 px-6 py-10 text-center'">
-          <span class="grid size-[42px] place-items-center rounded-full bg-muted text-muted-foreground">
+        <section
+          data-slot="not-found"
+          [class]="card + ' mx-auto grid max-w-[300px] justify-items-center px-5 py-[54px] text-center'"
+        >
+          <span
+            class="grid size-[42px] place-items-center rounded-[11px] bg-[#edf4f4] text-[#238c82] dark:bg-[#17302f] dark:text-[#7cc7c2]"
+          >
             <ng-icon name="lucideUsers" class="!size-5" />
           </span>
-          <h1 class="text-[17px] font-normal text-foreground">Profissional não encontrado</h1>
-          <p class="text-[11px] text-muted-foreground">Este cadastro não está disponível na equipe técnica.</p>
-          <a class="mt-2 flex items-center gap-1.5 text-[10px] font-semibold text-primary" routerLink="/staff">
+          <h1 class="mt-[14px] mb-[5px] text-[19px] font-normal text-foreground">Profissional não encontrado</h1>
+          <p class="mb-4 text-[11px] text-muted-foreground">Este cadastro não está disponível na equipe técnica.</p>
+          <a class="flex items-center gap-1.5 text-[10px] text-muted-foreground hover:text-primary" routerLink="/staff">
             <ng-icon name="lucideArrowLeft" class="!size-[15px]" />
             Voltar para a equipe
           </a>

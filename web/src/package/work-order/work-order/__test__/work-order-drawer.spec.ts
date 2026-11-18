@@ -627,8 +627,14 @@ describe('WorkOrderDrawer', () => {
     vi.restoreAllMocks();
   });
 
+  const onMotor = [{ id: 'a1', workOrderId: orderA.id, workOrderServiceId: motor.id, staffId: 'rafael', teamId: null }];
+
   /** The list as `role`, with Rafael, Pedro and Equipe Alfa, and Rafael on "Motor" of #AB12CD34. */
-  async function open(role: 'administrator' | 'operator', workOrders: WorkOrder[] = fleet) {
+  async function open(
+    role: 'administrator' | 'operator',
+    workOrders: WorkOrder[] = fleet,
+    assignments: object[] = onMotor,
+  ) {
     TestBed.inject(AuthenticationService).role.set(role);
     const page = await WorkOrderListPage.pending();
     const reads = page.reads();
@@ -638,7 +644,7 @@ describe('WorkOrderDrawer', () => {
     answerWorkforce(controller, {
       staff: [rafael, pedro],
       teams: [alfa],
-      assignments: [{ id: 'a1', workOrderId: orderA.id, workOrderServiceId: motor.id, staffId: 'rafael', teamId: null }],
+      assignments,
     });
     await settle();
     return page;
@@ -712,38 +718,104 @@ describe('WorkOrderDrawer', () => {
   });
 
   it('workforce C26 edits the responsável of each service and limits closed ones', async () => {
-    const withDone: WorkOrder = { ...orderA, services: [motor, { ...pintura, status: 'COMPLETED' }] };
-    const page = await open('administrator', [withDone]);
+    const helice = { ...pintura, id: `${orderA.id}-s3`, name: 'Hélice', status: 'COMPLETED' as const };
+    const withDone: WorkOrder = { ...orderA, services: [motor, { ...pintura, status: 'COMPLETED' }, helice] };
+    const page = await open('administrator', [withDone], [
+      ...onMotor,
+      { id: 'a3', workOrderId: orderA.id, workOrderServiceId: helice.id, staffId: null, teamId: 'alfa' },
+    ]);
 
-    const menu = await page.openMenu('#AB12CD34');
-    await click(buttonByText('Editar', menu));
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
 
     const entries = [...drawer()!.querySelectorAll<HTMLElement>('[data-slot="existing-service"]')];
     expect(entries.map((entry) => entry.querySelector<HTMLInputElement>('input[readonly]')!.value)).toEqual([
       'Motor',
       'Pintura do casco',
+      'Hélice',
     ]);
     expect(entries.every((entry) => entry.querySelector<HTMLInputElement>('input[readonly]')!.readOnly)).toBe(true);
     expect(select('#wo-existing-assignee-0')!.value).toBe('staff:rafael');
     expect(optionsOf('#wo-existing-assignee-0')).toHaveLength(4);
-    // "Pintura do casco" is COMPLETED and had none: only "Sem responsável".
+    // A COMPLETED service keeps only what it had: none, or its Responsável.
     expect(optionsOf('#wo-existing-assignee-1')).toEqual(['Sem responsável']);
+    expect(optionsOf('#wo-existing-assignee-2')).toEqual(['Sem responsável', 'Equipe Alfa · Motor']);
+    expect(select('#wo-existing-assignee-2')!.value).toBe('team:alfa');
 
-    // Closing the WorkOrder limits every service to what it had.
-    await type('#wo-status', 'CANCELLED');
+    // A Responsável chosen, then the WorkOrder closed: the choice goes back to the one it had.
+    await type('#wo-existing-assignee-0', 'team:alfa');
+    await type('#wo-status', 'COMPLETED');
     expect(optionsOf('#wo-existing-assignee-0')).toEqual(['Sem responsável', 'Rafael Mendes · Mecânico naval']);
+    expect(select('#wo-existing-assignee-0')!.value).toBe('staff:rafael');
+    await type('#wo-status', 'CANCELLED');
+    expect(select('#wo-existing-assignee-0')!.value).toBe('staff:rafael');
+
+    // Saved closed, nothing new is sent.
+    await click(buttonByText('Salvar alterações', drawer()!));
+    let put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body.status).toBe('CANCELLED');
+    expect(put.request.body.services).toEqual([
+      { id: motor.id, staffId: 'rafael' },
+      { id: pintura.id },
+      { id: helice.id, teamId: 'alfa' },
+    ]);
+    put.flush(null);
+    await settle();
+    await page.reload([withDone]);
+    answerWorkforce(controller, { staff: [rafael, pedro], teams: [alfa] });
+    await settle();
+
+    // Open again, in progress: Motor takes Equipe Alfa and Hélice is cleared.
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
     await type('#wo-status', 'IN_PROGRESS');
     await type('#wo-existing-assignee-0', 'team:alfa');
+    await type('#wo-existing-assignee-2', '');
     await click(buttonByText('Salvar alterações', drawer()!));
-
-    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
-    expect(put.request.body.services).toEqual([{ id: motor.id, teamId: 'alfa' }, { id: pintura.id }]);
-    expect(put.request.body.status).toBe('IN_PROGRESS');
+    put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body.services).toEqual([{ id: motor.id, teamId: 'alfa' }, { id: pintura.id }, { id: helice.id }]);
     put.flush(null);
     await settle();
     await page.reload([withDone]);
     answerWorkforce(controller);
     await settle();
+  });
+
+  it('workforce C41 edits without services while the assignments are not loaded and toasts a failure', async () => {
+    const error = vi.spyOn(toast, 'error');
+    TestBed.inject(AuthenticationService).role.set('administrator');
+    const page = await WorkOrderListPage.pending();
+    const reads = page.reads();
+    reads.workOrders.flush({ workOrders: fleet, total: fleet.length });
+    reads.vessels.flush({ vessels: harnessVessels, total: harnessVessels.length });
+    reads.customers.flush({ customers: harnessCustomers, total: harnessCustomers.length });
+    controller.expectOne('/api/staff').flush({ staff: [rafael] });
+    controller.expectOne('/api/teams').flush({ teams: [alfa] });
+    const assignments = controller.expectOne('/api/assignments');
+    await settle();
+
+    // Still loading: the drawer lists no service and the save sends none.
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    await click(buttonByText('Salvar alterações', drawer()!));
+    let put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    await page.reload(fleet);
+
+    // Failed: the same, and a toast says so.
+    assignments.flush({ message: 'Internal server error' }, { status: 500, statusText: 'Server Error' });
+    await settle();
+    expect(error).toHaveBeenCalledWith('Erro ao carregar os responsáveis', {
+      description: 'Não foi possível carregar os responsáveis.',
+    });
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    await click(buttonByText('Salvar alterações', drawer()!));
+    put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    await page.reload(fleet);
   });
 
   it('workforce C26 shows no services to an operator editing', async () => {

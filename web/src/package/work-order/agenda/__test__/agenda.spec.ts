@@ -530,6 +530,41 @@ describe('Agenda', () => {
     ]);
   });
 
+  it('workforce C27 Adicionar à agenda sends the responsável as staffId or teamId', async () => {
+    const element = await renderAgenda(controller, 'administrator', workOrders(), {
+      staff: [{ id: 'rafael', name: 'Rafael Mendes', specialty: 'Mecânico naval', email: 'r@x.test', phone: '1', teamId: null }],
+      teams: [{ id: 'alfa', name: 'Equipe Alfa', specialty: 'Motor', staffCount: 0 }],
+    });
+
+    await click(button(element, 'Novo compromisso'));
+    const sheet = drawer(element)!;
+    choose(sheet.querySelector<HTMLSelectElement>('#appointment-work-order')!, AURORA);
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-name')!, 'Troca de anodos');
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-description')!, 'Anodos da popa');
+    fill(sheet.querySelector<HTMLInputElement>('#appointment-end')!, '2026-11-18T12:00');
+    choose(sheet.querySelector<HTMLSelectElement>('#appointment-assignee')!, 'team:alfa');
+    await settle();
+    await click(button(sheet, 'Agendar serviço'));
+
+    const created = controller.expectOne(`/api/work-orders/${AURORA}/services`);
+    expect(created.request.body).toMatchObject({ name: 'Troca de anodos', status: 'PENDING', teamId: 'alfa' });
+    expect(created.request.body).not.toHaveProperty('staffId');
+    created.flush({ id: 'svc-new' }, { status: 201, statusText: 'Created' });
+    await settle();
+    controller
+      .expectOne({ method: 'GET', url: '/api/work-orders' })
+      .flush({ workOrders: workOrders(), total: workOrders().length });
+    await settle();
+  });
+
+  it('workforce C27 Adicionar à agenda shows no responsável to an operator', async () => {
+    const element = await renderAgenda(controller, 'operator');
+
+    await click(button(element, 'Novo compromisso'));
+    expect(drawer(element)!.querySelector('#appointment-assignee')).toBeNull();
+    expect(drawer(element)!.textContent).not.toContain('Responsável');
+  });
+
   it('work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00', async () => {
     const element = await renderAgenda(controller, 'administrator');
     const start = () =>

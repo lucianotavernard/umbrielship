@@ -777,7 +777,10 @@ describe('WorkOrderDetail', () => {
     TestBed.inject(AuthenticationService).role.set('operator');
   });
 
-  afterEach(() => controller.verify());
+  afterEach(() => {
+    controller.verify();
+    vi.restoreAllMocks();
+  });
 
   it('workforce C28 shows the responsável of each service', async () => {
     const fixture = TestBed.createComponent(WorkOrderDetail);
@@ -809,5 +812,108 @@ describe('WorkOrderDetail', () => {
       ['Pintura', 'Responsável: Equipe Alfa'],
       ['Hélice', 'Sem responsável'],
     ]);
+  });
+
+  async function renderReads(role: 'administrator' | 'operator') {
+    TestBed.inject(AuthenticationService).role.set(role);
+    const fixture = TestBed.createComponent(WorkOrderDetail);
+    fixture.componentRef.setInput('id', ID);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+    controller.expectOne(`${BASE}/services`).flush({ services, total: services.length });
+    controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [] });
+    await settle();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  const rafael = { id: 'rafael', name: 'Rafael Mendes', specialty: 'Mecânico naval', email: 'r@x.test', phone: '1', teamId: null };
+  const alfa = { id: 'alfa', name: 'Alfa', specialty: 'Motor', staffCount: 0 };
+  const onMotor = [{ id: 'a1', workOrderId: ID, workOrderServiceId: 'svc-1', staffId: 'rafael', teamId: null }];
+  const assignees = (element: HTMLElement) =>
+    [...element.querySelectorAll('[data-slot="service-assignee"]')].map((label) => squash(label.textContent));
+
+  it('workforce C41 shows no responsável until the workforce reads answer and toasts a failure', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const element = await renderReads('administrator');
+
+    // Loading: no service reads "Sem responsável", and "Editar" sends no services.
+    expect(assignees(element)).toEqual([]);
+    await click(buttonByText('Editar', element));
+    controller.expectOne('/api/vessels/v-aur').flush({ vessel: auroraVessel });
+    await settle();
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    await click(buttonByText('Salvar alterações', drawer()!));
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === BASE);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+
+    controller.expectOne('/api/staff').flush({ staff: [rafael] });
+    controller.expectOne('/api/teams').flush({ teams: [alfa] });
+    controller.expectOne('/api/assignments').flush({ message: 'Internal server error' }, { status: 500, statusText: 'Server Error' });
+    await settle();
+    expect(error).toHaveBeenCalledWith('Erro ao carregar os responsáveis', {
+      description: 'Não foi possível carregar os responsáveis.',
+    });
+    expect(assignees(element)).toEqual([]);
+  });
+
+  it('workforce C41 edits the responsável from the detail once the reads answered', async () => {
+    const element = await renderReads('administrator');
+    answerWorkforce(controller, { staff: [rafael], teams: [alfa], assignments: onMotor });
+    await settle();
+
+    expect(assignees(element)).toEqual(['Responsável: Rafael Mendes', 'Sem responsável', 'Sem responsável']);
+    await click(buttonByText('Editar', element));
+    controller.expectOne('/api/vessels/v-aur').flush({ vessel: auroraVessel });
+    await settle();
+    expect(drawer()!.querySelectorAll('[data-slot="existing-service"]')).toHaveLength(3);
+    await type('#wo-existing-assignee-1', 'team:alfa');
+    await click(buttonByText('Salvar alterações', drawer()!));
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === BASE);
+    expect(put.request.body.services).toEqual([
+      { id: 'svc-1', staffId: 'rafael' },
+      { id: 'svc-2', teamId: 'alfa' },
+      { id: 'svc-3' },
+    ]);
+    put.flush(null);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+    controller.expectOne('/api/assignments').flush({ assignments: onMotor });
+    await settle();
+  });
+
+  it('workforce C27 Novo serviço on the detail sends the responsável chosen by an administrator', async () => {
+    const element = await renderReads('administrator');
+    answerWorkforce(controller, { staff: [rafael], teams: [alfa], assignments: [] });
+    await settle();
+
+    await click(buttonByText('Novo serviço', element));
+    await type('#svc-name', 'Pintura do convés');
+    await type('#svc-description', 'Duas demãos');
+    await type('#svc-start', '2026-11-18T08:00');
+    await type('#svc-end', '2026-11-18T17:00');
+    await type('#svc-assignee', 'staff:rafael');
+    await click(buttonByText('Criar serviço', drawer()!));
+
+    const post = controller.expectOne((req) => req.method === 'POST' && req.url === `${BASE}/services`);
+    expect(post.request.body).toMatchObject({ name: 'Pintura do convés', staffId: 'rafael' });
+    expect(post.request.body).not.toHaveProperty('teamId');
+    post.flush({ service: { id: 'svc-4' } });
+    await settle();
+    controller.expectOne(`${BASE}/services`).flush({ services, total: services.length });
+    controller.expectOne('/api/assignments').flush({ assignments: [] });
+    await settle();
+  });
+
+  it('workforce C27 Novo serviço on the detail shows no responsável to an operator', async () => {
+    const element = await renderReads('operator');
+    answerWorkforce(controller);
+    await settle();
+
+    await click(buttonByText('Novo serviço', element));
+    expect(drawer()!.querySelector('#svc-assignee')).toBeNull();
+    expect(drawer()!.textContent).not.toContain('Responsável');
   });
 });

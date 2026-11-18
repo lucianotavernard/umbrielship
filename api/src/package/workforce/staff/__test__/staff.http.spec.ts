@@ -192,6 +192,23 @@ describe('POST /staff', () => {
     expect((await post(body({ name: '   ', email: 'a4@x.test' }))).status).toBe(
       400,
     );
+    expect(
+      (
+        await post(
+          body({ name: 'a5', email: `${'a'.repeat(244)}@umbriel.test` }),
+        )
+      ).status,
+    ).toBe(400);
+    const { phone: _phone, ...missingPhone } = body({
+      name: 'a6',
+      email: 'a6@x.test',
+    });
+    expect((await post(missingPhone)).status).toBe(400);
+    expect(
+      workforce.staff.items.some((item) =>
+        ['a1', 'a2', 'a3', 'a5', 'a6'].includes(item.name),
+      ),
+    ).toBe(false);
 
     const used = await post(
       body({ name: 'RAFAEL MENDES', email: 'r2@x.test' }),

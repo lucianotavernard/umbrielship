@@ -50,7 +50,7 @@ const AVATAR_TONES = [
   template: `
     <div class="relative w-full overflow-x-auto">
       <table class="w-full min-w-[820px] border-collapse text-left whitespace-nowrap">
-        <thead class="h-[35px]">
+        <thead class="h-[35px] border-t border-border">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
             <th class="w-9 pr-2 text-center">
               <input

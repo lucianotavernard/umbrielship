@@ -23,7 +23,7 @@ export type TeamRow = TeamListItem & { status: WorkforceStatus };
   template: `
     <div class="relative w-full overflow-x-auto">
       <table class="w-full min-w-[640px] border-collapse text-left whitespace-nowrap">
-        <thead class="h-[35px]">
+        <thead class="h-[35px] border-t border-border">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
             <th class="font-bold">NOME</th>
             <th class="font-bold">ESPECIALIDADE</th>
@@ -58,7 +58,7 @@ export type TeamRow = TeamListItem & { status: WorkforceStatus };
                   </span>
                 </td>
                 <td>
-                  <span class="flex items-center gap-1.5"
+                  <span data-slot="team-specialty" class="flex items-center gap-1.5"
                     ><ng-icon name="lucideWrench" class="!size-[13px] shrink-0" />{{ team.specialty }}</span
                   >
                 </td>

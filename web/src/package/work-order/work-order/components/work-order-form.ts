@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal, untracked } from '@angular/core';
 import { applyEach, disabled, form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -293,7 +293,29 @@ export class WorkOrderForm {
    * (AD-068); it keeps the one it had or none.
    */
   protected isClosed(service: { status: WorkOrderServiceStatus }) {
-    const status = this.model().status;
+    return this.isClosedAt(service, this.model().status);
+  }
+
+  constructor() {
+    // A service that turns closed goes back to the Responsável it had, unless it was cleared: the
+    // select then shows what will be sent, and the API would refuse a new one (AD-068).
+    effect(() => {
+      const status = this.model().status;
+      untracked(() => {
+        const existing = this.model().existing;
+        const reverted = existing.map((service) =>
+          this.isClosedAt(service, status) && service.assignee !== '' && service.assignee !== service.original
+            ? { ...service, assignee: service.original }
+            : service,
+        );
+        if (reverted.some((service, index) => service !== existing[index])) {
+          this.model.update((model) => ({ ...model, existing: reverted }));
+        }
+      });
+    });
+  }
+
+  private isClosedAt(service: { status: WorkOrderServiceStatus }, status: WorkOrderStatus) {
     return service.status === 'COMPLETED' || status === 'COMPLETED' || status === 'CANCELLED';
   }
 

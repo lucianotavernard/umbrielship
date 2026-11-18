@@ -65,6 +65,23 @@ describe('UpdateStaffUseCase', () => {
     ).toBe('rafael@umbriel.test');
   });
 
+  it('workforce C2 refuses the name of another staff on edit', async () => {
+    const promise = sut.handle({
+      organizationId: 'A',
+      id: 'rafael',
+      name: ' camila rocha',
+      specialty: 'Mecânico naval',
+      email: 'rafael@umbriel.test',
+      phone: '(13) 1',
+    });
+
+    await expect(promise).rejects.toBeInstanceOf(AlreadyExistsDomainException);
+    await expect(promise).rejects.toThrow('Staff name already exists');
+    expect(
+      workforce.staff.items.find((item) => item.id === 'rafael')!.name,
+    ).toBe('Rafael Mendes');
+  });
+
   it('workforce C4 replaces every field', async () => {
     workforce.teams.items.push(makeTeam({ organizationId: 'A' }, 'team-a'));
 

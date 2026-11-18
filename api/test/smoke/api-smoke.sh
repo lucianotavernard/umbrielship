@@ -175,13 +175,22 @@ req GET "/staff/$ST1" "$TA"
 check "workforce C4 staff edit reads back" "Mecânica naval/team" "$(echo "$BODY" | jq -r --arg t "$TEAM_A" '.staff.specialty + "/" + (if .staff.teamId == $t then "team" else "no team" end)')"
 # Two creates of one name at once: the unique index keeps one.
 CONCURRENT=()
-for email in c1@umbriel.test c2@umbriel.test; do
-  curl -s -o /dev/null -X POST "http://127.0.0.1:$API_PORT/staff" -H 'Content-Type: application/json' -H "Authorization: Bearer $TA" -d "$(staff_body 'Concorrente' "$email")" &
+for who in c1 c2; do
+  curl -s -o "/tmp/smoke-concurrent-$SUFFIX-$who" -w '%{http_code}' -X POST "http://127.0.0.1:$API_PORT/staff" -H 'Content-Type: application/json' -H "Authorization: Bearer $TA" -d "$(staff_body 'Concorrente' "$who@umbriel.test")" > "/tmp/smoke-concurrent-$SUFFIX-$who.status" &
   CONCURRENT+=("$!")
 done
 # Only the two requests: a bare `wait` would also wait for the API process.
 wait "${CONCURRENT[@]}"
 req GET /staff "$TA"; check "workforce C38 concurrent staff creates store one" 1 "$(echo "$BODY" | jq '[.staff[] | select(.name == "Concorrente")] | length')"
+# The loser answers 409 with the name message, not 500.
+STATUSES="$(cat "/tmp/smoke-concurrent-$SUFFIX-c1.status"; echo; cat "/tmp/smoke-concurrent-$SUFFIX-c2.status"; echo)"
+check "workforce C38 concurrent staff creates answer 201 and 409" "201 409" "$(echo "$STATUSES" | sort | xargs)"
+LOSER=""
+for who in c1 c2; do
+  [ "$(cat "/tmp/smoke-concurrent-$SUFFIX-$who.status")" = 409 ] && LOSER="$(jq -r '.message' "/tmp/smoke-concurrent-$SUFFIX-$who")"
+done
+check "workforce C38 concurrent loser message" "Staff name already exists" "$LOSER"
+rm -f /tmp/smoke-concurrent-$SUFFIX-*
 # A team with two members and no Assignment leaves them with no team.
 req POST /teams "$TA" '{"name":"Equipe Bravo","specialty":"Hidráulica"}'; TEAM_B="$(echo "$BODY" | jq -r '.team.id')"
 req POST /staff "$TA" "$(staff_body 'João Ferreira' joao@umbriel.test "$TEAM_B")"; ST3="$(echo "$BODY" | jq -r '.staff.id')"

@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
+import { toast } from '../../../shared/components/ui/toaster';
 import { StaffDetail } from '../staff-detail/staff-detail';
 import { Staff } from '../staff.service';
 import { assignments, camila, click, pedro, rafael, settle, squash, teams, workOrders } from './testing';
@@ -104,5 +105,26 @@ describe('StaffDetail', () => {
     expect(element.textContent).toContain('Este cadastro não está disponível na equipe técnica.');
     const back = [...element.querySelectorAll('a')].find((link) => squash(link.textContent) === 'Voltar para a equipe');
     expect(back?.getAttribute('href')).toBe('/staff');
+  });
+
+  it('workforce C35 shows a skeleton while loading and toasts a failure', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const fixture = TestBed.createComponent(StaffDetail);
+    fixture.componentRef.setInput('id', 'rafael');
+    await settle();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('[data-slot="profile-skeleton"]')).not.toBeNull();
+    controller.expectOne('/api/staff/rafael').flush({ staff: rafael });
+    controller.expectOne('/api/teams').flush({ teams });
+    controller.expectOne('/api/assignments').flush({ message: 'Internal server error' }, { status: 500, statusText: 'Server Error' });
+    controller.expectOne('/api/work-orders').flush({ workOrders, total: workOrders.length });
+    controller.expectOne('/api/vessels').flush({ vessels, total: vessels.length });
+    await settle();
+
+    expect(error).toHaveBeenCalledWith('Erro ao carregar a equipe técnica', {
+      description: 'Não foi possível carregar a equipe técnica.',
+    });
+    vi.restoreAllMocks();
   });
 });

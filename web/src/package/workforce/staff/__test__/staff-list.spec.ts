@@ -166,6 +166,10 @@ describe('StaffList', () => {
   it('workforce C14 creates a professional from the drawer and toasts its name', async () => {
     const success = vi.spyOn(toast, 'success');
     const page = await StaffListPage.open();
+    // Filters on: the new professional still shows once saved, as the mareos clears them.
+    await click(page.chip('Técnica elétrica'));
+    await page.filterTeam('alfa');
+    await page.search('camila');
 
     await click(buttonByText('Cadastrar profissional', page.element));
     expect(squash(drawer()!.textContent)).toContain('Novo profissional');
@@ -191,6 +195,10 @@ describe('StaffList', () => {
     expect(success).toHaveBeenCalledWith('Marina Alves foi adicionado à equipe técnica.');
     expect(drawer()).toBeNull();
     expect(page.names()).toContain('Marina Alves');
+    expect(page.names()).toHaveLength(5);
+    expect(page.element.querySelector<HTMLInputElement>('input[placeholder="Buscar profissional..."]')!.value).toBe('');
+    expect(page.element.querySelector<HTMLSelectElement>('#team-filter')!.value).toBe('');
+    expect(page.chip('Todas')?.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('workforce C14 keeps the drawer open on a 409', async () => {
@@ -289,12 +297,17 @@ describe('StaffList', () => {
     expect(router.url).toBe('/?tab=equipes');
     expect(page.tab('Equipes')?.getAttribute('aria-selected')).toBe('true');
     expect(page.teamRows()).toEqual([
-      ['Equipe Alfa', '2', 'Em serviço'],
-      ['Equipe Bravo', '1', 'Disponível'],
-      ['Equipe Charlie', '0', 'Disponível'],
+      ['Equipe Alfa', 'Motor', '2', 'Em serviço'],
+      ['Equipe Bravo', 'Hidráulica', '1', 'Disponível'],
+      ['Equipe Charlie', 'Elétrica', '0', 'Disponível'],
     ]);
-    expect(page.element.textContent).toContain('NOME');
-    expect(page.element.textContent).toContain('PROFISSIONAIS');
+    expect([...page.element.querySelectorAll('thead th')].map((th) => squash(th.textContent))).toEqual([
+      'NOME',
+      'ESPECIALIDADE',
+      'PROFISSIONAIS',
+      'STATUS',
+      'Ações',
+    ]);
 
     await click(page.tab('Profissionais'));
     expect(router.url).toBe('/');
@@ -370,6 +383,21 @@ describe('StaffList', () => {
     expect(error).toHaveBeenCalledWith('Erro ao excluir equipe', {
       description: 'Esta equipe é responsável por um serviço e não pode ser excluída.',
     });
+  });
+
+  it('workforce C35 toasts the known API message of a failed read', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const page = await StaffListPage.pending();
+
+    controller.expectOne('/api/staff').flush({ staff: [] });
+    controller.expectOne('/api/teams').flush({ message: 'Team not found' }, { status: 404, statusText: 'Not Found' });
+    controller.expectOne('/api/assignments').flush({ assignments: [] });
+    controller.expectOne('/api/work-orders').flush({ workOrders: [], total: 0 });
+    await new Promise((resolve) => setTimeout(resolve));
+    TestBed.tick();
+
+    expect(error).toHaveBeenCalledWith('Erro ao carregar a equipe técnica', { description: 'Equipe não encontrada.' });
+    expect(page.rows()).toHaveLength(0);
   });
 
   it('workforce C35 shows skeletons while loading and toasts a failure', async () => {
