@@ -43,6 +43,12 @@ describe('openAllocations', () => {
       order('ef90ab12-0000-4000-8000-000000000000', 'CANCELLED', [
         service('cancelled', local(2026, 11, 5, 9, 0), local(2026, 11, 6, 9, 0), 'PENDING'),
       ]),
+      order('cd56ef78-0000-4000-8000-000000000000', 'PENDING', [
+        service('pending', local(2026, 11, 25, 7, 30), local(2026, 11, 25, 12, 0), 'PENDING'),
+      ]),
+      order('aa000001-0000-4000-8000-000000000000', 'COMPLETED', [
+        service('closed', local(2026, 11, 2, 9, 0), local(2026, 11, 3, 9, 0), 'IN_PROGRESS'),
+      ]),
     ];
     const assignments = [
       assignment('late', 'rafael', null),
@@ -50,6 +56,8 @@ describe('openAllocations', () => {
       assignment('done', 'rafael', null),
       assignment('other', 'pedro', null),
       assignment('cancelled', 'rafael', null),
+      assignment('pending', null, 'alfa'),
+      assignment('closed', 'rafael', null),
     ];
 
     const result = openAllocations(
@@ -73,6 +81,14 @@ describe('openAllocations', () => {
         code: '#AB12CD34',
         vesselName: 'Aurora',
         period: '20/11/2026 08:00 – 21/11/2026 17:00',
+      },
+      // A PENDING WorkOrder is open; a COMPLETED or CANCELLED one is not.
+      {
+        workOrderId: 'cd56ef78-0000-4000-8000-000000000000',
+        serviceName: 'Serviço pending',
+        code: '#CD56EF78',
+        vesselName: 'Aurora',
+        period: '25/11/2026 07:30 – 25/11/2026 12:00',
       },
     ]);
 

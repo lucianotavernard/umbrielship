@@ -6,7 +6,7 @@ Run smoke: `bash api/test/smoke/api-smoke.sh`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose`
 Plan: `.specs/features/workforce/plan.md`
 
-40 checks in 4 slices · 4 one-way doors · 0 open, of which 0 block
+41 checks in 4 slices (C41 appended from the Verifier) · 4 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -30,6 +30,7 @@ Proof: run api | ✓ staff.http.spec.ts > POST /staff > workforce C2 answers 400
 Proof: run smoke | ok   workforce C2 staff name in another case (409)
 Proof: run smoke | ok   workforce C2 staff email in another case (409)
 Proof: run smoke | ok   workforce C2 same staff name in another organization (201)
+Proof: run api | ✓ update-staff.use-case.spec.ts > UpdateStaffUseCase > workforce C2 refuses the name of another staff on edit
 
 **C3** - `GET /staff` answers every Staff of the caller's Organization ordered by name and none of another; `GET /staff/:id` answers `{ staff }`, or 404 `Staff not found` for another Organization's or none; no token answers 401 (AC 3)
 Proof: run api | ✓ fetch-staff.use-case.spec.ts > FetchStaffUseCase > workforce C3 returns the staff of the organization by name
@@ -161,10 +162,12 @@ Proof: run api | ✓ delete-work-order.use-case.spec.ts > DeleteWorkOrderUseCase
 Proof: run api | ✓ delete-work-order-service.use-case.spec.ts > DeleteWorkOrderServiceUseCase > workforce C24 removes the assignment of the service
 Proof: run smoke | ok   workforce C24 assignments gone with the service (0)
 Proof: run smoke | ok   workforce C24 assignments gone with the work order (0)
+Proof: run api | ✓ delete-work-order-service.use-case.spec.ts > DeleteWorkOrderServiceUseCase > workforce C24 keeps the assignment when an inspection refuses the service delete
 
 **C25** - For an `administrator` each service of "Serviços a realizar" in "Nova ordem de serviço" carries "Responsável" ("Sem responsável", the groups "Profissionais" and "Equipes", each "<nome> · <especialidade>") and saving sends `staffId` or `teamId`; an `operator` sees no such field (AC 25)
 Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C25 sends the responsável of each service chosen by an administrator
 Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C25 shows no responsável to an operator
+Proof: run web | ✓ vessel-detail.spec.ts > VesselDetail > workforce C25 Nova ordem on the Vessel detail sends the responsável of an administrator and hides it from an operator
 
 **C26** - "Editar" on a WorkOrder, for an `administrator`, lists its services with their names read only and "Responsável" set to the current Assignment; a `COMPLETED` service, or any service while "Status" reads "Concluído" or "Cancelado", offers only its current value and "Sem responsável"; saving sends `services` with every listed service; an `operator` sees no services (AC 26)
 Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26 edits the responsável of each service and limits closed ones
@@ -173,6 +176,10 @@ Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26
 **C27** - For an `administrator` "Novo serviço" and "Adicionar à agenda" carry "Responsável" in their "Serviço" card, sent as `staffId` or `teamId` (AC 27)
 Proof: run web | ✓ work-order-service-form.spec.ts > WorkOrderServiceForm > workforce C27 sends the responsável chosen by an administrator
 Proof: run web | ✓ appointment-form.spec.ts > AppointmentForm > workforce C27 sends the responsável chosen by an administrator
+Proof: run web | ✓ agenda.spec.ts > Agenda > workforce C27 Adicionar à agenda sends the responsável as staffId or teamId
+Proof: run web | ✓ agenda.spec.ts > Agenda > workforce C27 Adicionar à agenda shows no responsável to an operator
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C27 Novo serviço on the detail sends the responsável chosen by an administrator
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C27 Novo serviço on the detail shows no responsável to an operator
 
 ### S3 - Everyone sees who works where
 
@@ -203,6 +210,8 @@ Proof: walk - open `/staff`, `/staff?tab=equipes` and `/staff/:id` at each width
 
 **C35** - While a request loads the metrics and tables show skeletons; a failure toasts "Erro ao carregar a equipe técnica" with the API message or "Não foi possível carregar a equipe técnica." (AC 35)
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C35 shows skeletons while loading and toasts a failure
+Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C35 toasts the known API message of a failed read
+Proof: run web | ✓ staff-detail.spec.ts > StaffDetail > workforce C35 shows a skeleton while loading and toasts a failure
 
 ### S4 - The documents say so
 
@@ -218,12 +227,19 @@ Proof: `bash api/test/db/migration-check.sh drift`
 **C38** - Two `POST /staff` with the same name sent at once store one Staff and answer 409 to the other; a unique violation from the database becomes `AlreadyExistsDomainException` (Landing 1, concurrency)
 Proof: run api | ✓ staff.repository.spec.ts > PrismaStaffRepository > workforce C38 turns a unique violation into AlreadyExistsDomainException
 Proof: run smoke | ok   workforce C38 concurrent staff creates store one (1)
+Proof: run smoke | ok   workforce C38 concurrent staff creates answer 201 and 409
+Proof: run smoke | ok   workforce C38 concurrent loser message (Staff name already exists)
 
 **C39** - `workforce` imports no other context; `work-order` reaches `workforce` only through `workforce.module.js` and `workforce.facade.js`; `WorkforceModule` exports only `WorkforceFacade`; `AppModule` composes it (Landing 3)
 Proof: run api | ✓ layout.spec.ts > acme layout > workforce C39 keeps workforce free of other contexts and work-order away from its internals
 
 **C40** - Every assignee is validated before anything is written: a WorkOrder create naming a Team of another Organization in its second service stores no WorkOrder, service or Assignment (Landing 2)
 Proof: run api | ✓ create-work-order.use-case.spec.ts > CreateWorkOrderUseCase > workforce C40 validates every assignee before writing anything
+
+**C41** - While `/api/assignments`, `/api/staff` or `/api/teams` has not answered, or has failed, the WorkOrder edit drawer (list and detail) lists no service and saves no `services`, the WorkOrder detail shows no "Responsável" line, and a failed read toasts "Erro ao carregar os responsáveis" with the API message or "Não foi possível carregar os responsáveis."; once they answer, the edit lists the services with their Responsável (appended from the Verifier, finding 1: an edit opened before the read cleared every Responsável)
+Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the assignments are not loaded and toasts a failure
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C41 shows no responsável until the workforce reads answer and toasts a failure
+Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C41 edits the responsável from the detail once the reads answered
 
 ## Coverage
 
@@ -259,7 +275,7 @@ Proof: run api | ✓ create-work-order.use-case.spec.ts > CreateWorkOrderUseCase
 ## Swept
 
 - validation: C2, C6, C20
-- failure modes: C20, C40, C24
+- failure modes: C20, C40, C24, C41
 - idempotency: C22 (the same assignee sent again changes nothing)
 - authorization: C8, C18, C21, C25
 - concurrency: C38
@@ -271,7 +287,7 @@ Proof: run api | ✓ create-work-order.use-case.spec.ts > CreateWorkOrderUseCase
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** none
+- **Dispatched:** at `b4e1016` (diff `9d32c67..b4e1016`, `proofs.md` at `b4e1016`, 122 pass and the 6 pictures awaiting judgement): the Verifier (fresh sub-agent) - returned, FAIL with 11 findings; screens round 1 (fresh sub-agent, the 6 pictures against their captures) - returned, 4 diverge (metric notes, team select, two dividers, the not-found card), 2 match
 - **Boundary:** C1-C40 closed at the commit that follows `5af0763`
 - **Abandoned:** none
 - **Walked:** at `5af0763` plus the profile pill fix, on an isolated stack started for the walk (PostgreSQL, Redis and Mailpit in new containers `wf-walk-pg`, `wf-walk-redis`, `wf-walk-mailpit` on ports 55700, 56700, 51700/58700; the API built from this checkout on 3336; `ng serve` on 4302 with a proxy to 3336), seeded through the API with fictional data only: the internal Organization's seeded Administrator, the Teams "Equipe Alfa" (Motor), "Equipe Bravo" (Hidráulica) and "Equipe Charlie" (Elétrica), the six professionals of the mareos capture, the Customer "Pescados Atlântico" with "Santa Maria" and "Lula Branca", a WorkOrder `IN_PROGRESS` on Santa Maria with "Revisão do motor principal" (Rafael Mendes) and "Troca do sistema hidráulico" (João Ferreira), both `IN_PROGRESS`, a `PENDING` WorkOrder on Lula Branca with "Manutenção do guincho de rede" (Equipe Charlie), and the operator "Lucas Costa". Headless Chrome (Playwright on `/usr/bin/google-chrome`, light theme, the session token set in `localStorage`) saved each `*.running.png` in a 1440x1000 window: C9 `captures/staff-list.running.png` (`/staff`), C12 `captures/staff-list-filtered.running.png` (chip "Mecânico naval": Pedro Nascimento, Rafael Mendes) and `captures/staff-list-empty.running.png` (search "zzz"), C14 `captures/staff-drawer.running.png` ("Cadastrar profissional", focus on "Nome completo"), C31 `captures/staff-detail.running.png` (`/staff/:id` of Rafael Mendes: "Em serviço", "Equipe Alfa", the allocation "Revisão do motor principal #0A16306B · Santa Maria · 17/11/2026 08:00 – 21/11/2026 17:00"), C33 `captures/staff-detail-not-found.running.png` (`/staff/00000000-0000-4000-8000-000000000000`). The flows, performed with clicks and typing as the administrator: "Cadastrar profissional" created "Ana Souza" in Equipe Bravo (toast "Ana Souza foi adicionado à equipe técnica.", the row appeared), its row menu "Editar" opened with "Técnica de pintura" and saved "Pintora naval" ("Profissional atualizado com sucesso"), "Excluir" with "Confirmar" removed it ("Profissional excluído com sucesso"); the tab "Equipes" moved the URL to `/staff?tab=equipes` and survived a reload; "Nova equipe" created "Equipe Delta" ("Equipe criada com sucesso"); "Excluir" on Equipe Charlie warned "Os 2 profissionais desta equipe ficarão sem equipe." and, confirmed, answered "Erro ao excluir equipe" / "Esta equipe é responsável por um serviço e não pode ser excluída."; on `/work-orders` "Nova ordem de serviço" offered "Responsável" with "Sem responsável", the six professionals and four teams, and created a WorkOrder on Lula Branca with "Pintura do casco" for Camila Rocha, whose detail read "Responsável: Camila Rocha" and whose "Editar" drawer listed the service with its Responsável. As the operator, `/staff` showed no "Cadastrar profissional" and "Nova ordem de serviço" showed no "Responsável". C34: `/staff`, `/staff?tab=equipes` and `/staff/:id` at 640, 768, 1024, 1280 and 1536 px - `scrollWidth` equals `innerWidth` in all 15. A user reaches the states from the sidebar "Equipe técnica", a specialty chip, the search, "Cadastrar profissional", a professional's name and an unknown `/staff/:id`. Seen in the walk: in the first pictures headless Chrome took the dark theme, so they were retaken with the light theme the captures use; the profile's team block showed the Team's status where the mareos shows the professional's, fixed before the final pictures.

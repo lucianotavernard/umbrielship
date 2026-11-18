@@ -285,6 +285,48 @@ describe('VesselDetail', () => {
     expect(rows[0].querySelector('a')?.textContent?.trim()).toBe('#5FBE9F04');
   });
 
+  it('workforce C25 Nova ordem on the Vessel detail sends the responsável of an administrator and hides it from an operator', async () => {
+    TestBed.inject(AuthenticationService).role.set('administrator');
+    const element = await render(aurora, []);
+    // The drawer's choices: the Staff and Teams, no Assignment needed here.
+    controller.expectOne('/api/staff').flush({
+      staff: [{ id: 'rafael', name: 'Rafael Mendes', specialty: 'Mecânico naval', email: 'r@x.test', phone: '1', teamId: null }],
+    });
+    controller.expectOne('/api/teams').flush({ teams: [{ id: 'alfa', name: 'Equipe Alfa', specialty: 'Motor', staffCount: 0 }] });
+    controller.expectNone('/api/assignments');
+    await settle();
+
+    await click(buttonByText('Nova ordem', element));
+    const sheet = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
+    expect([...sheet.querySelectorAll('#wo-service-assignee-0 option')].map((option) => squash(option.textContent))).toEqual([
+      'Sem responsável',
+      'Rafael Mendes · Mecânico naval',
+      'Equipe Alfa · Motor',
+    ]);
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão geral do motor');
+    await type('#wo-service-assignee-0', 'team:alfa');
+    await type('#wo-start', '2026-11-10T09:00');
+    await type('#wo-end', '2026-11-15T18:00');
+    await click(buttonByText('Criar ordem', sheet));
+
+    const post = controller.expectOne('/api/work-orders');
+    expect(post.request.body.services).toEqual([{ name: 'Motor', description: 'Revisão geral do motor', teamId: 'alfa' }]);
+    post.flush({ workOrder: {} }, { status: 201, statusText: 'Created' });
+    await settle();
+    controller.expectOne(page(0)).flush({ workOrders: [workOrder], total: 1 });
+    await settle();
+
+    // An operator gets the drawer without "Responsável" and no workforce read.
+    TestBed.inject(AuthenticationService).role.set('operator');
+    await settle();
+    controller.expectNone('/api/staff');
+    await click(buttonByText('Nova ordem', element));
+    const again = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
+    expect(again.querySelector('#wo-service-assignee-0')).toBeNull();
+    expect(again.textContent).not.toContain('Responsável');
+  });
+
   it('customer-ui C51 deletes a work order only after Confirmar and drops the row', async () => {
     const success = vi.spyOn(toast, 'success');
     const element = await render();

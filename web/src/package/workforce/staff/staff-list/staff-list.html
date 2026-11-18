@@ -41,10 +41,10 @@
         <t-skeleton data-slot="metric-skeleton" class="h-[78px] rounded-lg" />
       }
     } @else {
-      <t-metric label="Profissionais cadastrados" note="na equipe" tone="blue" [value]="metrics().staff">
+      <t-metric label="Profissionais cadastrados" note="na equipe" notePlacement="end" tone="blue" [value]="metrics().staff">
         <ng-icon name="lucideUsers" class="!size-[17px]" />
       </t-metric>
-      <t-metric label="Equipes cadastradas" note="equipes" tone="teal" [value]="metrics().teams">
+      <t-metric label="Equipes cadastradas" note="equipes" notePlacement="end" tone="teal" [value]="metrics().teams">
         <ng-icon name="lucideAnchor" class="!size-[17px]" />
       </t-metric>
       <t-metric label="Disponíveis agora" tone="green" [value]="metrics().available">
@@ -91,7 +91,7 @@
         (edited)="openEditTeam($event)"
         (deleted)="deletingTeam.set($event)"
       />
-      <footer data-slot="list-footer" class="flex min-h-[45px] items-center text-[9px] text-muted-foreground">
+      <footer data-slot="list-footer" class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground">
         @if (loading()) {
           <t-skeleton class="h-3 w-32 rounded" />
         } @else {
@@ -133,7 +133,7 @@
           <label class="sr-only" for="team-filter">Filtrar por equipe</label>
           <select
             id="team-filter"
-            class="h-[32px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] text-foreground"
+            class="h-[33px] max-w-[190px] rounded-[5px] border border-border bg-card px-[9px] py-0 text-[10px] leading-[31px] text-foreground"
             [value]="team()"
             (change)="team.set($any($event.target).value)"
           >
@@ -187,7 +187,7 @@
         (deleted)="deletingStaff.set($event)"
       />
 
-      <footer data-slot="list-footer" class="flex min-h-[45px] items-center text-[9px] text-muted-foreground">
+      <footer data-slot="list-footer" class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground">
         @if (loading()) {
           <t-skeleton class="h-3 w-32 rounded" />
         } @else {

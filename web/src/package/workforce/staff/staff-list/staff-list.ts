@@ -215,8 +215,15 @@ export class StaffList {
 
     call.subscribe({
       next: () => {
-        if (id) toast.success('Profissional atualizado com sucesso');
-        else toast.success(`${request.name} foi adicionado à equipe técnica.`);
+        if (id) {
+          toast.success('Profissional atualizado com sucesso');
+        } else {
+          toast.success(`${request.name} foi adicionado à equipe técnica.`);
+          // The new professional shows whatever was filtered before, as the mareos does.
+          this.search.set('');
+          this.team.set(ALL_TEAMS);
+          this.specialty.set(null);
+        }
         this.submitting.set(false);
         this.isStaffSheetActive.set(false);
         this.editingStaffId.set(null);

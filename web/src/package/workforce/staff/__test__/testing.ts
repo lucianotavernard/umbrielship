@@ -169,6 +169,7 @@ export class StaffListPage {
   teamRows() {
     return [...this.element.querySelectorAll<HTMLElement>('[data-slot="team-row"]')].map((row) => [
       squash(row.querySelector('[data-slot="team-name"]')?.textContent),
+      squash(row.querySelector('[data-slot="team-specialty"]')?.textContent),
       squash(row.querySelector('[data-slot="team-count"]')?.textContent),
       squash(row.querySelector('[data-slot="team-status"]')?.textContent),
     ]);

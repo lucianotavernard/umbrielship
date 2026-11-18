@@ -146,6 +146,7 @@ export async function renderAgenda(
   controller: HttpTestingController,
   role: Role | null,
   orders: object[] = workOrders(),
+  workforce: Parameters<typeof answerWorkforce>[1] = {},
 ) {
   TestBed.inject(AuthenticationService).role.set(role);
   const fixture = TestBed.createComponent(Agenda);
@@ -156,7 +157,7 @@ export async function renderAgenda(
   controller
     .expectOne({ method: 'GET', url: '/api/vessels' })
     .flush({ vessels, total: vessels.length });
-  answerWorkforce(controller);
+  answerWorkforce(controller, workforce);
   await settle();
   return fixture.nativeElement as HTMLElement;
 }

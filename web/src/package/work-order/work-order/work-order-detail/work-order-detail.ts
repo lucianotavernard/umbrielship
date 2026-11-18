@@ -91,6 +91,8 @@ export class WorkOrderDetail {
   protected readonly workforce = workforceResources(() => true);
   /** "Responsável: …" or "Sem responsável" for each service. */
   responsaveis = computed(() => {
+    // Nothing until the three reads answer: a read still loading is not "Sem responsável".
+    if (!this.workforce.ready()) return new Map<string, string>();
     const byService = this.workforce.byService();
     return new Map(
       this.services().map((service) => [
@@ -171,20 +173,23 @@ export class WorkOrderDetail {
   formValue = computed<WorkOrderFormValue | null>(() => {
     const order = this.workOrder();
     const byService = this.workforce.byService();
-    return order
-      ? {
-          vesselId: order.vessel.vesselId,
-          startDate: order.startDate,
-          endDate: order.endDate,
-          status: order.status,
-          services: this.services().map((service) => ({
-            id: service.id,
-            name: service.name,
-            status: service.status,
-            assignee: assigneeKeyOf(byService.get(service.id)),
-          })),
-        }
-      : null;
+    if (!order) return null;
+    const value: WorkOrderFormValue = {
+      vesselId: order.vessel.vesselId,
+      startDate: order.startDate,
+      endDate: order.endDate,
+      status: order.status,
+    };
+    // Only once the Responsáveis and the services are known: an edit sent without them would clear them all.
+    if (this.workforce.ready() && !this.servicesResource.isLoading() && !this.servicesResource.error()) {
+      value.services = this.services().map((service) => ({
+        id: service.id,
+        name: service.name,
+        status: service.status,
+        assignee: assigneeKeyOf(byService.get(service.id)),
+      }));
+    }
+    return value;
   });
   private readonly vessel = computed(() => resourceValue(this.vesselResource)?.vessel ?? null);
   formVessels = computed(() => {

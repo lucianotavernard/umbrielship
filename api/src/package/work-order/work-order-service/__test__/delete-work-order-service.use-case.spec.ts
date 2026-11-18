@@ -178,3 +178,47 @@ describe('DeleteWorkOrderServiceUseCase', () => {
     ).toEqual(['s2']);
   });
 });
+
+describe('DeleteWorkOrderServiceUseCase', () => {
+  it('workforce C24 keeps the assignment when an inspection refuses the service delete', async () => {
+    const services = new InMemoryWorkOrderServicesRepository();
+    const workforce = inMemoryWorkforce();
+    const inspectionAssignments = new InMemoryInspectionAssignmentsRepository();
+    const inspections = new InMemoryInspectionsRepository(
+      inspectionAssignments,
+    );
+    services.items.push(
+      makeService({ organizationId: 'org-1', workOrderId: 'wo1' }, 's1'),
+    );
+    inspectionAssignments.items.push(
+      makeInspectionAssignment(
+        { workOrderId: 'wo1', service: { id: 's1', name: 'Pintura' } },
+        'ia-s1',
+      ),
+    );
+    inspections.items.push(inspectionOf('ia-s1'));
+    workforce.assignments.items.push(
+      makeAssignment({
+        organizationId: 'org-1',
+        workOrderId: 'wo1',
+        workOrderServiceId: 's1',
+        staffId: 'rafael',
+      }),
+    );
+    const sut = new DeleteWorkOrderServiceUseCase(
+      services,
+      inspections,
+      workforce.facade,
+    );
+
+    await expect(
+      sut.handle({
+        organizationId: 'org-1',
+        workOrderId: 'wo1',
+        serviceId: 's1',
+      }),
+    ).rejects.toBeInstanceOf(ConflictDomainException);
+    expect(services.items).toHaveLength(1);
+    expect(workforce.assignments.items).toHaveLength(1);
+  });
+});

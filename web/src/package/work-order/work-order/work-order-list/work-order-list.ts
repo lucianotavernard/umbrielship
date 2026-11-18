@@ -212,13 +212,16 @@ export class WorkOrderList {
       startDate: order.startDate,
       endDate: order.endDate,
       status: order.status,
-      services: order.services.map((service) => ({
+    };
+    // Only once the Responsáveis are known: an edit sent without them would clear them all.
+    if (this.workforce.ready()) {
+      value.services = order.services.map((service) => ({
         id: service.id,
         name: service.name,
         status: service.status,
         assignee: assigneeKeyOf(assignments.get(service.id)),
-      })),
-    };
+      }));
+    }
     this.editing.set(value);
     this.editingId.set(order.id);
     this.workOrderForm()?.load(value);
