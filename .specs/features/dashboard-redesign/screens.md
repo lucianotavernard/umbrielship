@@ -1,16 +1,22 @@
 # Dashboard redesign screens
 
 **Verifier**: independent sub-agent (author != verifier)
-**Round**: 1
-**HEAD**: 6bd121d
+**Round**: 2
+**HEAD**: a74601e
 
 | Screen | Compared with | Verdict | Finding |
 | --- | --- | --- | --- |
-| `captures/dashboard.running.png` | `captures/dashboard.png` | diverges | 1 row differs (sun beside the heading) |
-| `captures/dashboard-period-today.running.png` | `captures/dashboard-period-today.png` | diverges | 1 row differs (sun beside the heading) |
-| `captures/dashboard-tab-em-andamento.running.png` | `captures/dashboard-tab-em-andamento.png` | diverges | 1 row differs (sun beside the heading) |
-| `captures/dashboard-search-empty.running.png` | `captures/dashboard-search-empty.png` | diverges | 2 rows differ (sun beside the heading; rule under the column headers) |
-| `captures/dashboard-dark.running.png` | `captures/dashboard-dark.png` | diverges | 2 rows differ (sun beside the heading; boxed page controls) |
+| `captures/dashboard.running.png` | `captures/dashboard.png` | matches | the round-1 row (sun) is now same; no regression |
+| `captures/dashboard-period-today.running.png` | `captures/dashboard-period-today.png` | matches | the round-1 row (sun) is now same; no regression |
+| `captures/dashboard-tab-em-andamento.running.png` | `captures/dashboard-tab-em-andamento.png` | matches | the round-1 row (sun) is now same; no regression |
+| `captures/dashboard-search-empty.running.png` | `captures/dashboard-search-empty.png` | matches | both round-1 rows (sun, rule under the column headers) are now same; no regression |
+| `captures/dashboard-dark.running.png` | `captures/dashboard-dark.png` | matches | both round-1 rows (sun, boxed page controls) are now same; no regression |
+
+Round 2 reopened only the rows round 1 marked `differs`, on the pictures retaken at `a74601e`; every
+other row keeps its round-1 result and note. A pixel diff of each retaken picture against its round-1
+picture changes only the sun, the Team names (now "Equipe Alfa", "Equipe Bravo", "Equipe Charlie", as
+criterion 10 and AD-093 write them), the `#` codes of the fictional data with the 1px column shift
+they cause, the empty table's rule and the dark pager; none of it breaks a `same` row.
 
 Judged on the page inside the shell. The shell (sidebar, topbar, brand, organization switcher,
 "Oficina em operação", help, notifications, support card) belongs to another feature and AD-025 and
@@ -26,7 +32,7 @@ is resized.
 | arrangement: header block, one row of four cards, "Agenda de serviços" (wide, left) beside "Equipes em campo" (right) at one height, "Ordens de serviço" full width below | same | |
 | kicker: short rule, then the upper-case date | same | "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026", the day the picture was taken |
 | heading "Bom dia, Lucas" | same | |
-| sun beside the heading: a filled amber sun (solid disc with eight rays, the `☀` glyph) | differs | an outline sun: eight amber rays around a hollow ring |
+| sun beside the heading: a filled amber sun (solid disc with eight rays, the `☀` glyph) | same | round 2: a filled amber sun, solid disc with eight rays (round 1: an outline sun) |
 | subtitle "Aqui está o resumo da operação da sua oficina hoje." | same | |
 | `Nova ordem de serviço` button, teal filled, "+" icon, right of the header | same | |
 | four cards of equal width, each a label top-left, a tinted icon tile top-right and a two-digit value | same | |
@@ -67,7 +73,7 @@ is resized.
 | arrangement: header block, four cards, "Agenda de serviços" beside "Equipes em campo", "Ordens de serviço" below | same | |
 | kicker: short rule, then the upper-case date | same | "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026" |
 | heading "Bom dia, Lucas" | same | |
-| sun beside the heading: a filled amber sun (solid disc with eight rays) | differs | an outline sun: eight amber rays around a hollow ring |
+| sun beside the heading: a filled amber sun (solid disc with eight rays) | same | round 2: a filled amber sun, solid disc with eight rays (round 1: an outline sun) |
 | subtitle "Aqui está o resumo da operação da sua oficina hoje." | same | |
 | `Nova ordem de serviço` button, teal filled, "+" icon | same | |
 | four cards: label, tinted icon tile, two-digit value; "Em execução" with "<n> equipes mobilizadas" at the right of the bottom line | same | "Ordens em aberto 06", "Em execução 02" with "2 equipes mobilizadas", "Pendentes 04", "Concluídas no mês 01" (AD-088) |
@@ -94,7 +100,7 @@ is resized.
 | --- | --- | --- |
 | arrangement: header block, four cards, "Agenda de serviços" beside "Equipes em campo", "Ordens de serviço" below, the whole panel in the window | same | |
 | kicker, heading "Bom dia, Lucas", subtitle | same | "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026" |
-| sun beside the heading: a filled amber sun (solid disc with eight rays) | differs | an outline sun: eight amber rays around a hollow ring |
+| sun beside the heading: a filled amber sun (solid disc with eight rays) | same | round 2: a filled amber sun, solid disc with eight rays (round 1: an outline sun) |
 | `Nova ordem de serviço` button | same | |
 | four cards with values, "Em execução" with its mobilised-Teams note | same | "Pendentes" for "Aguardando peças" (AD-088); no trends or other notes (AD-091) |
 | "Agenda de serviços": header, `Esta semana`, day block "QUA 18", three items, `Ver agenda completa` | same | tags "Serviço" (AD-091), no ⋯ on the items (AD-091); note: link about 14px lower |
@@ -114,7 +120,7 @@ is resized.
 | --- | --- | --- |
 | arrangement: header block, four cards, "Agenda de serviços" beside "Equipes em campo", "Ordens de serviço" below, the whole panel in the window | same | |
 | kicker, heading "Bom dia, Lucas", subtitle | same | "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026" |
-| sun beside the heading: a filled amber sun (solid disc with eight rays) | differs | an outline sun: eight amber rays around a hollow ring |
+| sun beside the heading: a filled amber sun (solid disc with eight rays) | same | round 2: a filled amber sun, solid disc with eight rays (round 1: an outline sun) |
 | `Nova ordem de serviço` button | same | |
 | four cards with values, "Em execução" with its mobilised-Teams note | same | "Pendentes" (AD-088); no trends or other notes (AD-091) |
 | "Agenda de serviços": header, `Esta semana`, day block, three items, `Ver agenda completa` | same | tags "Serviço", no ⋯ on the items (AD-091) |
@@ -124,7 +130,7 @@ is resized.
 | tabs, "Todas as ordens" active with count badge | same | "Todas as ordens 6", "Em andamento", "Pendentes" (AD-090) |
 | search field holding "zzz" with the magnifier | same | without "⌘K" (AD-091); note: teal focus border, the capture's grey |
 | column headers EMBARCAÇÃO, SERVIÇO, EQUIPE, PRAZO, STATUS, spread over the empty table | same | "RESPONSÁVEL" (AD-086); note: the columns sit at other offsets |
-| no rule between the column headers and the empty message: the capture's table draws the rule under the tabs and the rule above the footer only | differs | a rule under the column headers, between them and "Nenhuma ordem encontrada." |
+| no rule between the column headers and the empty message: the capture's table draws the rule under the tabs and the rule above the footer only | same | round 2: the rule under the tabs and the rule above the footer only (round 1: a rule under the column headers too) |
 | "Nenhuma ordem encontrada." centred in the table | same | |
 | table footer "Exibindo **0–0** de **24** ordens" at the left | same | "Exibindo 0–0 de 0 ordens", the count of the search (criterion 14) |
 | pager: previous, "1" boxed, "2", "3", "…", "8", next | same | previous and next only, both grey; one button per page (AD-044) draws none for no row, as criterion 24 does for no open order |
@@ -138,7 +144,7 @@ is resized.
 | arrangement: dark page, header block, four cards, "Agenda de serviços" beside "Equipes em campo", "Ordens de serviço" below | same | |
 | kicker: short rule, upper-case date in muted grey | same | "QUARTA-FEIRA, 18 DE NOVEMBRO DE 2026" |
 | heading "Bom dia, Lucas" in light text | same | |
-| sun beside the heading: a filled amber sun (solid disc with eight rays) | differs | an outline sun: eight amber rays around a hollow ring |
+| sun beside the heading: a filled amber sun (solid disc with eight rays) | same | round 2: a filled amber sun, solid disc with eight rays (round 1: an outline sun) |
 | subtitle in light grey | same | |
 | `Nova ordem de serviço` button, teal filled, "+" icon | same | note: a lighter teal with a dark label, the capture's darker teal with a white label |
 | four dark cards with a border: label, icon tile top-right, value | same | note: the icon tiles are dark tints of blue, green, amber, green; the capture's are near-white |
@@ -160,6 +166,6 @@ is resized.
 | column headers in light upper-case | same | "RESPONSÁVEL" (AD-086); note: headers in muted grey, the capture's near-white |
 | five rows with rules: avatar tile, Vessel, code · Customer, service, initials and team, clock and Prazo, status badge, ⋯ | same | one teal avatar (AD-044) on a dark tint; codes "#…" (AD-034); Responsável "A Equipe Alfa", "RM Rafael Mendes" (AD-086) in light text where the capture's team names are faint; badges "Em andamento" / "Pendente" (AD-034) on dark tints where the capture's are light pills |
 | table footer "Exibindo **1–5** de **24** ordens" | same | "Exibindo 1–5 de 6 ordens" |
-| pager: every control - previous, "1", "2", "3", "8", next - drawn as a bordered square box | differs | only the current page "1" boxed (teal border); previous, "2" and next plain, with no box (the light capture also boxes only the current page) |
+| pager: every control - previous, "1", "2", "3", "8", next - drawn as a bordered square box | same | round 2: previous, "1", "2" and next each a bordered square box, one button per page (AD-044); note: "1" in teal and previous dimmed on page 1 (round 1: only "1" boxed) |
 | page footer "MARÉOS · …" and "Última atualização há 2 min" | same | nothing (AD-025) |
 | render: nothing overlaps, is cut off or scrolls off the window | same | |
