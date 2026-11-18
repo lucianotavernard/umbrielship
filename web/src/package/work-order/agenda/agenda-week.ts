@@ -12,6 +12,8 @@ export const agendaKindLabels: Record<AgendaKind, string> = {
 export type AgendaItem = {
   key: string;
   workOrderId: string;
+  /** The WorkOrderService of a `SERVICE` item; null for a Docagem or a Desdocagem. */
+  serviceId: string | null;
   kind: AgendaKind;
   at: Date;
   time: string;
@@ -109,14 +111,15 @@ export function agendaItems(workOrders: WorkOrder[], vesselNames: ReadonlyMap<st
     if (order.status === 'CANCELLED') continue;
     const vesselName = vesselNames.get(order.vesselId) ?? '';
     const code = workOrderCode(order.id);
-    const item = (key: string, kind: AgendaKind, iso: string, title: string): AgendaItem => {
+    const item = (key: string, kind: AgendaKind, iso: string, title: string, serviceId: string | null = null): AgendaItem => {
       const at = new Date(iso);
-      return { key, workOrderId: order.id, kind, at, time: `${pad(at.getHours())}:${pad(at.getMinutes())}`, vesselName, title, code };
+      const time = `${pad(at.getHours())}:${pad(at.getMinutes())}`;
+      return { key, workOrderId: order.id, serviceId, kind, at, time, vesselName, title, code };
     };
     items.push(item(`${order.id}:docking`, 'DOCKING', order.startDate, agendaKindLabels.DOCKING));
     items.push(item(`${order.id}:undocking`, 'UNDOCKING', order.endDate, agendaKindLabels.UNDOCKING));
     for (const service of order.services ?? []) {
-      items.push(item(`${order.id}:${service.id}`, 'SERVICE', service.startDate, service.name));
+      items.push(item(`${order.id}:${service.id}`, 'SERVICE', service.startDate, service.name, service.id));
     }
   }
   return items.sort((a, b) => a.at.getTime() - b.at.getTime());

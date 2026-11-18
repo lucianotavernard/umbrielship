@@ -1,17 +1,399 @@
-<section class="mx-auto grid max-w-7xl gap-4 px-6 py-8 sm:grid-cols-2">
-  <t-card>
-    <t-card-header>
-      <t-card-description>Total de Clientes</t-card-description>
-      <t-card-title class="text-2xl">—</t-card-title>
-    </t-card-header>
-  </t-card>
-  <t-card>
-    <t-card-header>
-      <t-card-description>Embarcações Ativas</t-card-description>
-      <t-card-title class="text-2xl">—</t-card-title>
-    </t-card-header>
-    <t-card-content>
-      <p class="text-sm text-muted-foreground">Nenhum evento ainda</p>
-    </t-card-content>
-  </t-card>
-</section>
+<div class="mx-auto w-full max-w-[1084px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[30px]">
+  <div class="mb-[23px] flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
+    <div>
+      <div data-slot="kicker" class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-[18px] bg-[#83b8b5]"></span>
+        {{ kicker }}
+      </div>
+      <h1
+        data-slot="greeting"
+        class="mt-[9px] mb-[5px] flex items-center gap-2 text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]"
+      >
+        {{ greeting.text }}, {{ firstName() }}
+        @if (greeting.icon === 'sun') {
+          <ng-icon data-slot="greeting-icon" data-icon="sun" name="lucideSun" class="!size-[17px] text-[#d9a247]" aria-hidden="true" />
+        } @else {
+          <ng-icon data-slot="greeting-icon" data-icon="moon" name="lucideMoon" class="!size-[17px] text-[#8a9bc0]" aria-hidden="true" />
+        }
+      </h1>
+      <p class="text-[12px] text-muted-foreground">Aqui está o resumo da operação da sua oficina hoje.</p>
+    </div>
+    @if (canWrite()) {
+      <button
+        tButton
+        type="button"
+        class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+        (click)="openCreate()"
+      >
+        <ng-icon name="lucidePlus" class="!size-[17px]" />
+        Nova ordem de serviço
+      </button>
+    }
+  </div>
+
+  <section aria-label="Indicadores da operação" class="mb-4 grid grid-cols-2 gap-[9px] lg:grid-cols-4 lg:gap-[13px]">
+    @if (!cardsReady()) {
+      @for (slot of [1, 2, 3, 4]; track slot) {
+        <t-skeleton data-slot="stat-skeleton" class="h-[119px] rounded-lg" />
+      }
+    } @else {
+      <article data-slot="stat-card" class="min-h-[119px] rounded-lg border border-border bg-card px-4 pt-[15px] pb-[13px]">
+        <div class="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span data-slot="stat-label">Ordens em aberto</span>
+          <span class="grid size-7 place-items-center rounded-[7px] bg-[#ebf2fb] text-[#5586c0] dark:bg-[#18283a] dark:text-[#8db4dc]">
+            <ng-icon name="lucideClipboardList" class="!size-[17px]" />
+          </span>
+        </div>
+        <div data-slot="stat-value" class="mt-2 mb-[7px] text-[24px] leading-none font-bold tracking-[-0.6px] text-foreground">
+          {{ counts().open }}
+        </div>
+      </article>
+      <article data-slot="stat-card" class="min-h-[119px] rounded-lg border border-border bg-card px-4 pt-[15px] pb-[13px]">
+        <div class="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span data-slot="stat-label">Em execução</span>
+          <span class="grid size-7 place-items-center rounded-[7px] bg-[#e8f5f3] text-[#238c82] dark:bg-[#17302f] dark:text-[#7cc7c2]">
+            <ng-icon name="lucideWrench" class="!size-[17px]" />
+          </span>
+        </div>
+        <div data-slot="stat-value" class="mt-2 mb-[7px] text-[24px] leading-none font-bold tracking-[-0.6px] text-foreground">
+          {{ counts().inProgress }}
+        </div>
+        <div class="flex items-center justify-end text-[9px] text-muted-foreground">
+          <span data-slot="stat-note">{{ mobilized() }}</span>
+        </div>
+      </article>
+      <article data-slot="stat-card" class="min-h-[119px] rounded-lg border border-border bg-card px-4 pt-[15px] pb-[13px]">
+        <div class="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span data-slot="stat-label">Pendentes</span>
+          <span class="grid size-7 place-items-center rounded-[7px] bg-[#fff5e7] text-[#d29735] dark:bg-[#30291f] dark:text-[#e2c18b]">
+            <ng-icon name="lucideClock3" class="!size-[17px]" />
+          </span>
+        </div>
+        <div data-slot="stat-value" class="mt-2 mb-[7px] text-[24px] leading-none font-bold tracking-[-0.6px] text-foreground">
+          {{ counts().pending }}
+        </div>
+      </article>
+      <article data-slot="stat-card" class="min-h-[119px] rounded-lg border border-border bg-card px-4 pt-[15px] pb-[13px]">
+        <div class="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span data-slot="stat-label">Concluídas no mês</span>
+          <span class="grid size-7 place-items-center rounded-[7px] bg-[#eaf5ee] text-[#49a275] dark:bg-[#15291f] dark:text-[#8fcfab]">
+            <ng-icon name="lucideAnchor" class="!size-[17px]" />
+          </span>
+        </div>
+        <div data-slot="stat-value" class="mt-2 mb-[7px] text-[24px] leading-none font-bold tracking-[-0.6px] text-foreground">
+          {{ counts().completedThisMonth }}
+        </div>
+      </article>
+    }
+  </section>
+
+  <div class="mb-4 grid grid-cols-1 gap-[14px] lg:grid-cols-[1.35fr_1fr]">
+    <section
+      data-slot="agenda-panel"
+      aria-labelledby="dashboard-agenda-title"
+      class="flex min-w-0 flex-col rounded-lg border border-border bg-card px-[18px] py-[17px]"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="dashboard-agenda-title" class="text-[13px] font-normal tracking-[-0.1px] text-foreground">Agenda de serviços</h2>
+          <p class="mt-[5px] text-[10px] text-muted-foreground">O que está acontecendo na oficina</p>
+        </div>
+        <button
+          type="button"
+          data-slot="period"
+          class="flex h-7 shrink-0 items-center gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground/80 hover:text-foreground"
+          (click)="togglePeriod()"
+        >
+          {{ periodLabel() }}
+          <ng-icon name="lucideChevronDown" class="!size-[14px]" />
+        </button>
+      </div>
+
+      <div data-slot="agenda-list" class="mt-5 h-[152px] overflow-y-auto pr-1">
+        @if (!agendaReady()) {
+          @for (slot of [1, 2, 3]; track slot) {
+            <div data-slot="agenda-skeleton" class="mb-3 flex items-center gap-3">
+              <t-skeleton class="h-3 w-10 rounded" />
+              <t-skeleton class="h-3 w-48 rounded" />
+            </div>
+          }
+        } @else {
+          @for (day of agendaDays(); track day.key) {
+            <div data-slot="agenda-day" class="flex">
+              <div class="flex w-[53px] flex-none flex-col">
+                <div class="grid h-[45px] w-[34px] content-center gap-0.5 rounded-md border border-border text-center">
+                  <span data-slot="agenda-weekday" class="text-[8px] font-bold tracking-[0.5px] text-muted-foreground">{{ day.weekday }}</span>
+                  <strong data-slot="agenda-date" class="text-[16px] leading-none text-foreground">{{ day.day }}</strong>
+                </div>
+                <span class="ml-[17px] min-h-3 flex-1 border-l border-dashed border-border"></span>
+              </div>
+              <div class="min-w-0 flex-1">
+                @for (item of day.items; track item.key) {
+                  <a
+                    data-slot="agenda-item"
+                    class="grid min-h-12 grid-cols-[42px_11px_minmax(0,1fr)] items-start rounded-[5px] pt-0.5 hover:bg-muted/60"
+                    [routerLink]="['/work-orders', item.workOrderId]"
+                  >
+                    <span data-slot="agenda-time" class="pt-1 text-[9px] text-muted-foreground">{{ item.time }}</span>
+                    <span
+                      aria-hidden="true"
+                      class="mt-1.5 size-[7px] rounded-full outline-2"
+                      [class]="kindDots[item.kind]"
+                    ></span>
+                    <span class="min-w-0">
+                      <strong class="flex min-w-0 items-center gap-[7px] text-[10px] font-semibold text-foreground">
+                        <span data-slot="agenda-vessel" class="truncate">{{ item.vesselName }}</span>
+                        <span data-slot="agenda-tag" class="shrink-0 rounded px-1.5 py-[3px] text-[8px] font-semibold" [class]="kindTags[item.kind]">
+                          {{ kindLabels[item.kind] }}
+                        </span>
+                      </strong>
+                      <span data-slot="agenda-line" class="mt-[5px] block truncate text-[9px] text-muted-foreground">{{ item.line }}</span>
+                    </span>
+                  </a>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p data-slot="agenda-empty" class="pt-6 text-center text-[11px] text-muted-foreground">{{ agendaEmpty() }}</p>
+          }
+        }
+      </div>
+
+      <a
+        routerLink="/agenda"
+        class="mt-auto flex w-fit items-center gap-[5px] pt-[3px] pl-[53px] text-[10px] font-semibold text-primary hover:underline"
+      >
+        Ver agenda completa
+        <ng-icon name="lucideChevronRight" class="!size-[15px]" />
+      </a>
+    </section>
+
+    <section
+      data-slot="teams-panel"
+      aria-labelledby="dashboard-teams-title"
+      class="flex min-w-0 flex-col rounded-lg border border-border bg-card px-[18px] py-[17px]"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="dashboard-teams-title" class="text-[13px] font-normal tracking-[-0.1px] text-foreground">Equipes em campo</h2>
+          <p class="mt-[5px] text-[10px] text-muted-foreground">Disponibilidade das equipes</p>
+        </div>
+        <a
+          routerLink="/staff"
+          [queryParams]="{ tab: 'equipes' }"
+          aria-label="Mais opções"
+          class="grid size-6 place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ng-icon name="lucideEllipsis" class="!size-[18px]" />
+        </a>
+      </div>
+
+      <div data-slot="team-list" class="mt-[15px] h-[147px] overflow-y-auto">
+        @if (!teamsReady()) {
+          @for (slot of [1, 2, 3]; track slot) {
+            <div data-slot="team-skeleton" class="flex h-[49px] items-center gap-[9px]">
+              <t-skeleton class="size-7 rounded-[7px]" />
+              <t-skeleton class="h-3 w-32 rounded" />
+            </div>
+          }
+        } @else {
+          @for (team of teamList(); track team.id) {
+            <div data-slot="team-row" class="flex min-h-[49px] items-center gap-[9px] border-b border-border">
+              <span aria-hidden="true" class="grid size-7 shrink-0 place-items-center rounded-[7px]" [class]="teamTones[team.tone]">
+                <ng-icon name="lucideWrench" class="!size-[15px]" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <strong data-slot="team-name" class="block truncate text-[10px] font-semibold text-foreground">{{ team.name }}</strong>
+                <span data-slot="team-line" class="mt-1 block truncate text-[9px] text-muted-foreground">{{ team.line }}</span>
+              </div>
+              <span data-slot="team-status" class="flex shrink-0 items-center gap-[5px] text-[9px] text-muted-foreground">
+                <span aria-hidden="true" class="size-1.5 rounded-full" [class]="stateDots[team.status]"></span>
+                {{ team.status }}
+              </span>
+            </div>
+          } @empty {
+            <p data-slot="teams-empty" class="pt-6 text-center text-[11px] text-muted-foreground">
+              Ainda não há equipes cadastradas.
+            </p>
+          }
+        }
+      </div>
+
+      <div data-slot="team-footer" class="mt-auto flex items-center justify-between pt-[13px] text-[9px] text-muted-foreground">
+        @if (!teamsReady()) {
+          <t-skeleton class="h-3 w-24 rounded" />
+        } @else {
+          <span data-slot="team-footer-label">{{ footer().label }}</span>
+          <span class="flex pl-1">
+            @for (initials of footer().initials; track $index; let index = $index) {
+              <i
+                data-slot="team-footer-initials"
+                class="-ml-1 grid size-[21px] place-items-center rounded-full border-2 border-card text-[7px] font-bold not-italic"
+                [class]="
+                  index === 0
+                    ? 'bg-[#e6f0ed] text-[#498275] dark:bg-[#17302f] dark:text-[#7cc7c2]'
+                    : 'bg-[#f6ecdf] text-[#ad8051] dark:bg-[#30291f] dark:text-[#e2c18b]'
+                "
+              >
+                {{ initials }}
+              </i>
+            }
+            @if (footer().more; as more) {
+              <i
+                data-slot="team-footer-more"
+                class="-ml-1 grid size-[21px] place-items-center rounded-full border-2 border-card bg-[#eef0f5] text-[7px] font-bold text-[#6c7890] not-italic dark:bg-[#1a2632] dark:text-[#a5b3c0]"
+              >
+                {{ more }}
+              </i>
+            }
+          </span>
+        }
+      </div>
+    </section>
+  </div>
+
+  <section
+    aria-labelledby="dashboard-orders-title"
+    class="rounded-lg border border-border bg-card px-[13px] pt-[17px] pb-0 sm:px-[18px]"
+  >
+    <div class="flex items-start justify-between gap-[9px] sm:items-center">
+      <div>
+        <h2 id="dashboard-orders-title" class="text-[13px] font-normal tracking-[-0.1px] text-foreground">Ordens de serviço</h2>
+        <p class="mt-[5px] text-[10px] text-muted-foreground">Acompanhe e gerencie os serviços da sua frota</p>
+      </div>
+      <button
+        type="button"
+        class="flex h-[29px] shrink-0 items-center gap-[7px] rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="!tableReady() || filtered().length === 0"
+        (click)="exportRows()"
+      >
+        <ng-icon name="lucideDownload" class="!size-[15px]" />
+        Exportar
+      </button>
+    </div>
+
+    <div
+      class="mt-[17px] flex min-h-[41px] flex-col-reverse items-start gap-2 border-b border-border pb-2 sm:flex-row sm:items-center sm:justify-between sm:pb-0"
+    >
+      <div role="tablist" aria-label="Filtrar ordens" class="flex h-[41px] w-full items-stretch gap-[17px] overflow-x-auto sm:w-auto sm:gap-[18px]">
+        @for (item of tabs; track item.value) {
+          <button
+            type="button"
+            role="tab"
+            class="relative flex shrink-0 items-center gap-[7px] px-px text-[10px] whitespace-nowrap text-muted-foreground aria-selected:font-semibold aria-selected:text-primary aria-selected:after:absolute aria-selected:after:inset-x-0 aria-selected:after:-bottom-px aria-selected:after:h-0.5 aria-selected:after:rounded-sm aria-selected:after:bg-primary"
+            [attr.aria-selected]="tab() === item.value"
+            (click)="pickTab(item.value)"
+          >
+            {{ item.label }}
+            @if (item.value === 'ALL') {
+              <span data-slot="tab-count" class="rounded-[4px] bg-primary/10 px-[5px] py-0.5 text-[9px] text-primary">
+                {{ tableReady() ? rows().length : '–' }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+      <label
+        class="flex h-7 w-full items-center gap-1.5 rounded-[5px] border border-border px-[7px] text-muted-foreground focus-within:border-primary/50 sm:w-[188px]"
+      >
+        <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
+        <input
+          type="search"
+          aria-label="Buscar ordens"
+          class="min-w-0 flex-1 border-0 bg-transparent text-[9px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+          placeholder="Buscar ordem..."
+          [value]="search()"
+          (input)="setSearch($any($event.target).value)"
+        />
+      </label>
+    </div>
+
+    <open-orders-table-ui
+      [canWrite]="canWrite()"
+      [loading]="!tableReady()"
+      [rows]="shown()"
+      [responsaveis]="responsaveis()"
+      [emptyMessage]="emptyMessage()"
+      (edited)="openEdit($event)"
+      (deleted)="openDelete($event)"
+    />
+
+    <footer
+      data-slot="list-footer"
+      class="flex min-h-12 flex-wrap items-center justify-between gap-2 border-t border-border py-2 text-[9px] text-muted-foreground"
+    >
+      @if (!tableReady()) {
+        <t-skeleton class="h-3 w-32 rounded" />
+      } @else {
+        <span data-slot="range">
+          Exibindo <strong class="text-foreground/80">{{ range().first }}–{{ range().last }}</strong> de
+          <strong class="text-foreground/80">{{ range().total }}</strong> ordens
+        </span>
+        <nav aria-label="Paginação" class="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Página anterior"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() <= 1"
+            (click)="goTo(currentPage() - 1)"
+          >
+            <ng-icon name="lucideChevronLeft" class="!size-[15px]" />
+          </button>
+          @for (number of pages(); track number) {
+            <button
+              type="button"
+              data-slot="page"
+              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
+              [attr.aria-current]="number === currentPage() ? 'page' : null"
+              (click)="goTo(number)"
+            >
+              {{ number }}
+            </button>
+          }
+          <button
+            type="button"
+            aria-label="Próxima página"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            [disabled]="currentPage() >= pages().length"
+            (click)="goTo(currentPage() + 1)"
+          >
+            <ng-icon name="lucideChevronRight" class="!size-[15px]" />
+          </button>
+        </nav>
+      }
+    </footer>
+  </section>
+</div>
+
+<t-sheet
+  [kicker]="editing() ? 'ORDEM DE SERVIÇO' : 'NOVA SOLICITAÇÃO'"
+  [title]="editing() ? 'Editar ordem de serviço' : 'Nova ordem de serviço'"
+  [description]="
+    editing()
+      ? 'Atualize o período e o status da ordem de serviço.'
+      : 'Preencha os dados dos serviços para programar o atendimento da embarcação.'
+  "
+  [isActive]="isSheetActive()"
+  (closed)="closeSheet()"
+>
+  <work-order-form-ui
+    [loading]="submitting()"
+    [vessels]="vesselOptions()"
+    [customerNames]="customerNames()"
+    [workOrder]="editing()"
+    [assignees]="assigneeOptions()"
+    (closed)="closeSheet()"
+    (submitted)="save($event)"
+  />
+</t-sheet>
+
+<t-confirmation
+  title="Excluir ordem de serviço"
+  description="Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="deleting() !== null"
+  [loading]="confirming()"
+  (closed)="closeDelete()"
+  (confirmed)="delete()"
+/>
