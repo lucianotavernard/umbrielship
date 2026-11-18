@@ -5,7 +5,10 @@ import { provideRouter } from '@angular/router';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { toast } from '../../../shared/components/ui/toaster';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 import {
+  customers as harnessCustomers,
+  vessels as harnessVessels,
   buttonByText,
   byLabel,
   click,
@@ -602,5 +605,159 @@ describe('WorkOrderDrawer', () => {
       ),
     );
     expect(drawer()).toBeNull();
+  });
+});
+
+describe('WorkOrderDrawer', () => {
+  let controller: HttpTestingController;
+  const rafael = { id: 'rafael', name: 'Rafael Mendes', specialty: 'Mecânico naval', email: 'r@x.test', phone: '1', teamId: 'alfa' };
+  const pedro = { id: 'pedro', name: 'Pedro Nascimento', specialty: 'Mecânico naval', email: 'p@x.test', phone: '2', teamId: null };
+  const alfa = { id: 'alfa', name: 'Equipe Alfa', specialty: 'Motor', staffCount: 1 };
+  const [motor, pintura] = orderA.services;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    controller = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    controller.verify();
+    vi.restoreAllMocks();
+  });
+
+  /** The list as `role`, with Rafael, Pedro and Equipe Alfa, and Rafael on "Motor" of #AB12CD34. */
+  async function open(role: 'administrator' | 'operator', workOrders: WorkOrder[] = fleet) {
+    TestBed.inject(AuthenticationService).role.set(role);
+    const page = await WorkOrderListPage.pending();
+    const reads = page.reads();
+    reads.workOrders.flush({ workOrders, total: workOrders.length });
+    reads.vessels.flush({ vessels: harnessVessels, total: harnessVessels.length });
+    reads.customers.flush({ customers: harnessCustomers, total: harnessCustomers.length });
+    answerWorkforce(controller, {
+      staff: [rafael, pedro],
+      teams: [alfa],
+      assignments: [{ id: 'a1', workOrderId: orderA.id, workOrderServiceId: motor.id, staffId: 'rafael', teamId: null }],
+    });
+    await settle();
+    return page;
+  }
+
+  const select = (id: string) => drawer()!.querySelector<HTMLSelectElement>(id);
+  const optionsOf = (id: string) => [...select(id)!.querySelectorAll('option')].map((option) => squash(option.textContent));
+  const groupsOf = (id: string) => [...select(id)!.querySelectorAll('optgroup')].map((group) => group.label);
+
+  it('workforce C25 sends the responsável of each service chosen by an administrator', async () => {
+    const page = await open('administrator');
+    await click(buttonByText('Nova ordem de serviço', page.element));
+
+    expect(squash(drawer()!.querySelector('label[for="wo-service-assignee-0"]')?.textContent)).toBe('Responsável');
+    expect(optionsOf('#wo-service-assignee-0')).toEqual([
+      'Sem responsável',
+      'Pedro Nascimento · Mecânico naval',
+      'Rafael Mendes · Mecânico naval',
+      'Equipe Alfa · Motor',
+    ]);
+    expect(groupsOf('#wo-service-assignee-0')).toEqual(['Profissionais', 'Equipes']);
+    expect(select('#wo-service-assignee-0')!.value).toBe('');
+
+    await type('#wo-vessel', 'v-aur');
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão');
+    await type('#wo-service-assignee-0', 'staff:rafael');
+    await click(buttonByText('Adicionar serviço', drawer()!));
+    await type('#wo-service-name-1', 'Pintura');
+    await type('#wo-service-description-1', 'Casco');
+    await type('#wo-service-assignee-1', 'team:alfa');
+    await click(buttonByText('Adicionar serviço', drawer()!));
+    await type('#wo-service-name-2', 'Limpeza');
+    await type('#wo-service-description-2', 'Convés');
+    await type('#wo-start', '2026-11-21T08:00');
+    await type('#wo-end', '2026-11-25T17:30');
+    await click(buttonByText('Criar ordem', drawer()!));
+
+    const post = controller.expectOne((req) => req.method === 'POST' && req.url === '/api/work-orders');
+    expect(post.request.body.services).toEqual([
+      { name: 'Motor', description: 'Revisão', staffId: 'rafael' },
+      { name: 'Pintura', description: 'Casco', teamId: 'alfa' },
+      { name: 'Limpeza', description: 'Convés' },
+    ]);
+    post.flush({ workOrder: { id: 'new' } });
+    await settle();
+    await page.reload(fleet);
+    answerWorkforce(controller);
+    await settle();
+  });
+
+  it('workforce C25 shows no responsável to an operator', async () => {
+    const page = await open('operator');
+    await click(buttonByText('Nova ordem de serviço', page.element));
+
+    expect(drawer()!.querySelector('#wo-service-assignee-0')).toBeNull();
+    expect(drawer()!.textContent).not.toContain('Responsável');
+
+    await type('#wo-vessel', 'v-aur');
+    await type('#wo-service-name-0', 'Motor');
+    await type('#wo-service-description-0', 'Revisão');
+    await type('#wo-start', '2026-11-21T08:00');
+    await type('#wo-end', '2026-11-25T17:30');
+    await click(buttonByText('Criar ordem', drawer()!));
+
+    const post = controller.expectOne((req) => req.method === 'POST' && req.url === '/api/work-orders');
+    expect(post.request.body.services).toEqual([{ name: 'Motor', description: 'Revisão' }]);
+    post.flush({ workOrder: { id: 'new' } });
+    await settle();
+    await page.reload(fleet);
+  });
+
+  it('workforce C26 edits the responsável of each service and limits closed ones', async () => {
+    const withDone: WorkOrder = { ...orderA, services: [motor, { ...pintura, status: 'COMPLETED' }] };
+    const page = await open('administrator', [withDone]);
+
+    const menu = await page.openMenu('#AB12CD34');
+    await click(buttonByText('Editar', menu));
+
+    const entries = [...drawer()!.querySelectorAll<HTMLElement>('[data-slot="existing-service"]')];
+    expect(entries.map((entry) => entry.querySelector<HTMLInputElement>('input[readonly]')!.value)).toEqual([
+      'Motor',
+      'Pintura do casco',
+    ]);
+    expect(entries.every((entry) => entry.querySelector<HTMLInputElement>('input[readonly]')!.readOnly)).toBe(true);
+    expect(select('#wo-existing-assignee-0')!.value).toBe('staff:rafael');
+    expect(optionsOf('#wo-existing-assignee-0')).toHaveLength(4);
+    // "Pintura do casco" is COMPLETED and had none: only "Sem responsável".
+    expect(optionsOf('#wo-existing-assignee-1')).toEqual(['Sem responsável']);
+
+    // Closing the WorkOrder limits every service to what it had.
+    await type('#wo-status', 'CANCELLED');
+    expect(optionsOf('#wo-existing-assignee-0')).toEqual(['Sem responsável', 'Rafael Mendes · Mecânico naval']);
+    await type('#wo-status', 'IN_PROGRESS');
+    await type('#wo-existing-assignee-0', 'team:alfa');
+    await click(buttonByText('Salvar alterações', drawer()!));
+
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body.services).toEqual([{ id: motor.id, teamId: 'alfa' }, { id: pintura.id }]);
+    expect(put.request.body.status).toBe('IN_PROGRESS');
+    put.flush(null);
+    await settle();
+    await page.reload([withDone]);
+    answerWorkforce(controller);
+    await settle();
+  });
+
+  it('workforce C26 shows no services to an operator editing', async () => {
+    const page = await open('operator');
+
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    expect(drawer()!.textContent).not.toContain('Responsável');
+    await click(buttonByText('Salvar alterações', drawer()!));
+
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    await page.reload(fleet);
   });
 });

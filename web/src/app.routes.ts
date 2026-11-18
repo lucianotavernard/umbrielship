@@ -108,6 +108,16 @@ export const routes: Routes = [
         loadComponent: () => import('./package/work-order/agenda/agenda-page/agenda').then((m) => m.Agenda),
       },
       {
+        path: 'staff',
+        title: 'Equipe técnica',
+        loadComponent: () => import('./package/workforce/staff/staff-list/staff-list').then((m) => m.StaffList),
+      },
+      {
+        path: 'staff/:id',
+        title: 'Profissional',
+        loadComponent: () => import('./package/workforce/staff/staff-detail/staff-detail').then((m) => m.StaffDetail),
+      },
+      {
         path: 'organizations',
         title: 'Organizações',
         canActivate: [internalAdministratorGuard],

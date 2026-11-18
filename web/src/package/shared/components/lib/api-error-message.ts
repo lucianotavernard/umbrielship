@@ -29,6 +29,14 @@ const MESSAGES: Record<string, string> = {
   'Wrong credentials': 'E-mail ou senha incorretos.',
   'Validation failed': 'Verifique os campos preenchidos.',
   'File is required': 'Selecione um arquivo.',
+  'Staff name already exists': 'Já existe um profissional com este nome.',
+  'Staff email already exists': 'Já existe um profissional com este e-mail.',
+  'Staff not found': 'Profissional não encontrado.',
+  'Staff has Assignment': 'Este profissional é responsável por um serviço e não pode ser excluído.',
+  'Team name already exists': 'Já existe uma equipe com este nome.',
+  'Team not found': 'Equipe não encontrada.',
+  'Team has Assignment': 'Esta equipe é responsável por um serviço e não pode ser excluída.',
+  'Work order service is not open': 'Este serviço não aceita um novo responsável.',
 };
 
 export function apiErrorMessage(

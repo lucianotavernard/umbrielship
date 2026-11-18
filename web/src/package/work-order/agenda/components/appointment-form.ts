@@ -8,6 +8,8 @@ import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '
 import { FormGroup, Input, Label, Select, Textarea } from '../../../shared/components/ui/form';
 import { toLocalInput } from '../../work-order/components/work-order-form';
 import { workOrderCode } from '../../work-order/work-order.service';
+import { AssigneeKey, assigneeIds } from '../../../workforce/staff/assignee';
+import { AssigneeOptions, AssigneeSelect } from '../../../workforce/staff/components/assignee-select';
 
 export type AppointmentWorkOrder = { id: string; vesselName: string };
 
@@ -17,9 +19,18 @@ export type AppointmentRequest = {
   description: string;
   startDate: string;
   endDate: string;
+  staffId?: string;
+  teamId?: string;
 };
 
-const blank = (start = '') => ({ workOrderId: '', name: '', description: '', startDate: start, endDate: '' });
+const blank = (start = '') => ({
+  workOrderId: '',
+  name: '',
+  description: '',
+  startDate: start,
+  endDate: '',
+  assignee: '' as AssigneeKey,
+});
 
 /** The "Novo compromisso" drawer: a new service on an open WorkOrder (AD-037). */
 @Component({
@@ -36,6 +47,7 @@ const blank = (start = '') => ({ workOrderId: '', name: '', description: '', sta
     DrawerCard,
     DrawerFooter,
     RequiredMark,
+    AssigneeSelect,
   ],
   viewProviders: [provideIcons({ lucideCalendarDays, lucideWrench })],
   host: { class: 'flex min-h-0 flex-1 flex-col' },
@@ -66,6 +78,16 @@ const blank = (start = '') => ({ workOrderId: '', name: '', description: '', sta
             <label tLabel for="appointment-description">Descrição <t-required /></label>
             <textarea tTextarea rows="3" id="appointment-description" [formField]="appointmentForm.description"></textarea>
           </t-form-group>
+          @if (assignees(); as options) {
+            <t-form-group>
+              <label tLabel for="appointment-assignee">Responsável</label>
+              <assignee-select-ui
+                selectId="appointment-assignee"
+                [options]="options"
+                [formField]="appointmentForm.assignee"
+              />
+            </t-form-group>
+          }
         </section>
 
         <section
@@ -93,6 +115,8 @@ const blank = (start = '') => ({ workOrderId: '', name: '', description: '', sta
 export class AppointmentForm {
   workOrders = input<AppointmentWorkOrder[]>([]);
   loading = input(false);
+  /** The "Responsável" choices, for an administrator only; null hides the field (AD-078, AD-079). */
+  assignees = input<AssigneeOptions | null>(null);
   submitted = output<AppointmentRequest>();
   closed = output<void>();
 
@@ -125,6 +149,7 @@ export class AppointmentForm {
       description: value.description.trim(),
       startDate: new Date(value.startDate).toISOString(),
       endDate: new Date(value.endDate).toISOString(),
+      ...(this.assignees() ? assigneeIds(value.assignee) : {}),
     });
   }
 }

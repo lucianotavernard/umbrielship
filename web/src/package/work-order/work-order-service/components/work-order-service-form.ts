@@ -6,6 +6,8 @@ import { lucideCalendarDays, lucideWrench } from '@ng-icons/lucide';
 
 import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '../../../shared/components/ui/drawer';
 import { FormGroup, Input, Label, Select, Textarea } from '../../../shared/components/ui/form';
+import { AssigneeKey, assigneeIds } from '../../../workforce/staff/assignee';
+import { AssigneeOptions, AssigneeSelect } from '../../../workforce/staff/components/assignee-select';
 import {
   CreateWorkOrderServiceRequest,
   WorkOrderServiceStatus,
@@ -18,6 +20,7 @@ const blank = () => ({
   startDate: '',
   endDate: '',
   status: 'PENDING' as WorkOrderServiceStatus,
+  assignee: '' as AssigneeKey,
 });
 
 /** The "Novo serviço" drawer of a WorkOrder: the cards "Serviço" and "Planejamento" (AD-056, AD-058). */
@@ -35,6 +38,7 @@ const blank = () => ({
     DrawerCard,
     DrawerFooter,
     RequiredMark,
+    AssigneeSelect,
   ],
   viewProviders: [provideIcons({ lucideCalendarDays, lucideWrench })],
   template: `
@@ -55,6 +59,12 @@ const blank = () => ({
               [formField]="serviceForm.description"
             ></textarea>
           </t-form-group>
+          @if (assignees(); as options) {
+            <t-form-group>
+              <label tLabel for="svc-assignee">Responsável</label>
+              <assignee-select-ui selectId="svc-assignee" [options]="options" [formField]="serviceForm.assignee" />
+            </t-form-group>
+          }
         </section>
 
         <section
@@ -90,6 +100,8 @@ const blank = () => ({
 })
 export class WorkOrderServiceForm {
   loading = input(false);
+  /** The "Responsável" choices, for an administrator only; null hides the field (AD-078, AD-079). */
+  assignees = input<AssigneeOptions | null>(null);
 
   submitted = output<CreateWorkOrderServiceRequest>();
   closed = output<void>();
@@ -123,6 +135,7 @@ export class WorkOrderServiceForm {
       startDate: new Date(value.startDate).toISOString(),
       endDate: new Date(value.endDate).toISOString(),
       status: value.status,
+      ...(this.assignees() ? assigneeIds(value.assignee) : {}),
     });
   }
 }

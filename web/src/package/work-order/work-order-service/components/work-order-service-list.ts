@@ -53,6 +53,9 @@ import { WorkOrderServiceItem, workOrderServiceStatusLabels } from '../work-orde
                     <span data-slot="service-description" class="mt-1 block max-w-[320px] break-words text-[9px]">
                       {{ service.description }}
                     </span>
+                    <span data-slot="service-assignee" class="mt-1 block text-[9px] font-semibold text-foreground/70">
+                      {{ responsaveis().get(service.id) ?? 'Sem responsável' }}
+                    </span>
                   </td>
                   <td data-slot="service-start" class="px-2 py-2.5 whitespace-nowrap tabular-nums">
                     {{ service.startDate | date: 'dd/MM/yyyy HH:mm' }}
@@ -100,6 +103,8 @@ export class WorkOrderServiceList {
   canWrite = input.required<boolean>();
   loading = input(true);
   services = input<WorkOrderServiceItem[]>([]);
+  /** "Responsável: …" or "Sem responsável" by service id (AD-083). */
+  responsaveis = input<ReadonlyMap<string, string>>(new Map());
   fileSelected = output<{ serviceId: string; file: File }>();
 
   protected readonly labels = workOrderServiceStatusLabels;

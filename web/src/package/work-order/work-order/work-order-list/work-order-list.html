@@ -177,6 +177,7 @@
     [vessels]="vessels()"
     [customerNames]="customerNames()"
     [workOrder]="editing()"
+    [assignees]="isAdministrator() ? workforce.options() : null"
     (closed)="closeSheet()"
     (submitted)="save($event)"
   />

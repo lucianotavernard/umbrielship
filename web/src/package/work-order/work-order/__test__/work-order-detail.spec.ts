@@ -10,6 +10,7 @@ import { AuthenticationService } from '../../../identity/authentication/authenti
 import { toast } from '../../../shared/components/ui/toaster';
 import { WorkOrderDetail } from '../work-order-detail/work-order-detail';
 import { buttonByText, click, drawer, local, settle, squash, type } from './work-order-list.harness';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 
 registerLocaleData(localePtBr);
 
@@ -95,6 +96,7 @@ describe('WorkOrderDetail', () => {
     controller.expectOne(BASE).flush({ workOrder });
     controller.expectOne(`${BASE}/services`).flush({ services: serviceList, total: serviceList.length });
     controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [] });
+    answerWorkforce(controller);
     await settle();
     return fixture.nativeElement as HTMLElement;
   }
@@ -398,6 +400,7 @@ describe('WorkOrderDetail', () => {
     controller.expectOne(BASE).flush(notFound, { status: 404, statusText: 'Not Found' });
     controller.expectOne(`${BASE}/services`).flush(notFound, { status: 404, statusText: 'Not Found' });
     controller.expectOne(`${BASE}/inspection-assignments`).flush(notFound, { status: 404, statusText: 'Not Found' });
+    answerWorkforce(controller);
     await settle();
 
     const element = fixture.nativeElement as HTMLElement;
@@ -424,6 +427,7 @@ describe('WorkOrderDetail', () => {
     controller.expectOne(BASE).flush({ workOrder });
     controller.expectOne(`${BASE}/services`).flush({ services, total: services.length });
     controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [] });
+    answerWorkforce(controller);
     await settle();
 
     expect(element.querySelectorAll('t-skeleton').length).toBe(0);
@@ -754,5 +758,56 @@ describe('WorkOrderDetail', () => {
     await click(buttonByText('Cancelar', sheet));
     expect(drawer()).toBeNull();
     expect(sent()).toEqual([]);
+  });
+});
+
+describe('WorkOrderDetail', () => {
+  let controller: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: LOCALE_ID, useValue: 'pt-BR' },
+      ],
+    });
+    controller = TestBed.inject(HttpTestingController);
+    TestBed.inject(AuthenticationService).role.set('operator');
+  });
+
+  afterEach(() => controller.verify());
+
+  it('workforce C28 shows the responsável of each service', async () => {
+    const fixture = TestBed.createComponent(WorkOrderDetail);
+    fixture.componentRef.setInput('id', ID);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+    controller.expectOne(`${BASE}/services`).flush({ services, total: services.length });
+    controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [] });
+    // Every Role reads who answers for each service.
+    controller.expectOne('/api/staff').flush({
+      staff: [{ id: 'rafael', name: 'Rafael Mendes', specialty: 'Mecânico naval', email: 'r@x.test', phone: '1', teamId: null }],
+    });
+    controller.expectOne('/api/teams').flush({ teams: [{ id: 'alfa', name: 'Alfa', specialty: 'Motor', staffCount: 0 }] });
+    controller.expectOne('/api/assignments').flush({
+      assignments: [
+        { id: 'a1', workOrderId: ID, workOrderServiceId: 'svc-1', staffId: 'rafael', teamId: null },
+        { id: 'a2', workOrderId: ID, workOrderServiceId: 'svc-2', staffId: null, teamId: 'alfa' },
+      ],
+    });
+    await settle();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const rows = [...element.querySelectorAll<HTMLElement>('[data-slot="service-row"]')].map((row) => [
+      squash(row.querySelector('[data-slot="service-name"]')?.textContent),
+      squash(row.querySelector('[data-slot="service-assignee"]')?.textContent),
+    ]);
+    expect(rows).toEqual([
+      ['Motor', 'Responsável: Rafael Mendes'],
+      ['Pintura', 'Responsável: Equipe Alfa'],
+      ['Hélice', 'Sem responsável'],
+    ]);
   });
 });

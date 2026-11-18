@@ -231,4 +231,49 @@ describe('documents follow the acme platform', () => {
     expect(inspection).toContain('discard');
     expect(inspection).toContain('cannot be deleted');
   });
+
+  it('workforce C36 the documents describe the workforce as built', () => {
+    const context = read('CONTEXT.md');
+    const staff = glossaryEntry(context, 'Staff');
+    expect(staff).toContain('not a User');
+    expect(staff).toContain('specialty');
+    expect(staff).toContain('phone');
+    expect(staff).toContain(
+      'unique within its Organization, compared without case',
+    );
+    const team = glossaryEntry(context, 'Team');
+    expect(team).toContain('specialty');
+    expect(team).toContain('Deleting it leaves its Staff with no Team');
+    const assignment = glossaryEntry(context, 'Assignment');
+    expect(assignment).toContain('one Staff or one Team');
+    expect(assignment).toContain('at most one per WorkOrderService');
+    expect(assignment).toContain(
+      'deleted with its WorkOrder or its WorkOrderService',
+    );
+    expect(assignment).toContain('keeps its Staff or Team from being deleted');
+    const inspection = glossaryEntry(context, 'Inspection');
+    expect(inspection).toContain(
+      'An InspectionAssignment holds any number of Inspections',
+    );
+    expect(inspection).not.toContain('An assignment holds');
+
+    const agents = read('AGENTS.md');
+    expectAll(
+      agents,
+      [
+        '| `workforce` | `staff`, `team`, `assignment` |',
+        '`WorkforceFacade`',
+        '`WorkOrderModule` and `WorkforceModule`',
+        'only through `WorkforceFacade`',
+        '`identity`, `customer` and `workforce` import no context',
+        '`staff`, `teams`, `assignments`',
+        "@Roles('administrator')",
+      ],
+      'AGENTS.md',
+    );
+
+    const item = roadmapItem(read('ROADMAP.md'), 8);
+    expect(item).toContain('Workforce');
+    expect(item).toContain('**Status:** built in `workforce`');
+  });
 });

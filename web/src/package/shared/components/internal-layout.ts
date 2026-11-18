@@ -63,6 +63,7 @@ const MAIN_MENU: MenuItem[] = [
   { key: 'vessels', label: 'Embarcações', link: '/vessels', icon: 'lucideShip' },
   { key: 'customers', label: 'Clientes', link: '/customers', icon: 'lucideUsers' },
   { key: 'agenda', label: 'Agenda', link: '/agenda', icon: 'lucideCalendarDays' },
+  { key: 'staff', label: 'Equipe técnica', link: '/staff', icon: 'lucideUsers' },
 ];
 
 const MANAGEMENT_MENU: MenuItem[] = [
@@ -82,6 +83,7 @@ const SECTIONS: { pattern: RegExp; key: string }[] = [
   { pattern: /^\/vessels(\/|$)/, key: 'vessels' },
   { pattern: /^\/customers(\/|$)/, key: 'customers' },
   { pattern: /^\/agenda(\/|$)/, key: 'agenda' },
+  { pattern: /^\/staff(\/|$)/, key: 'staff' },
   { pattern: /^\/organizations(\/|$)/, key: 'organizations' },
 ];
 

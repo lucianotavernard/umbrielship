@@ -13,6 +13,7 @@ import { VesselList } from '../../customer/vessel/vessel-list/vessel-list';
 import { AuthenticationService } from '../../identity/authentication/authentication.service';
 import type { Role } from '../../identity/user/user.service';
 import { WorkOrderDetail } from '../../work-order/work-order/work-order-detail/work-order-detail';
+import { answerWorkforce } from './workforce';
 
 // Fixtures and renderers for the five pages whose write controls depend on the session Role.
 
@@ -147,6 +148,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       const fixture = TestBed.createComponent(CustomerList);
       await settle();
       controller.expectOne('/api/customers').flush({ customers: [atlantic], total: 1 });
+      answerWorkforce(controller);
       await settle();
       return fixture.nativeElement;
     }
@@ -160,6 +162,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       controller
         .expectOne('/api/vessels?customerId=c1')
         .flush({ vessels: [aurora], total: 1 });
+      answerWorkforce(controller);
       await settle();
       return harness.routeNativeElement as HTMLElement;
     }
@@ -168,6 +171,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       await settle();
       controller.expectOne('/api/vessels').flush({ vessels: [aurora], total: 1 });
       controller.expectOne('/api/customers').flush({ customers: [atlantic], total: 1 });
+      answerWorkforce(controller);
       await settle();
       return fixture.nativeElement;
     }
@@ -181,6 +185,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       controller
         .expectOne('/api/work-orders?vesselId=vessel-1&take=10&skip=0')
         .flush({ workOrders: [workOrder], total: 1 });
+      answerWorkforce(controller);
       await settle();
       return fixture.nativeElement;
     }
@@ -200,6 +205,7 @@ export async function render(page: Page, role: Role | null): Promise<HTMLElement
       controller
         .expectOne('/api/work-orders/wo-1/inspection-assignments')
         .flush({ inspectionAssignments: [] });
+      answerWorkforce(controller);
       await settle();
       return fixture.nativeElement;
     }

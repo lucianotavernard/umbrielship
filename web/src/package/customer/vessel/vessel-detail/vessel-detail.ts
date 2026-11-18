@@ -24,7 +24,8 @@ import { Pagination } from '../../../shared/components/ui/pagination';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
-import { WorkOrderForm } from '../../../work-order/work-order/components/work-order-form';
+import { WorkOrderForm, WorkOrderFormSubmit } from '../../../work-order/work-order/components/work-order-form';
+import { workforceResources } from '../../../workforce/staff/workforce-resources';
 import { WorkOrderList } from '../../../work-order/work-order/components/work-order-list';
 import {
   CreateWorkOrderRequest,
@@ -71,6 +72,9 @@ import {
 })
 export class VesselDetail {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
+  /** Only an administrator names a Responsável (AD-079). */
+  protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
+  protected readonly workforce = workforceResources(() => this.isAdministrator(), { withAssignments: false });
   vesselService = inject(VesselService);
   workOrderService = inject(WorkOrderService);
   private readonly vesselForm = viewChild(VesselForm);
@@ -170,7 +174,7 @@ export class VesselDetail {
       });
   }
 
-  createWorkOrder(workOrder: CreateWorkOrderRequest) {
+  createWorkOrder(workOrder: WorkOrderFormSubmit) {
     this.submitting.set(true);
     this.workOrderService.createWorkOrder(workOrder).subscribe({
       next: () => {

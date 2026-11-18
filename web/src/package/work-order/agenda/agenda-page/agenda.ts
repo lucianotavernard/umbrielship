@@ -47,6 +47,7 @@ import {
   weekdayLabel,
   weekLabel,
 } from '../agenda-week';
+import { workforceResources } from '../../../workforce/staff/workforce-resources';
 import { AppointmentForm, AppointmentRequest } from '../components/appointment-form';
 
 const kindTones: Record<AgendaKind, string> = {
@@ -92,6 +93,9 @@ const railTones: Record<AgendaKind, string> = {
 })
 export class Agenda {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
+  /** Only an administrator names a Responsável (AD-078, AD-079). */
+  protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
+  protected readonly workforce = workforceResources(() => this.isAdministrator(), { withAssignments: false });
   private readonly router = inject(Router);
   private readonly serviceService = inject(WorkOrderServiceService);
   private readonly appointmentForm = viewChild(AppointmentForm);
@@ -228,6 +232,8 @@ export class Agenda {
         startDate: request.startDate,
         endDate: request.endDate,
         status: 'PENDING',
+        ...(request.staffId ? { staffId: request.staffId } : {}),
+        ...(request.teamId ? { teamId: request.teamId } : {}),
       })
       .subscribe({
         next: () => {

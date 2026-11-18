@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import type { Role } from '../../../identity/user/user.service';
 import { Agenda } from '../agenda-page/agenda';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 
 // Shared steps and fixtures for the Agenda specs. The clock is Wednesday 18 Nov 2026, 10:00:
 // the week shown first is Monday 16 to Sunday 22.
@@ -155,6 +156,7 @@ export async function renderAgenda(
   controller
     .expectOne({ method: 'GET', url: '/api/vessels' })
     .flush({ vessels, total: vessels.length });
+  answerWorkforce(controller);
   await settle();
   return fixture.nativeElement as HTMLElement;
 }

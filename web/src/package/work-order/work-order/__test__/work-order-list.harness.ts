@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WorkOrderList } from '../work-order-list/work-order-list';
 import { WorkOrder, WorkOrderStatus } from '../work-order.service';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 
 // Fixtures and a page object for the specs of the "Ordens de serviço" page and its drawer.
 
@@ -186,6 +187,7 @@ export class WorkOrderListPage {
     requests.workOrders.flush({ workOrders, total: workOrders.length });
     requests.vessels.flush({ vessels: vesselList, total: vesselList.length });
     requests.customers.flush({ customers: customerList, total: customerList.length });
+    answerWorkforce(page.controller);
     await settle();
     return Object.assign(page, { requests });
   }

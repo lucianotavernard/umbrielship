@@ -64,7 +64,13 @@ export type WorkOrderDetail = {
 export type NewWorkOrderService = {
   name: string;
   description: string;
+  /** The Responsável, one of the two at most; only an administrator sends it (AD-079). */
+  staffId?: string;
+  teamId?: string;
 };
+
+/** The Responsável of an existing service; neither id clears it (AD-077). */
+export type WorkOrderServiceAssignee = { id: string; staffId?: string; teamId?: string };
 
 export type CreateWorkOrderRequest = {
   vesselId: string;
@@ -78,6 +84,7 @@ export type UpdateWorkOrderRequest = {
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
+  services?: WorkOrderServiceAssignee[];
 };
 
 export type GetWorkOrdersResponse = {

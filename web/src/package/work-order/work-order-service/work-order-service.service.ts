@@ -26,6 +26,9 @@ export type CreateWorkOrderServiceRequest = {
   startDate: string;
   endDate: string;
   status: WorkOrderServiceStatus;
+  /** The Responsável, one of the two at most; only an administrator sends it (AD-078). */
+  staffId?: string;
+  teamId?: string;
 };
 
 export type GetWorkOrderServicesResponse = {
