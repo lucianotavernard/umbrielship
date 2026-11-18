@@ -3,18 +3,23 @@ import { Assignment, Staff } from './staff.service';
 
 export type WorkforceStatus = 'Em serviço' | 'Disponível';
 
-/** The id of every WorkOrderService `IN_PROGRESS`. */
-export function servicesInProgress(workOrders: Pick<WorkOrder, 'services'>[]): Set<string> {
+/**
+ * The id of every WorkOrderService `IN_PROGRESS` of an open WorkOrder (`PENDING` or `IN_PROGRESS`):
+ * a service left in progress on a closed WorkOrder is not work being done (AD-084).
+ */
+export function servicesInProgress(workOrders: Pick<WorkOrder, 'services' | 'status'>[]): Set<string> {
   return new Set(
-    workOrders.flatMap((order) =>
-      order.services.filter((service) => service.status === 'IN_PROGRESS').map((service) => service.id),
-    ),
+    workOrders
+      .filter((order) => order.status === 'PENDING' || order.status === 'IN_PROGRESS')
+      .flatMap((order) =>
+        order.services.filter((service) => service.status === 'IN_PROGRESS').map((service) => service.id),
+      ),
   );
 }
 
 /**
- * "Em serviço" while the Staff's own Assignment, or its Team's, is on a WorkOrderService
- * `IN_PROGRESS`; "Disponível" otherwise (AD-067).
+ * "Em serviço" while the Staff's own Assignment, or its Team's, is on a WorkOrderService that
+ * `servicesInProgress` keeps; "Disponível" otherwise (AD-084).
  */
 export function staffStatus(
   staff: Pick<Staff, 'id' | 'teamId'>,
@@ -30,7 +35,7 @@ export function staffStatus(
   return busy ? 'Em serviço' : 'Disponível';
 }
 
-/** "Em serviço" while the Team's own Assignment is on a WorkOrderService `IN_PROGRESS` (AD-072). */
+/** "Em serviço" while the Team's own Assignment is on a WorkOrderService that `servicesInProgress` keeps (AD-084). */
 export function teamStatus(
   teamId: string,
   assignments: Assignment[],

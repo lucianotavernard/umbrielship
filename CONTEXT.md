@@ -61,11 +61,11 @@ One answer sheet of an InspectionAssignment, completed by an `inspector` while t
 *Avoid*: vistoria (in identifiers), report, check
 
 **Staff**:
-A person the Organization allocates to WorkOrderServices, shown in the app as "Profissional"; not a User, it never signs in. It has a name, a specialty (free text), an email and a phone, all required, and at most one Team. The name and the email are each unique within its Organization, compared without case. Only an `administrator` creates, edits or deletes it, and every Role reads it. A Staff that is the Responsável of a WorkOrderService cannot be deleted. Its status is derived, never stored: "Em serviço" while it, or its Team, is the Responsável of a WorkOrderService `IN_PROGRESS`, otherwise "Disponível".
+A person the Organization allocates to WorkOrderServices, shown in the app as "Profissional"; not a User, it never signs in. It has a name, a specialty (free text), an email and a phone, all required, and at most one Team. The name and the email are each unique within its Organization, compared without case. Only an `administrator` creates, edits or deletes it, and every Role reads it. A Staff that is the Responsável of a WorkOrderService cannot be deleted. Its status is derived, never stored: "Em serviço" while it, or its Team, is the Responsável of a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`, otherwise "Disponível".
 *Avoid*: technician, user, employee
 
 **Team**:
-A group of Staff with a name, unique within its Organization (compared without case), and a specialty; shown in the app as "Equipe". Only an `administrator` creates, edits or deletes it. Deleting it leaves its Staff with no Team; a Team that is the Responsável of a WorkOrderService cannot be deleted. Its status is "Em serviço" while the Team itself is the Responsável of a WorkOrderService `IN_PROGRESS`.
+A group of Staff with a name, unique within its Organization (compared without case), and a specialty; shown in the app as "Equipe". Only an `administrator` creates, edits or deletes it. Deleting it leaves its Staff with no Team; a Team that is the Responsável of a WorkOrderService cannot be deleted. Its status is "Em serviço" while the Team itself is the Responsável of a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`.
 *Avoid*: crew, squad, time
 
 **Assignment**:

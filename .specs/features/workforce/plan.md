@@ -98,11 +98,11 @@ WorkOrderService and WorkOrder by plain ids. One-way constraints: Staff name and
 ```mermaid
 stateDiagram-v2
     [*] --> Disponivel
-    Disponivel --> EmServico : its Assignment (or its Team's, for a Staff) is on a WorkOrderService that turns IN_PROGRESS
-    EmServico --> Disponivel : that WorkOrderService turns COMPLETED, or the Assignment is cleared or deleted
+    Disponivel --> EmServico : its Assignment (or its Team's, for a Staff) is on a WorkOrderService that turns IN_PROGRESS while its WorkOrder is PENDING or IN_PROGRESS
+    EmServico --> Disponivel : that WorkOrderService turns COMPLETED, its WorkOrder turns COMPLETED or CANCELLED, or the Assignment is cleared or deleted
 ```
 
-The states are derived on every read and never stored (AD-067, AD-072); "Disponivel" reads
+The states are derived on every read and never stored (AD-084); "Disponivel" reads
 "Disponível" and "EmServico" reads "Em serviço".
 
 ## Surface
@@ -191,9 +191,9 @@ service's Responsável.
 **Acceptance Criteria**
 
 28. The WorkOrder detail SHALL show for each service "Responsável: <nome do profissional>", "Responsável: Equipe <nome>" or "Sem responsável", for every Role (AD-083)
-29. A Staff's status SHALL read "Em serviço" while its own Assignment, or its Team's Assignment, is on a WorkOrderService `IN_PROGRESS`, and "Disponível" otherwise (AD-067)
-    - own Assignment on a `PENDING` service → "Disponível"; its Team responsible for an `IN_PROGRESS` service → "Em serviço"; that service turned `COMPLETED` → "Disponível"; no Team and no Assignment → "Disponível"
-30. A Team's status SHALL read "Em serviço" while the Team's own Assignment is on a WorkOrderService `IN_PROGRESS`, and "Disponível" otherwise; a member's own Assignment SHALL not count (AD-072)
+29. A Staff's status SHALL read "Em serviço" while its own Assignment, or its Team's Assignment, is on a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`, and "Disponível" otherwise (AD-084)
+    - own Assignment on a `PENDING` service → "Disponível"; its Team responsible for an `IN_PROGRESS` service → "Em serviço"; that service turned `COMPLETED` → "Disponível"; no Team and no Assignment → "Disponível"; its service still `IN_PROGRESS` on a `CANCELLED` or `COMPLETED` WorkOrder → "Disponível"
+30. A Team's status SHALL read "Em serviço" while the Team's own Assignment is on a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`, and "Disponível" otherwise; a member's own Assignment SHALL not count (AD-084)
 31. WHEN a user opens `/staff/:id` THEN the system SHALL show the profile as `.specs/features/workforce/captures/staff-detail.png` (`.specs/features/workforce/captures/staff-detail.aria.yml`), with "Equipe vinculada" reading the Team's name or "Sem equipe", "Situação atual" the status of criterion 29, the email as a `mailto:` link and the phone as a `tel:` link with only its digits and "+"
 32. Under "Alocação na oficina" the profile SHALL list the open WorkOrderServices - WorkOrder `PENDING` or `IN_PROGRESS` and service not `COMPLETED` - whose Assignment names the Staff or its Team, ordered by the service's start, each with the service name, the WorkOrder's `#` code, the Vessel name and the period as "17/11/2026 09:00 – 18/11/2026 17:00", opening `/work-orders/:id`; IF there is none THEN "Nenhuma alocação em serviços abertos." (AD-071)
 33. IF `/staff/:id` names a Staff of another Organization or none THEN the system SHALL show "Profissional não encontrado", "Este cadastro não está disponível na equipe técnica." and "Voltar para a equipe" to `/staff`, as `.specs/features/workforce/captures/staff-detail-not-found.png`
@@ -234,7 +234,7 @@ service's Responsável.
 | What an operator sees | no "Responsável"; 403 when it sends one | user chose "Campo escondido" (AD-079) | y |
 | Which services accept a new Responsável | WorkOrder `PENDING` or `IN_PROGRESS` and service not `COMPLETED`; clearing always | user chose "OS e serviço abertos" (AD-068) | y |
 | Staff and Team screens | "Equipe técnica" after the mareos screens, tab "Equipes" (list, drawer, row menu), row menu on professionals, "Sem equipe" in the filter, word "Equipe" | user chose "Mareos + aba Times", "Lista simples", "Menu na linha", "Opção Sem equipe", "Equipe" (AD-066, AD-069, AD-070, AD-074, AD-075) | y |
-| Statuses and the profile | derived Staff and Team statuses; the profile lists open services | user chose "Derivar das alocações", "Equipe alocada", "Listar alocações" (AD-067, AD-071, AD-072) | y |
+| Statuses and the profile | derived Staff and Team statuses, counting only services of an open WorkOrder; the profile lists open services | user chose "Derivar das alocações", "Equipe alocada", "Listar alocações" (AD-067, AD-071, AD-072), then "Sim, ajustar aqui" (AD-084) | y |
 | Copy and drawers | "Equipes cadastradas"; subtitle with "equipes"; footers omitted; the drawers, cards and buttons of AD-082; "Responsável" display of AD-083 | user accepted the four proposals (AD-080 to AD-083) | y |
 | Web routes | `/staff` (tab `?tab=equipes`) and `/staff/:id` | the API's names, as the other modules | n |
 | Team field limits | name 1 to 120, specialty 1 to 100 | the mareos limits for the Staff fields | n |
@@ -251,7 +251,7 @@ service's Responsável.
 | --- | --- | --- |
 | Drawer with a white form, the buttons after the fields and "Cadastrar profissional" with a plus | the drawer standard: cards, pinned footer, "Cancelar" with X and "Criar profissional" with a check | y - AD-053, AD-054, AD-082 |
 | "Equipe" select starting at "Equipe Alfa" | "Sem equipe", then the Teams by name | y - AD-060, AD-070 |
-| Status "Folga" | none; "Em serviço" and "Disponível" derived | y - AD-067 |
+| Status "Folga" | none; "Em serviço" and "Disponível" derived | y - AD-084 |
 | Metric "Times em operação" | "Equipes cadastradas" | y - AD-080 |
 | "Conheça os profissionais e organize os times da oficina." | "Conheça os profissionais e organize as equipes da oficina." | y - AD-081 |
 | Footers "Equipe técnica MARÉOS", "Gestão da equipe técnica" and "MARÉOS · Operação com rumo certo." | nothing | y - AD-081, AD-025 |

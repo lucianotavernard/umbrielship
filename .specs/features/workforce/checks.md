@@ -187,10 +187,10 @@ Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C27
 Proof: run web | ✓ work-order-detail.spec.ts > WorkOrderDetail > workforce C28 shows the responsável of each service
 Proof: run web | ✓ work-order-detail.inspector.spec.ts > WorkOrderDetail as an inspector > workforce C28 shows the responsável to an inspector
 
-**C29** - A Staff reads "Em serviço" while its own Assignment or its Team's is on a WorkOrderService `IN_PROGRESS`, and "Disponível" otherwise (AC 29)
+**C29** - A Staff reads "Em serviço" while its own Assignment or its Team's is on a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`, and "Disponível" otherwise, a service left `IN_PROGRESS` on a `CANCELLED` or `COMPLETED` WorkOrder included (AC 29, AD-084 settled mid-build)
 Proof: run web | ✓ staff-status.spec.ts > staffStatus > workforce C29 derives em serviço from its own or its team's service in progress
 
-**C30** - A Team reads "Em serviço" while its own Assignment is on a WorkOrderService `IN_PROGRESS`, and "Disponível" otherwise; a member's Assignment does not count (AC 30)
+**C30** - A Team reads "Em serviço" while its own Assignment is on a WorkOrderService `IN_PROGRESS` whose WorkOrder is `PENDING` or `IN_PROGRESS`, and "Disponível" otherwise; a member's Assignment does not count (AC 30, AD-084 settled mid-build)
 Proof: run web | ✓ staff-status.spec.ts > teamStatus > workforce C30 derives em serviço from its own service in progress only
 
 **C31** - `/staff/:id` matches `.specs/features/workforce/captures/staff-detail.png` (`.specs/features/workforce/captures/staff-detail.aria.yml`), with "Equipe vinculada" the team or "Sem equipe", "Situação atual" the status, the email a `mailto:` link and the phone a `tel:` link of its digits and "+" (AC 31)
@@ -264,7 +264,7 @@ Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41
 | Staff uniqueness rule, AC 2 (4 examples) | " rafael mendes" C2 · email in another case C2 · other Organization C2 · own name on edit C2 | - |
 | Team delete rule, AC 7 (2 examples) | 2 Staff no Assignment C7 · responsible for a `COMPLETED` service C7 | - |
 | Open-service rule, AC 22 (4 examples) | same assignee on `COMPLETED` C22 · another on `COMPLETED` C22 · clear on `COMPLETED` C22 · `CANCELLED` with a new one C22 | - |
-| Staff status rule, AC 29 (4 examples) | own on `PENDING` C29 · team on `IN_PROGRESS` C29 · turned `COMPLETED` C29 · no team and no Assignment C29 | - |
+| Staff status rule, AC 29 (5 examples) | own on `PENDING` C29 · team on `IN_PROGRESS` C29 · turned `COMPLETED` C29 · no team and no Assignment C29 · `IN_PROGRESS` on a `CANCELLED` or `COMPLETED` WorkOrder C29 | - |
 | Team status rule, AC 30 (2 examples) | own on `IN_PROGRESS` C30 · member's own does not count C30 | - |
 | Filters rule, AC 12 (2 examples) | chip with "Sem equipe" C12 · search "ALFA" C12 | - |
 | source controls: `staff-list.png` (8) | "Cadastrar profissional" C14 · "Exportar" C13 · "Buscar profissional" C12 · "Filtrar por equipe" C12 · specialty chips C12 · "Selecionar todos os profissionais visíveis" C13 · row checkbox C13 · name link C11 | - |
@@ -288,7 +288,7 @@ Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41
 
 ## Handoff
 
-- **Settled mid-build:** none
+- **Settled mid-build:** after the gate, to the question "O status 'Em serviço' deve contar só serviços de OS abertas?" (the Verifier's note on AC 29 against AC 32) the user answered "Sim, ajustar aqui" - recorded as AD-084, C29 and C30 restated, their tests changed with them
 - **Dispatched:** at `b4e1016` (diff `9d32c67..b4e1016`, `proofs.md` at `b4e1016`, 122 pass and the 6 pictures awaiting judgement): the Verifier (fresh sub-agent) - returned, FAIL with 11 findings; screens round 1 (fresh sub-agent, the 6 pictures against their captures) - returned, 4 diverge (metric notes, team select, two dividers, the not-found card), 2 match; fix pass at `764e2d2` and `b080d34`, every picture retaken at `b080d34`; screens round 2 (the round-1 screens sub-agent resumed) at `b080d34` - returned, all 6 pictures match, no regression
 - **Boundary:** C1-C40 closed at `b4e1016`; the Verifier's 11 findings closed at `764e2d2` (C41 appended) and the screens round-1 rows at `764e2d2` and `b080d34`; the Verifier, resumed for C41 at `9fa930a`, found C41 proven on the assignments read only (finding 12), closed by tests at `736d554` with no product code change - a commit outside `.specs/` after screens round 2 at `b080d34`
 - **Abandoned:** none
