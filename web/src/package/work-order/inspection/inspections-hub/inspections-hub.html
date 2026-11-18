@@ -58,28 +58,28 @@
     } @else {
       <h2 id="inspection-list-title" class="text-[13px] font-normal text-foreground">Central de inspeções</h2>
       <p class="mt-[5px] text-[10px] text-muted-foreground">Gerencie os modelos e acompanhe as execuções por ordem de serviço.</p>
-      <div role="tablist" aria-label="Seções de inspeções" class="mt-[15px] flex gap-1 border-b border-border">
+      <div role="tablist" aria-label="Seções de inspeções" class="mt-[17px] flex items-center gap-[7px] overflow-x-auto pb-px">
         <button
           type="button"
           role="tab"
-          class="group -mb-px flex h-[34px] items-center gap-2 rounded-t-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-border aria-selected:border-b-card aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+          class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
           [attr.aria-selected]="tab() === 'templates'"
           (click)="tab.set('templates')"
         >
           Modelos
-          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-selected:bg-primary/10">
+          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] text-muted-foreground group-aria-selected:bg-primary/10 group-aria-selected:text-primary">
             {{ templates().length }}
           </span>
         </button>
         <button
           type="button"
           role="tab"
-          class="group -mb-px flex h-[34px] items-center gap-2 rounded-t-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-border aria-selected:border-b-card aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+          class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
           [attr.aria-selected]="tab() === 'assignments'"
           (click)="tab.set('assignments')"
         >
           Atribuições
-          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-selected:bg-primary/10">
+          <span data-slot="tab-count" class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] text-muted-foreground group-aria-selected:bg-primary/10 group-aria-selected:text-primary">
             {{ assignmentRows().length }}
           </span>
         </button>
