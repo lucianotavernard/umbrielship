@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 47,
+  "next_id": 59,
   "lessons": [
     {
       "id": "L-001",
@@ -840,6 +840,222 @@
       ],
       "created": "2026-11-18T01:45:31Z",
       "last_seen": "2026-11-18T01:45:31Z"
+    },
+    {
+      "id": "L-047",
+      "key": "ac_gap::an edit form that sends every child s state on save opens with that state only after its read has answered or a pending or failed read clears it",
+      "text": "An edit form that sends every child's state on save opens with that state only after its read has answered, or a pending or failed read clears it.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-048",
+      "key": "ac_gap::when another field narrows a select s allowed options put its value back to an allowed one or the hidden value is still sent",
+      "text": "When another field narrows a select's allowed options, put its value back to an allowed one, or the hidden value is still sent.",
+      "signal": "ac_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-049",
+      "key": "spec_deviation::copy the binding source s resets after a save a create that keeps the list filters on can hide the new row",
+      "text": "Copy the binding source's resets after a save: a create that keeps the list filters on can hide the new row.",
+      "signal": "spec_deviation",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 3 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-050",
+      "key": "weak_test::a concurrency proof asserts each request s status and message not only the rows left",
+      "text": "A concurrency proof asserts each request's status and message, not only the rows left.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 4 (api)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-051",
+      "key": "weak_test::prove a uniqueness rule on update as well as on create",
+      "text": "Prove a uniqueness rule on update as well as on create.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 5 (api)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-052",
+      "key": "weak_test::prove a status filter on every value of the enum not on two",
+      "text": "Prove a status filter on every value of the enum, not on two.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 6 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-053",
+      "key": "weak_test::a rule that several pages open must be proven on each page the criterion names",
+      "text": "A rule that several pages open must be proven on each page the criterion names.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 7 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-054",
+      "key": "weak_test::prove the page s handling of a form s output not only the form on a test host",
+      "text": "Prove the page's handling of a form's output, not only the form on a test host.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 8 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-055",
+      "key": "weak_test::prove that related records stay on every delete path the rule names",
+      "text": "Prove that related records stay on every delete path the rule names.",
+      "signal": "weak_test",
+      "scope": "api",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 9 (api)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-056",
+      "key": "weak_test::prove each page s loading and failure states and the known message mapping not one page s fallback",
+      "text": "Prove each page's loading and failure states and the known-message mapping, not one page's fallback.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 10 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-057",
+      "key": "weak_test::assert every column the criterion names not a subset",
+      "text": "Assert every column the criterion names, not a subset.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 11 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
+    },
+    {
+      "id": "L-058",
+      "key": "weak_test::a gate over several reads is proven with each read pending or failed in turn",
+      "text": "A gate over several reads is proven with each read pending or failed in turn.",
+      "signal": "weak_test",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "workforce"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 12 (web)"
+      ],
+      "created": "2026-11-18T05:16:36Z",
+      "last_seen": "2026-11-18T05:16:36Z"
     }
   ]
 }
