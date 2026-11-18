@@ -4,7 +4,7 @@ Build: `cd web && npm run build`
 Run web: `cd web && npx ng test --watch=false --reporters=verbose`
 Plan: `.specs/features/drawer-standard/plan.md`
 
-38 checks in 3 slices · 0 one-way doors · 0 open, of which 0 block
+39 checks in 3 slices (C39 appended from the Verifier) · 0 one-way doors · 0 open, of which 0 block
 
 ## Checks
 
@@ -183,6 +183,9 @@ Proof: run web | ✓ drawer-forms.spec.ts > Drawer forms > drawer-standard C38 o
 Proof: run web | ✓ drawer-forms.spec.ts > Drawer forms > drawer-standard C38 user-form shows no red and no message after reset
 Proof: run web | ✓ drawer-forms.spec.ts > Drawer forms > drawer-standard C38 invitation-form shows no red and no message after reset
 
+**C39** - A form outside a drawer keeps today's validation: on the sign-in form, leaving an empty "E-mail" before any submit shows "E-mail é obrigatório" in `t-input-error`, the input turns red through its touched rule (`[&.ng-invalid.ng-touched]:border-destructive`, no drawer field style), the label keeps `text-sm` and its touched red rule, and nothing carries `data-invalid` or a drawer `[data-slot="error"]` (plan `## Shape` shared UI row, `## Out of scope` forms outside drawers)
+Proof: run web | ✓ authentication-form.spec.ts > AuthenticationForm > drawer-standard C39 the sign-in form outside a drawer keeps its touched message, red field and label
+
 ## Coverage
 
 | Set (size) | Member -> proof | Unproven |
@@ -206,7 +209,7 @@ Proof: run web | ✓ drawer-forms.spec.ts > Drawer forms > drawer-standard C38 i
 
 ## Swept
 
-- validation: C34, C35, C36, C37
+- validation: C34, C35, C36, C37; forms outside drawers keep today's touched validation C39
 - failure modes: C28, C29, C30 (a failed request brings the save button back with the values kept); existing - `work-order-drawer.spec.ts` "work-order-ui C23 keeps the drawer and the values when the API fails" and each page's error toast (AD-026)
 - idempotency: C13-C30 - one request per save, the button disabled while it runs (C10)
 - authorization: existing - write controls render only for a Role that may write (AD-017, `shared/testing/write-access.ts`); this change adds no control and no route
@@ -219,7 +222,7 @@ Proof: run web | ✓ drawer-forms.spec.ts > Drawer forms > drawer-standard C38 i
 ## Handoff
 
 - **Settled mid-build:** none
-- **Dispatched:** four test-builder sub-agents at `16aa2a2` plus the uncommitted build (shared pieces, 11 forms, 10 pages), each writing only its spec files and committing nothing: (A) shared `drawer.spec.ts` and `drawer-forms.spec.ts` - C3-C11, C34-C38; (B) `work-order-drawer.spec.ts`, `work-order-detail.spec.ts`, `vessel-detail.spec.ts` - C13-C16, C17, C18, C21, C31; (C) `inspections-hub.spec.ts`, `inspection-template-detail.spec.ts`, `inspection-template-form.spec.ts`, `inspection-assignment-form.spec.ts`, `agenda.spec.ts` - C24-C27, C32, C33; (D) `vessel-list.spec.ts`, `customer-list.spec.ts`, `organization-list.spec.ts`, `organization-detail.spec.ts`, `organization-form.spec.ts`, `user-form.spec.ts` - C19, C20, C22, C23, C28-C30 - all four returned: every new title passes in its own run, no defect in the built code; B and D found the wrong routes in C20, C21, C29 and C30 (see Corrected); A notes the customer form's own message "Cidade é obrigatório" (asserted as written); D kept the titles of `customer-ui C21` and `C41`, which are proof lines of `customer-ui-redesign/checks.md`, changing only their assertions
+- **Dispatched:** four test-builder sub-agents at `16aa2a2` plus the uncommitted build (shared pieces, 11 forms, 10 pages), each writing only its spec files and committing nothing: (A) shared `drawer.spec.ts` and `drawer-forms.spec.ts` - C3-C11, C34-C38; (B) `work-order-drawer.spec.ts`, `work-order-detail.spec.ts`, `vessel-detail.spec.ts` - C13-C16, C17, C18, C21, C31; (C) `inspections-hub.spec.ts`, `inspection-template-detail.spec.ts`, `inspection-template-form.spec.ts`, `inspection-assignment-form.spec.ts`, `agenda.spec.ts` - C24-C27, C32, C33; (D) `vessel-list.spec.ts`, `customer-list.spec.ts`, `organization-list.spec.ts`, `organization-detail.spec.ts`, `organization-form.spec.ts`, `user-form.spec.ts` - C19, C20, C22, C23, C28-C30 - all four returned: every new title passes in its own run, no defect in the built code; B and D found the wrong routes in C20, C21, C29 and C30 (see Corrected); A notes the customer form's own message "Cidade é obrigatório" (asserted as written); D kept the titles of `customer-ui C21` and `C41`, which are proof lines of `customer-ui-redesign/checks.md`, changing only their assertions; Verifier at `66dfc38` (diff `16aa2a2..66dfc38`, `proofs.md` at `66dfc38`); screens round 1 at `66dfc38` (pictures taken at `315114f`, no code change since) - returned, both pictures match, no row differs (notes: the focus ring reads a stronger teal than in both captures, the dark surfaces 5-7 RGB units darker than the user's screenshot and its crop 5px lower)
 - **Boundary:** C1-C38 closed at `315114f`
 - **Abandoned:** none
 - **Corrected:** C20, C21, C29 and C30 named routes that do not exist (`PUT /api/vessels/:id`, `POST /api/organizations/:id/users`, `POST /api/organizations/:id/invitations`), a derivation error of the checks; the approved plan fixes the request each drawer sends today (AC 29, `## Surface` None), so the claims now name today's `PUT /api/customers/:customerId/vessels/:id`, `POST /api/users` and `POST /api/invitations` (found by test-builder B)
