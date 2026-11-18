@@ -1,17 +1,17 @@
 # Workforce screens
 
 **Verifier**: independent sub-agent (author != verifier)
-**Round**: 1
-**HEAD**: b4e1016
+**Round**: 2
+**HEAD**: b080d34
 
 | Screen | Compared with | Verdict | Finding |
 | --- | --- | --- | --- |
-| `captures/staff-list.running.png` | `captures/staff-list.png` | diverges | 4 rows differ: metric notes placement, team select label not centred, no line under the chips, no line under the last row |
-| `captures/staff-list-filtered.running.png` | `captures/staff-list-filtered.png` | diverges | 4 rows differ: metric notes placement, team select label not centred, no line under the chips, no line under the last row |
-| `captures/staff-list-empty.running.png` | `captures/staff-list-empty.png` | diverges | 4 rows differ: metric notes placement, team select label not centred, no line under the chips, no line above the footer |
-| `captures/staff-drawer.running.png` | `captures/staff-drawer.png` | matches | 0 rows differ |
-| `captures/staff-detail.running.png` | `captures/staff-detail.png` | matches | 0 rows differ |
-| `captures/staff-detail-not-found.running.png` | `captures/staff-detail-not-found.png` | diverges | 2 rows differ: card width, icon tile shape |
+| `captures/staff-list.running.png` | `captures/staff-list.png` | matches | round 2: the 4 rows that differed are same; no regression |
+| `captures/staff-list-filtered.running.png` | `captures/staff-list-filtered.png` | matches | round 2: the 4 rows that differed are same; no regression |
+| `captures/staff-list-empty.running.png` | `captures/staff-list-empty.png` | matches | round 2: the 4 rows that differed are same; no regression |
+| `captures/staff-drawer.running.png` | `captures/staff-drawer.png` | matches | round 2: no regression |
+| `captures/staff-detail.running.png` | `captures/staff-detail.png` | matches | round 2: no regression |
+| `captures/staff-detail-not-found.running.png` | `captures/staff-detail-not-found.png` | matches | round 2: the 2 rows that differed are same; no regression |
 
 ### `captures/staff-list.running.png`
 
@@ -32,14 +32,14 @@
 | metric 1: people icon (blue tile), `Profissionais cadastrados`, `06` | same | |
 | metric 2: anchor icon (teal tile), `Times em operação`, `03` | same | "Equipes cadastradas", as listed (AD-080); value is sample data |
 | metric 3: pulse icon (green tile), `Disponíveis agora`, `03` | same | value is sample data |
-| metric notes: `na equipe`, `equipes` and `• disponíveis` on the right of each card, centred between the label and the value | differs | `na equipe` and `equipes` sit at the bottom right, level with the number; only `• disponíveis` stays centred |
+| metric notes: `na equipe`, `equipes` and `• disponíveis` on the right of each card, centred between the label and the value | same | round 2: all three notes centred on the right, between the label and the value |
 | (no tabs) | same | tabs `Profissionais` (selected) and `Equipes` between the metrics and the panel, as listed (AD-066, AD-074) |
 | panel: white card, title `Profissionais` and subtitle `Cadastro e alocação dos técnicos da oficina.` on the left | same | |
 | toolbar on the right of the panel title: `Exportar` (disabled, download icon), search box, team select, in this order | same | |
 | search: magnifier and placeholder `Buscar profissional...` | same | note: placeholder a shade darker |
-| team select: `Todas as equipes` and a chevron on the right, label centred in the box | differs | label and chevron pinned to the top of the box, about 7px above its centre |
+| team select: `Todas as equipes` and a chevron on the right, label centred in the box | same | round 2: label and chevron centred in the box, level with the search placeholder |
 | specialty chips: `Todas 6` selected (teal outline and tint), then `Especialista hidráulico 1`, `Mecânico naval 2`, `Técnica de docagem 1`, `Técnica de manutenção 1`, `Técnica elétrica 1`, each count in a pill | same | |
-| line under the chips, across the panel, above the table header | differs | no line; the header row follows the chips directly |
+| line under the chips, across the panel, above the table header | same | round 2: a line across the panel under the chips, above the header row |
 | table header: select-all checkbox, `PROFISSIONAL`, `ESPECIALIDADE`, `EQUIPE`, `CONTATO`, `STATUS` in small caps, line beneath | same | |
 | row: checkbox, initials avatar (tinted rounded square), bold name | same | rows by name (criterion 11); names are sample data |
 | row: specialty with a wrench icon | same | |
@@ -48,7 +48,7 @@
 | row: status badge on the right, dot and text: amber `Em serviço`, green `Disponível`, grey `Folga` | same | no `Folga`, as listed (AD-067); note: badge text a size smaller |
 | (no row actions) | same | a `...` button at the end of each row, as listed (AD-069) |
 | line between rows | same | |
-| line under the last row, above the panel footer | differs | no line under the last row |
+| line under the last row, above the panel footer | same | round 2: a line under the last row, above `Exibindo 6 de 6 profissionais` |
 | panel footer: `Exibindo 6 de 6 profissionais` on the left | same | |
 | panel footer right: `Equipe técnica MARÉOS` | same | omitted, as listed (AD-081) |
 | page footer: `MARÉOS · Operação com rumo certo.` and `Gestão da equipe técnica` | same | omitted, as listed (AD-025, AD-081) |
@@ -66,19 +66,19 @@
 | header: kicker `OPERAÇÃO / PESSOAS`, title `Equipe técnica`, subtitle | same | subtitle with "equipes", as listed (AD-081) |
 | header: `Cadastrar profissional` button, filled teal with a plus, on the right | same | |
 | metrics: `Profissionais cadastrados` `06`, `Times em operação` `03`, `Disponíveis agora` `03`, each with its icon tile | same | "Equipes cadastradas", as listed (AD-080); values are sample data |
-| metric notes: `na equipe`, `equipes` and `• disponíveis` centred on the right of each card | differs | `na equipe` and `equipes` sit at the bottom right, level with the number; only `• disponíveis` stays centred |
+| metric notes: `na equipe`, `equipes` and `• disponíveis` centred on the right of each card | same | round 2: all three notes centred on the right, between the label and the value |
 | (no tabs) | same | tabs `Profissionais` (selected) and `Equipes`, as listed (AD-066, AD-074) |
 | panel: title `Profissionais`, subtitle `Cadastro e alocação dos técnicos da oficina.` | same | |
 | toolbar: `Exportar` (disabled), search `Buscar profissional...`, team select, on the right | same | |
-| team select: `Todas as equipes` and a chevron, label centred in the box | differs | label and chevron pinned to the top of the box |
+| team select: `Todas as equipes` and a chevron, label centred in the box | same | round 2: label and chevron centred in the box, level with the search placeholder |
 | specialty chips: `Mecânico naval 2` selected (teal outline and tint), `Todas 6` and the others unselected | same | |
-| line under the chips, above the table header | differs | no line |
+| line under the chips, above the table header | same | round 2: a line across the panel under the chips, above the header row |
 | table header: select-all checkbox, `PROFISSIONAL`, `ESPECIALIDADE`, `EQUIPE`, `CONTATO`, `STATUS`, line beneath | same | |
 | rows: only the two `Mecânico naval` Staff, each checkbox, avatar, bold name, wrench specialty, people team, mail and phone contact | same | ordered by name (criterion 11); note: contact text a size smaller |
 | status badges: amber `Em serviço`, grey `Folga` | same | no `Folga`, as listed (AD-067); note: badge text a size smaller |
 | (no row actions) | same | `...` at the end of each row, as listed (AD-069) |
 | line between the two rows | same | |
-| line under the last row, above the panel footer | differs | no line under the last row |
+| line under the last row, above the panel footer | same | round 2: a line under the last row, above `Exibindo 2 de 6 profissionais` |
 | panel footer: `Exibindo 2 de 6 profissionais` | same | |
 | panel footer right `Equipe técnica MARÉOS`; page footer `MARÉOS · Operação com rumo certo.` and `Gestão da equipe técnica` | same | omitted, as listed (AD-025, AD-081) |
 
@@ -95,17 +95,17 @@
 | header: kicker `OPERAÇÃO / PESSOAS`, title `Equipe técnica`, subtitle | same | subtitle with "equipes", as listed (AD-081) |
 | header: `Cadastrar profissional` button, filled teal with a plus, on the right | same | |
 | metrics: `Profissionais cadastrados` `06`, `Times em operação` `03`, `Disponíveis agora` `03`, each with its icon tile | same | "Equipes cadastradas", as listed (AD-080); values are sample data |
-| metric notes: `na equipe`, `equipes` and `• disponíveis` centred on the right of each card | differs | `na equipe` and `equipes` sit at the bottom right, level with the number; only `• disponíveis` stays centred |
+| metric notes: `na equipe`, `equipes` and `• disponíveis` centred on the right of each card | same | round 2: all three notes centred on the right, between the label and the value |
 | (no tabs) | same | tabs `Profissionais` (selected) and `Equipes`, as listed (AD-066, AD-074) |
 | panel: title `Profissionais`, subtitle `Cadastro e alocação dos técnicos da oficina.` | same | |
 | toolbar: `Exportar` (disabled), team select, on the right | same | |
 | search: `zzz` typed, teal border of the focused box | same | |
-| team select: `Todas as equipes` and a chevron, label centred in the box | differs | label and chevron pinned to the top of the box |
+| team select: `Todas as equipes` and a chevron, label centred in the box | same | round 2: label and chevron centred in the box, level with the search placeholder |
 | specialty chips: `Todas 6` selected, then the five specialties with their counts | same | |
-| line under the chips, above the table header | differs | no line |
+| line under the chips, above the table header | same | round 2: a line across the panel under the chips, above the header row |
 | table header: select-all checkbox, `PROFISSIONAL`, `ESPECIALIDADE`, `EQUIPE`, `CONTATO`, `STATUS` spread across the panel, no line beneath | same | |
 | empty message `Nenhum profissional encontrado com esses filtros.` centred under the header | same | |
-| line above the panel footer | differs | no line between the message and the footer |
+| line above the panel footer | same | round 2: a line between the message and `Exibindo 0 de 6 profissionais` |
 | panel footer: `Exibindo 0 de 6 profissionais` | same | |
 | panel footer right `Equipe técnica MARÉOS`; page footer `MARÉOS · Operação com rumo certo.` and `Gestão da equipe técnica` | same | omitted, as listed (AD-025, AD-081) |
 
@@ -166,8 +166,8 @@
 | sidebar: `Estoque e peças`, `Relatórios` and the `Precisa de ajuda?` card | same | omitted, as listed (AD-024, AD-025) |
 | topbar: breadcrumb `Operação > Equipe técnica` | same | |
 | topbar: `Oficina em operação`, help and notifications buttons | same | omitted, as listed |
-| one white card, horizontally centred at the top of the content, about 300px wide and 245px tall | differs | a card about 510px wide (the profile column) and 212px tall |
-| icon: people icon in a teal-tinted rounded square, centred | differs | a grey circle with a grey people icon |
+| one white card, horizontally centred at the top of the content, about 300px wide and 245px tall | same | round 2: a card about 300px wide and 247px tall, centred at the top of the content |
+| icon: people icon in a teal-tinted rounded square, centred | same | round 2: a people icon in a teal-tinted rounded square |
 | title `Profissional não encontrado`, centred | same | note: a size smaller |
 | sentence `Este cadastro não está disponível na equipe técnica.`, centred | same | |
 | link `← Voltar para a equipe`, centred | same | note: teal and bold; the capture draws it grey and regular |
