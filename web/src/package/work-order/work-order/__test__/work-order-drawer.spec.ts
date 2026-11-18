@@ -818,6 +818,34 @@ describe('WorkOrderDrawer', () => {
     await page.reload(fleet);
   });
 
+  it('workforce C41 edits without services while the teams read is pending', async () => {
+    TestBed.inject(AuthenticationService).role.set('administrator');
+    const page = await WorkOrderListPage.pending();
+    const reads = page.reads();
+    reads.workOrders.flush({ workOrders: fleet, total: fleet.length });
+    reads.vessels.flush({ vessels: harnessVessels, total: harnessVessels.length });
+    reads.customers.flush({ customers: harnessCustomers, total: harnessCustomers.length });
+    controller.expectOne('/api/staff').flush({ staff: [rafael] });
+    controller.expectOne('/api/assignments').flush({ assignments: onMotor });
+    const teams = controller.expectOne('/api/teams');
+    await settle();
+
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
+    await click(buttonByText('Salvar alterações', drawer()!));
+    const put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
+    expect(put.request.body).not.toHaveProperty('services');
+    put.flush(null);
+    await settle();
+    await page.reload(fleet);
+
+    // Once the Teams answer, the edit lists the services with their Responsável.
+    teams.flush({ teams: [alfa] });
+    await settle();
+    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    expect(drawer()!.querySelectorAll('[data-slot="existing-service"]')).toHaveLength(2);
+  });
+
   it('workforce C26 shows no services to an operator editing', async () => {
     const page = await open('operator');
 
