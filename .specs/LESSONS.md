@@ -282,6 +282,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 11 (Editar drawer on the WorkOrder detail) (web)
 - last seen: 2026-11-17T19:09:24Z
 
+### L-046 - When a shared component gains a branch for one kind of caller, give the promise that every other caller keeps today's behaviour its own check on a real other caller.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: drawer-standard
+- evidence: .specs/features/drawer-standard/verification.md finding 1 (closed by C39) (web)
+- last seen: 2026-11-18T01:45:31Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

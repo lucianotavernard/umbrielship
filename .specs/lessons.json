@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 46,
+  "next_id": 47,
   "lessons": [
     {
       "id": "L-001",
@@ -822,6 +822,24 @@
       ],
       "created": "2026-11-17T19:09:24Z",
       "last_seen": "2026-11-17T19:09:24Z"
+    },
+    {
+      "id": "L-046",
+      "key": "spec_precision_gap::when a shared component gains a branch for one kind of caller give the promise that every other caller keeps today s behaviour its own check on a real other caller",
+      "text": "When a shared component gains a branch for one kind of caller, give the promise that every other caller keeps today's behaviour its own check on a real other caller.",
+      "signal": "spec_precision_gap",
+      "scope": "web",
+      "status": "candidate",
+      "features": [
+        "drawer-standard"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/drawer-standard/verification.md finding 1 (closed by C39) (web)"
+      ],
+      "created": "2026-11-18T01:45:31Z",
+      "last_seen": "2026-11-18T01:45:31Z"
     }
   ]
 }
