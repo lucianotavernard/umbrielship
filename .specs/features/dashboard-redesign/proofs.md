@@ -1,6 +1,6 @@
 # dashboard-redesign proofs
 
-**HEAD**: 244ea06
+**HEAD**: 59ccd81
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 55 pass, 0 fail
@@ -68,19 +68,19 @@
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/customer/vessel/__test__/vessel-csv.spec.ts > vesselsCsv > customer-ui C40 guards formulas and doubles quotes 2ms
- ✓  web  src/package/work-order/agenda/__test__/agenda-week.spec.ts > agendaItems > work-order-ui C59 places services and dockings, clamps the rows and hides cancelled orders 1ms
  ✓  web  src/package/work-order/agenda/__test__/agenda-week.spec.ts > weekLabel > work-order-ui C61 reads one month or the cross month range 1ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-filters.spec.ts > workOrderMetrics > work-order-ui C5 counts 24, 08, 05, 07 and 120 over every work order 0ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-filters.spec.ts > filterWorkOrders > work-order-ui C7 matches code with or without hash, vessel, customer and service names 0ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-filters.spec.ts > prazoLabel > work-order-ui C8 reads Hoje, Amanhã or the short date with the time 0ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-csv.spec.ts > workOrderCsv > work-order-ui C13 writes the header, the Aurora line, a guarded formula and doubled quotes 1ms
+ ✓  web  src/package/workforce/staff/__test__/staff-csv.spec.ts > staffCsv > workforce C13 writes the header and one line per staff with sem equipe 0ms
  ✓  web  src/package/workforce/staff/__test__/staff-status.spec.ts > staffStatus > workforce C29 derives em serviço from its own or its team's service in progress 1ms
  ✓  web  src/package/workforce/staff/__test__/staff-status.spec.ts > teamStatus > workforce C30 derives em serviço from its own service in progress only 0ms
- ✓  web  src/package/workforce/staff/__test__/staff-allocations.spec.ts > openAllocations > workforce C32 lists the open services of the staff and its team by start 2ms
  ✓  web  src/package/shared/components/lib/__test__/theme.spec.ts > restoreTheme > customer-ui C4 applies the saved theme before boot 1ms
  ✓  web  src/package/work-order/inspection-assignment/__test__/inspection-availability.spec.ts > inspectionBlockedReason > work-order-ui C42 blocks on the work order and then on the target service 0ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-csv.spec.ts > workOrderCsv > work-order-ui C13 writes the header, the Aurora line, a guarded formula and doubled quotes 1ms
- ✓  web  src/package/workforce/staff/__test__/staff-csv.spec.ts > staffCsv > workforce C13 writes the header and one line per staff with sem equipe 1ms
 
  Test Files  62 passed (62)
       Tests  406 passed (406)
-   Start at  09:25:29
-   Duration  6.78s (transform 1.36s, setup 980ms, import 2.68s, tests 21.10s, environment 24.53s)
+   Start at  09:26:18
+   Duration  10.37s (transform 1.89s, setup 6.51s, import 3.10s, tests 28.20s, environment 26.54s)
 ```
