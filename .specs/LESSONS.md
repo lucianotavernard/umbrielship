@@ -288,6 +288,78 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: .specs/features/drawer-standard/verification.md finding 1 (closed by C39) (web)
 - last seen: 2026-11-18T01:45:31Z
 
+### L-047 - An edit form that sends every child's state on save opens with that state only after its read has answered, or a pending or failed read clears it.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 1 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-048 - When another field narrows a select's allowed options, put its value back to an allowed one, or the hidden value is still sent.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 2 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-049 - Copy the binding source's resets after a save: a create that keeps the list filters on can hide the new row.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 3 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-050 - A concurrency proof asserts each request's status and message, not only the rows left.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 4 (api)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-051 - Prove a uniqueness rule on update as well as on create.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 5 (api)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-052 - Prove a status filter on every value of the enum, not on two.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 6 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-053 - A rule that several pages open must be proven on each page the criterion names.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 7 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-054 - Prove the page's handling of a form's output, not only the form on a test host.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 8 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-055 - Prove that related records stay on every delete path the rule names.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `api` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 9 (api)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-056 - Prove each page's loading and failure states and the known-message mapping, not one page's fallback.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 10 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-057 - Assert every column the criterion names, not a subset.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 11 (web)
+- last seen: 2026-11-18T05:16:36Z
+
+### L-058 - A gate over several reads is proven with each read pending or failed in turn.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: workforce
+- evidence: verification.md finding 12 (web)
+- last seen: 2026-11-18T05:16:36Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
