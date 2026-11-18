@@ -139,13 +139,13 @@ export function techniciansLabel(count: number): string {
   return count === 1 ? '1 técnico' : `${count} técnicos`;
 }
 
-/** Every Team by name in `pt-BR`, "<especialidade> · <n> técnicos" and its status (AD-084, AD-085). */
+/** Every Team by name in `pt-BR` as "Equipe <nome>", "<especialidade> · <n> técnicos" and its status (AD-084, AD-085, AD-093). */
 export function teamRows(teams: TeamListItem[], assignments: Assignment[], inProgress: ReadonlySet<string>): TeamRow[] {
   return [...teams]
     .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
     .map((team, index) => ({
       id: team.id,
-      name: team.name,
+      name: `Equipe ${team.name}`,
       line: `${team.specialty} · ${techniciansLabel(team.staffCount)}`,
       status: teamStatus(team.id, assignments, inProgress),
       tone: index % 3,

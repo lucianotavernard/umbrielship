@@ -157,7 +157,7 @@ import { Responsavel } from '../dashboard-summary';
         </tbody>
       </table>
       @if (!loading() && rows().length === 0) {
-        <div data-slot="empty" class="border-t border-border p-[25px] text-center text-[11px] text-muted-foreground">
+        <div data-slot="empty" class="p-[25px] text-center text-[11px] text-muted-foreground">
           {{ emptyMessage() }}
         </div>
       }

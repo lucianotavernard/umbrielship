@@ -243,10 +243,10 @@ describe('teamRows', () => {
     const rows = teamRows(teams, [assignment('s1', { teamId: 'alfa' })], servicesInProgress(fleet));
 
     expect(rows.map((row) => [row.name, row.line, row.status, row.tone])).toEqual([
-      ['Ágil', 'Pintura · 3 técnicos', 'Disponível', 0],
-      ['Alfa', 'Motor · 2 técnicos', 'Em serviço', 1],
-      ['Bravo', 'Hidráulica · 0 técnicos', 'Disponível', 2],
-      ['Charlie', 'Elétrica · 1 técnico', 'Disponível', 0],
+      ['Equipe Ágil', 'Pintura · 3 técnicos', 'Disponível', 0],
+      ['Equipe Alfa', 'Motor · 2 técnicos', 'Em serviço', 1],
+      ['Equipe Bravo', 'Hidráulica · 0 técnicos', 'Disponível', 2],
+      ['Equipe Charlie', 'Elétrica · 1 técnico', 'Disponível', 0],
     ]);
     expect(teamRows([], [], new Set())).toEqual([]);
   });

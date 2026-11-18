@@ -15,7 +15,6 @@ import {
   lucideMoon,
   lucidePlus,
   lucideSearch,
-  lucideSun,
   lucideWrench,
 } from '@ng-icons/lucide';
 import { Observable } from 'rxjs';
@@ -107,8 +106,7 @@ const STATE_DOTS = { 'Em serviço': 'bg-[#d9a247]', Disponível: 'bg-[#49a77e]' 
       lucideMoon,
       lucidePlus,
       lucideSearch,
-      lucideSun,
-      lucideWrench,
+          lucideWrench,
     }),
   ],
   templateUrl: './dashboard.html',
@@ -244,25 +242,27 @@ export class Dashboard {
   private readonly editingId = signal<string | null>(null);
   deleting = signal<WorkOrderRow | null>(null);
 
+  private readonly reads = [
+    this.workOrderResource,
+    this.vesselResource,
+    this.customerResource,
+    this.staffResource,
+    this.teamResource,
+    this.assignmentResource,
+  ];
+  /** Whether a read failed: it turns true once, so the page says so once however many fail (AC 23). */
+  private readonly failed = computed(() => this.reads.some((resource) => !!resource.error()));
+
   constructor() {
     effect(() => {
-      for (const resource of [
-        this.workOrderResource,
-        this.vesselResource,
-        this.customerResource,
-        this.staffResource,
-        this.teamResource,
-        this.assignmentResource,
-      ]) {
-        const error = resource.error();
-        if (!error) continue;
-        // The toaster keeps its toasts in a signal: reading it here would re-run this effect forever.
-        untracked(() =>
-          toast.error('Erro ao carregar a visão geral', {
-            description: apiErrorMessage(error as { error?: unknown }, 'Não foi possível carregar a visão geral.'),
-          }),
-        );
-      }
+      if (!this.failed()) return;
+      // The toaster keeps its toasts in a signal: reading it here would re-run this effect forever.
+      untracked(() => {
+        const error = this.reads.map((resource) => resource.error()).find((failure) => !!failure);
+        toast.error('Erro ao carregar a visão geral', {
+          description: apiErrorMessage(error as { error?: unknown }, 'Não foi possível carregar a visão geral.'),
+        });
+      });
     });
   }
 
