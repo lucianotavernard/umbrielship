@@ -8,6 +8,8 @@ import { InMemoryCustomersRepository } from '@test/repositories/in-memory-custom
 import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
 import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
+import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
+import { inMemoryWorkforce } from '@test/workforce.js';
 import { CreateWorkOrderUseCase } from '../create-work-order.use-case.js';
 import { DeleteWorkOrderUseCase } from '../delete-work-order.use-case.js';
 import { EditWorkOrderUseCase } from '../edit-work-order.use-case.js';
@@ -46,7 +48,11 @@ describe('WorkOrder tenancy', () => {
   });
 
   it('[C37] CreateWorkOrderUseCase answers vessel not found for a Vessel of another Organization and stores nothing', async () => {
-    const promise = new CreateWorkOrderUseCase(workOrders, facade).handle({
+    const promise = new CreateWorkOrderUseCase(
+      workOrders,
+      facade,
+      inMemoryWorkforce().facade,
+    ).handle({
       organizationId: 'A',
       vesselId: 'vb',
       status: 'PENDING',
@@ -67,7 +73,11 @@ describe('WorkOrder tenancy', () => {
       organizationId: 'A',
       id: 'wb',
     });
-    const edit = new EditWorkOrderUseCase(workOrders).handle({
+    const edit = new EditWorkOrderUseCase(
+      workOrders,
+      new InMemoryWorkOrderServicesRepository(),
+      inMemoryWorkforce().facade,
+    ).handle({
       organizationId: 'A',
       workOrderId: 'wb',
       status: 'COMPLETED',
@@ -76,6 +86,7 @@ describe('WorkOrder tenancy', () => {
     const remove = new DeleteWorkOrderUseCase(
       workOrders,
       new InMemoryInspectionsRepository(),
+      inMemoryWorkforce().facade,
     ).handle({
       organizationId: 'A',
       id: 'wb',

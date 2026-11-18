@@ -27,6 +27,12 @@ import { InMemoryCustomersRepository } from '@test/repositories/in-memory-custom
 import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
+import {
+  inMemoryWorkforce,
+  makeAssignment,
+  makeStaff,
+  makeTeam,
+} from '@test/workforce.js';
 import { CreateWorkOrderUseCase } from '../create-work-order.use-case.js';
 import { DeleteWorkOrderUseCase } from '../delete-work-order.use-case.js';
 import { EditWorkOrderUseCase } from '../edit-work-order.use-case.js';
@@ -66,13 +72,19 @@ const customers = new InMemoryCustomersRepository();
 const vessels = new InMemoryVesselsRepository(customers);
 const workOrders = new InMemoryWorkOrdersRepository();
 const facade = new CustomerFacade(vessels);
+const workforce = inMemoryWorkforce();
 const useCases = {
-  create: new CreateWorkOrderUseCase(workOrders, facade),
+  create: new CreateWorkOrderUseCase(workOrders, facade, workforce.facade),
   delete: new DeleteWorkOrderUseCase(
     workOrders,
     new InMemoryInspectionsRepository(),
+    workforce.facade,
   ),
-  edit: new EditWorkOrderUseCase(workOrders),
+  edit: new EditWorkOrderUseCase(
+    workOrders,
+    workOrders.services,
+    workforce.facade,
+  ),
   fetch: new FetchWorkOrdersUseCase(workOrders),
   get: new GetWorkOrderByIdUseCase(workOrders, facade),
 };
@@ -394,5 +406,210 @@ describe('POST /work-orders', () => {
     expect(response.body.message).toBe('Vessel not found');
     expect(workOrders.items).toEqual([]);
     expect(workOrders.services.items).toEqual([]);
+  });
+});
+
+const STAFF = '66666666-6666-4666-8666-666666666666';
+const TEAM = '44444444-4444-4444-8444-444444444444';
+const STRANGER_TEAM = '55555555-5555-4555-8555-555555555555';
+
+const seedWorkforce = () => {
+  workforce.staff.items = [makeStaff({ organizationId: ORGANIZATION }, STAFF)];
+  workforce.teams.items = [
+    makeTeam({ organizationId: ORGANIZATION }, TEAM),
+    makeTeam({ organizationId: OTHER_ORGANIZATION }, STRANGER_TEAM),
+  ];
+  workforce.assignments.items = [];
+};
+
+const edit = (id: string, body: object, role: Role = 'administrator') =>
+  agent()
+    .put(`/work-orders/${id}`)
+    .set('Authorization', `Bearer ${tokens[role]}`)
+    .send(body);
+
+describe('POST /work-orders', () => {
+  beforeEach(seedWorkforce);
+
+  it('workforce C19 answers 201 and assigns the services', async () => {
+    const response = await create(
+      workOrderBody([
+        { name: 'Pintura', description: 'Casco', staffId: STAFF },
+        { name: 'Motor', description: 'Revisão', teamId: TEAM },
+      ]),
+      'administrator',
+    );
+
+    expect(response.status).toBe(201);
+    const id = response.body.workOrder.id;
+    expect(workforce.assignments.items).toHaveLength(2);
+    expect(
+      workforce.assignments.items.every((item) => item.workOrderId === id),
+    ).toBe(true);
+    expect(
+      workforce.assignments.items
+        .map((item) => `${item.staffId}/${item.teamId}`)
+        .sort((x, y) => x.localeCompare(y)),
+    ).toEqual(
+      [`${STAFF}/null`, `null/${TEAM}`].sort((x, y) => x.localeCompare(y)),
+    );
+  });
+
+  it('workforce C20 answers 400 for both ids, 404 for an unknown team and 409 on a cancelled work order', async () => {
+    const both = await create(
+      workOrderBody([
+        { name: 'Pintura', description: 'Casco', staffId: STAFF, teamId: TEAM },
+      ]),
+      'administrator',
+    );
+    expect(both.status).toBe(400);
+
+    const unknown = await create(
+      workOrderBody([
+        { name: 'Pintura', description: 'Casco', teamId: STRANGER_TEAM },
+      ]),
+      'administrator',
+    );
+    expect(unknown.status).toBe(404);
+    expect(unknown.body.message).toBe('Team not found');
+
+    const cancelled = await create(
+      {
+        ...workOrderBody([
+          { name: 'Pintura', description: 'Casco', staffId: STAFF },
+        ]),
+        status: 'CANCELLED',
+      },
+      'administrator',
+    );
+    expect(cancelled.status).toBe(409);
+    expect(cancelled.body.message).toBe('Work order service is not open');
+
+    expect(workOrders.items).toHaveLength(0);
+    expect(workforce.assignments.items).toHaveLength(0);
+  });
+
+  it('workforce C21 answers 403 to an operator sending an assignee and 201 without one', async () => {
+    const refused = await create(
+      workOrderBody([
+        { name: 'Pintura', description: 'Casco', staffId: STAFF },
+      ]),
+      'operator',
+    );
+    expect(refused.status).toBe(403);
+    expect(workOrders.items).toHaveLength(0);
+
+    const plain = await create(
+      workOrderBody([{ name: 'Pintura', description: 'Casco' }]),
+      'operator',
+    );
+    expect(plain.status).toBe(201);
+    expect(workforce.assignments.items).toHaveLength(0);
+  });
+});
+
+describe('PUT /work-orders/:id', () => {
+  beforeEach(() => {
+    seedWorkforce();
+    workOrders.items.push(
+      makeWorkOrder(
+        {
+          organizationId: ORGANIZATION,
+          vesselId: VESSEL,
+          status: 'IN_PROGRESS',
+        },
+        'wo1',
+      ),
+    );
+    workOrders.services.items.push(
+      makeService(
+        { organizationId: ORGANIZATION, workOrderId: 'wo1', status: 'PENDING' },
+        's1',
+      ),
+      makeService(
+        {
+          organizationId: ORGANIZATION,
+          workOrderId: 'wo1',
+          status: 'COMPLETED',
+        },
+        's2',
+      ),
+    );
+    workforce.assignments.items.push(
+      makeAssignment({
+        organizationId: ORGANIZATION,
+        workOrderId: 'wo1',
+        workOrderServiceId: 's2',
+        staffId: STAFF,
+      }),
+    );
+  });
+
+  const period = {
+    startDate: '2026-11-17T09:12:00.000Z',
+    endDate: '2026-11-20T10:00:00.000Z',
+    status: 'IN_PROGRESS',
+  };
+
+  it('workforce C21 answers 403 to an operator sending services', async () => {
+    const refused = await edit(
+      'wo1',
+      {
+        ...period,
+        status: 'COMPLETED',
+        services: [{ id: 's1', teamId: TEAM }],
+      },
+      'operator',
+    );
+    expect(refused.status).toBe(403);
+    expect(workOrders.items[0].status).toBe('IN_PROGRESS');
+    expect(workforce.assignments.items).toHaveLength(1);
+
+    expect(
+      (await edit('wo1', { ...period, status: 'COMPLETED' }, 'operator'))
+        .status,
+    ).toBe(200);
+  });
+
+  it('workforce C22 answers 200, 400, 404 and 409', async () => {
+    const assigned = await edit('wo1', {
+      ...period,
+      services: [{ id: 's1', teamId: TEAM }],
+    });
+    expect(assigned.status).toBe(200);
+    expect(
+      workforce.assignments.items.find(
+        (item) => item.workOrderServiceId === 's1',
+      )!.teamId,
+    ).toBe(TEAM);
+
+    expect(
+      (
+        await edit('wo1', {
+          ...period,
+          services: [{ id: 's1', staffId: STAFF, teamId: TEAM }],
+        })
+      ).status,
+    ).toBe(400);
+
+    const missing = await edit('wo1', {
+      ...period,
+      services: [{ id: 'not-a-service' }],
+    });
+    expect(missing.status).toBe(404);
+    expect(missing.body.message).toBe('Work order service not found');
+
+    const closed = await edit('wo1', {
+      ...period,
+      services: [{ id: 's2', teamId: TEAM }],
+    });
+    expect(closed.status).toBe(409);
+    expect(closed.body.message).toBe('Work order service is not open');
+
+    const cleared = await edit('wo1', { ...period, services: [{ id: 's2' }] });
+    expect(cleared.status).toBe(200);
+    expect(
+      workforce.assignments.items.map((item) => item.workOrderServiceId),
+    ).toEqual(['s1']);
   });
 });

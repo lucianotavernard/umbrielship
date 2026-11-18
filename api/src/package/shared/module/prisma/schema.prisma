@@ -335,3 +335,62 @@ model InspectionAnswer {
   @@index([organizationId])
   @@map("inspection_answers")
 }
+
+// workforce
+// Staff, Team and Assignment; `workOrderId` and `workOrderServiceId` are plain ids of the work-order
+// context (no foreign key across contexts, AD-002). An Assignment names exactly one of `staffId` and
+// `teamId` (a CHECK in the migration) and a WorkOrderService has at most one (AD-076).
+
+model Team {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String   @db.Citext
+  specialty      String
+  createdAt      DateTime @default(now())
+
+  staff       Staff[]
+  assignments Assignment[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("teams")
+}
+
+model Staff {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String   @db.Citext
+  specialty      String
+  email          String   @db.Citext
+  phone          String
+  teamId         String?
+  createdAt      DateTime @default(now())
+
+  team        Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments Assignment[]
+
+  @@unique([organizationId, name])
+  @@unique([organizationId, email])
+  @@index([organizationId])
+  @@index([teamId])
+  @@map("staff")
+}
+
+model Assignment {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  workOrderId        String
+  workOrderServiceId String   @unique
+  staffId            String?
+  teamId             String?
+  createdAt          DateTime @default(now())
+
+  staff Staff? @relation(fields: [staffId], references: [id], onDelete: Restrict)
+  team  Team?  @relation(fields: [teamId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([workOrderId])
+  @@index([staffId])
+  @@index([teamId])
+  @@map("assignments")
+}

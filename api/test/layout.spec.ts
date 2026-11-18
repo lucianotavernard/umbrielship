@@ -31,6 +31,9 @@ const aggregates = [
   'identity/user',
   'identity/organization',
   'identity/invitation',
+  'workforce/staff',
+  'workforce/team',
+  'workforce/assignment',
 ];
 
 const read = (path: string) => readFileSync(path, 'utf8');
@@ -93,6 +96,9 @@ describe('acme layout', () => {
       'IUsersRepository',
       'IOrganizationsRepository',
       'IInvitationsRepository',
+      'IStaffRepository',
+      'ITeamsRepository',
+      'IAssignmentsRepository',
     ];
     const contracts = files.filter((path) =>
       path.endsWith('-repository.contract.ts'),
@@ -179,6 +185,16 @@ describe('acme layout', () => {
         'POST /invitations',
         'POST /invitations/:id/resend',
         'POST /invitations/accept',
+        'GET /staff',
+        'GET /staff/:id',
+        'POST /staff',
+        'PUT /staff/:id',
+        'DELETE /staff/:id',
+        'GET /teams',
+        'POST /teams',
+        'PUT /teams/:id',
+        'DELETE /teams/:id',
+        'GET /assignments',
       ].sort((a, b) => a.localeCompare(b)),
     );
 
@@ -199,6 +215,9 @@ describe('acme layout', () => {
         'organization.controller.ts',
         'user.controller.ts',
         'invitation.controller.ts',
+        'staff.controller.ts',
+        'team.controller.ts',
+        'assignment.controller.ts',
       ].sort((a, b) => a.localeCompare(b)),
     );
   });
@@ -303,5 +322,82 @@ describe('acme layout', () => {
     expect(
       writers.filter((line) => line.endsWith("('inspector')")),
     ).toHaveLength(2);
+  });
+
+  it('workforce C8 every write handler of workforce declares the administrator role', () => {
+    const writers: string[] = [];
+
+    for (const file of files.filter(
+      (path) =>
+        path.endsWith('.controller.ts') && path.includes('/package/workforce/'),
+    )) {
+      for (const chunk of read(file).split('\n  async ').slice(0, -1)) {
+        const decorators = chunk.split('\n  }\n').pop()!;
+        const method = decorators.match(/@(Post|Put|Delete)\(/);
+        if (!method) continue;
+
+        writers.push(`${rel(file)} ${method[1]}`);
+        expect(decorators, `${rel(file)} ${method[1]}`).toContain(
+          "@Roles('administrator')",
+        );
+      }
+    }
+
+    expect(writers.sort()).toEqual(
+      [
+        'package/workforce/staff/staff.controller.ts Post',
+        'package/workforce/staff/staff.controller.ts Put',
+        'package/workforce/staff/staff.controller.ts Delete',
+        'package/workforce/team/team.controller.ts Post',
+        'package/workforce/team/team.controller.ts Put',
+        'package/workforce/team/team.controller.ts Delete',
+      ].sort(),
+    );
+  });
+
+  it('workforce C39 keeps workforce free of other contexts and work-order away from its internals', () => {
+    const contexts = ['identity', 'customer', 'work-order'];
+
+    for (const file of files.filter(
+      (path) => path.includes('/package/workforce/') && path.endsWith('.ts'),
+    )) {
+      for (const match of read(file).matchAll(/from '([^']*)'/g)) {
+        for (const context of contexts) {
+          expect(
+            match[1].includes(`package/${context}/`) ||
+              match[1].includes(`../${context}/`),
+            `${rel(file)} imports ${match[1]}`,
+          ).toBe(false);
+        }
+      }
+    }
+
+    const allowed = ['workforce.module.js', 'workforce.facade.js'];
+    let reached = 0;
+    for (const file of files.filter(
+      (path) =>
+        path.includes('/package/work-order/') &&
+        path.endsWith('.ts') &&
+        !path.includes('/__test__/'),
+    )) {
+      for (const match of read(file).matchAll(
+        /from '([^']*package\/workforce[^']*|\.\.\/workforce[^']*)'/g,
+      )) {
+        reached += 1;
+        expect(
+          allowed.some((name) => match[1].endsWith(name)),
+          `${rel(file)} imports ${match[1]}`,
+        ).toBe(true);
+      }
+    }
+    expect(reached).toBeGreaterThan(0);
+
+    expect(read(join(packageRoot, 'workforce/workforce.module.ts'))).toMatch(
+      /exports: \[WorkforceFacade\]/,
+    );
+    expect(read(join(packageRoot, 'work-order/work-order.module.ts'))).toMatch(
+      /imports: \[[^\]]*WorkforceModule[^\]]*\]/,
+    );
+    expect(read(join(srcRoot, 'app.module.ts'))).toMatch(/WorkforceModule,/);
   });
 });

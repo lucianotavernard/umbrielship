@@ -66,7 +66,10 @@ export const ModelName = {
   InspectionAssignment: 'InspectionAssignment',
   InspectionAssignmentItem: 'InspectionAssignmentItem',
   Inspection: 'Inspection',
-  InspectionAnswer: 'InspectionAnswer'
+  InspectionAnswer: 'InspectionAnswer',
+  Team: 'Team',
+  Staff: 'Staff',
+  Assignment: 'Assignment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -280,6 +283,44 @@ export const InspectionAnswerScalarFieldEnum = {
 } as const
 
 export type InspectionAnswerScalarFieldEnum = (typeof InspectionAnswerScalarFieldEnum)[keyof typeof InspectionAnswerScalarFieldEnum]
+
+
+export const TeamScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  specialty: 'specialty',
+  createdAt: 'createdAt'
+} as const
+
+export type TeamScalarFieldEnum = (typeof TeamScalarFieldEnum)[keyof typeof TeamScalarFieldEnum]
+
+
+export const StaffScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  specialty: 'specialty',
+  email: 'email',
+  phone: 'phone',
+  teamId: 'teamId',
+  createdAt: 'createdAt'
+} as const
+
+export type StaffScalarFieldEnum = (typeof StaffScalarFieldEnum)[keyof typeof StaffScalarFieldEnum]
+
+
+export const AssignmentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  workOrderId: 'workOrderId',
+  workOrderServiceId: 'workOrderServiceId',
+  staffId: 'staffId',
+  teamId: 'teamId',
+  createdAt: 'createdAt'
+} as const
+
+export type AssignmentScalarFieldEnum = (typeof AssignmentScalarFieldEnum)[keyof typeof AssignmentScalarFieldEnum]
 
 
 export const SortOrder = {

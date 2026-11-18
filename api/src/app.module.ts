@@ -5,6 +5,7 @@ import { IdentityModule } from './package/identity/identity.module.js';
 import { AuthModule } from './package/shared/module/auth/auth.module.js';
 import { ConfigModule } from './package/shared/module/config/config.module.js';
 import { WorkOrderModule } from './package/work-order/work-order.module.js';
+import { WorkforceModule } from './package/workforce/workforce.module.js';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { WorkOrderModule } from './package/work-order/work-order.module.js';
     IdentityModule,
     CustomerModule,
     WorkOrderModule,
+    WorkforceModule,
   ],
 })
 export class AppModule {}

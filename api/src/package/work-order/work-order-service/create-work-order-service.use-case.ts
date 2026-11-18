@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
+import { WorkforceFacade } from '@/package/workforce/workforce.facade.js';
 
 import {
   WorkOrderService,
@@ -8,6 +9,7 @@ import {
 } from './work-order-service.entity.js';
 import { IWorkOrdersRepository } from '../work-order/contracts/work-order-repository.contract.js';
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract.js';
+import { assertAssigneesExist, assertOpenForAssignee } from './assignee.js';
 
 type CreateWorkOrderServiceUseCaseRequest = {
   organizationId: string;
@@ -17,6 +19,8 @@ type CreateWorkOrderServiceUseCaseRequest = {
   startDate: Date;
   endDate: Date;
   status: WorkOrderServiceStatus;
+  staffId?: string | null;
+  teamId?: string | null;
 };
 
 type CreateWorkOrderServiceUseCaseResponse = {
@@ -28,6 +32,7 @@ export class CreateWorkOrderServiceUseCase {
   constructor(
     private readonly workOrdersRepository: IWorkOrdersRepository,
     private readonly workOrderServicesRepository: IWorkOrderServicesRepository,
+    private readonly workforceFacade: WorkforceFacade,
   ) {}
 
   async handle(
@@ -42,6 +47,14 @@ export class CreateWorkOrderServiceUseCase {
       throw new NotFoundDomainException('Work order not found');
     }
 
+    const assigned = Boolean(input.staffId || input.teamId);
+    await assertAssigneesExist(this.workforceFacade, input.organizationId, [
+      input,
+    ]);
+    if (assigned) {
+      assertOpenForAssignee(workOrder.status, input.status);
+    }
+
     const service = WorkOrderService.create({
       organizationId: input.organizationId,
       workOrderId: input.workOrderId,
@@ -53,6 +66,15 @@ export class CreateWorkOrderServiceUseCase {
     });
 
     await this.workOrderServicesRepository.create(service);
+
+    if (assigned) {
+      await this.workforceFacade.assign(input.organizationId, {
+        workOrderId: input.workOrderId,
+        workOrderServiceId: service.id,
+        staffId: input.staffId ?? null,
+        teamId: input.teamId ?? null,
+      });
+    }
 
     return { service };
   }

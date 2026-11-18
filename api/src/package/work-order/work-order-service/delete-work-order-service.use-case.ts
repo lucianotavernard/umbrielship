@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
+import { WorkforceFacade } from '@/package/workforce/workforce.facade.js';
+
 import { IInspectionsRepository } from '../inspection/contracts/inspection-repository.contract.js';
 import { IWorkOrderServicesRepository } from './contracts/work-order-service-repository.contract.js';
 
@@ -17,6 +19,7 @@ export class DeleteWorkOrderServiceUseCase {
   constructor(
     private readonly workOrderServicesRepository: IWorkOrderServicesRepository,
     private readonly inspectionsRepository: IInspectionsRepository,
+    private readonly workforceFacade: WorkforceFacade,
   ) {}
 
   async handle(input: DeleteWorkOrderServiceUseCaseRequest): Promise<void> {
@@ -39,6 +42,8 @@ export class DeleteWorkOrderServiceUseCase {
       throw new ConflictDomainException('Work order service has inspections');
     }
 
+    // Its Assignment goes with it (AD-064).
+    await this.workforceFacade.unassign(input.organizationId, input.serviceId);
     await this.workOrderServicesRepository.delete(input.serviceId);
   }
 }

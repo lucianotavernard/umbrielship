@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Checks the tenancy migration against a throwaway PostgreSQL 17 (Docker).
-# Usage: migration-check.sh backfill | roles | constraints | drift | seed
+# Usage: migration-check.sh backfill | roles | constraints | drift | seed | workforce
 set -euo pipefail
 
-MODE="${1:?mode: backfill|roles|constraints|drift|seed}"
+MODE="${1:?mode: backfill|roles|constraints|drift|seed|workforce}"
 API_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 MIG_DIR="$API_DIR/src/package/shared/module/prisma/migrations"
 NEW_MIGRATION="20261108120000_add_tenancy"
@@ -127,6 +127,34 @@ seed)
   expect "$(q sd2 "select count(*) from users where email='admin@umbrielship.test'")" 1 "backfilled admin user"
   expect "$before" "1/3" "before seed"
   echo "ok seed"
+  ;;
+workforce)
+  # Landing door 1 of `.specs/features/workforce/plan.md`, on a database with every migration.
+  new_db wf
+  for d in $(ls "$MIG_DIR" | grep -v migration_lock | sort); do psql_db wf < "$MIG_DIR/$d/migration.sql" >/dev/null; done
+  q wf "insert into teams (id,\"organizationId\",name,specialty) values ('tA','oA','Equipe Alfa','Motor'),('tB','oB','Equipe Alfa','Motor');
+        insert into staff (id,\"organizationId\",name,specialty,email,phone,\"teamId\") values
+          ('s1','oA','Rafael Mendes','Mecânico naval','rafael@x.test','1','tA'),('s2','oA','Camila Rocha','Técnica elétrica','camila@x.test','2','tA'),
+          ('s3','oB','Rafael Mendes','Mecânico naval','rafael@x.test','1',null);" >/dev/null
+  refuse() { if q wf "$1" >/dev/null 2>&1; then fail "$2 should be refused"; fi; }
+  refuse "insert into staff (id,\"organizationId\",name,specialty,email,phone) values ('sx','oA','RAFAEL MENDES','m','other@x.test','1')" "staff name in another case"
+  refuse "insert into staff (id,\"organizationId\",name,specialty,email,phone) values ('sy','oA','Outro','m','RAFAEL@X.test','1')" "staff email in another case"
+  refuse "insert into teams (id,\"organizationId\",name,specialty) values ('tx','oA','equipe alfa','m')" "team name in another case"
+  q wf "insert into assignments (id,\"organizationId\",\"workOrderId\",\"workOrderServiceId\",\"staffId\") values ('a1','oA','no-such-work-order','no-such-service','s1')" >/dev/null || fail "assignment with plain work order ids"
+  refuse "insert into assignments (id,\"organizationId\",\"workOrderId\",\"workOrderServiceId\",\"teamId\") values ('a2','oA','w','no-such-service','tA')" "second assignment of one service"
+  refuse "insert into assignments (id,\"organizationId\",\"workOrderId\",\"workOrderServiceId\") values ('a3','oA','w','svc-3')" "assignment with no assignee"
+  refuse "insert into assignments (id,\"organizationId\",\"workOrderId\",\"workOrderServiceId\",\"staffId\",\"teamId\") values ('a4','oA','w','svc-4','s2','tA')" "assignment with both assignees"
+  refuse "delete from staff where id='s1'" "deleting a staff an assignment names"
+  q wf "insert into assignments (id,\"organizationId\",\"workOrderId\",\"workOrderServiceId\",\"teamId\") values ('a5','oB','w','svc-5','tB')" >/dev/null
+  refuse "delete from teams where id='tB'" "deleting a team an assignment names"
+  q wf "delete from teams where id='tA'" >/dev/null || fail "deleting a team no assignment names"
+  expect "$(q wf "select count(*) from staff where \"teamId\" is null and \"organizationId\"='oA'")" 2 "staff left with no team"
+  expect "$(q wf "select count(*) from information_schema.table_constraints where table_name='assignments' and constraint_type='FOREIGN KEY'")" 2 "assignments foreign keys (staff and team only)"
+  for t in staff teams assignments; do
+    [ "$(q wf "select count(*) from pg_indexes where tablename='$t' and indexdef like '%(\"organizationId\"%'")" -ge 1 ] || fail "$t has no organizationId index"
+  done
+  [ "$(q wf "select count(*) from pg_indexes where tablename='assignments' and indexdef like '%(\"workOrderId\")%'")" -ge 1 ] || fail "assignments has no workOrderId index"
+  echo "ok workforce"
   ;;
 *) fail "unknown mode $MODE" ;;
 esac

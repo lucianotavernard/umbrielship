@@ -10,6 +10,11 @@ import { InMemoryInspectionAssignmentsRepository } from '@test/repositories/in-m
 import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
 import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
 import { DeleteWorkOrderServiceUseCase } from '../delete-work-order-service.use-case.js';
+import {
+  inMemoryWorkforce,
+  makeAssignment,
+  makeTeam,
+} from '@test/workforce.js';
 
 const inspectionOf = (assignmentId: string, discarded = false) => {
   const inspection = Inspection.create({
@@ -33,6 +38,7 @@ describe('DeleteWorkOrderServiceUseCase', () => {
     sut = new DeleteWorkOrderServiceUseCase(
       services,
       new InMemoryInspectionsRepository(),
+      inMemoryWorkforce().facade,
     );
     services.items.push(
       makeService({ workOrderId: 'wo1' }, 's1'),
@@ -76,7 +82,11 @@ describe('DeleteWorkOrderServiceUseCase', () => {
   it('inspection C35 refuses a service targeted by an inspected assignment', async () => {
     const assignments = new InMemoryInspectionAssignmentsRepository();
     const inspections = new InMemoryInspectionsRepository(assignments);
-    sut = new DeleteWorkOrderServiceUseCase(services, inspections);
+    sut = new DeleteWorkOrderServiceUseCase(
+      services,
+      inspections,
+      inMemoryWorkforce().facade,
+    );
     assignments.items.push(
       makeInspectionAssignment(
         { workOrderId: 'wo1', service: { id: 's1', name: 'Pintura' } },
@@ -101,7 +111,11 @@ describe('DeleteWorkOrderServiceUseCase', () => {
   it('inspection C36 deletes a service whose assignments have no Inspection', async () => {
     const assignments = new InMemoryInspectionAssignmentsRepository();
     const inspections = new InMemoryInspectionsRepository(assignments);
-    sut = new DeleteWorkOrderServiceUseCase(services, inspections);
+    sut = new DeleteWorkOrderServiceUseCase(
+      services,
+      inspections,
+      inMemoryWorkforce().facade,
+    );
     assignments.items.push(
       makeInspectionAssignment(
         { workOrderId: 'wo1', service: { id: 's1', name: 'Pintura' } },
@@ -118,5 +132,49 @@ describe('DeleteWorkOrderServiceUseCase', () => {
     });
 
     expect(services.items.map((item) => item.id)).toEqual(['s2']);
+  });
+});
+
+describe('DeleteWorkOrderServiceUseCase', () => {
+  it('workforce C24 removes the assignment of the service', async () => {
+    const services = new InMemoryWorkOrderServicesRepository();
+    const workforce = inMemoryWorkforce();
+    services.items.push(
+      makeService({ organizationId: 'A', workOrderId: 'wo1' }, 's1'),
+      makeService({ organizationId: 'A', workOrderId: 'wo1' }, 's2'),
+    );
+    workforce.teams.items.push(makeTeam({ organizationId: 'A' }, 'alfa'));
+    workforce.assignments.items.push(
+      makeAssignment({
+        organizationId: 'A',
+        workOrderId: 'wo1',
+        workOrderServiceId: 's1',
+        staffId: null,
+        teamId: 'alfa',
+      }),
+      makeAssignment({
+        organizationId: 'A',
+        workOrderId: 'wo1',
+        workOrderServiceId: 's2',
+        staffId: null,
+        teamId: 'alfa',
+      }),
+    );
+    const sut = new DeleteWorkOrderServiceUseCase(
+      services,
+      new InMemoryInspectionsRepository(),
+      workforce.facade,
+    );
+
+    await sut.handle({
+      organizationId: 'A',
+      workOrderId: 'wo1',
+      serviceId: 's1',
+    });
+
+    expect(services.items.map((item) => item.id)).toEqual(['s2']);
+    expect(
+      workforce.assignments.items.map((item) => item.workOrderServiceId),
+    ).toEqual(['s2']);
   });
 });
