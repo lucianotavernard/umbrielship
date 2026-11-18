@@ -3,6 +3,7 @@ import {
   ConflictException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -35,6 +36,18 @@ const workOrderServiceBodySchema = z.object({
 });
 
 type WorkOrderServiceBodySchema = z.infer<typeof workOrderServiceBodySchema>;
+
+// A new service may name its Responsável: one Staff or one Team, never both (AD-078).
+const createWorkOrderServiceBodySchema = workOrderServiceBodySchema
+  .extend({ staffId: z.uuid().optional(), teamId: z.uuid().optional() })
+  .refine(
+    (body) => !(body.staffId && body.teamId),
+    'A service takes a staff or a team, not both',
+  );
+
+type CreateWorkOrderServiceBodySchema = z.infer<
+  typeof createWorkOrderServiceBodySchema
+>;
 
 @Controller('/work-orders/:workOrderId/services')
 export class WorkOrderServiceController {
@@ -94,10 +107,17 @@ export class WorkOrderServiceController {
   @Post()
   async create(
     @CurrentUser() user: UserPayload,
-    @Body(new ZodValidationPipe(workOrderServiceBodySchema))
-    body: WorkOrderServiceBodySchema,
+    @Body(new ZodValidationPipe(createWorkOrderServiceBodySchema))
+    body: CreateWorkOrderServiceBodySchema,
     @Param('workOrderId') workOrderId: string,
   ) {
+    // Only an administrator names a Responsável (AD-079).
+    if (user.role !== 'administrator' && (body.staffId || body.teamId)) {
+      throw new ForbiddenException(
+        'Only an administrator assigns staff or teams',
+      );
+    }
+
     try {
       const { service } = await this.createWorkOrderService.handle({
         organizationId: user.organizationId,
@@ -109,6 +129,10 @@ export class WorkOrderServiceController {
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ConflictDomainException) {
+        throw new ConflictException(error.message);
       }
 
       throw error;

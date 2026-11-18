@@ -153,6 +153,75 @@ check "work-order-ui C35 assignment carries the work order status" PENDING "$(wo
 req PUT "/work-orders/$WO1" "$TA" "{$PERIOD,\"status\":\"IN_PROGRESS\"}"
 check "work-order-ui C35 assignment follows the work order edit" IN_PROGRESS "$(work_order_status_of "$AS1")"
 
+echo "workforce"
+req POST /users "$T" "{\"name\":\"Uo\",\"email\":\"uo@x.test\",\"password\":\"password-o1\",\"role\":\"operator\",\"organizationId\":\"$A\"}"
+TO="$(login uo@x.test password-o1)"
+staff_body() { # staff_body <name> <email> [teamId]
+  local team=""; [ -n "${3:-}" ] && team=",\"teamId\":\"$3\""
+  echo "{\"name\":\"$1\",\"specialty\":\"Mecânico naval\",\"email\":\"$2\",\"phone\":\"(13) 99821-4401\"$team}"
+}
+req POST /teams "$TA" '{"name":"Equipe Alfa","specialty":"Motor"}'; TEAM_A="$(echo "$BODY" | jq -r '.team.id')"
+req POST /teams "$TA" '{"name":"equipe alfa","specialty":"Motor"}'; check "workforce C6 team name in another case" 409 "$STATUS"
+req POST /staff "$TA" "{\"name\":\"  Rafael Mendes \",\"specialty\":\" Mecânico naval \",\"email\":\" Rafael@Umbriel.TEST \",\"phone\":\" (13) 99821-4401 \",\"teamId\":\"$TEAM_A\"}"; ST1="$(echo "$BODY" | jq -r '.staff.id')"
+req GET "/staff/$ST1" "$TA"
+check "workforce C1 staff stored trimmed and lower-cased" "Rafael Mendes|Mecânico naval|rafael@umbriel.test|(13) 99821-4401" "$(echo "$BODY" | jq -r '.staff | [.name, .specialty, .email, .phone] | join("|")')"
+req POST /staff "$TA" "$(staff_body 'RAFAEL MENDES' other@umbriel.test)"; check "workforce C2 staff name in another case" 409 "$STATUS"
+req POST /staff "$TA" "$(staff_body 'Outro Nome' RAFAEL@umbriel.test)"; check "workforce C2 staff email in another case" 409 "$STATUS"
+req POST /staff "$TB" "$(staff_body 'Rafael Mendes' rafael@umbriel.test)"; check "workforce C2 same staff name in another organization" 201 "$STATUS"
+req POST /staff "$TA" "$(staff_body 'Camila Rocha' camila@umbriel.test "$TEAM_A")"; ST2="$(echo "$BODY" | jq -r '.staff.id')"
+req GET /teams "$TA"; check "workforce C6 team staffCount" 2 "$(echo "$BODY" | jq -r --arg id "$TEAM_A" '.teams[] | select(.id == $id) | .staffCount')"
+req PUT "/staff/$ST1" "$TA" "{\"name\":\"Rafael Mendes\",\"specialty\":\"Mecânica naval\",\"email\":\"rafael@umbriel.test\",\"phone\":\"1\",\"teamId\":\"$TEAM_A\"}"
+req GET "/staff/$ST1" "$TA"
+check "workforce C4 staff edit reads back" "Mecânica naval/team" "$(echo "$BODY" | jq -r --arg t "$TEAM_A" '.staff.specialty + "/" + (if .staff.teamId == $t then "team" else "no team" end)')"
+# Two creates of one name at once: the unique index keeps one.
+CONCURRENT=()
+for email in c1@umbriel.test c2@umbriel.test; do
+  curl -s -o /dev/null -X POST "http://127.0.0.1:$API_PORT/staff" -H 'Content-Type: application/json' -H "Authorization: Bearer $TA" -d "$(staff_body 'Concorrente' "$email")" &
+  CONCURRENT+=("$!")
+done
+# Only the two requests: a bare `wait` would also wait for the API process.
+wait "${CONCURRENT[@]}"
+req GET /staff "$TA"; check "workforce C38 concurrent staff creates store one" 1 "$(echo "$BODY" | jq '[.staff[] | select(.name == "Concorrente")] | length')"
+# A team with two members and no Assignment leaves them with no team.
+req POST /teams "$TA" '{"name":"Equipe Bravo","specialty":"Hidráulica"}'; TEAM_B="$(echo "$BODY" | jq -r '.team.id')"
+req POST /staff "$TA" "$(staff_body 'João Ferreira' joao@umbriel.test "$TEAM_B")"; ST3="$(echo "$BODY" | jq -r '.staff.id')"
+req POST /staff "$TA" "$(staff_body 'Marina Alves' marina@umbriel.test "$TEAM_B")"; ST4="$(echo "$BODY" | jq -r '.staff.id')"
+req DELETE "/teams/$TEAM_B" "$TA"
+team_of() { req GET "/staff/$1" "$TA"; echo "$BODY" | jq -r '.staff.teamId'; }
+check "workforce C7 team members left with no team" "null/null" "$(team_of "$ST3")/$(team_of "$ST4")"
+# Assignments written with the WorkOrder.
+req POST /teams "$TA" '{"name":"Equipe Charlie","specialty":"Elétrica"}'; TEAM_C="$(echo "$BODY" | jq -r '.team.id')"
+WOA_PERIOD='"startDate":"2026-11-17T09:00:00.000Z","endDate":"2026-11-20T17:00:00.000Z"'
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$WOA_PERIOD,\"status\":\"IN_PROGRESS\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\",\"staffId\":\"$ST1\"},{\"name\":\"Motor\",\"description\":\"Revisão\",\"teamId\":\"$TEAM_A\"},{\"name\":\"Limpeza\",\"description\":\"Convés\"}]}"
+WOA="$(echo "$BODY" | jq -r '.workOrder.id')"
+req GET "/work-orders/$WOA/services" "$TA"
+service_id() { echo "$BODY" | jq -r --arg n "$1" '.services[] | select(.name == $n) | .id'; }
+SV_PINTURA="$(service_id Pintura)"; SV_MOTOR="$(service_id Motor)"; SV_LIMPEZA="$(service_id Limpeza)"
+req GET /assignments "$TA"
+check "workforce C19 assignment stored with the work order" "staff/team" "$(echo "$BODY" | jq -r --arg wo "$WOA" --arg s "$ST1" --arg t "$TEAM_A" '[.assignments[] | select(.workOrderId == $wo)] as $a | (if any($a[]; .staffId == $s and .teamId == null) then "staff" else "-" end) + "/" + (if any($a[]; .teamId == $t and .staffId == null) then "team" else "-" end)')"
+BEFORE="$(total_of)"
+req POST /work-orders "$TA" "{\"vesselId\":\"$VW\",$WOA_PERIOD,\"status\":\"PENDING\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\",\"staffId\":\"00000000-0000-4000-8000-000000000001\"}]}"
+check "workforce C20 unknown staff answers 404" 404 "$STATUS"
+AFTER="$(total_of)"
+check "workforce C20 unknown staff stores no work order" same "$([ -n "$BEFORE" ] && [ "$BEFORE" != null ] && [ "$BEFORE" = "$AFTER" ] && echo same || echo "$BEFORE $AFTER")"
+req POST /work-orders "$TO" "{\"vesselId\":\"$VW\",$WOA_PERIOD,\"status\":\"PENDING\",\"services\":[{\"name\":\"Pintura\",\"description\":\"Casco\",\"staffId\":\"$ST1\"}]}"
+check "workforce C21 operator assignee answers 403" 403 "$STATUS"
+req DELETE "/staff/$ST1" "$TA"; check "workforce C5 staff with assignment answers 409" 409 "$STATUS"
+assignee_of() { req GET /assignments "$TA"; echo "$BODY" | jq -r --arg sv "$1" '[.assignments[] | select(.workOrderServiceId == $sv)] | if length == 0 then "0" elif .[0].teamId != null then "team" else "staff" end'; }
+req PUT "/work-orders/$WOA" "$TA" "{$WOA_PERIOD,\"status\":\"IN_PROGRESS\",\"services\":[{\"id\":\"$SV_PINTURA\",\"teamId\":\"$TEAM_C\"}]}"
+check "workforce C22 assignee replaced by a team" team "$(assignee_of "$SV_PINTURA")"
+req PUT "/work-orders/$WOA" "$TA" "{$WOA_PERIOD,\"status\":\"IN_PROGRESS\",\"services\":[{\"id\":\"$SV_PINTURA\"}]}"
+check "workforce C22 assignee cleared" 0 "$(assignee_of "$SV_PINTURA")"
+req PUT "/work-orders/$WOA" "$TA" "{$WOA_PERIOD,\"status\":\"IN_PROGRESS\",\"services\":[{\"id\":\"$SV_LIMPEZA\",\"staffId\":\"$ST2\"}]}"
+req DELETE "/work-orders/$WOA/services/$SV_LIMPEZA" "$TA"
+check "workforce C24 assignments gone with the service" 0 "$(assignee_of "$SV_LIMPEZA")"
+req PUT "/work-orders/$WOA/services/$SV_MOTOR" "$TA" "{\"name\":\"Motor\",\"description\":\"Revisão\",$WOA_PERIOD,\"status\":\"COMPLETED\"}"
+req DELETE "/teams/$TEAM_A" "$TA"; check "workforce C7 team responsible for a completed service answers 409" 409 "$STATUS"
+req DELETE "/work-orders/$WOA" "$TA"
+req GET /assignments "$TA"
+check "workforce C24 assignments gone with the work order" 0 "$(echo "$BODY" | jq --arg wo "$WOA" '[.assignments[] | select(.workOrderId == $wo)] | length')"
+req DELETE "/staff/$ST1" "$TA"; check "workforce C5 staff without assignment answers 204" 204 "$STATUS"
+
 echo "authorization"
 req GET /organizations "$TA"; check "non-internal member on GET /organizations" 403 "$STATUS"
 req GET /organizations "$T"; check "internal administrator on GET /organizations" 200 "$STATUS"

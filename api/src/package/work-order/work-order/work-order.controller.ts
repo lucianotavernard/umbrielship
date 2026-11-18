@@ -3,6 +3,7 @@ import {
   ConflictException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   NotFoundException,
@@ -28,6 +29,10 @@ import { GetWorkOrderByIdUseCase } from './get-work-order-by-id.use-case.js';
 import { WORK_ORDER_STATUSES } from './work-order.entity.js';
 import { WorkOrderSummary } from './work-order-summary.entity.js';
 
+// One Staff or one Team, never both (AD-076).
+const oneAssignee = (item: { staffId?: string; teamId?: string }) =>
+  !(item.staffId && item.teamId);
+
 const createWorkOrderBodySchema = z.object({
   vesselId: z.uuid(),
   startDate: z.coerce.date(),
@@ -35,7 +40,16 @@ const createWorkOrderBodySchema = z.object({
   status: z.enum(WORK_ORDER_STATUSES),
   // Stored with the WorkOrder's period, PENDING, in the same transaction.
   services: z
-    .array(z.object({ name: z.string().min(1), description: z.string() }))
+    .array(
+      z
+        .object({
+          name: z.string().min(1),
+          description: z.string(),
+          staffId: z.uuid().optional(),
+          teamId: z.uuid().optional(),
+        })
+        .refine(oneAssignee, 'A service takes a staff or a team, not both'),
+    )
     .max(50)
     .optional(),
 });
@@ -46,6 +60,19 @@ const editWorkOrderBodySchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   status: z.enum(WORK_ORDER_STATUSES),
+  // The Responsável of each service listed; neither id clears it (AD-077).
+  services: z
+    .array(
+      z
+        .object({
+          id: z.string().min(1),
+          staffId: z.uuid().optional(),
+          teamId: z.uuid().optional(),
+        })
+        .refine(oneAssignee, 'A service takes a staff or a team, not both'),
+    )
+    .max(50)
+    .optional(),
 });
 
 type EditWorkOrderBodySchema = z.infer<typeof editWorkOrderBodySchema>;
@@ -154,6 +181,16 @@ export class WorkOrderController {
     @Body(new ZodValidationPipe(createWorkOrderBodySchema))
     body: CreateWorkOrderBodySchema,
   ) {
+    // Only an administrator names a Responsável (AD-079).
+    if (
+      user.role !== 'administrator' &&
+      body.services?.some((service) => service.staffId || service.teamId)
+    ) {
+      throw new ForbiddenException(
+        'Only an administrator assigns staff or teams',
+      );
+    }
+
     try {
       const { vesselId, startDate, endDate, status, services } = body;
 
@@ -172,6 +209,10 @@ export class WorkOrderController {
         throw new NotFoundException(error.message);
       }
 
+      if (error instanceof ConflictDomainException) {
+        throw new ConflictException(error.message);
+      }
+
       throw error;
     }
   }
@@ -184,8 +225,14 @@ export class WorkOrderController {
     body: EditWorkOrderBodySchema,
     @Param('id') workOrderId: string,
   ) {
+    if (user.role !== 'administrator' && body.services !== undefined) {
+      throw new ForbiddenException(
+        'Only an administrator assigns staff or teams',
+      );
+    }
+
     try {
-      const { startDate, endDate, status } = body;
+      const { startDate, endDate, status, services } = body;
 
       const result = await this.editWorkOrder.handle({
         organizationId: user.organizationId,
@@ -193,12 +240,17 @@ export class WorkOrderController {
         startDate,
         endDate,
         status,
+        services,
       });
 
       return { workOrder: result.workOrder };
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ConflictDomainException) {
+        throw new ConflictException(error.message);
       }
 
       throw error;

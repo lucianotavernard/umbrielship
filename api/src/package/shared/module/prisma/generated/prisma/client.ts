@@ -121,3 +121,18 @@ export type Inspection = Prisma.InspectionModel
  * 
  */
 export type InspectionAnswer = Prisma.InspectionAnswerModel
+/**
+ * Model Team
+ * 
+ */
+export type Team = Prisma.TeamModel
+/**
+ * Model Staff
+ * 
+ */
+export type Staff = Prisma.StaffModel
+/**
+ * Model Assignment
+ * 
+ */
+export type Assignment = Prisma.AssignmentModel

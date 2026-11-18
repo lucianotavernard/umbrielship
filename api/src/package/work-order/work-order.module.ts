@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 
 import { CustomerModule } from '../customer/customer.module.js';
+import { WorkforceModule } from '../workforce/workforce.module.js';
 import { CompleteInspectionUseCase } from './inspection/complete-inspection.use-case.js';
 import { IInspectionsRepository } from './inspection/contracts/inspection-repository.contract.js';
 import { DiscardInspectionUseCase } from './inspection/discard-inspection.use-case.js';
@@ -47,7 +48,7 @@ import { WorkOrderServiceController } from './work-order-service/work-order-serv
 import { PrismaWorkOrderServicesRepository } from './work-order-service/work-order-service.repository.js';
 
 @Module({
-  imports: [PrismaModule, CustomerModule],
+  imports: [PrismaModule, CustomerModule, WorkforceModule],
   controllers: [
     WorkOrderController,
     WorkOrderServiceController,

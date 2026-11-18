@@ -6,6 +6,7 @@ import { makeService, makeWorkOrder } from '@test/factory.js';
 import { InMemoryWorkOrderServicesRepository } from '@test/repositories/in-memory-work-order-services-repository.js';
 import { InMemoryWorkOrdersRepository } from '@test/repositories/in-memory-work-orders-repository.js';
 import { InMemoryInspectionsRepository } from '@test/repositories/in-memory-inspections-repository.js';
+import { inMemoryWorkforce } from '@test/workforce.js';
 import { CreateWorkOrderServiceUseCase } from '../create-work-order-service.use-case.js';
 import { DeleteWorkOrderServiceUseCase } from '../delete-work-order-service.use-case.js';
 import { EditWorkOrderServiceUseCase } from '../edit-work-order-service.use-case.js';
@@ -40,6 +41,7 @@ describe('WorkOrderService tenancy', () => {
     const create = new CreateWorkOrderServiceUseCase(
       workOrders,
       services,
+      inMemoryWorkforce().facade,
     ).handle({
       organizationId: 'A',
       workOrderId: 'wb',
@@ -66,6 +68,7 @@ describe('WorkOrderService tenancy', () => {
     const remove = new DeleteWorkOrderServiceUseCase(
       services,
       new InMemoryInspectionsRepository(),
+      inMemoryWorkforce().facade,
     ).handle({
       organizationId: 'A',
       workOrderId: 'wb',
