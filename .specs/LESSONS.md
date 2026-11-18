@@ -360,6 +360,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: verification.md finding 12 (web)
 - last seen: 2026-11-18T05:16:36Z
 
+### L-059 - A page that toasts a load error over several reads toasts on the change to any failure, and its test fails several reads at once and one after another.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 1; dashboard.ts failed (web)
+- last seen: 2026-11-18T12:25:58Z
+
+### L-060 - Before a plan fixes how a screen writes stored data, compare it with the capture and with how the same page writes that data elsewhere.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 2; AD-093 (web)
+- last seen: 2026-11-18T12:25:58Z
+
+### L-061 - An accessible name in the capture's aria tree is a label: copy it, or list the departure in Differences from the source.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 3; AD-094 (web)
+- last seen: 2026-11-18T12:25:58Z
+
+### L-062 - A total the capture prints in a table footer is matched, or listed in Differences from the source, before a criterion fixes another one.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 4; AD-095 (web)
+- last seen: 2026-11-18T12:25:58Z
+
+### L-063 - A paged table's fallback to the last page left after a write, and its reset after a create, each get a check.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 5; C27 (web)
+- last seen: 2026-11-18T12:25:58Z
+
+### L-064 - A test for a claim with several triggers exercises each trigger from the state the claim names.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `web` · harmful: 0
+- features: dashboard-redesign
+- evidence: verification.md finding 6; dashboard.spec.ts C27 (web)
+- last seen: 2026-11-18T12:25:58Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
