@@ -1,0 +1,49 @@
+- main:
+  - text: Operação
+  - strong: Equipe técnica
+  - text: Oficina em operação
+  - button "Ajuda"
+  - button "Ativar tema escuro"
+  - button "Notificações"
+  - text: LC
+  - navigation "Navegação estrutural":
+    - link "Equipe técnica":
+      - /url: /equipe-tecnica
+    - text: /
+    - strong: Rafael Mendes
+  - region "Rafael Mendes":
+    - text: PERFIL PROFISSIONAL
+    - heading "Rafael Mendes" [level=1]
+    - paragraph: Mecânico naval
+    - text: Em serviço
+  - region "Resumo profissional":
+    - article:
+      - text: Especialidade
+      - strong: Mecânico naval
+    - article:
+      - text: Equipe vinculada
+      - strong: Equipe Alfa
+    - article:
+      - text: Situação atual
+      - strong: Em serviço
+  - region "Contato profissional":
+    - heading "Contato profissional" [level=2]
+    - paragraph: Informações para comunicação direta.
+    - term: E-mail
+    - definition:
+      - link "rafael.mendes@mareos.com.br":
+        - /url: mailto:rafael.mendes@mareos.com.br
+    - term: Telefone
+    - definition:
+      - link "(13) 99821-4401":
+        - /url: tel:13998214401
+  - region "Alocação na oficina":
+    - heading "Alocação na oficina" [level=2]
+    - paragraph: Vínculo atual do profissional.
+    - strong: Equipe Alfa
+    - text: Equipe técnica Em serviço
+    - link "Voltar à lista da equipe":
+      - /url: /equipe-tecnica
+  - text: MARÉOS · Operação com rumo certo.
+  - link "Equipe técnica":
+    - /url: /equipe-tecnica

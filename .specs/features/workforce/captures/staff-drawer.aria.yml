@@ -1,0 +1,25 @@
+- dialog "Novo profissional":
+  - banner:
+    - text: OPERAÇÃO / EQUIPE TÉCNICA
+    - heading "Novo profissional" [level=2]
+    - paragraph: Adicione um técnico e vincule-o a uma equipe.
+    - button "Fechar cadastro"
+  - text: Nome completo
+  - textbox "Nome completo":
+    - /placeholder: "Ex.: Ana Souza"
+  - text: Especialidade
+  - textbox "Especialidade":
+    - /placeholder: "Ex.: Mecânica naval"
+  - text: Equipe
+  - combobox "Equipe":
+    - option "Equipe Alfa" [selected]
+    - option "Equipe Bravo"
+    - option "Equipe Charlie"
+  - text: E-mail
+  - textbox "E-mail":
+    - /placeholder: nome@mareos.com.br
+  - text: Telefone
+  - textbox "Telefone":
+    - /placeholder: (00) 00000-0000
+  - button "Cancelar"
+  - button "Cadastrar profissional"
