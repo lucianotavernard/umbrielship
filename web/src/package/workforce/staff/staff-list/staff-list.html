@@ -133,7 +133,7 @@
           <label class="sr-only" for="team-filter">Filtrar por equipe</label>
           <select
             id="team-filter"
-            class="h-[33px] max-w-[190px] rounded-[5px] border border-border bg-card px-[9px] py-0 text-[10px] leading-[31px] text-foreground"
+            class="flex h-[33px] w-full max-w-[190px] items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-auto"
             [value]="team()"
             (change)="team.set($any($event.target).value)"
           >

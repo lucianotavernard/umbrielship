@@ -4,7 +4,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideActivity, lucideAnchor, lucideDownload, lucidePlus, lucideSearch, lucideUsers } from '@ng-icons/lucide';
+import {
+  lucideActivity,
+  lucideAnchor,
+  lucideDownload,
+  lucidePlus,
+  lucideSearch,
+  lucideUsers,
+} from '@ng-icons/lucide';
 import { map, Observable } from 'rxjs';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
@@ -50,7 +57,14 @@ type Tab = 'profissionais' | 'equipes';
   selector: 'staff-list',
   imports: [NgIcon, Button, Confirmation, Metric, Sheet, Skeleton, StaffForm, StaffTable, TeamForm, TeamTable],
   viewProviders: [
-    provideIcons({ lucideActivity, lucideAnchor, lucideDownload, lucidePlus, lucideSearch, lucideUsers }),
+    provideIcons({
+      lucideActivity,
+      lucideAnchor,
+      lucideDownload,
+      lucidePlus,
+      lucideSearch,
+      lucideUsers,
+    }),
   ],
   templateUrl: './staff-list.html',
 })
