@@ -1,6 +1,6 @@
 # drawer-standard proofs
 
-**HEAD**: 6ea022c
+**HEAD**: 8f054e1
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 93 pass, 0 fail
@@ -106,19 +106,19 @@
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > drawer-standard D2 Editar ordem de serviço keeps the standard frame, focuses Docagem and puts once 187ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 137ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 120ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 42ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 98ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 339ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 59ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > drawer-standard D12 Adicionar à agenda opens with the Serviço and Planejamento cards and posts once 145ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 114ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 64ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection 369ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 68ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > drawer-standard D2 Editar ordem de serviço keeps the standard frame, focuses Docagem and puts once 223ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 a cell opens the drawer at its hour and adds a pending service to the grid 147ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 122ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 71ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 121ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 46ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 100ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > drawer-standard D12 Adicionar à agenda opens with the Serviço and Planejamento cards and posts once 144ms
 
  Test Files  48 passed (48)
       Tests  312 passed (312)
-   Start at  22:45:01
-   Duration  6.61s (transform 8.69s, setup 9.21s, import 21.54s, tests 51.97s, environment 39.89s)
+   Start at  22:46:07
+   Duration  6.28s (transform 6.23s, setup 8.72s, import 16.68s, tests 50.88s, environment 37.59s)
 ```
