@@ -1,6 +1,6 @@
 # workforce proofs
 
-**HEAD**: a9d6573
+**HEAD**: 9dc6984
 **Tree**: clean
 **Shell**: /bin/sh
 **Result**: 144 pass, 0 fail
@@ -157,21 +157,21 @@
 `Run api` - exit 0
 
 ```
- ✓ src/package/workforce/assignment/__test__/assignment.repository.spec.ts > PrismaAssignmentsRepository > workforce C19 writes one assignment per service 4ms
- ✓ src/package/identity/user/__test__/fetch-users.use-case.spec.ts > FetchUsersUseCase > [C61] returns only the Users with no Membership in the Organization, paged, with the total 3ms
- ✓ src/package/shared/module/mail/__test__/nodemailer-email-sender.spec.ts > Nodemailer email sender > [C58] sends through one transport built from the mail settings 2ms
- ✓ src/package/shared/module/mail/__test__/nodemailer-email-sender.spec.ts > Nodemailer email sender > [C58] connects without authentication when no user is set 0ms
- ✓ src/package/workforce/assignment/__test__/fetch-assignments.use-case.spec.ts > FetchAssignmentsUseCase > workforce C19 returns every assignment of the organization 2ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for an unknown email 2ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] throws WrongCredentialsException for a wrong password 0ms
+ ✓ src/package/identity/auth/__test__/authenticate-user.use-case.spec.ts > AuthenticateUserUseCase > [C15] returns an access token encrypted from { sub: user id } 0ms
+ ✓ src/package/workforce/staff/__test__/get-staff-by-id.use-case.spec.ts > GetStaffByIdUseCase > workforce C3 answers staff not found for another organization 3ms
  ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns plain vessel data for a Vessel of the Organization 1ms
  ✓ src/package/customer/__test__/customer.facade.spec.ts > CustomerFacade > [C40] returns null for an unknown id and for a Vessel of another Organization 0ms
+ ✓ src/package/customer/vessel/__test__/vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given 2ms
 
  Test Files  98 passed (98)
       Tests  376 passed (376)
-   Start at  02:15:25
-   Duration  2.62s (transform 6.57s, setup 0ms, import 30.11s, tests 2.84s, environment 11ms)
+   Start at  07:51:08
+   Duration  2.66s (transform 6.58s, setup 0ms, import 30.88s, tests 3.05s, environment 10ms)
 
-[Nest] 1122458  - 18/11/2026, 02:15:26   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"a4d7e43c-2953-4bab-86f8-f76c0ccb3f2f","message":"redis down"}
-[Nest] 1122700  - 18/11/2026, 02:15:27   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"d8497634-2b22-4419-a1a2-ade7232bf281","message":"redis down"}
+[Nest] 1365006  - 18/11/2026, 07:51:08   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"dest","invitationId":"9f7bb100-c29d-4a57-9aaf-a5a615545f21","message":"redis down"}
+[Nest] 1365267  - 18/11/2026, 07:51:09   ERROR [identity] {"operation":"invitation_enqueue_failed","organizationId":"organization","invitationId":"000774f9-6e2f-414f-98d5-23142a8148de","message":"redis down"}
 ```
 
 `Run smoke` - exit 0
@@ -197,21 +197,21 @@ smoke: all checks passed
 `Run web` - exit 0
 
 ```
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C25 sends the responsável of each service chosen by an administrator 93ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C67 Novo compromisso and Adicionar compromisso neste dia start at the selected day at 08:00 62ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 32ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 55ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C25 shows no responsável to an operator 62ms
- ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > drawer-standard D12 Adicionar à agenda opens with the Serviço and Planejamento cards and posts once 84ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26 edits the responsável of each service and limits closed ones 84ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the assignments are not loaded and toasts a failure 85ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the teams read is pending 65ms
- ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26 shows no services to an operator editing 48ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C69 shows no team, availability, tide or demo text 28ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included 43ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation 70ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message 42ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > work-order-ui C70 shows skeletons while loading and a toast when a request fails 61ms
+ ✓  web  src/package/work-order/agenda/__test__/agenda.spec.ts > Agenda > drawer-standard D12 Adicionar à agenda opens with the Serviço and Planejamento cards and posts once 92ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26 edits the responsável of each service and limits closed ones 89ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the assignments are not loaded and toasts a failure 87ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41 edits without services while the teams read is pending 68ms
+ ✓  web  src/package/work-order/work-order/__test__/work-order-drawer.spec.ts > WorkOrderDrawer > workforce C26 shows no services to an operator editing 49ms
 
  Test Files  59 passed (59)
       Tests  363 passed (363)
-   Start at  02:15:49
-   Duration  5.18s (transform 5.62s, setup 7.05s, import 15.05s, tests 44.83s, environment 36.80s)
+   Start at  07:51:33
+   Duration  5.13s (transform 5.35s, setup 6.55s, import 15.01s, tests 45.66s, environment 36.51s)
 ```
 
 `bash api/test/db/migration-check.sh workforce` - exit 0
