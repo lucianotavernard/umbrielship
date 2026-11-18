@@ -1,0 +1,129 @@
+- main:
+  - text: Operação
+  - strong: Visão geral
+  - text: Oficina em operação
+  - button "Ajuda"
+  - button "Notificações"
+  - text: LC QUARTA-FEIRA, 18 DE JUNHO DE 2025
+  - heading "Bom dia, Lucas ☀" [level=1]
+  - paragraph: Aqui está o resumo da operação da sua oficina hoje.
+  - button "Nova ordem de serviço"
+  - region "Indicadores da operação":
+    - article: Ordens em aberto 24 12% vs. semana passada 6 com prioridade alta
+    - article: Em execução 08 2 desde ontem 4 equipes mobilizadas
+    - article: Aguardando peças 03 1 desde ontem 2 entregas previstas hoje
+    - article: Concluídas no mês 37 8,4% vs. mês passado 92% no prazo
+  - article:
+    - heading "Agenda de serviços" [level=2]
+    - paragraph: O que está acontecendo na oficina
+    - button "Esta semana"
+    - text: QUA
+    - strong: "18"
+    - text: 08:30
+    - strong: Santa Maria Revisão
+    - text: Revisão do motor principal · Equipe Alfa
+    - button "Mais opções"
+    - text: 10:00
+    - strong: Lula Branca Hidráulica
+    - text: Troca do sistema hidráulico · Equipe Bravo
+    - button "Mais opções"
+    - text: 13:30
+    - strong: Estrela do Sul Mecânica
+    - text: Manutenção do guincho · Equipe Charlie
+    - button "Mais opções"
+    - button "Ver agenda completa"
+  - article:
+    - heading "Equipes em campo" [level=2]
+    - paragraph: Disponibilidade das equipes
+    - button "Mais opções"
+    - strong: Equipe Alfa
+    - text: Motor · 2 técnicos Em serviço
+    - strong: Equipe Bravo
+    - text: Hidráulica · 3 técnicos Em serviço
+    - strong: Equipe Charlie
+    - text: Elétrica · 2 técnicos Disponível 7 técnicos ativos RM JP +5
+  - heading "Ordens de serviço" [level=2]
+  - paragraph: Acompanhe e gerencie os serviços da sua frota
+  - button "Exportar"
+  - button "Filtros 2"
+  - tablist "Filtrar ordens":
+    - tab "Todas as ordens 24" [selected]
+    - tab "Em andamento"
+    - tab "Aguardando"
+    - tab "Agendadas"
+  - textbox "Buscar ordens":
+    - /placeholder: Buscar ordem...
+  - text: K
+  - table:
+    - rowgroup:
+      - row "EMBARCAÇÃO SERVIÇO EQUIPE PRAZO STATUS Ações":
+        - columnheader "EMBARCAÇÃO"
+        - columnheader "SERVIÇO"
+        - columnheader "EQUIPE"
+        - columnheader "PRAZO"
+        - columnheader "STATUS"
+        - columnheader "Ações"
+    - rowgroup:
+      - row "Santa Maria OS-2481 · Marcos Oliveira Revisão do motor principal MO Equipe Alfa Hoje, 14:30 Em andamento Mais opções para Santa Maria":
+        - cell "Santa Maria OS-2481 · Marcos Oliveira":
+          - strong: Santa Maria
+          - text: OS-2481 · Marcos Oliveira
+        - cell "Revisão do motor principal"
+        - cell "MO Equipe Alfa"
+        - cell "Hoje, 14:30"
+        - cell "Em andamento"
+        - cell "Mais opções para Santa Maria":
+          - button "Mais opções para Santa Maria"
+      - row "Lula Branca OS-2480 · Pescados Atlântico Troca do sistema hidráulico PA Equipe Bravo Hoje, 16:00 Aguardando peça Mais opções para Lula Branca":
+        - cell "Lula Branca OS-2480 · Pescados Atlântico":
+          - strong: Lula Branca
+          - text: OS-2480 · Pescados Atlântico
+        - cell "Troca do sistema hidráulico"
+        - cell "PA Equipe Bravo"
+        - cell "Hoje, 16:00"
+        - cell "Aguardando peça"
+        - cell "Mais opções para Lula Branca":
+          - button "Mais opções para Lula Branca"
+      - row "Maré Alta OS-2479 · Roberto Nunes Inspeção elétrica e sonar RN Equipe Alfa Amanhã, 09:00 Agendada Mais opções para Maré Alta":
+        - cell "Maré Alta OS-2479 · Roberto Nunes":
+          - strong: Maré Alta
+          - text: OS-2479 · Roberto Nunes
+        - cell "Inspeção elétrica e sonar"
+        - cell "RN Equipe Alfa"
+        - cell "Amanhã, 09:00"
+        - cell "Agendada"
+        - cell "Mais opções para Maré Alta":
+          - button "Mais opções para Maré Alta"
+      - row "Estrela do Sul OS-2478 · Pesca Forte Ltda. Manutenção do guincho de rede PF Equipe Charlie Amanhã, 11:30 Em andamento Mais opções para Estrela do Sul":
+        - cell "Estrela do Sul OS-2478 · Pesca Forte Ltda.":
+          - strong: Estrela do Sul
+          - text: OS-2478 · Pesca Forte Ltda.
+        - cell "Manutenção do guincho de rede"
+        - cell "PF Equipe Charlie"
+        - cell "Amanhã, 11:30"
+        - cell "Em andamento"
+        - cell "Mais opções para Estrela do Sul":
+          - button "Mais opções para Estrela do Sul"
+      - row "São Pedro II OS-2477 · André Carvalho Reparo na bomba de porão AC Equipe Bravo 18 jun, 15:00 Aguardando aprovação Mais opções para São Pedro II":
+        - cell "São Pedro II OS-2477 · André Carvalho":
+          - strong: São Pedro II
+          - text: OS-2477 · André Carvalho
+        - cell "Reparo na bomba de porão"
+        - cell "AC Equipe Bravo"
+        - cell "18 jun, 15:00"
+        - cell "Aguardando aprovação"
+        - cell "Mais opções para São Pedro II":
+          - button "Mais opções para São Pedro II"
+  - text: Exibindo
+  - strong: 1–5
+  - text: de
+  - strong: "24"
+  - text: ordens
+  - button "Página anterior"
+  - button "1"
+  - button "2"
+  - button "3"
+  - text: ...
+  - button "8"
+  - button "Próxima página"
+  - text: MARÉOS · Operação com rumo certo. Última atualização há 2 min

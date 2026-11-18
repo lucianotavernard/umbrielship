@@ -1,0 +1,117 @@
+- main:
+  - text: Operação
+  - strong: Equipe técnica
+  - text: Oficina em operação
+  - button "Ajuda"
+  - button "Ativar tema escuro"
+  - button "Notificações"
+  - text: LC OPERAÇÃO / PESSOAS
+  - heading "Equipe técnica" [level=1]
+  - paragraph: Conheça os profissionais e organize os times da oficina.
+  - button "Cadastrar profissional"
+  - region "Resumo da equipe":
+    - article:
+      - text: Profissionais cadastrados
+      - strong: "06"
+      - text: na equipe
+    - article:
+      - text: Times em operação
+      - strong: "03"
+      - text: equipes
+    - article:
+      - text: Disponíveis agora
+      - strong: "03"
+      - text: disponíveis
+  - region "Profissionais":
+    - heading "Profissionais" [level=2]
+    - paragraph: Cadastro e alocação dos técnicos da oficina.
+    - button "Selecione profissionais para exportar" [disabled]: Exportar
+    - text: Buscar profissional
+    - textbox "Buscar profissional":
+      - /placeholder: Buscar profissional...
+    - text: Filtrar por equipe
+    - combobox "Filtrar por equipe":
+      - option "Todas as equipes" [selected]
+      - option "Equipe Alfa"
+      - option "Equipe Bravo"
+      - option "Equipe Charlie"
+    - group "Filtrar por especialidade":
+      - button "Todas 6" [pressed]
+      - button "Especialista hidráulico 1"
+      - button "Mecânico naval 2"
+      - button "Técnica de docagem 1"
+      - button "Técnica de manutenção 1"
+      - button "Técnica elétrica 1"
+    - table:
+      - rowgroup:
+        - row "Selecionar todos os profissionais visíveis PROFISSIONAL ESPECIALIDADE EQUIPE CONTATO STATUS":
+          - columnheader "Selecionar todos os profissionais visíveis":
+            - checkbox "Selecionar todos os profissionais visíveis"
+          - columnheader "PROFISSIONAL"
+          - columnheader "ESPECIALIDADE"
+          - columnheader "EQUIPE"
+          - columnheader "CONTATO"
+          - columnheader "STATUS"
+      - rowgroup:
+        - row "Selecionar profissional Rafael Mendes Rafael Mendes Mecânico naval Equipe Alfa rafael.mendes@mareos.com.br (13) 99821-4401 Em serviço":
+          - cell "Selecionar profissional Rafael Mendes":
+            - checkbox "Selecionar profissional Rafael Mendes"
+          - cell "Rafael Mendes":
+            - link "Rafael Mendes":
+              - /url: /equipe-tecnica/tech-1
+          - cell "Mecânico naval"
+          - cell "Equipe Alfa"
+          - cell "rafael.mendes@mareos.com.br (13) 99821-4401"
+          - cell "Em serviço"
+        - row "Selecionar profissional Camila Rocha Camila Rocha Técnica elétrica Equipe Alfa camila.rocha@mareos.com.br (13) 99712-3088 Disponível":
+          - cell "Selecionar profissional Camila Rocha":
+            - checkbox "Selecionar profissional Camila Rocha"
+          - cell "Camila Rocha":
+            - link "Camila Rocha":
+              - /url: /equipe-tecnica/tech-2
+          - cell "Técnica elétrica"
+          - cell "Equipe Alfa"
+          - cell "camila.rocha@mareos.com.br (13) 99712-3088"
+          - cell "Disponível"
+        - row "Selecionar profissional João Ferreira João Ferreira Especialista hidráulico Equipe Bravo joao.ferreira@mareos.com.br (13) 99640-1157 Em serviço":
+          - cell "Selecionar profissional João Ferreira":
+            - checkbox "Selecionar profissional João Ferreira"
+          - cell "João Ferreira":
+            - link "João Ferreira":
+              - /url: /equipe-tecnica/tech-3
+          - cell "Especialista hidráulico"
+          - cell "Equipe Bravo"
+          - cell "joao.ferreira@mareos.com.br (13) 99640-1157"
+          - cell "Em serviço"
+        - row "Selecionar profissional Marina Alves Marina Alves Técnica de manutenção Equipe Bravo marina.alves@mareos.com.br (13) 99154-6620 Disponível":
+          - cell "Selecionar profissional Marina Alves":
+            - checkbox "Selecionar profissional Marina Alves"
+          - cell "Marina Alves":
+            - link "Marina Alves":
+              - /url: /equipe-tecnica/tech-4
+          - cell "Técnica de manutenção"
+          - cell "Equipe Bravo"
+          - cell "marina.alves@mareos.com.br (13) 99154-6620"
+          - cell "Disponível"
+        - row "Selecionar profissional Pedro Nascimento Pedro Nascimento Mecânico naval Equipe Charlie pedro.nascimento@mareos.com.br (13) 99771-2083 Folga":
+          - cell "Selecionar profissional Pedro Nascimento":
+            - checkbox "Selecionar profissional Pedro Nascimento"
+          - cell "Pedro Nascimento":
+            - link "Pedro Nascimento":
+              - /url: /equipe-tecnica/tech-5
+          - cell "Mecânico naval"
+          - cell "Equipe Charlie"
+          - cell "pedro.nascimento@mareos.com.br (13) 99771-2083"
+          - cell "Folga"
+        - row "Selecionar profissional Bianca Costa Bianca Costa Técnica de docagem Equipe Charlie bianca.costa@mareos.com.br (13) 99932-7804 Disponível":
+          - cell "Selecionar profissional Bianca Costa":
+            - checkbox "Selecionar profissional Bianca Costa"
+          - cell "Bianca Costa":
+            - link "Bianca Costa":
+              - /url: /equipe-tecnica/tech-6
+          - cell "Técnica de docagem"
+          - cell "Equipe Charlie"
+          - cell "bianca.costa@mareos.com.br (13) 99932-7804"
+          - cell "Disponível"
+    - text: Exibindo 6 de 6 profissionais Equipe técnica MARÉOS
+  - text: MARÉOS · Operação com rumo certo. Gestão da equipe técnica
