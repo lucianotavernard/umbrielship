@@ -336,6 +336,7 @@ The Agenda shows each service at its start and each WorkOrder at its Docagem and
 | An item opens "DETALHES DO COMPROMISSO" | an item opens the WorkOrder | y - AD-047 |
 | Every event shown | items of a `CANCELLED` WorkOrder hidden | y - AD-047 |
 | "Adicionar à agenda" drawer with Embarcação, Serviço, Tipo, Equipe, Data, Horário; "Reserve um horário para a embarcação e equipe." | Ordem de serviço, Serviço, Descrição, Início, Fim; "Reserve um horário para um serviço da ordem." | y - AD-037, AD-049 |
+| "Central de inspeções" tabs joined to a rule | the pill tabs of "Lista de ordens", no rule under them | y - AD-096 |
 
 ## Sources
 

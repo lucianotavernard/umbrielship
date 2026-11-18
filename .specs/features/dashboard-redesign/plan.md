@@ -205,6 +205,7 @@ WorkOrders of the active Organization, in the mareos look.
 | "Exibindo 1–2 de 24 ordens": the total of every order | the total of the tab and the search ("Exibindo 1–2 de 2 ordens") | y - AD-095 |
 | "Bom dia" at any hour | "Bom dia", "Boa tarde" or "Boa noite" by the hour | y - AD-092 |
 | Faint card values in dark mode | values at 4.5:1 or more | y - AD-092 |
+| Underlined tabs with "Buscar ordem..." to their right | the pill tabs of "Lista de ordens", then "Buscar ordem..." across the panel, no rule under the tabs | y - AD-097 |
 
 ## Sources
 

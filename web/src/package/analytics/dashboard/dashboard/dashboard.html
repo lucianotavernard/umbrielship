@@ -279,21 +279,22 @@
       </button>
     </div>
 
-    <div
-      class="mt-[17px] flex min-h-[41px] flex-col-reverse items-start gap-2 border-b border-border pb-2 sm:flex-row sm:items-center sm:justify-between sm:pb-0"
-    >
-      <div role="tablist" aria-label="Filtrar ordens" class="flex h-[41px] w-full items-stretch gap-[17px] overflow-x-auto sm:w-auto sm:gap-[18px]">
+    <div class="mt-[17px] flex flex-col gap-[11px]">
+      <div role="tablist" aria-label="Filtrar ordens" class="flex items-center gap-[7px] overflow-x-auto pb-px">
         @for (item of tabs; track item.value) {
           <button
             type="button"
             role="tab"
-            class="relative flex shrink-0 items-center gap-[7px] px-px text-[10px] whitespace-nowrap text-muted-foreground aria-selected:font-semibold aria-selected:text-primary aria-selected:after:absolute aria-selected:after:inset-x-0 aria-selected:after:-bottom-px aria-selected:after:h-0.5 aria-selected:after:rounded-sm aria-selected:after:bg-primary"
+            class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
             [attr.aria-selected]="tab() === item.value"
             (click)="pickTab(item.value)"
           >
             {{ item.label }}
             @if (item.value === 'ALL') {
-              <span data-slot="tab-count" class="rounded-[4px] bg-primary/10 px-[5px] py-0.5 text-[9px] text-primary">
+              <span
+                data-slot="tab-count"
+                class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] text-muted-foreground group-aria-selected:bg-primary/10 group-aria-selected:text-primary"
+              >
                 {{ tableReady() ? rows().length : '–' }}
               </span>
             }
@@ -301,13 +302,13 @@
         }
       </div>
       <label
-        class="flex h-7 w-full items-center gap-1.5 rounded-[5px] border border-border px-[7px] text-muted-foreground focus-within:border-primary/50 sm:w-[188px]"
+        class="flex h-[34px] w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50"
       >
         <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
         <input
           type="search"
           aria-label="Buscar ordens"
-          class="min-w-0 flex-1 border-0 bg-transparent text-[9px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+          class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
           placeholder="Buscar ordem..."
           [value]="search()"
           (input)="setSearch($any($event.target).value)"
