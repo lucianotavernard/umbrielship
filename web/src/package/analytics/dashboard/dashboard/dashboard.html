@@ -11,9 +11,13 @@
       >
         {{ greeting.text }}, {{ firstName() }}
         @if (greeting.icon === 'sun') {
-          <ng-icon data-slot="greeting-icon" data-icon="sun" name="lucideSun" class="!size-[17px] text-[#d9a247]" aria-hidden="true" />
+          <span data-slot="greeting-icon" data-icon="sun" class="grid place-items-center text-[#d9a247]" aria-hidden="true">
+            <ng-icon name="lucideSun" class="!size-[17px]" />
+          </span>
         } @else {
-          <ng-icon data-slot="greeting-icon" data-icon="moon" name="lucideMoon" class="!size-[17px] text-[#8a9bc0]" aria-hidden="true" />
+          <span data-slot="greeting-icon" data-icon="moon" class="grid place-items-center text-[#8a9bc0]" aria-hidden="true">
+            <ng-icon name="lucideMoon" class="!size-[17px]" />
+          </span>
         }
       </h1>
       <p class="text-[12px] text-muted-foreground">Aqui está o resumo da operação da sua oficina hoje.</p>
@@ -109,7 +113,7 @@
         </button>
       </div>
 
-      <div data-slot="agenda-list" class="mt-5 h-[152px] overflow-y-auto pr-1">
+      <div data-slot="agenda-list" class="mt-5 h-[144px] overflow-y-auto pr-1">
         @if (!agendaReady()) {
           @for (slot of [1, 2, 3]; track slot) {
             <div data-slot="agenda-skeleton" class="mb-3 flex items-center gap-3">
