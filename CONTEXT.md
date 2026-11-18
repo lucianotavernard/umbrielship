@@ -57,5 +57,17 @@ A copy of an InspectionTemplate's name and questions placed on one WorkOrder, wi
 *Avoid*: inspection (for the assignment itself), task
 
 **Inspection**:
-One answer sheet of an InspectionAssignment, completed by an `inspector` while the WorkOrder, and the target WorkOrderService when there is one, are `IN_PROGRESS`. Every question is answered with a value of its type or "not applicable", with an optional note except on free text; on closing, the inspector confirms the result, `APPROVED` or `REPROVED`. It keeps the inspector's name and the time, and is never edited. An inspector may discard it: it is hidden from the app and kept in the database. An assignment holds any number of Inspections, and a WorkOrder, WorkOrderService or assignment with an Inspection, discarded ones included, cannot be deleted.
+One answer sheet of an InspectionAssignment, completed by an `inspector` while the WorkOrder, and the target WorkOrderService when there is one, are `IN_PROGRESS`. Every question is answered with a value of its type or "not applicable", with an optional note except on free text; on closing, the inspector confirms the result, `APPROVED` or `REPROVED`. It keeps the inspector's name and the time, and is never edited. An inspector may discard it: it is hidden from the app and kept in the database. An InspectionAssignment holds any number of Inspections, and a WorkOrder, WorkOrderService or InspectionAssignment with an Inspection, discarded ones included, cannot be deleted.
 *Avoid*: vistoria (in identifiers), report, check
+
+**Staff**:
+A person the Organization allocates to WorkOrderServices, shown in the app as "Profissional"; not a User, it never signs in. It has a name, a specialty (free text), an email and a phone, all required, and at most one Team. The name and the email are each unique within its Organization, compared without case. Only an `administrator` creates, edits or deletes it, and every Role reads it. A Staff that is the Responsável of a WorkOrderService cannot be deleted. Its status is derived, never stored: "Em serviço" while it, or its Team, is the Responsável of a WorkOrderService `IN_PROGRESS`, otherwise "Disponível".
+*Avoid*: technician, user, employee
+
+**Team**:
+A group of Staff with a name, unique within its Organization (compared without case), and a specialty; shown in the app as "Equipe". Only an `administrator` creates, edits or deletes it. Deleting it leaves its Staff with no Team; a Team that is the Responsável of a WorkOrderService cannot be deleted. Its status is "Em serviço" while the Team itself is the Responsável of a WorkOrderService `IN_PROGRESS`.
+*Avoid*: crew, squad, time
+
+**Assignment**:
+The Responsável of one WorkOrderService: one Staff or one Team, never both, and at most one per WorkOrderService; shown in the app as "Responsável". It has no period of its own (it lasts as the service's) and nothing checks overlaps between services. An `administrator` sets, changes or clears it in the WorkOrder forms, and a new one is accepted only while the WorkOrder is `PENDING` or `IN_PROGRESS` and the service is not `COMPLETED`. It is deleted with its WorkOrder or its WorkOrderService, and it keeps its Staff or Team from being deleted.
+*Avoid*: allocation (in identifiers), InspectionAssignment (a different thing)

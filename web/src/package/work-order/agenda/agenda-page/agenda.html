@@ -335,6 +335,7 @@
   <appointment-form-ui
     [workOrders]="openWorkOrders()"
     [loading]="submitting()"
+    [assignees]="isAdministrator() ? workforce.options() : null"
     (closed)="closeSheet()"
     (submitted)="addAppointment($event)"
   />

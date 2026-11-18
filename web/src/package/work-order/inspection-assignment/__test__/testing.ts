@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import type { Role } from '../../../identity/user/user.service';
 import { WorkOrderDetail } from '../../work-order/work-order-detail/work-order-detail';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 
 // Renders the WorkOrder page with its assignments, as every assignment spec reaches it.
 
@@ -115,6 +116,7 @@ export async function render(
   controller
     .expectOne('/api/work-orders/wo-1/inspection-assignments')
     .flush({ inspectionAssignments: list });
+  answerWorkforce(controller);
   await settle();
   return fixture.nativeElement as HTMLElement;
 }

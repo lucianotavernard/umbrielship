@@ -14,9 +14,13 @@ import {
   RequiredMark,
 } from '../../../shared/components/ui/drawer';
 import { FormGroup, Input, Label, Select, Textarea } from '../../../shared/components/ui/form';
+import { AssigneeKey, assigneeIds } from '../../../workforce/staff/assignee';
+import { AssigneeOptions, AssigneeSelect } from '../../../workforce/staff/components/assignee-select';
+import type { WorkOrderServiceStatus } from '../../work-order-service/work-order-service.service';
 import {
   CreateWorkOrderRequest,
   WORK_ORDER_STATUSES,
+  WorkOrderServiceAssignee,
   WorkOrderStatus,
   workOrderStatusLabels,
 } from '../work-order.service';
@@ -24,13 +28,20 @@ import {
 /** A Vessel the drawer offers, with the Customer it belongs to. */
 export type WorkOrderFormVessel = { id: string; name: string; customerId: string };
 
-/** The WorkOrder the drawer edits: its Vessel stays, its services are edited on its page. */
+/** A service of the WorkOrder being edited, with its current Responsável (AD-077). */
+export type WorkOrderFormService = { id: string; name: string; status: WorkOrderServiceStatus; assignee: AssigneeKey };
+
+/** The WorkOrder the drawer edits: its Vessel stays; only the Responsável of its services changes here. */
 export type WorkOrderFormValue = {
   vesselId: string;
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
+  services?: WorkOrderFormService[];
 };
+
+/** What the drawer sends: the new WorkOrder, or the edit with the Responsável of each listed service. */
+export type WorkOrderFormSubmit = CreateWorkOrderRequest & { assignees?: WorkOrderServiceAssignee[] };
 
 export const SERVICE_DESCRIPTION_MAX = 240;
 
@@ -48,10 +59,12 @@ type Model = {
   startDate: string;
   endDate: string;
   status: WorkOrderStatus;
-  services: { name: string; description: string }[];
+  services: { name: string; description: string; assignee: AssigneeKey }[];
+  /** The services of the WorkOrder being edited; `original` is the Responsável it had when opened. */
+  existing: (WorkOrderFormService & { original: AssigneeKey })[];
 };
 
-const blankService = () => ({ name: '', description: '' });
+const blankService = () => ({ name: '', description: '', assignee: '' });
 
 /**
  * The mareos "Nova ordem de serviço" drawer (AD-035, AD-044): Embarcação with its Customer read only,
@@ -75,6 +88,7 @@ const blankService = () => ({ name: '', description: '' });
     DrawerAddButton,
     DrawerFooter,
     RequiredMark,
+    AssigneeSelect,
   ],
   viewProviders: [provideIcons({ lucideCalendarDays, lucidePlus, lucideShip, lucideWrench, lucideX })],
   template: `
@@ -144,12 +158,56 @@ const blankService = () => ({ name: '', description: '' });
                     [formField]="workOrderForm.services[index].description"
                   ></textarea>
                 </t-form-group>
+                @if (assignees(); as options) {
+                  <t-form-group>
+                    <label tLabel [for]="'wo-service-assignee-' + index">Responsável</label>
+                    <assignee-select-ui
+                      [selectId]="'wo-service-assignee-' + index"
+                      [options]="options"
+                      [formField]="workOrderForm.services[index].assignee"
+                    />
+                  </t-form-group>
+                }
               </div>
             }
             <button tDrawerAdd type="button" (click)="addService()">
               <ng-icon name="lucidePlus" class="!size-3.5" />
               Adicionar serviço
             </button>
+          </section>
+        }
+
+        @if (workOrder() && assignees() && model().existing.length) {
+          <section
+            tDrawerCard
+            heading="Serviços a realizar"
+            subheading="Defina o responsável de cada serviço"
+            icon="lucideWrench"
+          >
+            @for (service of model().existing; track service.id; let index = $index) {
+              <div tDrawerEntry data-slot="existing-service" [heading]="'Serviço ' + (index + 1)">
+                <t-form-group>
+                  <label tLabel [for]="'wo-existing-name-' + index">Nome do serviço</label>
+                  <input
+                    tInput
+                    type="text"
+                    readonly
+                    class="text-muted-foreground"
+                    [id]="'wo-existing-name-' + index"
+                    [value]="service.name"
+                  />
+                </t-form-group>
+                <t-form-group>
+                  <label tLabel [for]="'wo-existing-assignee-' + index">Responsável</label>
+                  <assignee-select-ui
+                    [selectId]="'wo-existing-assignee-' + index"
+                    [options]="assignees()!"
+                    [only]="isClosed(service) ? service.original : null"
+                    [formField]="workOrderForm.existing[index].assignee"
+                  />
+                </t-form-group>
+              </div>
+            }
           </section>
         }
 
@@ -198,8 +256,10 @@ export class WorkOrderForm {
   workOrder = input<WorkOrderFormValue | null>(null);
   /** A Vessel chosen by the page that opened the drawer (AD-042); the select is then locked. */
   lockedVesselId = input('');
+  /** The "Responsável" choices, for an administrator only; null hides the field (AD-079). */
+  assignees = input<AssigneeOptions | null>(null);
 
-  submitted = output<CreateWorkOrderRequest>();
+  submitted = output<WorkOrderFormSubmit>();
   closed = output<void>();
 
   protected readonly statuses = WORK_ORDER_STATUSES;
@@ -219,7 +279,23 @@ export class WorkOrderForm {
     return vessel ? (this.customerNames().get(vessel.customerId) ?? '') : '';
   });
 
-  model = signal<Model>({ vesselId: '', startDate: '', endDate: '', status: 'PENDING', services: [blankService()] });
+  model = signal<Model>({
+    vesselId: '',
+    startDate: '',
+    endDate: '',
+    status: 'PENDING',
+    services: [blankService()],
+    existing: [],
+  });
+
+  /**
+   * A service that takes no new Responsável: it is COMPLETED, or the WorkOrder is being closed
+   * (AD-068); it keeps the one it had or none.
+   */
+  protected isClosed(service: { status: WorkOrderServiceStatus }) {
+    const status = this.model().status;
+    return service.status === 'COMPLETED' || status === 'COMPLETED' || status === 'CANCELLED';
+  }
 
   workOrderForm = form(this.model, (path) => {
     required(path.vesselId, { message: 'Embarcação é obrigatória' });
@@ -245,6 +321,7 @@ export class WorkOrderForm {
       endDate: '',
       status: 'PENDING',
       services: [blankService()],
+      existing: [],
     });
   }
 
@@ -257,6 +334,7 @@ export class WorkOrderForm {
       endDate: toLocalInput(workOrder.endDate),
       status: workOrder.status,
       services: [],
+      existing: (workOrder.services ?? []).map((service) => ({ ...service, original: service.assignee })),
     });
   }
 
@@ -275,17 +353,21 @@ export class WorkOrderForm {
     if (this.workOrderForm().invalid()) return;
 
     const value = this.workOrderForm().value();
-    const request: CreateWorkOrderRequest = {
+    const request: WorkOrderFormSubmit = {
       vesselId: value.vesselId,
       startDate: new Date(value.startDate).toISOString(),
       endDate: new Date(value.endDate).toISOString(),
       status: value.status,
     };
+    const assigning = this.assignees() !== null;
     if (!this.workOrder()) {
       request.services = value.services.map((service) => ({
         name: service.name.trim(),
         description: service.description.trim(),
+        ...(assigning ? assigneeIds(service.assignee) : {}),
       }));
+    } else if (assigning && value.existing.length) {
+      request.assignees = value.existing.map((service) => ({ id: service.id, ...assigneeIds(service.assignee) }));
     }
     this.submitted.emit(request);
   }

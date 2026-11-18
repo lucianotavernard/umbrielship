@@ -28,7 +28,9 @@ import { Metric } from '../../../shared/components/ui/metric';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
-import { WorkOrderForm, WorkOrderFormValue } from '../components/work-order-form';
+import { assigneeKeyOf } from '../../../workforce/staff/assignee';
+import { workforceResources } from '../../../workforce/staff/workforce-resources';
+import { WorkOrderForm, WorkOrderFormSubmit, WorkOrderFormValue } from '../components/work-order-form';
 import { WorkOrderTable } from '../components/work-order-table';
 import { workOrdersCsv } from '../work-order-csv';
 import {
@@ -43,7 +45,7 @@ import {
   workOrderMetrics,
   WorkOrderRow,
 } from '../work-order-filters';
-import { CreateWorkOrderRequest, GetWorkOrdersResponse, WorkOrderService } from '../work-order.service';
+import { GetWorkOrdersResponse, WorkOrderService } from '../work-order.service';
 
 /** The mareos "Ordens de serviço": every WorkOrder of the Organization on one page (AD-040). */
 @Component({
@@ -67,6 +69,9 @@ import { CreateWorkOrderRequest, GetWorkOrdersResponse, WorkOrderService } from 
 })
 export class WorkOrderList {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
+  /** Only an administrator names a Responsável (AD-079). */
+  protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
+  protected readonly workforce = workforceResources(() => this.isAdministrator());
   private readonly workOrderService = inject(WorkOrderService);
   private readonly workOrderForm = viewChild(WorkOrderForm);
 
@@ -201,11 +206,18 @@ export class WorkOrderList {
   }
 
   openEdit(order: WorkOrderRow) {
+    const assignments = this.workforce.byService();
     const value: WorkOrderFormValue = {
       vesselId: order.vesselId,
       startDate: order.startDate,
       endDate: order.endDate,
       status: order.status,
+      services: order.services.map((service) => ({
+        id: service.id,
+        name: service.name,
+        status: service.status,
+        assignee: assigneeKeyOf(assignments.get(service.id)),
+      })),
     };
     this.editing.set(value);
     this.editingId.set(order.id);
@@ -217,7 +229,7 @@ export class WorkOrderList {
     this.isSheetActive.set(false);
   }
 
-  save(request: CreateWorkOrderRequest) {
+  save(request: WorkOrderFormSubmit) {
     const editingId = this.editingId();
     this.submitting.set(true);
 
@@ -226,6 +238,7 @@ export class WorkOrderList {
           startDate: request.startDate,
           endDate: request.endDate,
           status: request.status,
+          ...(request.assignees ? { services: request.assignees } : {}),
         })
       : this.workOrderService.createWorkOrder(request);
 
@@ -248,6 +261,9 @@ export class WorkOrderList {
         this.editing.set(null);
         this.editingId.set(null);
         this.workOrderResource.reload();
+        const assigned =
+          !!request.assignees || !!request.services?.some((service) => service.staffId || service.teamId);
+        if (assigned) this.workforce.reload();
       },
       error: (response) => {
         // The drawer stays open with what was typed.

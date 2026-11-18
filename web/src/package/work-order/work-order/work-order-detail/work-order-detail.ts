@@ -43,9 +43,10 @@ import {
   WorkOrderServiceService,
 } from '../../work-order-service/work-order-service.service';
 import { WorkOrderServiceImageService } from '../../work-order-service-image/work-order-service-image.service';
-import { WorkOrderForm, WorkOrderFormValue } from '../components/work-order-form';
+import { assigneeKeyOf, responsavelLabel } from '../../../workforce/staff/assignee';
+import { workforceResources } from '../../../workforce/staff/workforce-resources';
+import { WorkOrderForm, WorkOrderFormSubmit, WorkOrderFormValue } from '../components/work-order-form';
 import {
-  CreateWorkOrderRequest,
   GetWorkOrderResponse,
   workOrderCode,
   WorkOrderService,
@@ -86,6 +87,18 @@ import {
 })
 export class WorkOrderDetail {
   protected readonly canWrite = inject(AuthenticationService).canWrite;
+  /** Every Role reads the Responsável (AD-083); only an administrator names one (AD-079). */
+  protected readonly workforce = workforceResources(() => true);
+  /** "Responsável: …" or "Sem responsável" for each service. */
+  responsaveis = computed(() => {
+    const byService = this.workforce.byService();
+    return new Map(
+      this.services().map((service) => [
+        service.id,
+        responsavelLabel(byService.get(service.id), this.workforce.staffNames(), this.workforce.teamNames()),
+      ]),
+    );
+  });
   protected readonly isAdministrator = inject(AuthenticationService).isAdministrator;
   private readonly role = inject(AuthenticationService).role;
   protected readonly isInspector = computed(() => this.role() === 'inspector');
@@ -157,8 +170,20 @@ export class WorkOrderDetail {
   /** The drawer edits this WorkOrder with its Vessel locked. */
   formValue = computed<WorkOrderFormValue | null>(() => {
     const order = this.workOrder();
+    const byService = this.workforce.byService();
     return order
-      ? { vesselId: order.vessel.vesselId, startDate: order.startDate, endDate: order.endDate, status: order.status }
+      ? {
+          vesselId: order.vessel.vesselId,
+          startDate: order.startDate,
+          endDate: order.endDate,
+          status: order.status,
+          services: this.services().map((service) => ({
+            id: service.id,
+            name: service.name,
+            status: service.status,
+            assignee: assigneeKeyOf(byService.get(service.id)),
+          })),
+        }
       : null;
   });
   private readonly vessel = computed(() => resourceValue(this.vesselResource)?.vessel ?? null);
@@ -268,10 +293,15 @@ export class WorkOrderDetail {
     this.isCreateServiceSheetActive.set(false);
   }
 
-  editWorkOrder(request: CreateWorkOrderRequest) {
+  editWorkOrder(request: WorkOrderFormSubmit) {
     this.submitting.set(true);
     this.workOrderService
-      .updateWorkOrder(this.id(), { startDate: request.startDate, endDate: request.endDate, status: request.status })
+      .updateWorkOrder(this.id(), {
+        startDate: request.startDate,
+        endDate: request.endDate,
+        status: request.status,
+        ...(request.assignees ? { services: request.assignees } : {}),
+      })
       .subscribe({
         next: () => {
           toast.success('Ordem atualizada com sucesso', {
@@ -280,6 +310,7 @@ export class WorkOrderDetail {
           this.submitting.set(false);
           this.closeEditWorkOrderSheet();
           this.workOrderResource.reload();
+          if (request.assignees) this.workforce.reload();
         },
         error: (response) => {
           this.submitting.set(false);
@@ -300,6 +331,7 @@ export class WorkOrderDetail {
         this.submitting.set(false);
         this.closeCreateServiceSheet();
         this.servicesResource.reload();
+        if (service.staffId || service.teamId) this.workforce.reload();
       },
       error: (response) => {
         this.submitting.set(false);

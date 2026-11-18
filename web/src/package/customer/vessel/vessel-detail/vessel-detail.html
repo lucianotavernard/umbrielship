@@ -166,6 +166,7 @@
     [vessels]="formVessels()"
     [customerNames]="formCustomerNames()"
     [loading]="submitting()"
+    [assignees]="isAdministrator() ? workforce.options() : null"
     (closed)="closeCreateWorkOrderSheet()"
     (submitted)="createWorkOrder($event)"
   />

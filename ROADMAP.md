@@ -43,3 +43,9 @@ Controllers map the known domain exceptions to 404 and 409 and rethrow the rest,
 ## 7. Pagination fix (proposal)
 
 List controllers compute `take = page * 10` with `skip = (page - 1) * 10`, so page 2 returns up to 20 rows, and `customer-list` in the web requests `/api/customers` without a `page` parameter. Make the page size consistent (`take = 10`), pass `page` from the web list screens that have a paginator, and align `total` with the page filter.
+
+## 8. Workforce: Staff, Team and Assignment
+
+An Organization keeps its technicians and teams and names one of them as the Responsável of each WorkOrderService. Planned in `.specs/features/workforce/plan.md`.
+
+**Status:** built in `workforce`. Staff and Teams are created, listed, read, edited and deleted by an `administrator` (`/staff`, `/teams`); `GET /assignments` lists the Responsável of every WorkOrderService, written through `POST /work-orders`, `PUT /work-orders/:id` and `POST /work-orders/:id/services`. Web: "Equipe técnica" (`/staff`, tabs "Profissionais" and "Equipes"), the professional's profile (`/staff/:id`), and "Responsável" in the WorkOrder, "Novo serviço" and "Adicionar à agenda" drawers and on the WorkOrder detail.

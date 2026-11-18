@@ -138,6 +138,7 @@
           [canWrite]="canWrite()"
           [loading]="loadingServices()"
           [services]="services()"
+          [responsaveis]="responsaveis()"
           (fileSelected)="upload($event)"
         />
       </section>
@@ -192,6 +193,7 @@
     [vessels]="formVessels()"
     [customerNames]="formCustomerNames()"
     [workOrder]="formValue()"
+    [assignees]="isAdministrator() ? workforce.options() : null"
     (closed)="closeEditWorkOrderSheet()"
     (submitted)="editWorkOrder($event)"
   />
@@ -206,6 +208,7 @@
 >
   <work-order-service-form-ui
     [loading]="submitting()"
+    [assignees]="isAdministrator() ? workforce.options() : null"
     (closed)="closeCreateServiceSheet()"
     (submitted)="createWorkOrderService($event)"
   />

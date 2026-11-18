@@ -1,0 +1,247 @@
+<div class="mx-auto w-full max-w-[1044px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+  <div class="mb-[22px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-5">
+    <div>
+      <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-5 bg-muted-foreground/60"></span>
+        OPERAÇÃO / PESSOAS
+      </div>
+      <h1 class="mt-[9px] mb-[5px] text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]">
+        Equipe técnica
+      </h1>
+      <p class="text-[12px] text-muted-foreground">Conheça os profissionais e organize as equipes da oficina.</p>
+    </div>
+    @if (canWrite()) {
+      @if (tab() === 'equipes') {
+        <button
+          tButton
+          type="button"
+          class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+          (click)="openCreateTeam()"
+        >
+          <ng-icon name="lucidePlus" class="!size-[16px]" />
+          Nova equipe
+        </button>
+      } @else {
+        <button
+          tButton
+          type="button"
+          class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+          (click)="openCreateStaff()"
+        >
+          <ng-icon name="lucidePlus" class="!size-[16px]" />
+          Cadastrar profissional
+        </button>
+      }
+    }
+  </div>
+
+  <section aria-label="Resumo da equipe" class="mb-[17px] grid grid-cols-1 gap-2 sm:grid-cols-3 lg:gap-[13px]">
+    @if (loading()) {
+      @for (slot of [1, 2, 3]; track slot) {
+        <t-skeleton data-slot="metric-skeleton" class="h-[78px] rounded-lg" />
+      }
+    } @else {
+      <t-metric label="Profissionais cadastrados" note="na equipe" tone="blue" [value]="metrics().staff">
+        <ng-icon name="lucideUsers" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Equipes cadastradas" note="equipes" tone="teal" [value]="metrics().teams">
+        <ng-icon name="lucideAnchor" class="!size-[17px]" />
+      </t-metric>
+      <t-metric label="Disponíveis agora" tone="green" [value]="metrics().available">
+        <ng-icon name="lucideActivity" class="!size-[17px]" />
+        <span metric-end class="hidden items-center gap-[5px] self-center text-[9px] text-[#57906f] lg:flex">
+          <i class="size-1.5 rounded-full bg-[#49a77e]" aria-hidden="true"></i>
+          disponíveis
+        </span>
+      </t-metric>
+    }
+  </section>
+
+  <div role="tablist" aria-label="Equipe técnica" class="mb-3 flex items-center gap-[7px]">
+    <button
+      type="button"
+      role="tab"
+      class="h-[30px] rounded-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+      [attr.aria-selected]="tab() === 'profissionais'"
+      (click)="pickTab('profissionais')"
+    >
+      Profissionais
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="h-[30px] rounded-[5px] border border-transparent px-[11px] text-[10px] text-muted-foreground aria-selected:border-primary/20 aria-selected:bg-primary/5 aria-selected:font-semibold aria-selected:text-primary"
+      [attr.aria-selected]="tab() === 'equipes'"
+      (click)="pickTab('equipes')"
+    >
+      Equipes
+    </button>
+  </div>
+
+  @if (tab() === 'equipes') {
+    <section aria-labelledby="team-list-title" class="rounded-lg border border-border bg-card px-[18px] pt-[18px] pb-0">
+      <div class="pb-4">
+        <h2 id="team-list-title" class="text-[13px] font-normal text-foreground">Equipes</h2>
+        <p class="mt-[5px] text-[10px] text-muted-foreground">Organize as equipes da oficina e suas especialidades.</p>
+      </div>
+      <team-table-ui
+        [canWrite]="canWrite()"
+        [loading]="loading()"
+        [rows]="teamRows()"
+        (edited)="openEditTeam($event)"
+        (deleted)="deletingTeam.set($event)"
+      />
+      <footer data-slot="list-footer" class="flex min-h-[45px] items-center text-[9px] text-muted-foreground">
+        @if (loading()) {
+          <t-skeleton class="h-3 w-32 rounded" />
+        } @else {
+          <span>Exibindo {{ teamRows().length }} {{ teamRows().length === 1 ? 'equipe' : 'equipes' }}</span>
+        }
+      </footer>
+    </section>
+  } @else {
+    <section aria-labelledby="staff-list-title" class="rounded-lg border border-border bg-card px-[18px] pt-[18px] pb-0">
+      <div class="flex flex-col gap-[14px] pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-[18px]">
+        <div>
+          <h2 id="staff-list-title" class="text-[13px] font-normal text-foreground">Profissionais</h2>
+          <p class="mt-[5px] text-[10px] text-muted-foreground">Cadastro e alocação dos técnicos da oficina.</p>
+        </div>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            class="flex h-[32px] items-center justify-center gap-[7px] rounded-[5px] border border-border bg-card px-[11px] text-[10px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="selectedCount() === 0"
+            [attr.aria-label]="exportLabel()"
+            (click)="exportSelected()"
+          >
+            <ng-icon name="lucideDownload" class="!size-[15px]" />
+            Exportar{{ selectedCount() > 0 ? ' (' + selectedCount() + ')' : '' }}
+          </button>
+          <label
+            class="flex h-[32px] items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 sm:w-[230px]"
+          >
+            <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
+            <span class="sr-only">Buscar profissional</span>
+            <input
+              type="search"
+              class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+              placeholder="Buscar profissional..."
+              [value]="search()"
+              (input)="search.set($any($event.target).value)"
+            />
+          </label>
+          <label class="sr-only" for="team-filter">Filtrar por equipe</label>
+          <select
+            id="team-filter"
+            class="h-[32px] rounded-[5px] border border-border bg-card px-2.5 text-[10px] text-foreground"
+            [value]="team()"
+            (change)="team.set($any($event.target).value)"
+          >
+            <option value="">Todas as equipes</option>
+            @for (item of sortedTeams(); track item.id) {
+              <option [value]="item.id">{{ item.name }}</option>
+            }
+            <option [value]="noTeamFilter">{{ noTeam }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div role="group" aria-label="Filtrar por especialidade" class="mb-[3px] flex items-center gap-[7px] overflow-x-auto pb-px">
+        <button
+          type="button"
+          data-slot="specialty-chip"
+          class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-pressed:border-primary/20 aria-pressed:bg-primary/5 aria-pressed:font-semibold aria-pressed:text-primary"
+          [attr.aria-pressed]="specialty() === null"
+          (click)="specialty.set(null)"
+        >
+          <span>Todas</span>
+          <span class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-pressed:bg-primary/10">{{
+            rows().length
+          }}</span>
+        </button>
+        @for (chip of chips(); track chip.specialty) {
+          <button
+            type="button"
+            data-slot="specialty-chip"
+            class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-pressed:border-primary/20 aria-pressed:bg-primary/5 aria-pressed:font-semibold aria-pressed:text-primary"
+            [attr.aria-pressed]="specialty() === chip.specialty"
+            (click)="specialty.set(chip.specialty)"
+          >
+            <span>{{ chip.specialty }}</span>
+            <span class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-pressed:bg-primary/10">{{
+              chip.count
+            }}</span>
+          </button>
+        }
+      </div>
+
+      <staff-table-ui
+        [canWrite]="canWrite()"
+        [loading]="loading()"
+        [rows]="shown()"
+        [total]="rows().length"
+        [selected]="selected()"
+        (toggled)="toggle($event)"
+        (toggledAll)="toggleShown()"
+        (edited)="openEditStaff($event)"
+        (deleted)="deletingStaff.set($event)"
+      />
+
+      <footer data-slot="list-footer" class="flex min-h-[45px] items-center text-[9px] text-muted-foreground">
+        @if (loading()) {
+          <t-skeleton class="h-3 w-32 rounded" />
+        } @else {
+          <span data-slot="range">Exibindo {{ shown().length }} de {{ rows().length }} profissionais</span>
+        }
+      </footer>
+    </section>
+  }
+</div>
+
+<t-sheet
+  kicker="OPERAÇÃO / EQUIPE TÉCNICA"
+  closeLabel="Fechar cadastro"
+  [title]="editingStaffId() ? 'Editar profissional' : 'Novo profissional'"
+  [description]="editingStaffId() ? 'Atualize os dados do profissional.' : 'Adicione um técnico e vincule-o a uma equipe.'"
+  [isActive]="isStaffSheetActive()"
+  (closed)="isStaffSheetActive.set(false)"
+>
+  <staff-form-ui
+    [loading]="submitting()"
+    [teams]="teams()"
+    (closed)="isStaffSheetActive.set(false)"
+    (submitted)="saveStaff($event)"
+  />
+</t-sheet>
+
+<t-sheet
+  kicker="OPERAÇÃO / EQUIPE TÉCNICA"
+  [title]="editingTeamId() ? 'Editar equipe' : 'Nova equipe'"
+  [description]="editingTeamId() ? 'Atualize os dados da equipe.' : 'Cadastre uma equipe e sua especialidade.'"
+  [isActive]="isTeamSheetActive()"
+  (closed)="isTeamSheetActive.set(false)"
+>
+  <team-form-ui [loading]="submitting()" (closed)="isTeamSheetActive.set(false)" (submitted)="saveTeam($event)" />
+</t-sheet>
+
+<t-confirmation
+  title="Excluir profissional"
+  description="Tem certeza que deseja excluir este profissional? Esta ação não pode ser desfeita."
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="deletingStaff() !== null"
+  [loading]="confirming()"
+  (closed)="deletingStaff.set(null)"
+  (confirmed)="deleteStaff()"
+/>
+
+<t-confirmation
+  title="Excluir equipe"
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [description]="deleteTeamDescription()"
+  [isActive]="deletingTeam() !== null"
+  [loading]="confirming()"
+  (closed)="deletingTeam.set(null)"
+  (confirmed)="deleteTeam()"
+/>

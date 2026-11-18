@@ -128,6 +128,8 @@ describe('Shell', () => {
     ['Embarcações', '/vessels'],
     ['Clientes', '/customers'],
     ['Agenda', '/agenda'],
+    // AD-066: "Equipe técnica" follows "Agenda", as the mareos orders them.
+    ['Equipe técnica', '/staff'],
   ];
 
   it('work-order-ui C16 lists six items in the mareos order and Organizações only for the internal Administrator', async () => {

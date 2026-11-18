@@ -7,6 +7,7 @@ import { AuthenticationService } from '../../../identity/authentication/authenti
 import type { Role } from '../../../identity/user/user.service';
 import { WorkOrderDetail } from '../work-order-detail/work-order-detail';
 import { local, settle, squash } from './work-order-list.harness';
+import { answerWorkforce } from '../../../shared/testing/workforce';
 
 const ID = 'ab12cd34-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
 const BASE = `/api/work-orders/${ID}`;
@@ -60,6 +61,7 @@ describe('WorkOrderDetail as inspector', () => {
     controller.expectOne(BASE).flush({ workOrder });
     controller.expectOne(`${BASE}/services`).flush({ services: [service], total: 1 });
     controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [assignment] });
+    answerWorkforce(controller);
     await settle();
     return fixture.nativeElement as HTMLElement;
   }
@@ -94,5 +96,36 @@ describe('WorkOrderDetail as inspector', () => {
     // The content stays: the services and the assignment are listed.
     expect(inspector.textContent).toContain('Motor');
     expect(inspector.textContent).toContain('Casco e convés');
+  });
+});
+
+describe('WorkOrderDetail as an inspector', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+  });
+
+  afterEach(() => TestBed.inject(HttpTestingController).verify());
+
+  it('workforce C28 shows the responsável to an inspector', async () => {
+    const controller = TestBed.inject(HttpTestingController);
+    TestBed.inject(AuthenticationService).role.set('inspector');
+    const fixture = TestBed.createComponent(WorkOrderDetail);
+    fixture.componentRef.setInput('id', ID);
+    await settle();
+    controller.expectOne(BASE).flush({ workOrder });
+    controller.expectOne(`${BASE}/services`).flush({ services: [service], total: 1 });
+    controller.expectOne(`${BASE}/inspection-assignments`).flush({ inspectionAssignments: [] });
+    answerWorkforce(controller, {
+      teams: [{ id: 'alfa', name: 'Alfa', specialty: 'Motor', staffCount: 2 }],
+      assignments: [{ id: 'a1', workOrderId: ID, workOrderServiceId: 'svc-1', staffId: null, teamId: 'alfa' }],
+    });
+    await settle();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(squash(element.querySelector('[data-slot="service-assignee"]')?.textContent)).toBe('Responsável: Equipe Alfa');
+    // An inspector chooses no Responsável.
+    expect(element.textContent).not.toContain('Novo serviço');
   });
 });
