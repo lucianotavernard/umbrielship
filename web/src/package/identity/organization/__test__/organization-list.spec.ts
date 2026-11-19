@@ -117,7 +117,7 @@ describe('OrganizationList', () => {
   it('[C87] renders the organization and posts the create body', async () => {
     const fixture = TestBed.createComponent(OrganizationList);
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({
       organizations: [{ id: 'org-1', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false }],
       total: 1,
     });
@@ -142,13 +142,13 @@ describe('OrganizationList', () => {
     expect(created.request.body).toEqual({ name: 'Atlantic', email: 'ops@atlantic.test' });
     created.flush({ id: 'org-2', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false });
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=20').flush({ organizations: [], total: 0 });
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [], total: 0 });
   });
 
   it('[C87] an empty list says Nenhuma organização encontrada', async () => {
     TestBed.createComponent(OrganizationList);
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=20').flush({ organizations: [], total: 0 });
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [], total: 0 });
     await settle();
     expect(document.body.textContent).toContain('Nenhuma organização encontrada');
   });
@@ -159,7 +159,7 @@ describe('OrganizationList', () => {
     const fixture = TestBed.createComponent(OrganizationList);
     const element = fixture.nativeElement as HTMLElement;
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({
       organizations: [{ id: 'org-1', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false }],
       total: 1,
     });
@@ -232,7 +232,7 @@ describe('OrganizationList', () => {
     expect(requests[0].request.body).toEqual({ name: 'Boreal', email: 'ops@boreal.test' });
     requests[0].flush({ id: 'org-2', name: 'Boreal', email: 'ops@boreal.test', isInternal: false });
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=20').flush({ organizations: [], total: 0 });
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [], total: 0 });
     await settle();
 
     expect(success).toHaveBeenCalledWith('Organização criada com sucesso');

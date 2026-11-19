@@ -38,7 +38,7 @@ describe('OrganizationDetail', () => {
     controller.expectOne('/api/organizations/org-1').flush({
       organization: { id: 'org-1', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false },
     });
-    controller.expectOne('/api/organizations/org-1/users?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations/org-1/users?page=1&per_page=10').flush({
       users: [{ id: 'user-ana', name: 'Ana', email: 'ana@atlantic.test', role: 'operator' }],
       total: 1,
     });
@@ -48,7 +48,7 @@ describe('OrganizationDetail', () => {
         { role: 'operator', users: 1 },
       ],
     });
-    controller.expectOne('/api/organizations/org-1/invitations?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations/org-1/invitations?page=1&per_page=10').flush({
       invitations: [
         {
           id: 'inv-1',
@@ -263,7 +263,7 @@ describe('OrganizationDetail', () => {
     const error = vi.spyOn(toast, 'error');
     const element = await openPage();
     const userValues = () => values('#user-name', '#user-email', '#user-password', '#user-role');
-    const userReads = ['GET /api/organizations/org-1/roles', 'GET /api/organizations/org-1/users?page=1&per_page=20'];
+    const userReads = ['GET /api/organizations/org-1/roles', 'GET /api/organizations/org-1/users?page=1&per_page=10'];
 
     await click(buttonByText('Novo usuário', element));
     const sheet = drawer()!;
@@ -377,7 +377,7 @@ describe('OrganizationDetail', () => {
     const element = await openPage();
     const invitationValues = () => values('#invitation-user', '#invitation-role');
     const invitationReads = [
-      'GET /api/organizations/org-1/invitations?page=1&per_page=20',
+      'GET /api/organizations/org-1/invitations?page=1&per_page=10',
       'GET /api/users?not_in_organization=org-1&per_page=100',
     ];
 
