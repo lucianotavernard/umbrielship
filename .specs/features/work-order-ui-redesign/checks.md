@@ -45,8 +45,8 @@ Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C7 
 Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C8 shows vessel, code and customer, services, prazo and status in each row
 Proof: run web | ✓ work-order-filters.spec.ts > prazoLabel > work-order-ui C8 reads Hoje, Amanhã or the short date with the time
 
-**C9** - The table shows 8 per page, one button per page, ends disabled, and the footer `Exibindo <first>–<last> de <n> ordens` (AC 9)
-Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C9 pages by 8 with one button per page and the footer range
+**C9** - The table shows 10 per page (8 before AD-101), one button per page, ends disabled, and the footer `Exibindo <first>–<last> de <n> ordens` (AC 9)
+Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C9 pages by 10 with one button per page and the footer range
 
 **C10** - No WorkOrder says "Ainda não há ordens de serviço cadastradas."; no match says "Nenhuma ordem corresponde aos filtros aplicados." (AC 10)
 Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C10 tells an empty organization from a filter with no match
@@ -61,8 +61,8 @@ Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C12
 Proof: run web | ✓ work-order-csv.spec.ts > workOrderCsv > work-order-ui C13 writes the header, the Aurora line, a guarded formula and doubled quotes
 Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C13 exports the selected work orders, hidden ones included
 
-**C14** - "Ações para #code" offers Ver detalhes and, for a writer, Editar and Excluir; deleting confirms, calls `DELETE /api/work-orders/:id`, toasts "Ordem de serviço excluída com sucesso" and drops the row and its selection; a 409 keeps the row and toasts the API message (AC 14)
-Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row menu opens the detail and deletes after confirmation
+**C14** - A row opens its WorkOrder except on its checkbox and its actions, and for a writer the icon buttons "Editar ordem #code" and "Excluir ordem #code" (destructive) show on the row's hover (AD-102, before it the row menu "Ações para #code"); deleting confirms, calls `DELETE /api/work-orders/:id`, toasts "Ordem de serviço excluída com sucesso" and drops the row and its selection; a 409 keeps the row and toasts the API message (AC 14)
+Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C14 the row opens the detail and Excluir deletes after confirmation
 Proof: run web | ✓ work-order-list.spec.ts > WorkOrderList > work-order-ui C14 a 409 on delete keeps the row and shows the API message
 
 **C15** - An inspector sees no Nova ordem de serviço, Editar or Excluir on the list; selection and Exportar stay (AC 15)

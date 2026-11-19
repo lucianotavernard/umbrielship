@@ -337,6 +337,8 @@ The Agenda shows each service at its start and each WorkOrder at its Docagem and
 | Every event shown | items of a `CANCELLED` WorkOrder hidden | y - AD-047 |
 | "Adicionar à agenda" drawer with Embarcação, Serviço, Tipo, Equipe, Data, Horário; "Reserve um horário para a embarcação e equipe." | Ordem de serviço, Serviço, Descrição, Início, Fim; "Reserve um horário para um serviço da ordem." | y - AD-037, AD-049 |
 | "Central de inspeções" tabs joined to a rule | the pill tabs of "Lista de ordens", no rule under them | y - AD-096 |
+| "Lista de ordens" with the search under the status tabs | the tabs on the left and the search on the right of one row from 1120px; stacked below it | y - AD-100 |
+| "Ações para <#code>" menu button in each row, the Vessel name as a link | the row opens the WorkOrder, except on its checkbox and its actions; "Editar" and "Excluir" as ghost icon buttons shown on the row's hover or focus, "Excluir" in the destructive colour | y - AD-102 |
 
 ## Sources
 
