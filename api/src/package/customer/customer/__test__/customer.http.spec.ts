@@ -110,3 +110,66 @@ describe('GET /customers', () => {
     expect(response.status).toBe(401);
   });
 });
+
+describe('POST /customers', () => {
+  let app: INestApplication;
+  let token: string;
+  const customers = new InMemoryCustomersRepository();
+  const body = {
+    name: 'Cooperativa Mar Azul',
+    email: 'contato@marazul.test',
+    address: { address: 'Rua do Porto, 12', city: 'Laguna', state: 'SC' },
+  };
+
+  beforeAll(async () => {
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
+      controllers: [CustomerController],
+      providers: [
+        {
+          provide: CreateCustomerUseCase,
+          useValue: new CreateCustomerUseCase(customers),
+        },
+        { provide: DeleteCustomerUseCase, useValue: {} },
+        { provide: EditCustomerUseCase, useValue: {} },
+        { provide: FetchCustomersUseCase, useValue: {} },
+        { provide: GetCustomerByIdUseCase, useValue: {} },
+      ],
+      users,
+    }));
+    token = sign(SUB);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  const post = (payload: object) =>
+    request(app.getHttpServer())
+      .post('/customers')
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+  it('answers 400 and stores nothing for a customer with a null, missing or empty phone', async () => {
+    for (const [label, payload] of [
+      ['null', { ...body, phone: null }],
+      ['missing', body],
+      ['empty', { ...body, phone: '' }],
+    ] as const) {
+      const response = await post(payload);
+
+      expect(response.status, label).toBe(400);
+    }
+    expect(customers.items).toHaveLength(0);
+  });
+
+  it('answers 201 with the phone for a customer that has one', async () => {
+    const response = await post({ ...body, email: 'frota@marazul.test', phone: '(48) 3646-1206' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.customer.phone).toBe('(48) 3646-1206');
+    expect(customers.items.map((customer) => customer.phone)).toEqual([
+      '(48) 3646-1206',
+    ]);
+  });
+});

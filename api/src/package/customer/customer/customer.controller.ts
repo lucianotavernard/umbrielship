@@ -40,6 +40,13 @@ const customerBodySchema = z.object({
 
 type CustomerBodySchema = z.infer<typeof customerBodySchema>;
 
+// A new Customer always has a phone: the column is required. An edit may still omit it to keep it.
+const createCustomerBodySchema = customerBodySchema.extend({
+  phone: z.string().min(1),
+});
+
+type CreateCustomerBodySchema = z.infer<typeof createCustomerBodySchema>;
+
 // No `page` answers every record; `page=n` answers that page of 10.
 const pageQueryParamSchema = z
   .string()
@@ -105,7 +112,8 @@ export class CustomerController {
   @Post()
   async create(
     @CurrentUser() user: UserPayload,
-    @Body(new ZodValidationPipe(customerBodySchema)) body: CustomerBodySchema,
+    @Body(new ZodValidationPipe(createCustomerBodySchema))
+    body: CreateCustomerBodySchema,
   ) {
     try {
       const { name, email, phone, address } = body;
