@@ -1,9 +1,11 @@
-import { Component, computed, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePencil, lucideShip, lucideTrash2 } from '@ng-icons/lucide';
 
+import { Button } from '../../../shared/components/ui/button';
+import { Checkbox } from '../../../shared/components/ui/form';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { formatLength } from '../vessel-csv';
 import { Vessel, vesselTypeLabels } from '../vessel.service';
@@ -11,10 +13,13 @@ import { Vessel, vesselTypeLabels } from '../vessel.service';
 /** A Vessel row of the list: the Vessel and the name of its Customer. */
 export type VesselRow = Vessel & { customerName: string };
 
-/** The mareos "Lista de embarcações" table, with a selection column and no status (AD-021). */
+/**
+ * The mareos "Lista de embarcações" table, with a selection column and no status (AD-021). A row opens
+ * its Vessel; "Editar" and "Excluir" show on the row's hover (AD-103).
+ */
 @Component({
   selector: 'vessel-list-ui',
-  imports: [NgIcon, RouterLink, Skeleton],
+  imports: [NgIcon, Button, Skeleton, Checkbox],
   viewProviders: [provideIcons({ lucidePencil, lucideShip, lucideTrash2 })],
   template: `
     <div class="relative mt-[14px] overflow-x-auto">
@@ -24,7 +29,7 @@ export type VesselRow = Vessel & { customerName: string };
             <th class="w-9 pr-2 text-center">
               <input
                 type="checkbox"
-                class="size-[15px] cursor-pointer align-middle accent-primary"
+                tCheckbox
                 aria-label="Selecionar todas as embarcações visíveis"
                 [checked]="allSelected()"
                 [indeterminate]="someSelected()"
@@ -62,13 +67,17 @@ export type VesselRow = Vessel & { customerName: string };
             @for (vessel of rows(); track vessel.id) {
               <tr
                 data-slot="vessel-row"
-                class="h-[62px] border-t border-border text-[10px] text-muted-foreground data-[selected]:bg-primary/5"
+                tabindex="0"
+                class="group h-[62px] cursor-pointer border-t border-border text-[10px] text-muted-foreground outline-none hover:bg-muted/40 focus-visible:bg-muted/40 data-[selected]:bg-primary/5"
                 [attr.data-selected]="selected().has(vessel.id) ? '' : null"
+                (click)="open(vessel)"
+                (keydown.enter)="open(vessel)"
               >
-                <td class="w-9 pr-2 text-center">
+                <!-- The checkbox and the actions keep their own clicks: neither opens the Vessel. -->
+                <td class="w-9 pr-2 text-center" (click)="$event.stopPropagation()">
                   <input
                     type="checkbox"
-                    class="size-[15px] cursor-pointer align-middle accent-primary"
+                    tCheckbox
                     [attr.aria-label]="'Selecionar embarcação ' + vessel.name"
                     [checked]="selected().has(vessel.id)"
                     (change)="toggled.emit(vessel.id)"
@@ -82,37 +91,42 @@ export type VesselRow = Vessel & { customerName: string };
                     >
                       <ng-icon name="lucideShip" class="!size-4" />
                     </span>
-                    <a
-                      class="text-[10px] font-semibold text-foreground hover:text-primary hover:underline"
-                      [routerLink]="['/vessels', vessel.id]"
-                    >
-                      {{ vessel.name }}
-                    </a>
+                    <span data-slot="vessel-name" class="text-[10px] font-semibold text-foreground">{{ vessel.name }}</span>
                   </div>
                 </td>
                 <td data-slot="imo" class="tabular-nums">{{ vessel.imoNumber || '—' }}</td>
                 <td data-slot="type">{{ labels[vessel.type] }}</td>
                 <td data-slot="length" class="tabular-nums">{{ length(vessel.length) }} m</td>
                 <td data-slot="customer" class="font-medium text-foreground/80">{{ vessel.customerName }}</td>
-                <td>
+                <td data-slot="row-actions" (click)="$event.stopPropagation()">
                   @if (canWrite()) {
-                    <div class="flex justify-end gap-1.5">
+                    <!-- Shown on the row's hover or focus, and always where there is no hover. -->
+                    <div
+                      class="flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100"
+                    >
                       <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
                         type="button"
-                        class="inline-flex items-center gap-1.5 rounded-[5px] border border-border bg-card px-2 py-1.5 text-[9px] text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                        class="size-[27px] rounded-[5px] text-muted-foreground hover:text-primary"
                         [attr.aria-label]="'Editar embarcação ' + vessel.name"
                         (click)="edited.emit(vessel)"
                       >
                         <ng-icon name="lucidePencil" class="!size-3.5" />
-                        <span>Editar</span>
+                        <span class="sr-only">Editar</span>
                       </button>
                       <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
                         type="button"
-                        class="inline-grid size-[27px] place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                        class="size-[27px] rounded-[5px] text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
                         [attr.aria-label]="'Excluir embarcação ' + vessel.name"
                         (click)="deleted.emit(vessel)"
                       >
                         <ng-icon name="lucideTrash2" class="!size-3.5" />
+                        <span class="sr-only">Excluir</span>
                       </button>
                     </div>
                   }
@@ -142,7 +156,14 @@ export class VesselList {
   edited = output<VesselRow>();
   deleted = output<VesselRow>();
 
+  private readonly router = inject(Router);
+
   protected readonly labels = vesselTypeLabels;
+
+  /** A row opens its Vessel (AD-103). */
+  protected open(vessel: VesselRow) {
+    void this.router.navigate(['/vessels', vessel.id]);
+  }
   protected readonly length = formatLength;
 
   protected readonly allSelected = computed(

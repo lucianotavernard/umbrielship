@@ -2,27 +2,31 @@ import { Component, computed, effect, input, output, signal, untracked } from '@
 import { form, FormField, hidden, required } from '@angular/forms/signals';
 
 import { provideIcons } from '@ng-icons/core';
-import { lucideRuler, lucideShip } from '@ng-icons/lucide';
+import { lucideAnchor, lucideRuler, lucideShip } from '@ng-icons/lucide';
 
 import { DrawerBody, DrawerCard, DrawerFooter, DrawerForm, RequiredMark } from '../../../shared/components/ui/drawer';
 import { FormGroup, Input, Label, Select } from '../../../shared/components/ui/form';
 import { Customer } from '../../customer/customer.service';
 import {
   CreateVesselRequest,
+  VESSEL_STATUSES,
   VESSEL_TYPES,
   Vessel,
+  VesselStatus,
+  vesselStatusLabels,
   VesselType,
   vesselTypeLabels,
 } from '../vessel.service';
 
 /**
- * The fields of the mareos "Nova embarcação" / "Editar embarcação" drawer, without the "Operação"
- * card (AD-021) and with today's rules (AD-028): the Customer and the IMO number only on create.
+ * The fields of the mareos "Nova embarcação" / "Editar embarcação" drawer with today's rules (AD-028):
+ * the Customer and the IMO number only on create. The "Operação" card holds the status alone, without
+ * "Porto base" (AD-021, AD-099).
  */
 @Component({
   selector: 'vessel-form-ui',
   imports: [FormField, FormGroup, Label, Input, Select, DrawerForm, DrawerBody, DrawerCard, DrawerFooter, RequiredMark],
-  viewProviders: [provideIcons({ lucideShip, lucideRuler })],
+  viewProviders: [provideIcons({ lucideShip, lucideRuler, lucideAnchor })],
   template: `
     <form [tDrawerForm]="shownErrors()" novalidate (submit)="submitForm($event)">
       <t-drawer-body>
@@ -83,6 +87,22 @@ import {
             />
           </t-form-group>
         </section>
+
+        <section
+          tDrawerCard
+          heading="Operação"
+          subheading="Localização e situação atual da frota"
+          icon="lucideAnchor"
+        >
+          <t-form-group>
+            <label tLabel for="vessel-status">Status</label>
+            <select tSelect id="vessel-status" [formField]="vesselForm.status">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ statusLabels[status] }}</option>
+              }
+            </select>
+          </t-form-group>
+        </section>
       </t-drawer-body>
 
       <footer
@@ -109,6 +129,8 @@ export class VesselForm {
 
   protected readonly types = VESSEL_TYPES;
   protected readonly labels = vesselTypeLabels;
+  protected readonly statuses = VESSEL_STATUSES;
+  protected readonly statusLabels = vesselStatusLabels;
   protected readonly sortedCustomers = computed(() =>
     [...this.customers()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
   );
@@ -119,6 +141,7 @@ export class VesselForm {
     imoNumber: '',
     type: '' as VesselType | '',
     length: '',
+    status: 'ACTIVE' as VesselStatus,
   });
 
   vesselForm = form(this.model, (schemaPath) => {
@@ -150,8 +173,9 @@ export class VesselForm {
             imoNumber: vessel.imoNumber,
             type: vessel.type,
             length: String(vessel.length),
+            status: vessel.status ?? 'ACTIVE',
           }
-        : { name: '', customerId, imoNumber: '', type: '', length: '' },
+        : { name: '', customerId, imoNumber: '', type: '', length: '', status: 'ACTIVE' },
     );
   }
 
@@ -163,6 +187,7 @@ export class VesselForm {
       imoNumber: '',
       type: '',
       length: '',
+      status: 'ACTIVE',
     });
   }
 
@@ -177,6 +202,7 @@ export class VesselForm {
       imoNumber: value.imoNumber,
       type: value.type as VesselType,
       length: Number(value.length),
+      status: value.status,
     });
   }
 }
