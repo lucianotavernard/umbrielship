@@ -1,9 +1,8 @@
-import { Component, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  lucideArrowUpRight,
   lucideMail,
   lucideMapPin,
   lucidePencil,
@@ -13,16 +12,19 @@ import {
 } from '@ng-icons/lucide';
 
 import { initials } from '../../../shared/components/lib/initials';
+import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { CustomerListItem } from '../customer.service';
 
-/** The mareos "Lista de clientes" table. The page sorts and filters; this draws the rows. */
+/**
+ * The mareos "Lista de clientes" table. The page sorts and filters; this draws the rows. A row opens
+ * its Customer; "Editar" and "Excluir" show on the row's hover (AD-103).
+ */
 @Component({
   selector: 'customer-list-ui',
-  imports: [NgIcon, RouterLink, Skeleton],
+  imports: [NgIcon, Button, Skeleton],
   viewProviders: [
     provideIcons({
-      lucideArrowUpRight,
       lucideMail,
       lucideMapPin,
       lucidePencil,
@@ -64,7 +66,13 @@ import { CustomerListItem } from '../customer.service';
             }
           } @else {
             @for (customer of customers(); track customer.id) {
-              <tr data-slot="customer-row" class="h-[68px] border-t border-border text-[10px] text-muted-foreground">
+              <tr
+                data-slot="customer-row"
+                tabindex="0"
+                class="group h-[68px] cursor-pointer border-t border-border text-[10px] text-muted-foreground outline-none hover:bg-muted/40 focus-visible:bg-muted/40"
+                (click)="open(customer)"
+                (keydown.enter)="open(customer)"
+              >
                 <td>
                   <div class="flex min-w-[190px] items-center gap-2.5">
                     <span
@@ -75,12 +83,9 @@ import { CustomerListItem } from '../customer.service';
                       {{ initialsOf(customer.name) }}
                     </span>
                     <span class="min-w-0">
-                      <a
-                        class="block max-w-[220px] truncate text-[10px] font-semibold text-foreground hover:text-primary hover:underline"
-                        [routerLink]="['/customers', customer.id]"
-                      >
+                      <span data-slot="customer-name" class="block max-w-[220px] truncate text-[10px] font-semibold text-foreground">
                         {{ customer.name }}
-                      </a>
+                      </span>
                       <small data-slot="street" class="mt-1 block max-w-[220px] truncate text-[9px] text-muted-foreground">
                         {{ customer.address.address || 'Endereço não informado' }}
                       </small>
@@ -108,34 +113,39 @@ import { CustomerListItem } from '../customer.service';
                     {{ customer.vesselCount === 1 ? 'embarcação' : 'embarcações' }}
                   </span>
                 </td>
-                <td>
-                  <div class="flex justify-end gap-1.5">
-                    <a
-                      class="inline-grid size-[29px] place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary"
-                      [routerLink]="['/customers', customer.id]"
-                      [attr.aria-label]="'Ver detalhes de ' + customer.name"
+                <!-- The actions keep their own clicks: they do not open the Customer. -->
+                <td data-slot="row-actions" (click)="$event.stopPropagation()">
+                  @if (canWrite()) {
+                    <!-- Shown on the row's hover or focus, and always where there is no hover. -->
+                    <div
+                      class="flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100"
                     >
-                      <ng-icon name="lucideArrowUpRight" class="!size-3.5" />
-                    </a>
-                    @if (canWrite()) {
                       <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
                         type="button"
-                        class="inline-grid size-[29px] place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary"
+                        class="size-[27px] rounded-[5px] text-muted-foreground hover:text-primary"
                         [attr.aria-label]="'Editar ' + customer.name"
                         (click)="edited.emit(customer)"
                       >
                         <ng-icon name="lucidePencil" class="!size-3.5" />
+                        <span class="sr-only">Editar</span>
                       </button>
                       <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
                         type="button"
-                        class="inline-grid size-[29px] place-items-center rounded-[5px] border border-border bg-card text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+                        class="size-[27px] rounded-[5px] text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
                         [attr.aria-label]="'Excluir ' + customer.name"
                         (click)="deleted.emit(customer)"
                       >
                         <ng-icon name="lucideTrash2" class="!size-3.5" />
+                        <span class="sr-only">Excluir</span>
                       </button>
-                    }
-                  </div>
+                    </div>
+                  }
                 </td>
               </tr>
             }
@@ -161,7 +171,14 @@ export class CustomerList {
   edited = output<CustomerListItem>();
   deleted = output<CustomerListItem>();
 
+  private readonly router = inject(Router);
+
   protected readonly initialsOf = initials;
+
+  /** A row opens its Customer (AD-103). */
+  protected open(customer: CustomerListItem) {
+    void this.router.navigate(['/customers', customer.id]);
+  }
 
   protected location(customer: CustomerListItem) {
     const { city, state } = customer.address;
