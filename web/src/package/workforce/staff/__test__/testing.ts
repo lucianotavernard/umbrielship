@@ -180,7 +180,7 @@ export class StaffListPage {
   }
 
   range() {
-    return squash(this.element.querySelector('[data-slot="list-footer"]')?.textContent);
+    return squash(this.element.querySelector('[data-slot="list-footer"] [data-slot="range"]')?.textContent);
   }
 
   empty() {

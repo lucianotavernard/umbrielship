@@ -87,17 +87,17 @@
       <team-table-ui
         [canWrite]="canWrite()"
         [loading]="loading()"
-        [rows]="teamRows()"
+        [rows]="teamShown()"
         (edited)="openEditTeam($event)"
         (deleted)="deletingTeam.set($event)"
       />
-      <footer data-slot="list-footer" class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground">
-        @if (loading()) {
-          <t-skeleton class="h-3 w-32 rounded" />
-        } @else {
-          <span>Exibindo {{ teamRows().length }} {{ teamRows().length === 1 ? 'equipe' : 'equipes' }}</span>
-        }
-      </footer>
+      <t-list-pager
+        noun="equipes"
+        [loading]="loading()"
+        [total]="teamRows().length"
+        [page]="teamCurrentPage()"
+        (pageChange)="goToTeams($event)"
+      />
     </section>
   } @else {
     <section aria-labelledby="staff-list-title" class="rounded-lg border border-border bg-card px-[18px] pt-[18px] pb-0">
@@ -187,13 +187,13 @@
         (deleted)="deletingStaff.set($event)"
       />
 
-      <footer data-slot="list-footer" class="flex min-h-[45px] items-center border-t border-border text-[9px] text-muted-foreground">
-        @if (loading()) {
-          <t-skeleton class="h-3 w-32 rounded" />
-        } @else {
-          <span data-slot="range">Exibindo {{ shown().length }} de {{ rows().length }} profissionais</span>
-        }
-      </footer>
+      <t-list-pager
+        noun="profissionais"
+        [loading]="loading()"
+        [total]="filtered().length"
+        [page]="currentPage()"
+        (pageChange)="goTo($event)"
+      />
     </section>
   }
 </div>
