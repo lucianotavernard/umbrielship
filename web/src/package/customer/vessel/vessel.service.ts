@@ -26,6 +26,17 @@ export const vesselTypeLabels: Record<VesselType, string> = {
   OTHER: 'Outro',
 };
 
+/** A Vessel's status (AD-099). */
+export const VESSEL_STATUSES = ['ACTIVE', 'MAINTENANCE', 'INACTIVE'] as const;
+
+export type VesselStatus = (typeof VESSEL_STATUSES)[number];
+
+export const vesselStatusLabels: Record<VesselStatus, string> = {
+  ACTIVE: 'Ativa',
+  MAINTENANCE: 'Em manutenção',
+  INACTIVE: 'Inativa',
+};
+
 export type Vessel = {
   id: string;
   imoNumber: string;
@@ -33,6 +44,7 @@ export type Vessel = {
   type: VesselType;
   length: number;
   customerId: string;
+  status: VesselStatus;
   customer?: Customer;
 };
 
@@ -42,6 +54,7 @@ export type CreateVesselRequest = {
   name: string;
   type: VesselType;
   length: number;
+  status: VesselStatus;
 };
 
 export type UpdateVesselRequest = {
@@ -49,6 +62,7 @@ export type UpdateVesselRequest = {
   name: string;
   type: VesselType;
   length: number;
+  status: VesselStatus;
 };
 
 export type GetVesselsResponse = {

@@ -153,9 +153,9 @@ export class VesselDetail {
     const current = this.vessel();
     if (!current) return;
     this.submitting.set(true);
-    const { name, type, length } = vessel;
+    const { name, type, length, status } = vessel;
     this.vesselService
-      .updateVessel(this.id(), { customerId: current.customerId, name, type, length })
+      .updateVessel(this.id(), { customerId: current.customerId, name, type, length, status })
       .subscribe({
         next: () => {
           this.submitting.set(false);

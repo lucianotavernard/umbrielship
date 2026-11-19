@@ -24,8 +24,26 @@
   </div>
 
   <section aria-label="Resumo da frota" class="mb-[17px] grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-[13px]">
-    <t-metric label="Total na frota" note="embarcações" tone="blue" [value]="total()">
+    <!-- Four cards leave the notes no room below 1280px. -->
+    <t-metric label="Total na frota" note="embarcações" noteFrom="xl" tone="blue" [value]="metrics().total">
       <ng-icon name="lucideShip" class="!size-[17px]" />
+    </t-metric>
+    <t-metric label="Em operação" tone="teal" [value]="metrics().active">
+      <ng-icon name="lucideCheck" class="!size-[17px]" />
+      <small
+        metric-end
+        data-slot="metric-note"
+        class="mb-0.5 hidden items-center gap-1.5 self-end text-[9px] whitespace-nowrap text-muted-foreground xl:flex"
+      >
+        <i aria-hidden="true" class="size-1.5 rounded-full bg-[#49a77e]"></i>
+        Ativas
+      </small>
+    </t-metric>
+    <t-metric label="Em manutenção" note="Atenção técnica" noteFrom="xl" tone="amber" [value]="metrics().maintenance">
+      <ng-icon name="lucideWrench" class="!size-[17px]" />
+    </t-metric>
+    <t-metric label="Fora de operação" note="Inativas" noteFrom="xl" tone="green" [value]="metrics().inactive">
+      <ng-icon name="lucideGauge" class="!size-[17px]" />
     </t-metric>
   </section>
 
@@ -47,7 +65,31 @@
       </button>
     </div>
 
-    <div class="mt-4 flex justify-end">
+    <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+      <label class="sr-only" for="vessel-customer-filter">Filtrar por cliente</label>
+      <select
+        id="vessel-customer-filter"
+        class="flex h-8 w-full items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-[190px]"
+        [value]="customerFilter()"
+        (change)="customerFilter.set($any($event.target).value)"
+      >
+        <option value="">Todos os clientes</option>
+        @for (customer of customerChoices(); track customer.id) {
+          <option [value]="customer.id">{{ customer.name }}</option>
+        }
+      </select>
+      <label class="sr-only" for="vessel-type-filter">Filtrar por tipo</label>
+      <select
+        id="vessel-type-filter"
+        class="flex h-8 w-full items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-[160px]"
+        [value]="typeFilter()"
+        (change)="typeFilter.set($any($event.target).value)"
+      >
+        <option value="">Todos os tipos</option>
+        @for (type of types; track type) {
+          <option [value]="type">{{ typeLabels[type] }}</option>
+        }
+      </select>
       <label
         class="flex h-8 w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 sm:w-[270px]"
       >
@@ -79,19 +121,13 @@
       (deleted)="openDialog($event)"
     />
 
-    <footer
-      data-slot="list-footer"
-      class="flex min-h-12 items-center border-t border-border text-[9px] text-muted-foreground"
-    >
-      @if (loading()) {
-        <t-skeleton class="h-3 w-32 rounded" />
-      } @else {
-        <span>
-          Exibindo <strong class="text-foreground/80">{{ shown().length }}</strong> de
-          <strong class="text-foreground/80">{{ rows().length }}</strong> embarcações
-        </span>
-      }
-    </footer>
+    <t-list-pager
+      noun="embarcações"
+      [loading]="loading()"
+      [total]="filtered().length"
+      [page]="currentPage()"
+      (pageChange)="goTo($event)"
+    />
   </section>
 </div>
 

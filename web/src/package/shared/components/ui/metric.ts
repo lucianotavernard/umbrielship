@@ -27,12 +27,18 @@ import { Component, input } from '@angular/core';
       }
     </div>
     @if (note() && notePlacement() === 'corner') {
-      <small class="mb-0.5 hidden self-end text-[9px] whitespace-nowrap text-muted-foreground lg:block">
+      <small
+        class="mb-0.5 hidden self-end text-[9px] whitespace-nowrap text-muted-foreground"
+        [class]="noteFrom() === 'xl' ? 'xl:block' : 'lg:block'"
+      >
         {{ note() }}
       </small>
     }
     @if (note() && notePlacement() === 'end') {
-      <small class="hidden shrink-0 self-center text-[9px] whitespace-nowrap text-muted-foreground/80 lg:block">
+      <small
+        class="hidden shrink-0 self-center text-[9px] whitespace-nowrap text-muted-foreground/80"
+        [class]="noteFrom() === 'xl' ? 'xl:block' : 'lg:block'"
+      >
         {{ note() }}
       </small>
     }
@@ -50,6 +56,8 @@ export class Metric {
   readonly value = input.required<string>();
   readonly note = input('');
   readonly notePlacement = input<'corner' | 'end' | 'below'>('corner');
+  /** From which width a `corner` or `end` note shows: `xl` where four cards leave it no room before 1280px. */
+  readonly noteFrom = input<'lg' | 'xl'>('lg');
   readonly tone = input<'blue' | 'teal' | 'amber' | 'green'>('blue');
 
   protected readonly tones = {

@@ -1,30 +1,48 @@
 import { httpResource } from '@angular/common/http';
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideDownload, lucidePlus, lucideSearch, lucideShip, lucideX } from '@ng-icons/lucide';
+import {
+  lucideCheck,
+  lucideDownload,
+  lucideGauge,
+  lucidePlus,
+  lucideSearch,
+  lucideShip,
+  lucideWrench,
+  lucideX,
+} from '@ng-icons/lucide';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
+import { clampPage, pageOf } from '../../../shared/components/lib/paging';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
-import { Metric, twoDigits } from '../../../shared/components/ui/metric';
+import { ListPager } from '../../../shared/components/ui/list-pager';
+import { Metric } from '../../../shared/components/ui/metric';
 import { Sheet } from '../../../shared/components/ui/sheet';
-import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
 import { GetCustomersResponse } from '../../customer/customer.service';
 import { VesselForm } from '../components/vessel-form';
 import { VesselList as VesselListUI, VesselRow } from '../components/vessel-list';
 import { downloadCsv, vesselsCsv } from '../vessel-csv';
-import { CreateVesselRequest, GetVesselsResponse, VesselService, vesselTypeLabels } from '../vessel.service';
-
-const fold = (text: string) => text.toLocaleLowerCase('pt-BR');
+import { customerOptions, filterVessels } from '../vessel-filters';
+import { vesselMetrics } from '../vessel-metrics';
+import {
+  CreateVesselRequest,
+  GetVesselsResponse,
+  VESSEL_TYPES,
+  VesselService,
+  vesselTypeLabels,
+} from '../vessel.service';
 
 @Component({
   selector: 'vessel-list',
-  imports: [NgIcon, Button, Confirmation, Metric, Sheet, Skeleton, VesselForm, VesselListUI],
-  viewProviders: [provideIcons({ lucideDownload, lucidePlus, lucideSearch, lucideShip, lucideX })],
+  imports: [NgIcon, Button, Confirmation, ListPager, Metric, Sheet, VesselForm, VesselListUI],
+  viewProviders: [
+    provideIcons({ lucideCheck, lucideDownload, lucideGauge, lucidePlus, lucideSearch, lucideShip, lucideWrench, lucideX }),
+  ],
   templateUrl: './vessel-list.html',
 })
 export class VesselList {
@@ -37,6 +55,9 @@ export class VesselList {
   customerResource = httpResource<GetCustomersResponse>(() => '/api/customers');
 
   search = signal('');
+  /** "Filtrar por cliente" and "Filtrar por tipo"; '' keeps every one. */
+  customerFilter = signal('');
+  typeFilter = signal('');
   selected = signal<ReadonlySet<string>>(new Set());
   submitting = signal(false);
   confirming = signal(false);
@@ -57,17 +78,18 @@ export class VesselList {
       .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   });
 
-  shown = computed(() => {
-    const term = fold(this.search().trim());
-    if (!term) return this.rows();
-    return this.rows().filter((vessel) =>
-      fold([vessel.name, vessel.customerName, vessel.imoNumber, vesselTypeLabels[vessel.type]].join(' ')).includes(
-        term,
-      ),
-    );
-  });
+  page = signal(1);
+  /** The Vessels the filters and the search keep, every page included. */
+  filtered = computed(() => filterVessels(this.rows(), this.customerFilter(), this.typeFilter(), this.search()));
+  /** The page shown, 10 at a time (AD-101). */
+  currentPage = computed(() => clampPage(this.page(), this.filtered().length));
+  shown = computed(() => pageOf(this.filtered(), this.currentPage()));
+  customerChoices = computed(() => customerOptions(this.rows()));
+  protected readonly types = VESSEL_TYPES;
+  protected readonly typeLabels = vesselTypeLabels;
 
-  total = computed(() => twoDigits(this.rows().length));
+  /** "Total na frota", "Em operação", "Em manutenção" and "Fora de operação" (AD-099). */
+  metrics = computed(() => vesselMetrics(this.rows()));
   selectedCount = computed(() => this.selected().size);
   exportLabel = computed(() => {
     const count = this.selectedCount();
@@ -85,7 +107,21 @@ export class VesselList {
     });
   }
 
-  /** Selects every row shown, or clears them when they are all selected already. */
+  constructor() {
+    // A new search or filter starts on page 1.
+    effect(() => {
+      this.search();
+      this.customerFilter();
+      this.typeFilter();
+      untracked(() => this.page.set(1));
+    });
+  }
+
+  goTo(page: number) {
+    this.page.set(clampPage(page, this.filtered().length));
+  }
+
+  /** Selects every row of the page, or clears them when they are all selected already. */
   toggleShown() {
     const shown = this.shown().map((vessel) => vessel.id);
     this.selected.update((current) => {
@@ -144,6 +180,7 @@ export class VesselList {
           name: vessel.name,
           type: vessel.type,
           length: vessel.length,
+          status: vessel.status,
         })
       : this.vesselService.createVessel(vessel);
 
@@ -157,7 +194,10 @@ export class VesselList {
           toast.success('Embarcação criada com sucesso', {
             description: 'A embarcação foi criada com sucesso.',
           });
+          // The new Vessel shows whatever was filtered before.
           this.search.set('');
+          this.customerFilter.set('');
+          this.typeFilter.set('');
         }
         this.submitting.set(false);
         this.closeSheet();

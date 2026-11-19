@@ -202,7 +202,13 @@ describe('VesselDetail', () => {
 
     const put = controller.expectOne('/api/customers/c-atl/vessels/vessel-1');
     expect(put.request.method).toBe('PUT');
-    expect(put.request.body).toEqual({ customerId: 'c-atl', name: 'Santa Maria II', type: 'FISHING', length: 33.5 });
+    expect(put.request.body).toEqual({
+      customerId: 'c-atl',
+      name: 'Santa Maria II',
+      type: 'FISHING',
+      length: 33.5,
+      status: 'ACTIVE',
+    });
     put.flush({ vessel: {} });
     await settle();
     controller.expectOne('/api/vessels/vessel-1').flush({ vessel: { ...aurora, name: 'Santa Maria II', length: 33.5 } });
@@ -562,6 +568,12 @@ describe('VesselDetail', () => {
         icon: 'lucideRuler',
         labels: ['Tipo de embarcação *', 'Comprimento (m) *'],
       },
+      {
+        title: 'Operação',
+        subtitle: 'Localização e situação atual da frota',
+        icon: 'lucideAnchor',
+        labels: ['Status'],
+      },
     ]);
     expect(sheet.querySelector('#customerId')).toBeNull();
     expect(sheet.querySelector('#imoNumber')).toBeNull();
@@ -585,6 +597,7 @@ describe('VesselDetail', () => {
       'vessel-name': ['Nome é obrigatório'],
       type: [],
       length: ['Comprimento é obrigatório'],
+      'vessel-status': [],
     });
     expect(invalidIn(sheet)).toEqual(['vessel-name', 'length']);
     for (const message of ['Nome é obrigatório', 'Comprimento é obrigatório']) {
@@ -611,7 +624,13 @@ describe('VesselDetail', () => {
 
     // The route the drawer calls today (AC 29): the Vessel under its Customer.
     const put = controller.expectOne({ method: 'PUT', url: '/api/customers/c-atl/vessels/vessel-1' });
-    expect(put.request.body).toEqual({ customerId: 'c-atl', name: 'Santa Maria II', type: 'FISHING', length: 33.5 });
+    expect(put.request.body).toEqual({
+      customerId: 'c-atl',
+      name: 'Santa Maria II',
+      type: 'FISHING',
+      length: 33.5,
+      status: 'ACTIVE',
+    });
     put.flush({ vessel: {} });
     await settle();
     controller

@@ -1,7 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { toast } from '../../../shared/components/ui/toaster';
@@ -26,9 +27,12 @@ const customers = [
   },
 ];
 
-const aurora = { id: 'v-aur', name: 'Aurora', imoNumber: '9182451', type: 'CARGO', length: 32.5, customerId: 'c-atl' };
-const lula = { id: 'v-lul', name: 'Lula Branca', imoNumber: '9236178', type: 'FISHING', length: 28, customerId: 'c-atl' };
-const vento = { id: 'v-ven', name: 'Vento Leste', imoNumber: '', type: 'TANKER', length: 26.44, customerId: 'c-mar' };
+const aurora = { id: 'v-aur', name: 'Aurora', imoNumber: '9182451', type: 'CARGO', length: 32.5, customerId: 'c-atl', status: 'ACTIVE' };
+const lula = { id: 'v-lul', name: 'Lula Branca', imoNumber: '9236178', type: 'FISHING', length: 28, customerId: 'c-atl', status: 'MAINTENANCE' };
+const vento = { id: 'v-ven', name: 'Vento Leste', imoNumber: '', type: 'TANKER', length: 26.44, customerId: 'c-mar', status: 'INACTIVE' };
+
+@Component({ template: 'detail' })
+class DetailStub {}
 
 describe('VesselList', () => {
   let controller: HttpTestingController;
@@ -37,7 +41,11 @@ describe('VesselList', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: 'vessels/:id', component: DetailStub }]),
+      ],
     });
     controller = TestBed.inject(HttpTestingController);
     // Write controls render only for a Role that may write.
@@ -85,8 +93,8 @@ describe('VesselList', () => {
   const buttonByText = (text: string, root: ParentNode = element) =>
     [...root.querySelectorAll<HTMLButtonElement>('button')].find((button) => button.textContent?.trim() === text);
   const rowNames = () =>
-    [...element.querySelectorAll('[data-slot="vessel-row"] a')].map((link) => link.textContent?.trim());
-  const footer = () => element.querySelector('[data-slot="list-footer"]')?.textContent?.replace(/\s+/g, ' ').trim();
+    [...element.querySelectorAll('[data-slot="vessel-row"] [data-slot="vessel-name"]')].map((name) => name.textContent?.trim());
+  const footer = () => element.querySelector('[data-slot="list-footer"] [data-slot="range"]')?.textContent?.replace(/\s+/g, ' ').trim();
   const search = (value: string) => type('input[aria-label="Buscar embarcação"]', value);
   const drawer = () => document.querySelector<HTMLElement>('[data-slot="sheet-content"]');
   const exportButton = () =>
@@ -156,10 +164,17 @@ describe('VesselList', () => {
 
     expect(vesselRequest.request.urlWithParams).toBe('/api/vessels');
     expect(customerRequest.request.urlWithParams).toBe('/api/customers');
-    const values = [...element.querySelectorAll('[data-slot="metric-value"]')].map((value) => value.textContent?.trim());
-    expect(values).toEqual(['03']);
-    expect(element.textContent).toContain('Total na frota');
-    for (const gone of ['Em operação', 'Em manutenção', 'Fora de operação', 'STATUS', 'Todas', 'Frota atualizada']) {
+    const metrics = [...element.querySelectorAll('[data-slot="metric"]')].map((metric) =>
+      metric.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    // One vessel of each status (AD-099).
+    expect(metrics).toEqual([
+      'Total na frota 03 embarcações',
+      'Em operação 01 Ativas',
+      'Em manutenção 01 Atenção técnica',
+      'Fora de operação 01 Inativas',
+    ]);
+    for (const gone of ['STATUS', 'Todas', 'Frota atualizada']) {
       expect(element.textContent).not.toContain(gone);
     }
     expect(element.textContent).toContain('OPERAÇÃO / FROTA');
@@ -177,7 +192,8 @@ describe('VesselList', () => {
     expect(headers).toEqual(['', 'EMBARCAÇÃO', 'NÚMERO IMO', 'TIPO', 'COMPRIMENTO', 'CLIENTE', 'Ações']);
     const rows = [...element.querySelectorAll<HTMLElement>('[data-slot="vessel-row"]')].map((row) => ({
       checkbox: row.querySelector('input[type="checkbox"]')?.getAttribute('aria-label'),
-      href: row.querySelector('a')?.getAttribute('href'),
+      // The name is no longer a link: the row opens the Vessel (AD-103).
+      links: row.querySelectorAll('a').length,
       imo: row.querySelector('[data-slot="imo"]')?.textContent?.trim(),
       type: row.querySelector('[data-slot="type"]')?.textContent?.trim(),
       length: row.querySelector('[data-slot="length"]')?.textContent?.trim(),
@@ -186,7 +202,7 @@ describe('VesselList', () => {
     expect(rows).toEqual([
       {
         checkbox: 'Selecionar embarcação Aurora',
-        href: '/vessels/v-aur',
+        links: 0,
         imo: '9182451',
         type: 'Carga',
         length: '32,5 m',
@@ -194,7 +210,7 @@ describe('VesselList', () => {
       },
       {
         checkbox: 'Selecionar embarcação Lula Branca',
-        href: '/vessels/v-lul',
+        links: 0,
         imo: '9236178',
         type: 'Pesca',
         length: '28 m',
@@ -202,7 +218,7 @@ describe('VesselList', () => {
       },
       {
         checkbox: 'Selecionar embarcação Vento Leste',
-        href: '/vessels/v-ven',
+        links: 0,
         imo: '—',
         type: 'Tanque',
         length: '26,4 m',
@@ -216,7 +232,7 @@ describe('VesselList', () => {
 
     await search('aurora');
     expect(rowNames()).toEqual(['Aurora']);
-    expect(footer()).toBe('Exibindo 1 de 3 embarcações');
+    expect(footer()).toBe('Exibindo 1–1 de 1 embarcações');
     await search('ATLÂNTICO');
     expect(rowNames()).toEqual(['Aurora', 'Lula Branca']);
     await search('9182');
@@ -234,7 +250,53 @@ describe('VesselList', () => {
     await click(byLabel('Limpar busca'));
     expect(element.querySelector<HTMLInputElement>('input[aria-label="Buscar embarcação"]')!.value).toBe('');
     expect(rowNames()).toHaveLength(3);
-    expect(footer()).toBe('Exibindo 3 de 3 embarcações');
+    expect(footer()).toBe('Exibindo 1–3 de 3 embarcações');
+  });
+
+  it('filters by customer and by type before the search, and the three combine', async () => {
+    await open();
+    const options = (id: string) =>
+      [...element.querySelectorAll<HTMLOptionElement>(`#${id} option`)].map((option) => option.textContent?.trim());
+
+    // The selects come before the search, on the same row.
+    const toolbar = element.querySelector('#vessel-customer-filter')!.parentElement!;
+    expect([...toolbar.querySelectorAll('select, input')].map((field) => field.id || field.getAttribute('aria-label'))).toEqual([
+      'vessel-customer-filter',
+      'vessel-type-filter',
+      'Buscar embarcação',
+    ]);
+    expect(options('vessel-customer-filter')).toEqual(['Todos os clientes', 'Cooperativa Mar Azul', 'Pescados Atlântico']);
+    expect(options('vessel-type-filter')).toEqual([
+      'Todos os tipos',
+      'Carga',
+      'Tanque',
+      'Passageiro',
+      'Pesca',
+      'Graneleiro',
+      'Contêiner',
+      'Outro',
+    ]);
+
+    await type('#vessel-customer-filter', 'c-atl');
+    expect(rowNames()).toEqual(['Aurora', 'Lula Branca']);
+    expect(footer()).toBe('Exibindo 1–2 de 2 embarcações');
+    await type('#vessel-type-filter', 'FISHING');
+    expect(rowNames()).toEqual(['Lula Branca']);
+    await search('aurora');
+    expect(rowNames()).toEqual([]);
+    expect(element.querySelector('[data-slot="empty"]')?.textContent?.trim()).toBe(
+      'Nenhuma embarcação corresponde à sua busca.',
+    );
+
+    await search('');
+    await type('#vessel-customer-filter', '');
+    expect(rowNames()).toEqual(['Lula Branca']);
+    await type('#vessel-type-filter', 'TANKER');
+    expect(rowNames()).toEqual(['Vento Leste']);
+    await type('#vessel-type-filter', '');
+    expect(rowNames()).toEqual(['Aurora', 'Lula Branca', 'Vento Leste']);
+    // The filters never ask the API.
+    expect(pending()).toEqual([]);
   });
 
   it('customer-ui C38 selects every shown row, goes indeterminate and keeps the selection across a search', async () => {
@@ -319,14 +381,21 @@ describe('VesselList', () => {
       name: `Cliente ${String(index + 1).padStart(2, '0')}`,
     }));
     await open([aurora], many);
+    // A filter that hides every row, cleared by the create below.
+    await type('#vessel-type-filter', 'TANKER');
+    expect(rowNames()).toEqual([]);
 
     await click(buttonByText('Nova embarcação'));
     const sheet = drawer()!;
     expect(sheet.querySelector('[data-slot="sheet-kicker"]')?.textContent?.trim()).toBe('FROTA / EMBARCAÇÕES');
     expect(sheet.querySelector('[data-slot="sheet-title"]')?.textContent?.trim()).toBe('Nova embarcação');
     expect(sheet.textContent).toContain('Preencha os dados abaixo para registrar uma embarcação na frota.');
-    expect(sheet.textContent).not.toContain('Operação');
+    // The "Operação" card holds the status alone, "Ativa" first (AD-099).
+    expect(sheet.textContent).toContain('Operação');
     expect(sheet.textContent).not.toContain('Porto base');
+    const status = sheet.querySelector<HTMLSelectElement>('#vessel-status')!;
+    expect(status.value).toBe('ACTIVE');
+    expect([...status.options].map((option) => option.textContent?.trim())).toEqual(['Ativa', 'Em manutenção', 'Inativa']);
     expect(sheet.querySelector('label[for="customerId"]')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
       'Cliente responsável *',
     );
@@ -343,6 +412,7 @@ describe('VesselList', () => {
     await type('#imoNumber', '9073412');
     await type('#type', 'FISHING');
     await type('#length', '24.8');
+    await type('#vessel-status', 'MAINTENANCE');
     await click(buttonByText('Criar embarcação', sheet));
 
     const post = controller.expectOne('/api/vessels');
@@ -353,6 +423,7 @@ describe('VesselList', () => {
       imoNumber: '9073412',
       type: 'FISHING',
       length: 24.8,
+      status: 'MAINTENANCE',
     });
     post.flush({ vessel: {} });
     await settle();
@@ -364,6 +435,7 @@ describe('VesselList', () => {
 
     expect(success).toHaveBeenCalledWith('Embarcação criada com sucesso', expect.anything());
     expect(drawer()).toBeNull();
+    expect(element.querySelector<HTMLSelectElement>('#vessel-type-filter')!.value).toBe('');
     expect(rowNames()).toEqual(['Aurora', 'Maré Alta']);
 
     // Cancelar and Fechar formulário close without a request.
@@ -388,6 +460,7 @@ describe('VesselList', () => {
     expect(sheet.querySelector<HTMLInputElement>('#vessel-name')!.value).toBe('Aurora');
     expect(sheet.querySelector<HTMLSelectElement>('#type')!.value).toBe('CARGO');
     expect(sheet.querySelector<HTMLInputElement>('#length')!.value).toBe('32.5');
+    expect(sheet.querySelector<HTMLSelectElement>('#vessel-status')!.value).toBe('ACTIVE');
 
     // What is typed and cancelled never comes back on the next Editar.
     await type('#vessel-name', 'Digitado e cancelado');
@@ -398,11 +471,12 @@ describe('VesselList', () => {
 
     await type('#vessel-name', 'Aurora II');
     await type('#length', '33');
+    await type('#vessel-status', 'INACTIVE');
     await click(buttonByText('Salvar alterações', drawer()!));
 
     const put = controller.expectOne('/api/customers/c-atl/vessels/v-aur');
     expect(put.request.method).toBe('PUT');
-    expect(put.request.body).toEqual({ customerId: 'c-atl', name: 'Aurora II', type: 'CARGO', length: 33 });
+    expect(put.request.body).toEqual({ customerId: 'c-atl', name: 'Aurora II', type: 'CARGO', length: 33, status: 'INACTIVE' });
     put.flush({ vessel: {} });
     await settle();
     controller.expectOne('/api/vessels').flush({
@@ -492,6 +566,12 @@ describe('VesselList', () => {
           icon: 'lucideRuler',
           labels: ['Número IMO *', 'Tipo de embarcação *', 'Comprimento (m) *'],
         },
+        {
+          title: 'Operação',
+          subtitle: 'Localização e situação atual da frota',
+          icon: 'lucideAnchor',
+          labels: ['Status'],
+        },
       ],
       hint: '* Campos obrigatórios',
       buttons: [
@@ -546,6 +626,7 @@ describe('VesselList', () => {
       imoNumber: '9073412',
       type: 'FISHING',
       length: 24.8,
+      status: 'ACTIVE',
     });
     requests[0].flush({ vessel: {} });
     await settle();
@@ -584,6 +665,12 @@ describe('VesselList', () => {
           subtitle: 'Identificação e dimensões da embarcação',
           icon: 'lucideRuler',
           labels: ['Tipo de embarcação *', 'Comprimento (m) *'],
+        },
+        {
+          title: 'Operação',
+          subtitle: 'Localização e situação atual da frota',
+          icon: 'lucideAnchor',
+          labels: ['Status'],
         },
       ],
       hint: '* Campos obrigatórios',
@@ -638,7 +725,13 @@ describe('VesselList', () => {
     expect(requests.map(({ request }) => `${request.method} ${request.urlWithParams}`)).toEqual([
       'PUT /api/customers/c-atl/vessels/v-aur',
     ]);
-    expect(requests[0].request.body).toEqual({ customerId: 'c-atl', name: 'Aurora II', type: 'TANKER', length: 33 });
+    expect(requests[0].request.body).toEqual({
+      customerId: 'c-atl',
+      name: 'Aurora II',
+      type: 'TANKER',
+      length: 33,
+      status: 'ACTIVE',
+    });
     requests[0].flush({ vessel: {} });
     await settle();
     controller.expectOne('/api/vessels').flush({
@@ -650,5 +743,69 @@ describe('VesselList', () => {
     expect(success).toHaveBeenCalledWith('Embarcação atualizada com sucesso', expect.anything());
     expect(drawer()).toBeNull();
     expect(pending()).toEqual([]);
+  });
+
+  it('pages the vessels 10 at a time and a search or a filter goes back to page 1', async () => {
+    const boats = Array.from({ length: 12 }, (_, at) => ({
+      ...aurora,
+      id: `v-${at + 1}`,
+      name: `Barco ${String(at + 1).padStart(2, '0')}`,
+      imoNumber: String(9000000 + at),
+      type: at < 11 ? 'CARGO' : 'FISHING',
+    }));
+    await open(boats);
+    const pager = () => element.querySelector('nav[aria-label="Paginação"]')!;
+    const pageButtons = () =>
+      [...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].map((button) => button.textContent?.trim());
+    const goToPage = (number: string) =>
+      click([...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].find((b) => b.textContent?.trim() === number));
+    const current = () => pager().querySelector('[aria-current="page"]')?.textContent?.trim();
+
+    expect(rowNames()).toHaveLength(10);
+    expect(footer()).toBe('Exibindo 1–10 de 12 embarcações');
+    expect(pageButtons()).toEqual(['1', '2']);
+
+    await goToPage('2');
+    expect(rowNames()).toEqual(['Barco 11', 'Barco 12']);
+    expect(footer()).toBe('Exibindo 11–12 de 12 embarcações');
+
+    await type('#vessel-type-filter', 'CARGO');
+    expect(current()).toBe('1');
+    expect(footer()).toBe('Exibindo 1–10 de 11 embarcações');
+
+    await goToPage('2');
+    expect(rowNames()).toEqual(['Barco 11']);
+    await search('barco 0');
+    expect(current()).toBe('1');
+    expect(rowNames()).toHaveLength(9);
+  });
+
+  it('customer-ui C36 a row opens its vessel except on the checkbox and the actions, which show on hover', async () => {
+    await open();
+    const router = TestBed.inject(Router);
+    const row = (name: string) =>
+      [...element.querySelectorAll<HTMLElement>('[data-slot="vessel-row"]')].find(
+        (item) => item.querySelector('[data-slot="vessel-name"]')?.textContent?.trim() === name,
+      )!;
+    const actions = row('Aurora').querySelector<HTMLElement>('[data-slot="row-actions"]')!;
+
+    expect([...actions.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Editar embarcação Aurora',
+      'Excluir embarcação Aurora',
+    ]);
+    expect(actions.firstElementChild!.classList).toContain('opacity-0');
+    expect(actions.firstElementChild!.classList).toContain('group-hover:opacity-100');
+    expect(byLabel('Excluir embarcação Aurora')!.classList).toContain('text-destructive');
+
+    await click(byLabel('Selecionar embarcação Aurora'));
+    await click(actions);
+    expect(router.url).toBe('/');
+
+    await click(row('Lula Branca').querySelector('[data-slot="type"]'));
+    expect(router.url).toBe('/vessels/v-lul');
+    row('Vento Leste').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve));
+    TestBed.tick();
+    expect(router.url).toBe('/vessels/v-ven');
   });
 });
