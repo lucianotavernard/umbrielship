@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import type { Role } from '../../../identity/user/user.service';
-import { buttonByText, byLabel, click, squash, WorkOrderListPage } from './work-order-list.harness';
+import { buttonByText, byLabel, click, WorkOrderListPage } from './work-order-list.harness';
 
 describe('WorkOrderList as inspector', () => {
   beforeEach(() => {
@@ -21,19 +21,15 @@ describe('WorkOrderList as inspector', () => {
     return WorkOrderListPage.open();
   }
 
-  /** Every label of the row menu of #AB12CD34, open or not. */
-  const menuItems = (page: WorkOrderListPage) =>
-    [
-      ...byLabel('Ações para #AB12CD34', page.element)!
-        .closest('t-dropdown-menu')!
-        .querySelectorAll('t-dropdown-menu-content a, t-dropdown-menu-content button'),
-    ].map((item) => squash(item.textContent));
+  /** The labels of the row actions of #AB12CD34. */
+  const actionLabels = (page: WorkOrderListPage) =>
+    [...page.actions('#AB12CD34').querySelectorAll('button')].map((button) => button.getAttribute('aria-label'));
 
   it('work-order-ui C15 hides the write controls and keeps selection and export', async () => {
     // The same page for a writer shows every control this test then looks for.
     const writer = await render('operator');
     expect(!!buttonByText('Nova ordem de serviço', writer.element)).toBe(true);
-    expect(menuItems(writer)).toEqual(['Ver detalhes', 'Editar', 'Excluir']);
+    expect(actionLabels(writer)).toEqual(['Editar ordem #AB12CD34', 'Excluir ordem #AB12CD34']);
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -44,11 +40,9 @@ describe('WorkOrderList as inspector', () => {
 
     expect(!!buttonByText('Nova ordem de serviço', page.element)).toBe(false);
     expect(page.element.textContent).not.toContain('Nova ordem de serviço');
-    expect(menuItems(page)).toEqual(['Ver detalhes']);
-    const menu = await page.openMenu('#AB12CD34');
-    expect(menu.getAttribute('data-state')).toBe('open');
-    expect(menu.textContent).not.toContain('Editar');
-    expect(menu.textContent).not.toContain('Excluir');
+    expect(actionLabels(page)).toEqual([]);
+    expect(page.element.textContent).not.toContain('Editar');
+    expect(page.element.textContent).not.toContain('Excluir');
 
     // Selection and Exportar stay.
     await click(byLabel('Selecionar ordem #AB12CD34', page.element));

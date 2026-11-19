@@ -137,10 +137,18 @@
         <work-order-service-list-ui
           [canWrite]="canWrite()"
           [loading]="loadingServices()"
-          [services]="services()"
+          [services]="shownServices()"
           [responsaveis]="responsaveis()"
           (fileSelected)="upload($event)"
         />
+        @if (!loadingServices() && services().length) {
+          <t-list-pager
+            noun="serviços"
+            [total]="services().length"
+            [page]="serviceCurrentPage()"
+            (pageChange)="servicePage.set($event)"
+          />
+        }
       </section>
 
       <section aria-labelledby="work-order-inspections-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">

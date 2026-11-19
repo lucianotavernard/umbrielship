@@ -20,8 +20,10 @@ import { formatLength } from '../../../customer/vessel/vessel-csv';
 import { GetVesselResponse, VesselType, vesselTypeLabels } from '../../../customer/vessel/vessel.service';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
+import { clampPage, pageOf } from '../../../shared/components/lib/paging';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
+import { ListPager } from '../../../shared/components/ui/list-pager';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
@@ -62,6 +64,7 @@ import {
     DatePipe,
     RouterLink,
     Confirmation,
+    ListPager,
     Sheet,
     Skeleton,
     WorkOrderForm,
@@ -143,6 +146,10 @@ export class WorkOrderDetail {
 
   services = computed(() => resourceValue(this.servicesResource)?.services ?? []);
   loadingServices = computed(() => this.servicesResource.isLoading());
+  /** The services table pages them 10 at a time (AD-101). */
+  servicePage = signal(1);
+  serviceCurrentPage = computed(() => clampPage(this.servicePage(), this.services().length));
+  shownServices = computed(() => pageOf(this.services(), this.serviceCurrentPage()));
 
   loadingAssignments = computed(() => this.assignmentsResource.isLoading());
   assignments = computed(() => resourceValue(this.assignmentsResource)?.inspectionAssignments ?? []);

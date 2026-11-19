@@ -268,7 +268,7 @@ describe('WorkOrderDrawer', () => {
     expect(success).toHaveBeenCalledWith('Ordem de serviço criada com sucesso', expect.anything());
     expect(drawer()).toBeNull();
     const row = page.rowOf('#FF001122')!;
-    expect(squash(row.querySelector('a[data-slot="vessel"]')?.textContent)).toBe('Lula Branca');
+    expect(squash(row.querySelector('[data-slot="vessel"]')?.textContent)).toBe('Lula Branca');
     expect(squash(row.querySelector('[data-slot="service"]')?.textContent)).toBe('Motor');
     expect(squash(row.querySelector('[data-slot="more-services"]')?.textContent)).toBe('+1 serviço');
     expect(page.codes()[0]).toBe('#FF001122');
@@ -345,7 +345,7 @@ describe('WorkOrderDrawer', () => {
     const success = vi.spyOn(toast, 'success');
     const page = await WorkOrderListPage.open();
 
-    const menu = await page.openMenu('#AB12CD34');
+    const menu = page.actions('#AB12CD34');
     await click(buttonByText('Editar', menu));
     const sheet = drawer()!;
 
@@ -515,7 +515,7 @@ describe('WorkOrderDrawer', () => {
   it('drawer-standard D2 Editar ordem de serviço keeps the standard frame, focuses Docagem and puts once', async () => {
     const page = await WorkOrderListPage.open();
     const openEdit = async () => {
-      await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+      await click(buttonByText('Editar', page.actions('#AB12CD34')));
       await settle();
       return drawer()!;
     };
@@ -725,7 +725,7 @@ describe('WorkOrderDrawer', () => {
       { id: 'a3', workOrderId: orderA.id, workOrderServiceId: helice.id, staffId: null, teamId: 'alfa' },
     ]);
 
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
 
     const entries = [...drawer()!.querySelectorAll<HTMLElement>('[data-slot="existing-service"]')];
     expect(entries.map((entry) => entry.querySelector<HTMLInputElement>('input[readonly]')!.value)).toEqual([
@@ -765,7 +765,7 @@ describe('WorkOrderDrawer', () => {
     await settle();
 
     // Open again, in progress: Motor takes Equipe Alfa and Hélice is cleared.
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     await type('#wo-status', 'IN_PROGRESS');
     await type('#wo-existing-assignee-0', 'team:alfa');
     await type('#wo-existing-assignee-2', '');
@@ -793,7 +793,7 @@ describe('WorkOrderDrawer', () => {
     await settle();
 
     // Still loading: the drawer lists no service and the save sends none.
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
     await click(buttonByText('Salvar alterações', drawer()!));
     let put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
@@ -808,7 +808,7 @@ describe('WorkOrderDrawer', () => {
     expect(error).toHaveBeenCalledWith('Erro ao carregar os responsáveis', {
       description: 'Não foi possível carregar os responsáveis.',
     });
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
     await click(buttonByText('Salvar alterações', drawer()!));
     put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
@@ -830,7 +830,7 @@ describe('WorkOrderDrawer', () => {
     const teams = controller.expectOne('/api/teams');
     await settle();
 
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
     await click(buttonByText('Salvar alterações', drawer()!));
     const put = controller.expectOne((req) => req.method === 'PUT' && req.url === `/api/work-orders/${orderA.id}`);
@@ -842,14 +842,14 @@ describe('WorkOrderDrawer', () => {
     // Once the Teams answer, the edit lists the services with their Responsável.
     teams.flush({ teams: [alfa] });
     await settle();
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     expect(drawer()!.querySelectorAll('[data-slot="existing-service"]')).toHaveLength(2);
   });
 
   it('workforce C26 shows no services to an operator editing', async () => {
     const page = await open('operator');
 
-    await click(buttonByText('Editar', await page.openMenu('#AB12CD34')));
+    await click(buttonByText('Editar', page.actions('#AB12CD34')));
     expect(drawer()!.querySelector('[data-slot="existing-service"]')).toBeNull();
     expect(drawer()!.textContent).not.toContain('Responsável');
     await click(buttonByText('Salvar alterações', drawer()!));

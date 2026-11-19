@@ -1,24 +1,23 @@
-import { Component, computed, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideClock3, lucideEllipsis, lucideEye, lucidePencil, lucideShip, lucideTrash2 } from '@ng-icons/lucide';
+import { lucideClock3, lucidePencil, lucideShip, lucideTrash2 } from '@ng-icons/lucide';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../shared/components/ui/dropdown-menu';
+import { Checkbox } from '../../../shared/components/ui/form';
+import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { moreServicesLabel, prazoLabel, shortDateTime, WorkOrderRow } from '../work-order-filters';
 import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../work-order.service';
 
-/** The mareos "Lista de ordens" table without "EQUIPE RESPONSÁVEL" and "PRIORIDADE" (AD-034). */
+/**
+ * The mareos "Lista de ordens" table without "EQUIPE RESPONSÁVEL" and "PRIORIDADE" (AD-034). A row opens
+ * its WorkOrder; "Editar" and "Excluir" show on the row's hover (AD-102).
+ */
 @Component({
   selector: 'work-order-table-ui',
-  imports: [NgIcon, RouterLink, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem],
-  viewProviders: [provideIcons({ lucideClock3, lucideEllipsis, lucideEye, lucidePencil, lucideShip, lucideTrash2 })],
+  imports: [NgIcon, Button, Skeleton, Checkbox],
+  viewProviders: [provideIcons({ lucideClock3, lucidePencil, lucideShip, lucideTrash2 })],
   template: `
     <div class="relative mt-[9px] w-full overflow-x-auto">
       <table class="w-full min-w-[760px] border-collapse text-left whitespace-nowrap">
@@ -27,7 +26,7 @@ import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../w
             <th class="w-9 pr-2 text-center">
               <input
                 type="checkbox"
-                class="size-[15px] cursor-pointer align-middle accent-primary"
+                tCheckbox
                 aria-label="Selecionar todas as ordens visíveis"
                 [checked]="allSelected()"
                 [indeterminate]="someSelected()"
@@ -63,13 +62,17 @@ import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../w
             @for (order of rows(); track order.id) {
               <tr
                 data-slot="work-order-row"
-                class="h-[59px] border-t border-border text-[10px] text-muted-foreground data-[selected]:bg-primary/5"
+                tabindex="0"
+                class="group h-[59px] cursor-pointer border-t border-border text-[10px] text-muted-foreground outline-none hover:bg-muted/40 focus-visible:bg-muted/40 data-[selected]:bg-primary/5"
                 [attr.data-selected]="selected().has(order.id) ? '' : null"
+                (click)="open(order)"
+                (keydown.enter)="open(order)"
               >
-                <td class="w-9 pr-2 text-center">
+                <!-- The checkbox and the actions keep their own clicks: neither opens the WorkOrder. -->
+                <td class="w-9 pr-2 text-center" (click)="$event.stopPropagation()">
                   <input
                     type="checkbox"
-                    class="size-[15px] cursor-pointer align-middle accent-primary"
+                    tCheckbox
                     [attr.aria-label]="'Selecionar ordem ' + code(order.id)"
                     [checked]="selected().has(order.id)"
                     (change)="toggled.emit(order.id)"
@@ -84,13 +87,9 @@ import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../w
                       <ng-icon name="lucideShip" class="!size-4" />
                     </span>
                     <div>
-                      <a
-                        data-slot="vessel"
-                        class="block text-[10px] font-semibold text-foreground hover:text-primary hover:underline"
-                        [routerLink]="['/work-orders', order.id]"
-                      >
+                      <span data-slot="vessel" class="block text-[10px] font-semibold text-foreground">
                         {{ order.vesselName }}
-                      </a>
+                      </span>
                       <span data-slot="code" class="mt-1 block text-[9px] text-muted-foreground">
                         {{ code(order.id) }} · {{ order.customerName }}
                       </span>
@@ -128,33 +127,38 @@ import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../w
                     {{ labels[order.status] }}
                   </span>
                 </td>
-                <td class="pr-[3px] text-right">
-                  <t-dropdown-menu>
-                    <button
-                      tDropdownMenuTrigger
-                      type="button"
-                      class="inline-grid size-[27px] place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-foreground"
-                      [attr.aria-label]="'Ações para ' + code(order.id)"
+                <td data-slot="row-actions" class="pr-[3px] text-right" (click)="$event.stopPropagation()">
+                  @if (canWrite()) {
+                    <!-- Shown on the row's hover or focus, and always where there is no hover. -->
+                    <div
+                      class="flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100"
                     >
-                      <ng-icon name="lucideEllipsis" class="!size-[17px]" />
-                    </button>
-                    <t-dropdown-menu-content align="end" class="w-40">
-                      <a tDropdownMenuItem [routerLink]="['/work-orders', order.id]">
-                        <ng-icon name="lucideEye" />
-                        Ver detalhes
-                      </a>
-                      @if (canWrite()) {
-                        <button tDropdownMenuItem type="button" (click)="edited.emit(order)">
-                          <ng-icon name="lucidePencil" />
-                          Editar
-                        </button>
-                        <button tDropdownMenuItem type="button" variant="destructive" (click)="deleted.emit(order)">
-                          <ng-icon name="lucideTrash2" />
-                          Excluir
-                        </button>
-                      }
-                    </t-dropdown-menu-content>
-                  </t-dropdown-menu>
+                      <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        class="size-[27px] rounded-[5px] text-muted-foreground hover:text-primary"
+                        [attr.aria-label]="'Editar ordem ' + code(order.id)"
+                        (click)="edited.emit(order)"
+                      >
+                        <ng-icon name="lucidePencil" class="!size-3.5" />
+                        <span class="sr-only">Editar</span>
+                      </button>
+                      <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        class="size-[27px] rounded-[5px] text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+                        [attr.aria-label]="'Excluir ordem ' + code(order.id)"
+                        (click)="deleted.emit(order)"
+                      >
+                        <ng-icon name="lucideTrash2" class="!size-3.5" />
+                        <span class="sr-only">Excluir</span>
+                      </button>
+                    </div>
+                  }
                 </td>
               </tr>
             }
@@ -179,12 +183,19 @@ export class WorkOrderTable {
   edited = output<WorkOrderRow>();
   deleted = output<WorkOrderRow>();
 
+  private readonly router = inject(Router);
+
   protected readonly labels = workOrderStatusLabels;
   protected readonly tones = workOrderStatusTones;
   protected readonly code = workOrderCode;
   protected readonly prazo = (iso: string) => prazoLabel(iso);
   protected readonly short = shortDateTime;
   protected readonly more = moreServicesLabel;
+
+  /** A row opens its WorkOrder (AD-102). */
+  protected open(order: WorkOrderRow) {
+    void this.router.navigate(['/work-orders', order.id]);
+  }
 
   protected readonly allSelected = computed(
     () => this.rows().length > 0 && this.rows().every((row) => this.selected().has(row.id)),

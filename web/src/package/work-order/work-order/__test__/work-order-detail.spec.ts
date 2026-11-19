@@ -759,6 +759,30 @@ describe('WorkOrderDetail', () => {
     expect(drawer()).toBeNull();
     expect(sent()).toEqual([]);
   });
+
+  it('pages the services 10 at a time', async () => {
+    const many = Array.from({ length: 12 }, (_, at) =>
+      service(`svc-${at + 1}`, `Serviço ${String(at + 1).padStart(2, '0')}`, 'Descrição', 'PENDING', 17),
+    );
+    const element = await render(many);
+    const panel = servicesPanel(element);
+    const names = () => [...panel.querySelectorAll('[data-slot="service-name"]')].map((name) => squash(name.textContent));
+    const range = () => squash(panel.querySelector('[data-slot="list-footer"] [data-slot="range"]')?.textContent);
+
+    expect(names()).toHaveLength(10);
+    expect(range()).toBe('Exibindo 1–10 de 12 serviços');
+    const two = [...panel.querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].find((b) => squash(b.textContent) === '2');
+    two!.click();
+    await settle();
+    expect(names()).toEqual(['Serviço 11', 'Serviço 12']);
+    expect(range()).toBe('Exibindo 11–12 de 12 serviços');
+  });
+
+  it('shows no services pager when the work order has no service', async () => {
+    const element = await render([]);
+
+    expect(servicesPanel(element).querySelector('[data-slot="list-footer"]')).toBeNull();
+  });
 });
 
 describe('WorkOrderDetail', () => {

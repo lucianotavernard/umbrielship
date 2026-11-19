@@ -287,10 +287,10 @@ export class WorkOrderListPage {
     return squash(this.element.querySelector('[data-slot="empty"]')?.textContent);
   }
 
-  /** Opens "Ações para <code>" and returns its menu. */
-  async openMenu(code: string) {
-    const trigger = byLabel<HTMLButtonElement>(`Ações para ${code}`, this.element);
-    await click(trigger);
-    return trigger!.closest('t-dropdown-menu')!.querySelector<HTMLElement>('t-dropdown-menu-content')!;
+  /** The actions cell of the row of `code`: its "Editar" and "Excluir" icon buttons (AD-102). */
+  actions(code: string) {
+    const row = this.rowOf(code);
+    if (!row) throw new Error(`no row ${code}`);
+    return row.querySelector<HTMLElement>('[data-slot="row-actions"]')!;
   }
 }

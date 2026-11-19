@@ -14,8 +14,6 @@ export const STATUS_TABS: { value: StatusTab; label: string }[] = [
   { value: 'CANCELLED', label: 'Cancelado' },
 ];
 
-export const PAGE_SIZE = 8;
-
 const fold = (text: string) => text.toLocaleLowerCase('pt-BR');
 
 /** The four metrics, over every WorkOrder and never over a tab or a search. */
@@ -64,21 +62,8 @@ export function filterWorkOrders(rows: WorkOrderRow[], tab: StatusTab, search: s
   });
 }
 
-/** The rows of page `page` (1-based), 8 at a time. */
-export function pageOf<T>(rows: T[], page: number, size = PAGE_SIZE): T[] {
-  return rows.slice((page - 1) * size, page * size);
-}
-
-export function pageCount(total: number, size = PAGE_SIZE): number {
-  return Math.ceil(total / size);
-}
-
-/** "Exibindo 9–16 de 17 ordens", over the filtered rows. */
-export function rangeLabel(total: number, page: number, size = PAGE_SIZE) {
-  const first = total ? (page - 1) * size + 1 : 0;
-  const last = Math.min(page * size, total);
-  return { first, last, total };
-}
+// The pages of the WorkOrder list and of the dashboard come from the shared paging (AD-101).
+export { pageCount, pageOf, rangeLabel } from '../../shared/components/lib/paging';
 
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
