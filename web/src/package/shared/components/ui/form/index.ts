@@ -4,3 +4,4 @@ export * from './input-error';
 export * from './label';
 export * from './select';
 export * from './textarea';
+export * from './checkbox';
