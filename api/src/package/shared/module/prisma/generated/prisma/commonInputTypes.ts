@@ -278,6 +278,13 @@ export type FloatFilter<$PrismaModel = never> = {
   not?: Prisma.NestedFloatFilter<$PrismaModel> | number
 }
 
+export type EnumVesselStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VesselStatus | Prisma.EnumVesselStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel> | $Enums.VesselStatus
+}
+
 export type EnumVesselTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.VesselType | Prisma.EnumVesselTypeFieldRefInput<$PrismaModel>
   in?: $Enums.VesselType[] | Prisma.ListEnumVesselTypeFieldRefInput<$PrismaModel>
@@ -302,6 +309,16 @@ export type FloatWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedFloatFilter<$PrismaModel>
   _min?: Prisma.NestedFloatFilter<$PrismaModel>
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type EnumVesselStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VesselStatus | Prisma.EnumVesselStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVesselStatusWithAggregatesFilter<$PrismaModel> | $Enums.VesselStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel>
 }
 
 export type EnumQuestionTypeFilter<$PrismaModel = never> = {
@@ -644,6 +661,13 @@ export type NestedEnumVesselTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumVesselTypeFilter<$PrismaModel> | $Enums.VesselType
 }
 
+export type NestedEnumVesselStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.VesselStatus | Prisma.EnumVesselStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel> | $Enums.VesselStatus
+}
+
 export type NestedEnumVesselTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.VesselType | Prisma.EnumVesselTypeFieldRefInput<$PrismaModel>
   in?: $Enums.VesselType[] | Prisma.ListEnumVesselTypeFieldRefInput<$PrismaModel>
@@ -668,6 +692,16 @@ export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedFloatFilter<$PrismaModel>
   _min?: Prisma.NestedFloatFilter<$PrismaModel>
   _max?: Prisma.NestedFloatFilter<$PrismaModel>
+}
+
+export type NestedEnumVesselStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.VesselStatus | Prisma.EnumVesselStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.VesselStatus[] | Prisma.ListEnumVesselStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumVesselStatusWithAggregatesFilter<$PrismaModel> | $Enums.VesselStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumVesselStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumQuestionTypeFilter<$PrismaModel = never> = {

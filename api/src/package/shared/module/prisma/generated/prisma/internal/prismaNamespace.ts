@@ -1982,7 +1982,8 @@ export const VesselScalarFieldEnum = {
   imoNumber: 'imoNumber',
   name: 'name',
   type: 'type',
-  length: 'length'
+  length: 'length',
+  status: 'status'
 } as const
 
 export type VesselScalarFieldEnum = (typeof VesselScalarFieldEnum)[keyof typeof VesselScalarFieldEnum]
@@ -2289,6 +2290,20 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VesselStatus'
+ */
+export type EnumVesselStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VesselStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VesselStatus[]'
+ */
+export type ListEnumVesselStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VesselStatus[]'>
     
 
 

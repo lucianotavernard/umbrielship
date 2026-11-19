@@ -41,6 +41,7 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
         length: vessel.length,
         imoNumber: vessel.imoNumber,
         customerId: vessel.customerId,
+        status: vessel.status,
         customer,
       },
       vessel.id,
@@ -94,11 +95,12 @@ export class InMemoryVesselsRepository implements IVesselsRepository {
   async save(vessel: Vessel): Promise<void> {
     const stored = this.items.find((item) => item.id === vessel.id);
 
-    // The Prisma repository updates only name, type and length.
+    // The Prisma repository updates only name, type, length and status.
     if (stored) {
       stored.name = vessel.name;
       stored.type = vessel.type;
       stored.length = vessel.length;
+      stored.status = vessel.status;
     }
   }
 

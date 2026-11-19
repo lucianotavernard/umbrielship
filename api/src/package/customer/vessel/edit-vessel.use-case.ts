@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 
-import { Vessel, VesselType } from './vessel.entity.js';
+import { Vessel, VesselStatus, VesselType } from './vessel.entity.js';
 import { IVesselsRepository } from './contracts/vessel-repository.contract.js';
 
 type EditVesselUseCaseRequest = {
@@ -12,6 +12,8 @@ type EditVesselUseCaseRequest = {
   name: string;
   type: VesselType;
   length: number;
+  /** The status it keeps when not given. */
+  status?: VesselStatus;
 };
 
 type EditVesselUseCaseResponse = {
@@ -29,6 +31,7 @@ export class EditVesselUseCase {
     name,
     type,
     length,
+    status,
   }: EditVesselUseCaseRequest): Promise<EditVesselUseCaseResponse> {
     const vessel = await this.vesselsRepository.findById(
       organizationId,
@@ -42,6 +45,7 @@ export class EditVesselUseCase {
     vessel.name = name;
     vessel.type = type;
     vessel.length = length;
+    vessel.status = status ?? vessel.status;
 
     await this.vesselsRepository.save(vessel);
 

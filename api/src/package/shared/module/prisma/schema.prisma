@@ -110,6 +110,14 @@ enum VesselType {
   @@map("vessel_type")
 }
 
+enum VesselStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+
+  @@map("vessel_status")
+}
+
 model Customer {
   id             String @id @default(uuid())
   organizationId String
@@ -196,6 +204,7 @@ model Vessel {
   name           String
   type           VesselType
   length         Float
+  status         VesselStatus @default(ACTIVE)
 
   customer Customer @relation(fields: [customerId], references: [id])
 
