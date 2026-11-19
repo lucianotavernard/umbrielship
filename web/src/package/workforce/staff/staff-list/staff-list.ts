@@ -17,9 +17,11 @@ import { map, Observable } from 'rxjs';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { downloadCsv } from '../../../shared/components/lib/csv';
+import { clampPage, pageOf } from '../../../shared/components/lib/paging';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
+import { ListPager } from '../../../shared/components/ui/list-pager';
 import { Metric } from '../../../shared/components/ui/metric';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
@@ -55,7 +57,7 @@ type Tab = 'profissionais' | 'equipes';
 /** The mareos "Equipe técnica" (AD-066) with the tab "Equipes" (AD-074). */
 @Component({
   selector: 'staff-list',
-  imports: [NgIcon, Button, Confirmation, Metric, Sheet, Skeleton, StaffForm, StaffTable, TeamForm, TeamTable],
+  imports: [NgIcon, Button, Confirmation, ListPager, Metric, Sheet, Skeleton, StaffForm, StaffTable, TeamForm, TeamTable],
   viewProviders: [
     provideIcons({
       lucideActivity,
@@ -139,7 +141,15 @@ export class StaffList {
 
   metrics = computed(() => staffMetrics(this.rows(), this.teams().length));
   chips = computed(() => specialtyChips(this.rows()));
-  shown = computed(() => filterStaff(this.rows(), this.team(), this.specialty(), this.search()));
+  /** The professionals the filters keep, every page included. */
+  filtered = computed(() => filterStaff(this.rows(), this.team(), this.specialty(), this.search()));
+  page = signal(1);
+  teamPage = signal(1);
+  /** The pages shown, 10 at a time (AD-101). */
+  currentPage = computed(() => clampPage(this.page(), this.filtered().length));
+  shown = computed(() => pageOf(this.filtered(), this.currentPage()));
+  teamCurrentPage = computed(() => clampPage(this.teamPage(), this.teamRows().length));
+  teamShown = computed(() => pageOf(this.teamRows(), this.teamCurrentPage()));
   sortedTeams = computed(() => [...this.teams()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')));
 
   selectedCount = computed(() => this.selected().size);
@@ -160,6 +170,14 @@ export class StaffList {
   });
 
   constructor() {
+    // A new search or filter starts on page 1.
+    effect(() => {
+      this.search();
+      this.team();
+      this.specialty();
+      untracked(() => this.page.set(1));
+    });
+
     effect(() => {
       for (const resource of [this.staffResource, this.teamResource, this.assignmentResource, this.workOrderResource]) {
         const error = resource.error();
@@ -172,6 +190,14 @@ export class StaffList {
         );
       }
     });
+  }
+
+  goTo(page: number) {
+    this.page.set(clampPage(page, this.filtered().length));
+  }
+
+  goToTeams(page: number) {
+    this.teamPage.set(clampPage(page, this.teamRows().length));
   }
 
   pickTab(tab: Tab) {
@@ -187,7 +213,7 @@ export class StaffList {
     });
   }
 
-  /** Selects the rows the filters show, or clears them when they are all selected already. */
+  /** Selects the rows of the page, or clears them when they are all selected already. */
   toggleShown() {
     const shown = this.shown().map((row) => row.id);
     this.selected.update((current) => {

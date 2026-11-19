@@ -77,7 +77,7 @@ describe('StaffList', () => {
     expect(camilaRow.textContent).toContain('(13) 99712-3088');
     expect(squash(camilaRow.textContent)).toContain('CR');
     expect(camilaRow.querySelector('[data-slot="staff-name"]')?.getAttribute('href')).toBe('/staff/camila');
-    expect(page.range()).toBe('Exibindo 4 de 4 profissionais');
+    expect(page.range()).toBe('Exibindo 1–4 de 4 profissionais');
   });
 
   it('workforce C12 filters by chip, team and search and shows both empty sentences', async () => {
@@ -101,7 +101,7 @@ describe('StaffList', () => {
     await click(page.chip('Todas'));
     await page.search('ALFA');
     expect(page.names()).toEqual(['Camila Rocha', 'Rafael Mendes']);
-    expect(page.range()).toBe('Exibindo 2 de 4 profissionais');
+    expect(page.range()).toBe('Exibindo 1–2 de 2 profissionais');
 
     await page.search('zzz');
     expect(page.empty()).toBe('Nenhum profissional encontrado com esses filtros.');
@@ -419,5 +419,42 @@ describe('StaffList', () => {
     expect(error).toHaveBeenCalledWith('Erro ao carregar a equipe técnica', {
       description: 'Não foi possível carregar a equipe técnica.',
     });
+  });
+
+  it('pages the professionals and the teams 10 at a time', async () => {
+    const people = Array.from({ length: 12 }, (_, at) => ({
+      ...rafael,
+      id: `s-${at + 1}`,
+      name: `Profissional ${String(at + 1).padStart(2, '0')}`,
+      email: `p${at + 1}@oficina.test`,
+    }));
+    const crews = Array.from({ length: 11 }, (_, at) => ({
+      ...alfa,
+      id: `t-${at + 1}`,
+      name: `Equipe ${String(at + 1).padStart(2, '0')}`,
+    }));
+    const page = await StaffListPage.open('administrator', { staff: people, teams: crews });
+    const element = page.element;
+    const pager = () => element.querySelector('nav[aria-label="Paginação"]')!;
+    const pageButtons = () =>
+      [...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].map((button) => button.textContent?.trim());
+    const goToPage = (number: string) =>
+      click([...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].find((b) => b.textContent?.trim() === number));
+    const current = () => pager().querySelector('[aria-current="page"]')?.textContent?.trim();
+
+    expect(page.names()).toHaveLength(10);
+    expect(page.range()).toBe('Exibindo 1–10 de 12 profissionais');
+    expect(pageButtons()).toEqual(['1', '2']);
+    await goToPage('2');
+    expect(page.names()).toEqual(['Profissional 11', 'Profissional 12']);
+    await page.search('profissional 1');
+    expect(current()).toBe('1');
+    expect(page.range()).toBe('Exibindo 1–3 de 3 profissionais');
+
+    await click(page.tab('Equipes'));
+    expect(page.teamRows()).toHaveLength(10);
+    expect(page.range()).toBe('Exibindo 1–10 de 11 equipes');
+    await goToPage('2');
+    expect(page.teamRows().map(([name]) => name)).toEqual(['Equipe 11']);
   });
 });

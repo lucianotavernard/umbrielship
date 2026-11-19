@@ -13,6 +13,7 @@ import {
   lucideWrench,
 } from '@ng-icons/lucide';
 
+import { Checkbox } from '../../../shared/components/ui/form';
 import { initials } from '../../../shared/components/lib/initials';
 import {
   DropdownMenu,
@@ -34,7 +35,7 @@ const AVATAR_TONES = [
 /** The mareos "Profissionais" table, with the row menu of AD-069. The page filters; this draws. */
 @Component({
   selector: 'staff-table-ui',
-  imports: [NgIcon, RouterLink, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem],
+  imports: [NgIcon, RouterLink, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Checkbox],
   viewProviders: [
     provideIcons({
       lucideEllipsis,
@@ -55,7 +56,7 @@ const AVATAR_TONES = [
             <th class="w-9 pr-2 text-center">
               <input
                 type="checkbox"
-                class="size-[15px] cursor-pointer align-middle accent-primary"
+                tCheckbox
                 aria-label="Selecionar todos os profissionais visíveis"
                 [checked]="allSelected()"
                 [indeterminate]="someSelected()"
@@ -93,7 +94,7 @@ const AVATAR_TONES = [
                 <td class="w-9 pr-2 text-center">
                   <input
                     type="checkbox"
-                    class="size-[15px] cursor-pointer align-middle accent-primary"
+                    tCheckbox
                     [attr.aria-label]="'Selecionar profissional ' + person.name"
                     [checked]="selected().has(person.id)"
                     (change)="toggled.emit(person.id)"
