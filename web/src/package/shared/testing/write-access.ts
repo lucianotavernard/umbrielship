@@ -134,7 +134,8 @@ export function writeControls(element: HTMLElement): string[] {
 // The page text with the write controls' labels removed, to compare what two Roles read.
 export function content(element: HTMLElement): string {
   let text = element.textContent ?? '';
-  for (const label of labels) text = text.replaceAll(label, '');
+  // A row's icon buttons carry "Editar" and "Excluir" as hidden text (AD-102, AD-103).
+  for (const label of [...labels, 'Excluir']) text = text.replaceAll(label, '');
   // Whitespace is dropped: a removed control leaves different spacing, not different content.
   return text.replace(/\s+/g, '');
 }

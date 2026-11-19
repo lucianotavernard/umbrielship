@@ -78,16 +78,13 @@
       (deleted)="openDialog($event)"
     />
 
-    <footer
-      data-slot="list-footer"
-      class="flex min-h-[45px] items-center text-[9px] text-muted-foreground"
-    >
-      @if (loading()) {
-        <t-skeleton class="h-3 w-32 rounded" />
-      } @else {
-        <span>Exibindo {{ shown().length }} de {{ customers().length }} clientes</span>
-      }
-    </footer>
+    <t-list-pager
+      noun="clientes"
+      [loading]="loading()"
+      [total]="filtered().length"
+      [page]="currentPage()"
+      (pageChange)="goTo($event)"
+    />
   </section>
 </div>
 

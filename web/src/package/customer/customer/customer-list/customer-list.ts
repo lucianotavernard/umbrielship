@@ -6,12 +6,13 @@ import { lucideMail, lucidePhone, lucidePlus, lucideSearch, lucideShip, lucideUs
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
+import { clampPage, pageOf } from '../../../shared/components/lib/paging';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
+import { ListPager } from '../../../shared/components/ui/list-pager';
 import { Metric, twoDigits } from '../../../shared/components/ui/metric';
 import { Sheet } from '../../../shared/components/ui/sheet';
-import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { toast } from '../../../shared/components/ui/toaster';
 import { CustomerForm } from '../components/customer-form';
 import { CustomerList as CustomerListUI } from '../components/customer-list';
@@ -27,7 +28,7 @@ const fold = (text: string) => text.toLocaleLowerCase('pt-BR');
 
 @Component({
   selector: 'customer-list',
-  imports: [NgIcon, Button, Confirmation, Metric, Sheet, Skeleton, CustomerForm, CustomerListUI],
+  imports: [NgIcon, Button, Confirmation, ListPager, Metric, Sheet, CustomerForm, CustomerListUI],
   viewProviders: [provideIcons({ lucideMail, lucidePhone, lucidePlus, lucideSearch, lucideShip, lucideUsers })],
   templateUrl: './customer-list.html',
 })
@@ -58,7 +59,10 @@ export class CustomerList {
     ),
   );
 
-  shown = computed(() => {
+  page = signal(1);
+
+  /** The Customers the search keeps, every page included. */
+  filtered = computed(() => {
     const term = fold(this.search().trim());
     if (!term) return this.customers();
     return this.customers().filter((customer) =>
@@ -67,6 +71,10 @@ export class CustomerList {
       ).includes(term),
     );
   });
+
+  /** The page shown, 10 at a time (AD-101). */
+  currentPage = computed(() => clampPage(this.page(), this.filtered().length));
+  shown = computed(() => pageOf(this.filtered(), this.currentPage()));
 
   /** Counted over every Customer, never over the search result. */
   metrics = computed(() => {
@@ -80,6 +88,12 @@ export class CustomerList {
   });
 
   constructor() {
+    // A new search starts on page 1.
+    effect(() => {
+      this.search();
+      untracked(() => this.page.set(1));
+    });
+
     effect(() => {
       const error = this.customerResource.error();
       if (!error) return;
@@ -90,6 +104,10 @@ export class CustomerList {
         }),
       );
     });
+  }
+
+  goTo(page: number) {
+    this.page.set(clampPage(page, this.filtered().length));
   }
 
   openCreate() {

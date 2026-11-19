@@ -1,7 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { toast } from '../../../shared/components/ui/toaster';
@@ -22,6 +23,9 @@ function customer(overrides: Partial<CustomerListItem> = {}): CustomerListItem {
   };
 }
 
+@Component({ template: 'detail' })
+class DetailStub {}
+
 describe('CustomerList', () => {
   let controller: HttpTestingController;
   let fixture: ComponentFixture<CustomerList>;
@@ -30,7 +34,11 @@ describe('CustomerList', () => {
   beforeEach(() => {
     sequence = 0;
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: 'customers/:id', component: DetailStub }]),
+      ],
     });
     controller = TestBed.inject(HttpTestingController);
     // Write controls render only for a Role that may write.
@@ -68,12 +76,12 @@ describe('CustomerList', () => {
 
   const search = (value: string) => type('input[placeholder="Buscar por nome, contato ou cidade..."]', value);
   const rowNames = () =>
-    [...element.querySelectorAll('[data-slot="customer-row"] a[href^="/customers/"]:not([aria-label])')].map(
-      (link) => link.textContent?.trim(),
+    [...element.querySelectorAll('[data-slot="customer-row"] [data-slot="customer-name"]')].map((name) =>
+      name.textContent?.trim(),
     );
   const metrics = () =>
     [...element.querySelectorAll('[data-slot="metric-value"]')].map((value) => value.textContent?.trim());
-  const footer = () => element.querySelector('[data-slot="list-footer"]')?.textContent?.replace(/\s+/g, ' ').trim();
+  const footer = () => element.querySelector('[data-slot="list-footer"] [data-slot="range"]')?.textContent?.replace(/\s+/g, ' ').trim();
   const byLabel = (label: string) => element.querySelector<HTMLElement>(`[aria-label="${label}"]`);
   const buttonByText = (text: string, root: ParentNode = element) =>
     [...root.querySelectorAll<HTMLButtonElement>('button')].find((button) => button.textContent?.trim() === text);
@@ -241,7 +249,7 @@ describe('CustomerList', () => {
     expect(rowNames()).toEqual(['Atlântico Pesca']);
     await search('SP');
     expect(rowNames()).toEqual(['Atlântico Pesca', 'Hispano Naval']);
-    expect(footer()).toBe('Exibindo 2 de 4 clientes');
+    expect(footer()).toBe('Exibindo 1–2 de 2 clientes');
     await search('cs@costa');
     expect(rowNames()).toEqual(['Costa Sul']);
     await search('2198888');
@@ -252,7 +260,7 @@ describe('CustomerList', () => {
     expect(rowNames()).toEqual(['Maré Alta']);
     await search('');
     expect(rowNames()).toHaveLength(4);
-    expect(footer()).toBe('Exibindo 4 de 4 clientes');
+    expect(footer()).toBe('Exibindo 1–4 de 4 clientes');
     // afterEach verifies that no request left the page while searching.
   });
 
@@ -281,7 +289,8 @@ describe('CustomerList', () => {
       row.querySelector(`[data-slot="${slot}"]`)?.textContent?.replace(/\s+/g, ' ').trim();
 
     expect(read(rows[0], 'initials')).toBe('PA');
-    expect(rows[0].querySelector('a[href="/customers/full"]')?.textContent?.trim()).toBe('Pescados Atlântico');
+    expect(read(rows[0], 'customer-name')).toBe('Pescados Atlântico');
+    expect(rows[0].querySelectorAll('a').length).toBe(0);
     expect(read(rows[0], 'street')).toBe('Rua Atlântica, 55');
     expect(read(rows[0], 'email')).toBe('ops@atl.test');
     expect(read(rows[0], 'phone')).toBe('47966665555');
@@ -532,10 +541,29 @@ describe('CustomerList', () => {
     expect(rowNames()).toEqual(['Atlantic']);
   });
 
-  it('customer-ui C25 Ver detalhes links to the customer', async () => {
-    await open([customer({ id: 'c-atl', name: 'Atlantic' })]);
+  it('customer-ui C25 a row opens the customer except on the actions, which show on hover', async () => {
+    await open([customer({ id: 'c-atl', name: 'Atlantic' }), customer({ id: 'c-mar', name: 'Mar Azul' })]);
+    const router = TestBed.inject(Router);
+    const rows = [...element.querySelectorAll<HTMLElement>('[data-slot="customer-row"]')];
+    const actions = rows[0].querySelector<HTMLElement>('[data-slot="row-actions"]')!;
 
-    expect(byLabel('Ver detalhes de Atlantic')?.getAttribute('href')).toBe('/customers/c-atl');
+    // "Ver detalhes de <nome>" gave way to the row itself (AD-103).
+    expect(byLabel('Ver detalhes de Atlantic')).toBeNull();
+    expect([...actions.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Editar Atlantic',
+      'Excluir Atlantic',
+    ]);
+    expect(actions.firstElementChild!.classList).toContain('opacity-0');
+    expect(actions.firstElementChild!.classList).toContain('group-hover:opacity-100');
+    expect(byLabel('Excluir Atlantic')!.classList).toContain('text-destructive');
+
+    await click(actions);
+    expect(router.url).toBe('/');
+    await click(rows[0].querySelector('[data-slot="location"]') as HTMLElement);
+    expect(router.url).toBe('/customers/c-atl');
+    rows[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await settle();
+    expect(router.url).toBe('/customers/c-mar');
   });
 
   it('drawer-standard D10 Novo cliente opens with the Dados do cliente and Endereço cards and posts once', async () => {
@@ -709,5 +737,29 @@ describe('CustomerList', () => {
     expect(success).toHaveBeenCalledWith('Cliente atualizado com sucesso', expect.anything());
     expect(dialog()).toBeNull();
     expect(pending()).toEqual([]);
+  });
+
+  it('pages the customers 10 at a time and a search goes back to page 1', async () => {
+    await open(Array.from({ length: 12 }, (_, at) => customer({ name: `Cliente ${String(at + 1).padStart(2, '0')}` })));
+    const pager = () => element.querySelector('nav[aria-label="Paginação"]')!;
+    const pageButtons = () =>
+      [...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].map((button) => button.textContent?.trim());
+    const goToPage = (number: string) =>
+      click([...pager().querySelectorAll<HTMLButtonElement>('button[data-slot="page"]')].find((b) => b.textContent?.trim() === number));
+    const current = () => pager().querySelector('[aria-current="page"]')?.textContent?.trim();
+
+    expect(rowNames()).toHaveLength(10);
+    expect(rowNames()[0]).toBe('Cliente 01');
+    expect(footer()).toBe('Exibindo 1–10 de 12 clientes');
+    expect(pageButtons()).toEqual(['1', '2']);
+
+    await goToPage('2');
+    expect(rowNames()).toEqual(['Cliente 11', 'Cliente 12']);
+    expect(footer()).toBe('Exibindo 11–12 de 12 clientes');
+
+    await search('cliente 1');
+    expect(current()).toBe('1');
+    expect(rowNames()).toEqual(['Cliente 10', 'Cliente 11', 'Cliente 12']);
+    expect(footer()).toBe('Exibindo 1–3 de 3 clientes');
   });
 });
