@@ -63,7 +63,7 @@ export class OrganizationDetail {
     () => `/api/users?not_in_organization=${this.id()}&per_page=100`,
   );
 
-  readonly perPage = 20;
+  readonly perPage = 10;
 
   usersPage = signal(1);
   invitationsPage = signal(1);

@@ -42,7 +42,7 @@ describe('OrganizationDetail with inspectors', () => {
         isInternal: false,
       },
     });
-    controller.expectOne('/api/organizations/org-1/users?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations/org-1/users?page=1&per_page=10').flush({
       users: [{ id: 'user-ines', name: 'Ines', email: 'ines@atlantic.test', role: 'inspector' }],
       total: 1,
     });
@@ -53,7 +53,7 @@ describe('OrganizationDetail with inspectors', () => {
         { role: 'inspector', users: 7 },
       ],
     });
-    controller.expectOne('/api/organizations/org-1/invitations?page=1&per_page=20').flush({
+    controller.expectOne('/api/organizations/org-1/invitations?page=1&per_page=10').flush({
       invitations: [],
       total: 0,
     });

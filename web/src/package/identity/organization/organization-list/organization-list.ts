@@ -27,7 +27,7 @@ export class OrganizationList {
     () => `/api/organizations?page=${this.page()}&per_page=${this.perPage}`,
   );
 
-  readonly perPage = 20;
+  readonly perPage = 10;
 
   page = signal(1);
   isSheetActive = signal(false);
