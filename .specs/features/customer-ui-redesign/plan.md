@@ -259,6 +259,10 @@ The Vessel detail shows the profile, its WorkOrders and its Customer.
 | "Ver ordens de serviço" and "Telefone e e-mail não estão cadastrados para este cliente." in "CLIENTE RESPONSÁVEL" | the Customer's email and phone and "Ver cliente" | y - AD-029 |
 | WorkOrder table with no actions and no pagination | delete with confirmation and 10 per page | y - AD-029 |
 | Light sidebar and faint Customer names in dark mode (`captures/customer-list-dark.jpg`) | dark sidebar `#141e29` and names at 4.5:1 or more | y - AD-030 |
+| The Customer detail 647px wide | 1044px wide at most, as the list pages | y - AD-098 |
+| Vessel status metrics and the "Operação" card | the four cards "Total na frota", "Em operação", "Em manutenção", "Fora de operação" and the "Status" field alone in "Operação"; no status tabs, badges or "Porto base" | y - AD-099 |
+| A name link in each Customer and Vessel row, "Ver detalhes de <nome>" in the Customer row, and "Editar"/"Excluir" always shown | the row opens the Customer or the Vessel, except on its checkbox and its actions; ghost icon buttons shown on the row's hover or focus, "Excluir" in the destructive colour | y - AD-103 |
+| The Vessel detail 988px wide | 1044px wide at most, as the Customer detail | y - AD-104 |
 
 ## Sources
 

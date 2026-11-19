@@ -81,7 +81,7 @@ Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C16 coun
 **C17** - Typing in the search filters by name, email, phone, city or state, case-insensitive, with no request, and the footer reads "Exibindo <shown> de <all> clientes" (AC 17)
 Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C17 filters by name, email, phone, city and state without a request
 
-**C18** - Each row shows the initials, the name link, street, email, phone, location and vessel count with the fallbacks of the source (AC 18)
+**C18** - Each row shows the initials, the name, street, email, phone, location and vessel count with the fallbacks of the source (AC 18)
 Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C18 shows each row with the fallbacks of the source
 
 **C19** - An Organization with no Customer says "Ainda não há clientes cadastrados."; a search with no match says "Nenhum cliente encontrado para essa busca." (AC 19)
@@ -105,8 +105,8 @@ Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C23 a 40
 Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C24 Excluir deletes only after the confirmation and drops the row
 Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C24 a refused delete keeps the row and toasts the message
 
-**C25** - "Ver detalhes de <name>" links to `/customers/:id` (AC 25)
-Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C25 Ver detalhes links to the customer
+**C25** - A row opens `/customers/:id` when clicked or on Enter, except on its actions, which show on the row's hover or focus (AC 25, AD-103)
+Proof: run web | ✓ customer-list.spec.ts > CustomerList > customer-ui C25 a row opens the customer except on the actions, which show on hover
 
 **C26** - An inspector sees no "Novo cliente", "Editar <name>" or "Excluir <name>" (AC 26)
 Proof: run web | ✓ customer-list.inspector.spec.ts > CustomerList for an inspector > customer-ui C26 renders no write control for an inspector
@@ -148,8 +148,9 @@ Proof: run api | ✓ vessel.http.spec.ts > GET /vessels > customer-ui C35 answer
 Proof: run api | ✓ vessel.http.spec.ts > GET /vessels > customer-ui C35 answers 401 without a token
 Proof: run api | ✓ vessel.repository.spec.ts > PrismaVesselsRepository > customer-ui C35 asks for every vessel when no page is given
 
-**C36** - Rows are sorted by Vessel name in pt-BR and show the checkbox, name link, IMO or "—", type label, "32,5 m" and the Customer name under "CLIENTE" (AC 36)
+**C36** - Rows are sorted by Vessel name in pt-BR and show the checkbox, name, IMO or "—", type label, "32,5 m" and the Customer name under "CLIENTE" (AC 36)
 Proof: run web | ✓ vessel-list.spec.ts > VesselList > customer-ui C36 sorts by name and shows IMO, type, length and the customer
+Proof: run web | ✓ vessel-list.spec.ts > VesselList > customer-ui C36 a row opens its vessel except on the checkbox and the actions, which show on hover
 
 **C37** - The search filters by name, Customer name, IMO or type label with no request; "Limpar busca" empties it; the footer and the empty message follow the source (AC 37)
 Proof: run web | ✓ vessel-list.spec.ts > VesselList > customer-ui C37 filters by name, customer, IMO and type and Limpar busca empties it
@@ -227,10 +228,10 @@ Proof: run web | ✓ vessel-detail.inspector.spec.ts > VesselDetail for an inspe
 | topbar sections (8 routes) | `/customers` · `/customers/:id` · `/vessels` · `/vessels/:id` · `/work-orders/:id` · `/dashboard` · `/inspection-templates` · `/organizations`, C5 table-driven over all 8 | - |
 | widths (5) | 640 C11 · 768 C11 · 1024 C11 · 1280 C11 · 1536 C11 | - |
 | source controls: shell, without "Recolher menu" (AD-031) (6) | Selecionar organização C6 · an Organization item C7 · a menu item C2, C9 · "..." / Sair C8 · Ativar tema escuro/claro C4 · Abrir menu C9 | - |
-| source controls: Customer list (5) | Novo cliente C21 · search C17 · name link C18 · Ver detalhes C25 · Editar C22 | - |
+| source controls: Customer list (5) | Novo cliente C21 · search C17 · name C18 · row opens the Customer C25 · Editar C22 | - |
 | source controls: Customer drawer (4) | Cadastrar cliente C21 · Salvar alterações C22 · Cancelar C21 · Fechar cadastro C21 | - |
 | source controls: Customer detail (2) | Clientes breadcrumb C28 · Vessel row link C30 | - |
-| source controls: Vessel list (8) | Nova embarcação C41 · Exportar C39, C40 · select all C38 · row checkbox C38 · search C37 · Limpar busca C37 · name link C36 · Editar C42 | - |
+| source controls: Vessel list (8) | Nova embarcação C41 · Exportar C39, C40 · select all C38 · row checkbox C38 · search C37 · Limpar busca C37 · name and row opens the Vessel C36 · Editar C42 | - |
 | source controls: Vessel drawer (4) | Salvar embarcação C41 · Salvar alterações C42 · Cancelar C41 · Fechar formulário C41 | - |
 | source controls: Vessel detail (4) | Voltar à frota C46 · Editar C48 · Nova ordem C50 · order code link C49 | - |
 | added controls (AD-022, AD-029) (4) | Excluir cliente C24 · Excluir embarcação (list) C43 · Excluir embarcação (detail) C31 · Excluir ordem C51 | - |
