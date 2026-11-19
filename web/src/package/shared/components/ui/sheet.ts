@@ -1,5 +1,7 @@
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   Injector,
@@ -9,10 +11,12 @@ import {
   inject,
   input,
   output,
+  untracked,
 } from '@angular/core';
 
 import { ClassValue } from 'clsx';
 
+import { lockBodyScroll } from '../lib/body-scroll-lock';
 import { cn } from '../lib/cn';
 
 @Component({
@@ -100,6 +104,9 @@ export class Sheet {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
+  /** Releases this drawer's lock on the page scroll; null while the drawer is closed. */
+  private releaseScroll: (() => void) | null = null;
 
   protected readonly computedClass = computed(() =>
     cn(
@@ -116,6 +123,21 @@ export class Sheet {
         afterNextRender(() => this.focusFirstField(), { injector: this.injector });
       }
     });
+
+    // While the drawer is open the page behind it does not scroll.
+    effect(() => {
+      const active = this.isActive();
+      untracked(() => {
+        if (active && !this.releaseScroll) this.releaseScroll = lockBodyScroll(this.document);
+        if (!active) this.unlockScroll();
+      });
+    });
+    inject(DestroyRef).onDestroy(() => this.unlockScroll());
+  }
+
+  private unlockScroll() {
+    this.releaseScroll?.();
+    this.releaseScroll = null;
   }
 
   private focusFirstField() {
