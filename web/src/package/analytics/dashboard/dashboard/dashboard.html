@@ -341,7 +341,7 @@
           <button
             type="button"
             aria-label="Página anterior"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground transition-colors enabled:hover:bg-muted enabled:hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted dark:enabled:hover:bg-accent"
             [disabled]="currentPage() <= 1"
             (click)="goTo(currentPage() - 1)"
           >
@@ -351,7 +351,7 @@
             <button
               type="button"
               data-slot="page"
-              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground dark:border-border dark:bg-muted aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
+              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:border-border dark:bg-muted dark:hover:bg-accent aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary aria-[current=page]:hover:bg-primary/10 aria-[current=page]:hover:text-primary"
               [attr.aria-current]="number === currentPage() ? 'page' : null"
               (click)="goTo(number)"
             >
@@ -361,7 +361,7 @@
           <button
             type="button"
             aria-label="Próxima página"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted"
+            class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent text-muted-foreground transition-colors enabled:hover:bg-muted enabled:hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 dark:border-border dark:bg-muted dark:enabled:hover:bg-accent"
             [disabled]="currentPage() >= pages().length"
             (click)="goTo(currentPage() + 1)"
           >
