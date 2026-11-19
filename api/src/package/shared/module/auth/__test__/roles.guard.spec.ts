@@ -118,7 +118,7 @@ const subOf = (role: Role, internal = false) =>
 const customerBody = {
   name: 'Atlantic',
   email: 'atlantic@example.com',
-  phone: null,
+  phone: '11999999999',
   address: { address: 'Rua 1', state: 'SP', city: 'Santos' },
 };
 const vesselBody = {
