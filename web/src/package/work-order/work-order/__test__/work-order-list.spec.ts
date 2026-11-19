@@ -105,61 +105,61 @@ describe('WorkOrderList', () => {
   });
 
   it('work-order-ui C6 filters by the status tab with its count and returns to page 1', async () => {
-    // 1-10 pending, 11-14 in progress, 15-16 completed, 17 cancelled.
+    // 1-12 pending, 13-17 in progress, 18-19 completed, 20-21 cancelled.
     const status = (index: number) =>
-      index <= 10 ? 'PENDING' : index <= 14 ? 'IN_PROGRESS' : index <= 16 ? 'COMPLETED' : 'CANCELLED';
-    const page = await WorkOrderListPage.open(generated(17, status));
+      index <= 12 ? 'PENDING' : index <= 17 ? 'IN_PROGRESS' : index <= 19 ? 'COMPLETED' : 'CANCELLED';
+    const page = await WorkOrderListPage.open(generated(21, status));
     const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, at) => code(from + at));
 
     expect(page.tabs().map((tab) => squash(tab.textContent))).toEqual([
-      'Todas 17',
-      'Pendente 10',
-      'Em andamento 4',
+      'Todas 21',
+      'Pendente 12',
+      'Em andamento 5',
       'Concluído 2',
-      'Cancelado 1',
+      'Cancelado 2',
     ]);
     expect(page.selectedTabs()).toEqual(['Todas']);
 
     await page.goToPage(2);
-    expect(page.codes()).toEqual(range(9, 16));
+    expect(page.codes()).toEqual(range(11, 20));
 
     await click(page.tab('Pendente'));
     expect(page.selectedTabs()).toEqual(['Pendente']);
     expect(page.tab('Pendente').getAttribute('aria-selected')).toBe('true');
     expect(page.currentPage()).toBe('1');
-    expect(page.codes()).toEqual(range(1, 8));
-    expect(page.range()).toBe('Exibindo 1–8 de 10 ordens');
+    expect(page.codes()).toEqual(range(1, 10));
+    expect(page.range()).toBe('Exibindo 1–10 de 12 ordens');
 
     await page.goToPage(2);
-    expect(page.codes()).toEqual(range(9, 10));
+    expect(page.codes()).toEqual(range(11, 12));
     await click(page.tab('Em andamento'));
     expect(page.selectedTabs()).toEqual(['Em andamento']);
     expect(page.currentPage()).toBe('1');
-    expect(page.codes()).toEqual(range(11, 14));
+    expect(page.codes()).toEqual(range(13, 17));
 
     await click(page.tab('Concluído'));
     expect(page.selectedTabs()).toEqual(['Concluído']);
-    expect(page.codes()).toEqual(range(15, 16));
+    expect(page.codes()).toEqual(range(18, 19));
 
     await click(page.tab('Cancelado'));
     expect(page.selectedTabs()).toEqual(['Cancelado']);
-    expect(page.codes()).toEqual([code(17)]);
+    expect(page.codes()).toEqual(range(20, 21));
 
     await click(page.tab('Todas'));
     expect(page.selectedTabs()).toEqual(['Todas']);
-    expect(page.codes()).toEqual(range(1, 8));
+    expect(page.codes()).toEqual(range(1, 10));
     // The counts never follow the tab.
     expect(page.tabs().map((tab) => squash(tab.textContent))).toEqual([
-      'Todas 17',
-      'Pendente 10',
-      'Em andamento 4',
+      'Todas 21',
+      'Pendente 12',
+      'Em andamento 5',
       'Concluído 2',
-      'Cancelado 1',
+      'Cancelado 2',
     ]);
   });
 
   it('work-order-ui C7 searches within the tab with no request and Limpar busca empties it', async () => {
-    // Eight older WorkOrders put the fleet on two pages.
+    // Eight older WorkOrders put the fleet on two pages of 10.
     const page = await WorkOrderListPage.open([...fleet, ...generated(8)]);
 
     expect(page.searchField().getAttribute('placeholder')).toBe('Buscar ordem, embarcação ou cliente...');
@@ -192,8 +192,8 @@ describe('WorkOrderList', () => {
     await click(byLabel('Limpar busca', page.element));
     expect(page.searchField().value).toBe('');
     expect(byLabel('Limpar busca', page.element)).toBeNull();
-    expect(page.codes()).toHaveLength(8);
-    expect(page.range()).toBe('Exibindo 1–8 de 13 ordens');
+    expect(page.codes()).toHaveLength(10);
+    expect(page.range()).toBe('Exibindo 1–10 de 13 ordens');
   });
 
   it('work-order-ui C8 shows vessel, code and customer, services, prazo and status in each row', async () => {
@@ -201,8 +201,9 @@ describe('WorkOrderList', () => {
 
     const rows = page.rows().map((row) => ({
       avatars: row.querySelectorAll('span[aria-hidden="true"].bg-\\[\\#e9f3f3\\]').length,
-      vessel: squash(row.querySelector('a[data-slot="vessel"]')?.textContent),
-      href: row.querySelector('a[data-slot="vessel"]')?.getAttribute('href'),
+      vessel: squash(row.querySelector('[data-slot="vessel"]')?.textContent),
+      // The Vessel name is no longer a link: the row opens the WorkOrder (AD-102).
+      links: row.querySelectorAll('a').length,
       code: squash(row.querySelector('[data-slot="code"]')?.textContent),
       service: squash(row.querySelector('[data-slot="service"]')?.textContent),
       more: squash(row.querySelector('[data-slot="more-services"]')?.textContent) ?? null,
@@ -215,7 +216,7 @@ describe('WorkOrderList', () => {
       {
         avatars: 1,
         vessel: 'Aurora',
-        href: `/work-orders/${orderA.id}`,
+        links: 0,
         code: '#AB12CD34 · Pescados Atlântico',
         service: 'Motor',
         more: '+1 serviço',
@@ -226,7 +227,7 @@ describe('WorkOrderList', () => {
       {
         avatars: 1,
         vessel: 'Lula Branca',
-        href: `/work-orders/${orderC.id}`,
+        links: 0,
         code: '#EF90AB12 · Pescados Atlântico',
         service: 'Nenhum serviço',
         more: null,
@@ -237,7 +238,7 @@ describe('WorkOrderList', () => {
       {
         avatars: 1,
         vessel: 'Vento Leste',
-        href: `/work-orders/${orderE.id}`,
+        links: 0,
         code: '#AA000001 · Cooperativa Mar Azul',
         service: 'Pintura do convés',
         more: null,
@@ -248,7 +249,7 @@ describe('WorkOrderList', () => {
       {
         avatars: 1,
         vessel: 'Vento Leste',
-        href: `/work-orders/${orderB.id}`,
+        links: 0,
         code: '#CD56EF78 · Cooperativa Mar Azul',
         service: 'Revisão do motor',
         more: null,
@@ -259,7 +260,7 @@ describe('WorkOrderList', () => {
       {
         avatars: 1,
         vessel: 'Aurora',
-        href: `/work-orders/${orderD.id}`,
+        links: 0,
         code: '#12AB34CD · Pescados Atlântico',
         service: 'Casco',
         more: '+2 serviços',
@@ -278,28 +279,28 @@ describe('WorkOrderList', () => {
     }
   });
 
-  it('work-order-ui C9 pages by 8 with one button per page and the footer range', async () => {
-    const page = await WorkOrderListPage.open(generated(17));
+  it('work-order-ui C9 pages by 10 with one button per page and the footer range', async () => {
+    const page = await WorkOrderListPage.open(generated(23));
     const previous = () => byLabel<HTMLButtonElement>('Página anterior', page.element)!;
     const next = () => byLabel<HTMLButtonElement>('Próxima página', page.element)!;
 
     expect(page.pageButtons().map((button) => squash(button.textContent))).toEqual(['1', '2', '3']);
-    expect(page.rows().length).toBe(8);
-    expect(page.range()).toBe('Exibindo 1–8 de 17 ordens');
+    expect(page.rows().length).toBe(10);
+    expect(page.range()).toBe('Exibindo 1–10 de 23 ordens');
     expect(previous().disabled).toBe(true);
     expect(next().disabled).toBe(false);
 
     await page.goToPage(2);
     expect(page.currentPage()).toBe('2');
-    expect(page.rows().length).toBe(8);
-    expect(page.range()).toBe('Exibindo 9–16 de 17 ordens');
+    expect(page.rows().length).toBe(10);
+    expect(page.range()).toBe('Exibindo 11–20 de 23 ordens');
     expect(previous().disabled).toBe(false);
     expect(next().disabled).toBe(false);
 
     await click(next());
     expect(page.currentPage()).toBe('3');
-    expect(page.codes()).toEqual([code(17)]);
-    expect(page.range()).toBe('Exibindo 17–17 de 17 ordens');
+    expect(page.codes()).toEqual([code(21), code(22), code(23)]);
+    expect(page.range()).toBe('Exibindo 21–23 de 23 ordens');
     expect(next().disabled).toBe(true);
     expect(previous().disabled).toBe(false);
 
@@ -376,57 +377,58 @@ describe('WorkOrderList', () => {
 
   it('work-order-ui C12 selects rows and the page, shows indeterminate and keeps the selection', async () => {
     // Odd ones pending, even ones in progress.
-    const page = await WorkOrderListPage.open(generated(17, (index) => (index % 2 ? 'PENDING' : 'IN_PROGRESS')));
+    const page = await WorkOrderListPage.open(generated(21, (index) => (index % 2 ? 'PENDING' : 'IN_PROGRESS')));
     const all = () => byLabel<HTMLInputElement>('Selecionar todas as ordens visíveis', page.element)!;
     const checked = () =>
       page.rows().map((row) => row.querySelector<HTMLInputElement>('input[type="checkbox"]')!.checked);
     const box = (index: number) => byLabel<HTMLInputElement>(`Selecionar ordem ${code(index)}`, page.element);
+    const only = (...on: number[]) => Array.from({ length: 10 }, (_, at) => on.includes(at));
 
     expect(page.rows().map((row) => row.querySelector('input[type="checkbox"]')!.getAttribute('aria-label'))).toEqual(
-      Array.from({ length: 8 }, (_, at) => `Selecionar ordem ${code(at + 1)}`),
+      Array.from({ length: 10 }, (_, at) => `Selecionar ordem ${code(at + 1)}`),
     );
 
     await click(box(1));
-    expect(checked()).toEqual([true, false, false, false, false, false, false, false]);
+    expect(checked()).toEqual(only(0));
     expect(all().indeterminate).toBe(true);
     expect(all().checked).toBe(false);
 
     await click(all());
-    expect(checked()).toEqual(Array(8).fill(true));
+    expect(checked()).toEqual(Array(10).fill(true));
     expect(all().checked).toBe(true);
     expect(all().indeterminate).toBe(false);
 
     // Page 2: none of its rows is selected yet.
     await page.goToPage(2);
-    expect(checked()).toEqual(Array(8).fill(false));
+    expect(checked()).toEqual(Array(10).fill(false));
     expect(all().checked).toBe(false);
     expect(all().indeterminate).toBe(false);
-    await click(box(9));
+    await click(box(11));
     expect(all().indeterminate).toBe(true);
 
-    // A tab keeps the selection: 2, 4, 6 and 8 were selected on page 1.
+    // A tab keeps the selection: 2, 4, 6, 8 and 10 were selected on page 1.
     await click(page.tab('Em andamento'));
-    expect(page.codes()).toEqual([2, 4, 6, 8, 10, 12, 14, 16].map(code));
-    expect(checked()).toEqual([true, true, true, true, false, false, false, false]);
+    expect(page.codes()).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20].map(code));
+    expect(checked()).toEqual(only(0, 1, 2, 3, 4));
     expect(all().indeterminate).toBe(true);
 
     // A search keeps it too.
     await click(page.tab('Todas'));
-    await page.search('00000009');
-    expect(page.codes()).toEqual([code(9)]);
+    await page.search('0000000B');
+    expect(page.codes()).toEqual([code(11)]);
     expect(checked()).toEqual([true]);
     expect(all().checked).toBe(true);
 
     await page.search('');
-    expect(checked()).toEqual(Array(8).fill(true));
+    expect(checked()).toEqual(Array(10).fill(true));
     await page.goToPage(2);
-    expect(checked()).toEqual([true, false, false, false, false, false, false, false]);
-    expect(page.exportButton().textContent?.trim()).toBe('Exportar (9)');
+    expect(checked()).toEqual(only(0));
+    expect(page.exportButton().textContent?.trim()).toBe('Exportar (11)');
 
     // With every shown row selected, the header clears them.
     await page.goToPage(1);
     await click(all());
-    expect(checked()).toEqual(Array(8).fill(false));
+    expect(checked()).toEqual(Array(10).fill(false));
     expect(page.exportButton().textContent?.trim()).toBe('Exportar (1)');
   });
 
@@ -479,28 +481,36 @@ describe('WorkOrderList', () => {
     }
   });
 
-  it('work-order-ui C14 the row menu opens the detail and deletes after confirmation', async () => {
+  it('work-order-ui C14 the row opens the detail and Excluir deletes after confirmation', async () => {
     const success = vi.spyOn(toast, 'success');
     const page = await WorkOrderListPage.open();
     const router = TestBed.inject(Router);
 
+    // The checkbox selects without opening the WorkOrder.
     await click(byLabel('Selecionar ordem #AB12CD34', page.element));
     await click(byLabel('Selecionar ordem #EF90AB12', page.element));
+    expect(router.url).toBe('/');
 
-    let menu = await page.openMenu('#AB12CD34');
-    expect(menu.getAttribute('data-state')).toBe('open');
-    expect([...menu.querySelectorAll('[role="menuitem"], a, button')].map((item) => squash(item.textContent))).toEqual([
-      'Ver detalhes',
-      'Editar',
-      'Excluir',
+    // Two icon buttons, hidden until the row's hover or focus; Excluir in the destructive colour.
+    const actions = page.actions('#AB12CD34');
+    expect([...actions.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Editar ordem #AB12CD34',
+      'Excluir ordem #AB12CD34',
     ]);
-    const details = [...menu.querySelectorAll('a')].find((link) => squash(link.textContent) === 'Ver detalhes')!;
-    expect(details.getAttribute('href')).toBe(`/work-orders/${orderA.id}`);
-    await click(details);
-    expect(router.url).toBe(`/work-orders/${orderA.id}`);
+    const reveal = actions.firstElementChild!;
+    expect(reveal.classList).toContain('opacity-0');
+    expect(reveal.classList).toContain('group-hover:opacity-100');
+    expect(page.rowOf('#AB12CD34')!.classList).toContain('group');
+    expect(byLabel('Excluir ordem #AB12CD34', page.element)!.classList).toContain('text-destructive');
+    expect(page.element.querySelector('[aria-label^="Ações para"]')).toBeNull();
+    expect(page.element.textContent).not.toContain('Ver detalhes');
 
-    menu = await page.openMenu('#AB12CD34');
-    await click(buttonByText('Excluir', menu));
+    // A click on the actions cell does not open the WorkOrder either.
+    await click(actions);
+    expect(router.url).toBe('/');
+
+    await click(byLabel('Excluir ordem #AB12CD34', page.element));
+    expect(router.url).toBe('/');
     const confirmation = document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!;
     expect(confirmation.textContent).toContain(
       'Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita.',
@@ -519,6 +529,14 @@ describe('WorkOrderList', () => {
     // Its selection went with it: only #EF90AB12 is left to export.
     expect(page.exportButton().textContent?.trim()).toBe('Exportar (1)');
     expect(page.exportButton().getAttribute('aria-label')).toBe('Exportar 1 ordem selecionada em CSV');
+    expect(router.url).toBe('/');
+
+    // A click anywhere else on the row opens its WorkOrder, and so does Enter on the row.
+    await click(page.rowOf('#CD56EF78')!.querySelector('[data-slot="vessel"]'));
+    expect(router.url).toBe(`/work-orders/${orderB.id}`);
+    page.rowOf('#AA000001')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await settle();
+    expect(router.url).toBe(`/work-orders/${orderE.id}`);
   });
 
   it('work-order-ui C14 a 409 on delete keeps the row and shows the API message', async () => {
@@ -526,8 +544,7 @@ describe('WorkOrderList', () => {
     const success = vi.spyOn(toast, 'success');
     const page = await WorkOrderListPage.open();
 
-    const menu = await page.openMenu('#AB12CD34');
-    await click(buttonByText('Excluir', menu));
+    await click(byLabel('Excluir ordem #AB12CD34', page.element));
     await click(buttonByText('Confirmar', document.querySelector<HTMLElement>('[data-slot="dialog-content"]')!));
     const deletion = controller.expectOne(`/api/work-orders/${orderA.id}`);
     expect(deletion.request.method).toBe('DELETE');

@@ -5,8 +5,6 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { Observable } from 'rxjs';
 import {
   lucideCheck,
-  lucideChevronLeft,
-  lucideChevronRight,
   lucideClipboardList,
   lucideClock3,
   lucideDownload,
@@ -24,6 +22,8 @@ import { downloadCsv } from '../../../shared/components/lib/csv';
 import { resourceValue } from '../../../shared/components/lib/resource-value';
 import { Button } from '../../../shared/components/ui/button';
 import { Confirmation } from '../../../shared/components/ui/confirmation';
+import { ListPager } from '../../../shared/components/ui/list-pager';
+import { clampPage } from '../../../shared/components/lib/paging';
 import { Metric } from '../../../shared/components/ui/metric';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
@@ -35,9 +35,7 @@ import { WorkOrderTable } from '../components/work-order-table';
 import { workOrdersCsv } from '../work-order-csv';
 import {
   filterWorkOrders,
-  pageCount,
   pageOf,
-  rangeLabel,
   sortWorkOrders,
   STATUS_TABS,
   StatusTab,
@@ -50,12 +48,10 @@ import { GetWorkOrdersResponse, WorkOrderService } from '../work-order.service';
 /** The mareos "Ordens de serviço": every WorkOrder of the Organization on one page (AD-040). */
 @Component({
   selector: 'work-order-list',
-  imports: [NgIcon, Button, Confirmation, Metric, Sheet, Skeleton, WorkOrderForm, WorkOrderTable],
+  imports: [NgIcon, Button, Confirmation, ListPager, Metric, Sheet, Skeleton, WorkOrderForm, WorkOrderTable],
   viewProviders: [
     provideIcons({
       lucideCheck,
-      lucideChevronLeft,
-      lucideChevronRight,
       lucideClipboardList,
       lucideClock3,
       lucideDownload,
@@ -118,11 +114,9 @@ export class WorkOrderList {
   metrics = computed(() => workOrderMetrics(this.rows()));
   counts = computed(() => tabCounts(this.rows()));
   filtered = computed(() => filterWorkOrders(this.rows(), this.tab(), this.search()));
-  pages = computed(() => Array.from({ length: pageCount(this.filtered().length) }, (_, index) => index + 1));
   /** The page shown: a delete or a filter that empties the last page falls back to the last one left. */
-  currentPage = computed(() => Math.min(this.page(), Math.max(1, this.pages().length)));
+  currentPage = computed(() => clampPage(this.page(), this.filtered().length));
   shown = computed(() => pageOf(this.filtered(), this.currentPage()));
-  range = computed(() => rangeLabel(this.filtered().length, this.currentPage()));
   emptyMessage = computed(() =>
     this.rows().length === 0
       ? 'Ainda não há ordens de serviço cadastradas.'
@@ -163,8 +157,7 @@ export class WorkOrderList {
   }
 
   goTo(page: number) {
-    const last = Math.max(1, this.pages().length);
-    this.page.set(Math.min(Math.max(1, page), last));
+    this.page.set(clampPage(page, this.filtered().length));
   }
 
   toggle(id: string) {

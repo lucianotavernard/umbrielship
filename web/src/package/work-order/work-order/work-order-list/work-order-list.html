@@ -62,8 +62,15 @@
       </button>
     </div>
 
-    <div class="mt-[17px] flex flex-col gap-[11px]">
-      <div role="tablist" aria-label="Filtrar ordens por status" class="flex items-center gap-[7px] overflow-x-auto pb-px">
+    <!-- The tabs on the left and the search on the right of one row from 1120px, where every tab fits; stacked below it. -->
+    <div
+      class="mt-[17px] flex flex-col gap-[11px] min-[1120px]:flex-row min-[1120px]:items-center min-[1120px]:justify-between min-[1120px]:gap-4"
+    >
+      <div
+        role="tablist"
+        aria-label="Filtrar ordens por status"
+        class="flex min-w-0 items-center gap-[7px] overflow-x-auto pb-px"
+      >
         @for (item of tabs; track item.value) {
           <button
             type="button"
@@ -83,7 +90,7 @@
         }
       </div>
       <label
-        class="flex h-[34px] w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50"
+        class="flex h-[34px] w-full shrink-0 items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 min-[1120px]:w-[240px] xl:w-[280px]"
       >
         <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
         <input
@@ -114,50 +121,13 @@
       (deleted)="openDelete($event)"
     />
 
-    <footer
-      data-slot="list-footer"
-      class="flex min-h-[49px] flex-wrap items-center justify-between gap-2 border-t border-border py-2 text-[9px] text-muted-foreground"
-    >
-      @if (loading()) {
-        <t-skeleton class="h-3 w-32 rounded" />
-      } @else {
-        <span data-slot="range">
-          Exibindo <strong class="text-foreground/80">{{ range().first }}–{{ range().last }}</strong> de
-          <strong class="text-foreground/80">{{ range().total }}</strong> ordens
-        </span>
-        <nav aria-label="Paginação" class="flex items-center gap-1">
-          <button
-            type="button"
-            aria-label="Página anterior"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
-            [disabled]="currentPage() <= 1"
-            (click)="goTo(currentPage() - 1)"
-          >
-            <ng-icon name="lucideChevronLeft" class="!size-[15px]" />
-          </button>
-          @for (number of pages(); track number) {
-            <button
-              type="button"
-              data-slot="page"
-              class="grid h-6 min-w-6 place-items-center rounded-[4px] border border-transparent px-[5px] text-[9px] text-muted-foreground aria-[current=page]:border-primary/20 aria-[current=page]:bg-primary/5 aria-[current=page]:font-bold aria-[current=page]:text-primary"
-              [attr.aria-current]="number === currentPage() ? 'page' : null"
-              (click)="goTo(number)"
-            >
-              {{ number }}
-            </button>
-          }
-          <button
-            type="button"
-            aria-label="Próxima página"
-            class="grid h-6 min-w-6 place-items-center rounded-[4px] text-muted-foreground disabled:cursor-not-allowed disabled:opacity-40"
-            [disabled]="currentPage() >= pages().length"
-            (click)="goTo(currentPage() + 1)"
-          >
-            <ng-icon name="lucideChevronRight" class="!size-[15px]" />
-          </button>
-        </nav>
-      }
-    </footer>
+    <t-list-pager
+      noun="ordens"
+      [loading]="loading()"
+      [total]="filtered().length"
+      [page]="currentPage()"
+      (pageChange)="goTo($event)"
+    />
   </section>
 </div>
 
