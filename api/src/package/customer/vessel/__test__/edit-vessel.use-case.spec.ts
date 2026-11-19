@@ -75,4 +75,17 @@ describe('EditVesselUseCase', () => {
       customerId: 'c1',
     });
   });
+
+  it('changes the status, and keeps it when none is given', async () => {
+    const { vessel } = await sut.handle({ ...input, status: 'INACTIVE' });
+    expect(vessel.status).toBe('INACTIVE');
+    expect(vessels.items[0].status).toBe('INACTIVE');
+
+    const { vessel: kept } = await sut.handle(input);
+    expect(kept.status).toBe('INACTIVE');
+    expect(vessels.items[0].status).toBe('INACTIVE');
+
+    await sut.handle({ ...input, status: 'ACTIVE' });
+    expect(vessels.items[0].status).toBe('ACTIVE');
+  });
 });

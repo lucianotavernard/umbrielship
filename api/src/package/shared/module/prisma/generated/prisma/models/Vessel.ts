@@ -42,6 +42,7 @@ export type VesselMinAggregateOutputType = {
   name: string | null
   type: $Enums.VesselType | null
   length: number | null
+  status: $Enums.VesselStatus | null
 }
 
 export type VesselMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type VesselMaxAggregateOutputType = {
   name: string | null
   type: $Enums.VesselType | null
   length: number | null
+  status: $Enums.VesselStatus | null
 }
 
 export type VesselCountAggregateOutputType = {
@@ -62,6 +64,7 @@ export type VesselCountAggregateOutputType = {
   name: number
   type: number
   length: number
+  status: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type VesselMinAggregateInputType = {
   name?: true
   type?: true
   length?: true
+  status?: true
 }
 
 export type VesselMaxAggregateInputType = {
@@ -92,6 +96,7 @@ export type VesselMaxAggregateInputType = {
   name?: true
   type?: true
   length?: true
+  status?: true
 }
 
 export type VesselCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type VesselCountAggregateInputType = {
   name?: true
   type?: true
   length?: true
+  status?: true
   _all?: true
 }
 
@@ -199,6 +205,7 @@ export type VesselGroupByOutputType = {
   name: string
   type: $Enums.VesselType
   length: number
+  status: $Enums.VesselStatus
   _count: VesselCountAggregateOutputType | null
   _avg: VesselAvgAggregateOutputType | null
   _sum: VesselSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type VesselWhereInput = {
   name?: Prisma.StringFilter<"Vessel"> | string
   type?: Prisma.EnumVesselTypeFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatFilter<"Vessel"> | number
+  status?: Prisma.EnumVesselStatusFilter<"Vessel"> | $Enums.VesselStatus
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
 }
 
@@ -243,6 +251,7 @@ export type VesselOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   customer?: Prisma.CustomerOrderByWithRelationInput
 }
 
@@ -258,6 +267,7 @@ export type VesselWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Vessel"> | string
   type?: Prisma.EnumVesselTypeFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatFilter<"Vessel"> | number
+  status?: Prisma.EnumVesselStatusFilter<"Vessel"> | $Enums.VesselStatus
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
 }, "id" | "organizationId_imoNumber">
 
@@ -269,6 +279,7 @@ export type VesselOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   _count?: Prisma.VesselCountOrderByAggregateInput
   _avg?: Prisma.VesselAvgOrderByAggregateInput
   _max?: Prisma.VesselMaxOrderByAggregateInput
@@ -287,6 +298,7 @@ export type VesselScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Vessel"> | string
   type?: Prisma.EnumVesselTypeWithAggregatesFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatWithAggregatesFilter<"Vessel"> | number
+  status?: Prisma.EnumVesselStatusWithAggregatesFilter<"Vessel"> | $Enums.VesselStatus
 }
 
 export type VesselCreateInput = {
@@ -296,6 +308,7 @@ export type VesselCreateInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
   customer: Prisma.CustomerCreateNestedOneWithoutVesselsInput
 }
 
@@ -307,6 +320,7 @@ export type VesselUncheckedCreateInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
 }
 
 export type VesselUpdateInput = {
@@ -316,6 +330,7 @@ export type VesselUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
   customer?: Prisma.CustomerUpdateOneRequiredWithoutVesselsNestedInput
 }
 
@@ -327,6 +342,7 @@ export type VesselUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 export type VesselCreateManyInput = {
@@ -337,6 +353,7 @@ export type VesselCreateManyInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
 }
 
 export type VesselUpdateManyMutationInput = {
@@ -346,6 +363,7 @@ export type VesselUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 export type VesselUncheckedUpdateManyInput = {
@@ -356,6 +374,7 @@ export type VesselUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 export type VesselListRelationFilter = {
@@ -381,6 +400,7 @@ export type VesselCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type VesselAvgOrderByAggregateInput = {
@@ -395,6 +415,7 @@ export type VesselMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type VesselMinOrderByAggregateInput = {
@@ -405,6 +426,7 @@ export type VesselMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   length?: Prisma.SortOrder
+  status?: Prisma.SortOrder
 }
 
 export type VesselSumOrderByAggregateInput = {
@@ -465,6 +487,10 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumVesselStatusFieldUpdateOperationsInput = {
+  set?: $Enums.VesselStatus
+}
+
 export type VesselCreateWithoutCustomerInput = {
   id?: string
   organizationId: string
@@ -472,6 +498,7 @@ export type VesselCreateWithoutCustomerInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
 }
 
 export type VesselUncheckedCreateWithoutCustomerInput = {
@@ -481,6 +508,7 @@ export type VesselUncheckedCreateWithoutCustomerInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
 }
 
 export type VesselCreateOrConnectWithoutCustomerInput = {
@@ -520,6 +548,7 @@ export type VesselScalarWhereInput = {
   name?: Prisma.StringFilter<"Vessel"> | string
   type?: Prisma.EnumVesselTypeFilter<"Vessel"> | $Enums.VesselType
   length?: Prisma.FloatFilter<"Vessel"> | number
+  status?: Prisma.EnumVesselStatusFilter<"Vessel"> | $Enums.VesselStatus
 }
 
 export type VesselCreateManyCustomerInput = {
@@ -529,6 +558,7 @@ export type VesselCreateManyCustomerInput = {
   name: string
   type: $Enums.VesselType
   length: number
+  status?: $Enums.VesselStatus
 }
 
 export type VesselUpdateWithoutCustomerInput = {
@@ -538,6 +568,7 @@ export type VesselUpdateWithoutCustomerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 export type VesselUncheckedUpdateWithoutCustomerInput = {
@@ -547,6 +578,7 @@ export type VesselUncheckedUpdateWithoutCustomerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 export type VesselUncheckedUpdateManyWithoutCustomerInput = {
@@ -556,6 +588,7 @@ export type VesselUncheckedUpdateManyWithoutCustomerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumVesselTypeFieldUpdateOperationsInput | $Enums.VesselType
   length?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.EnumVesselStatusFieldUpdateOperationsInput | $Enums.VesselStatus
 }
 
 
@@ -568,6 +601,7 @@ export type VesselSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   type?: boolean
   length?: boolean
+  status?: boolean
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vessel"]>
 
@@ -579,6 +613,7 @@ export type VesselSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   type?: boolean
   length?: boolean
+  status?: boolean
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vessel"]>
 
@@ -590,6 +625,7 @@ export type VesselSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   type?: boolean
   length?: boolean
+  status?: boolean
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vessel"]>
 
@@ -601,9 +637,10 @@ export type VesselSelectScalar = {
   name?: boolean
   type?: boolean
   length?: boolean
+  status?: boolean
 }
 
-export type VesselOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "customerId" | "imoNumber" | "name" | "type" | "length", ExtArgs["result"]["vessel"]>
+export type VesselOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "customerId" | "imoNumber" | "name" | "type" | "length" | "status", ExtArgs["result"]["vessel"]>
 export type VesselInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
 }
@@ -627,6 +664,7 @@ export type $VesselPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: string
     type: $Enums.VesselType
     length: number
+    status: $Enums.VesselStatus
   }, ExtArgs["result"]["vessel"]>
   composites: {}
 }
@@ -1058,6 +1096,7 @@ export interface VesselFieldRefs {
   readonly name: Prisma.FieldRef<"Vessel", 'String'>
   readonly type: Prisma.FieldRef<"Vessel", 'VesselType'>
   readonly length: Prisma.FieldRef<"Vessel", 'Float'>
+  readonly status: Prisma.FieldRef<"Vessel", 'VesselStatus'>
 }
     
 

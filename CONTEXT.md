@@ -29,7 +29,7 @@ A person or company that owns Vessels, with an email unique within its Organizat
 *Avoid*: client, owner (as a separate entity)
 
 **Vessel**:
-A ship that belongs to exactly one Customer. It has a name, a type (`CARGO`, `TANKER`, `PASSENGER`, `FISHING`, `BULK_CARRIER`, `CONTAINER`, `OTHER`) and a length (a positive number).
+A ship that belongs to exactly one Customer. It has a name, a type (`CARGO`, `TANKER`, `PASSENGER`, `FISHING`, `BULK_CARRIER`, `CONTAINER`, `OTHER`), a length (a positive number) and a status, `ACTIVE` ("Ativa"), `MAINTENANCE` ("Em manutenção") or `INACTIVE` ("Inativa"), `ACTIVE` when none is given. The status is set by hand in the Vessel drawer; no WorkOrder changes it.
 *Avoid*: ship, boat
 
 **IMO number**:

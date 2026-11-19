@@ -15,6 +15,7 @@ export class VesselDetail {
   length: number;
   imoNumber: string;
   customerId: string;
+  status: NonNullable<VesselProps['status']>;
   customer: Customer;
 
   private constructor(props: VesselDetailProps, id?: string) {
@@ -25,6 +26,7 @@ export class VesselDetail {
     this.length = props.length;
     this.imoNumber = props.imoNumber;
     this.customerId = props.customerId;
+    this.status = props.status ?? 'ACTIVE';
     this.customer = props.customer;
   }
 

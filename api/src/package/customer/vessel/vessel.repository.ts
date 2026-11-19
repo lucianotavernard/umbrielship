@@ -99,6 +99,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
         type: vessel.type,
         length: vessel.length,
         customerId: vessel.customerId,
+        status: vessel.status,
       },
     });
   }
@@ -110,6 +111,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
         name: vessel.name,
         type: vessel.type,
         length: vessel.length,
+        status: vessel.status,
       },
     });
   }
@@ -129,6 +131,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
         type: prismaVessel.type,
         length: prismaVessel.length,
         customerId: prismaVessel.customerId,
+        status: prismaVessel.status,
       },
       prismaVessel.id,
     );
@@ -147,6 +150,7 @@ export class PrismaVesselsRepository implements IVesselsRepository {
         type: prismaVessel.type,
         length: prismaVessel.length,
         customerId: prismaVessel.customerId,
+        status: prismaVessel.status,
         customer: {
           id: prismaVessel.customer.id,
           organizationId: prismaVessel.customer.organizationId,

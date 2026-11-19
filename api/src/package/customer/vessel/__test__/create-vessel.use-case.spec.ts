@@ -79,4 +79,16 @@ describe('CreateVesselUseCase', () => {
     await expect(promise).rejects.toThrow('Customer not found');
     expect(vessels.items).toHaveLength(0);
   });
+
+  it('stores the status given, and ACTIVE when none is given', async () => {
+    customers.items.push(makeCustomer({}, 'c1'));
+
+    const { vessel } = await sut.handle({ ...input, status: 'MAINTENANCE' });
+    expect(vessel.status).toBe('MAINTENANCE');
+    expect(vessels.items[0].status).toBe('MAINTENANCE');
+
+    const { vessel: other } = await sut.handle({ ...input, imoNumber: '9182451' });
+    expect(other.status).toBe('ACTIVE');
+    expect(vessels.items[1].status).toBe('ACTIVE');
+  });
 });

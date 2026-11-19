@@ -25,7 +25,7 @@ import { DeleteVesselUseCase } from './delete-vessel.use-case.js';
 import { EditVesselUseCase } from './edit-vessel.use-case.js';
 import { FetchVesselsUseCase } from './fetch-vessels.use-case.js';
 import { GetVesselByIdUseCase } from './get-vessel-by-id.use-case.js';
-import { VESSEL_TYPES } from './vessel.entity.js';
+import { VESSEL_STATUSES, VESSEL_TYPES } from './vessel.entity.js';
 
 const createVesselBodySchema = z.object({
   customerId: z.uuid(),
@@ -33,6 +33,7 @@ const createVesselBodySchema = z.object({
   name: z.string(),
   type: z.enum(VESSEL_TYPES),
   length: z.number().positive(),
+  status: z.enum(VESSEL_STATUSES).optional(),
 });
 
 type CreateVesselBodySchema = z.infer<typeof createVesselBodySchema>;
@@ -42,6 +43,7 @@ const editVesselBodySchema = z.object({
   name: z.string(),
   type: z.enum(VESSEL_TYPES),
   length: z.number().positive(),
+  status: z.enum(VESSEL_STATUSES).optional(),
 });
 
 type EditVesselBodySchema = z.infer<typeof editVesselBodySchema>;
@@ -122,7 +124,7 @@ export class VesselController {
     body: CreateVesselBodySchema,
   ) {
     try {
-      const { customerId, imoNumber, name, type, length } = body;
+      const { customerId, imoNumber, name, type, length, status } = body;
 
       const result = await this.createVessel.handle({
         organizationId: user.organizationId,
@@ -131,6 +133,7 @@ export class VesselController {
         type,
         length,
         customerId,
+        status,
       });
 
       return { vessel: result.vessel };
@@ -156,7 +159,7 @@ export class VesselController {
     @Param('id') vesselId: string,
   ) {
     try {
-      const { name, type, length, customerId } = body;
+      const { name, type, length, customerId, status } = body;
 
       const result = await this.editVessel.handle({
         organizationId: user.organizationId,
@@ -165,6 +168,7 @@ export class VesselController {
         name,
         type,
         length,
+        status,
       });
 
       return { vessel: result.vessel };

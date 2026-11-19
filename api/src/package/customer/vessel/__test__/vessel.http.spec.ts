@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import type { UserPayload } from '@/package/shared/module/auth/user-payload.js';
 
-import { makeVessel } from '@test/factory.js';
+import { makeCustomer, makeVessel } from '@test/factory.js';
 import { bootHttp } from '@test/http.js';
 import { InMemoryCustomersRepository } from '@test/repositories/in-memory-customers-repository.js';
 import { InMemoryVesselsRepository } from '@test/repositories/in-memory-vessels-repository.js';
@@ -104,5 +104,58 @@ describe('GET /vessels', () => {
     const response = await request(app.getHttpServer()).get('/vessels');
 
     expect(response.status).toBe(401);
+  });
+});
+
+describe('POST /vessels', () => {
+  const WRITER = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  const CUSTOMER = '33333333-3333-4333-8333-333333333333';
+  let app: INestApplication;
+  let token: string;
+  const customers = new InMemoryCustomersRepository();
+  const vessels = new InMemoryVesselsRepository(customers);
+  const body = { customerId: CUSTOMER, imoNumber: '9182451', name: 'Santa Maria', type: 'FISHING', length: 28 };
+
+  beforeAll(async () => {
+    customers.items.push(makeCustomer({ organizationId: ORGANIZATION }, CUSTOMER));
+    let sign: (sub: string) => string;
+    ({ app, sign } = await bootHttp({
+      controllers: [VesselController],
+      providers: [
+        { provide: CreateVesselUseCase, useValue: new CreateVesselUseCase(vessels, customers) },
+        { provide: DeleteVesselUseCase, useValue: {} },
+        { provide: EditVesselUseCase, useValue: {} },
+        { provide: FetchVesselsUseCase, useValue: {} },
+        { provide: GetVesselByIdUseCase, useValue: {} },
+      ],
+      users: {
+        [WRITER]: { sub: WRITER, name: 'Operator', organizationId: ORGANIZATION, role: 'operator', internal: false },
+      },
+    }));
+    token = sign(WRITER);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  const post = (payload: object) =>
+    request(app.getHttpServer()).post('/vessels').set('Authorization', `Bearer ${token}`).send(payload);
+
+  it('answers 400 and stores nothing for a status that does not exist', async () => {
+    const response = await post({ ...body, status: 'BROKEN' });
+
+    expect(response.status).toBe(400);
+    expect(vessels.items).toHaveLength(0);
+  });
+
+  it('answers 201 with the status given, and ACTIVE when none is given', async () => {
+    const given = await post({ ...body, status: 'INACTIVE' });
+    const none = await post({ ...body, imoNumber: '9236178', name: 'Lula Branca' });
+
+    expect(given.status).toBe(201);
+    expect(given.body.vessel.status).toBe('INACTIVE');
+    expect(none.status).toBe(201);
+    expect(none.body.vessel.status).toBe('ACTIVE');
   });
 });

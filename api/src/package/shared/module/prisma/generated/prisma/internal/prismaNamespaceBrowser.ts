@@ -190,7 +190,8 @@ export const VesselScalarFieldEnum = {
   imoNumber: 'imoNumber',
   name: 'name',
   type: 'type',
-  length: 'length'
+  length: 'length',
+  status: 'status'
 } as const
 
 export type VesselScalarFieldEnum = (typeof VesselScalarFieldEnum)[keyof typeof VesselScalarFieldEnum]

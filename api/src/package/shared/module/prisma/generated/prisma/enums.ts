@@ -48,6 +48,15 @@ export const VesselType = {
 export type VesselType = (typeof VesselType)[keyof typeof VesselType]
 
 
+export const VesselStatus = {
+  ACTIVE: 'ACTIVE',
+  MAINTENANCE: 'MAINTENANCE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type VesselStatus = (typeof VesselStatus)[keyof typeof VesselStatus]
+
+
 export const WorkOrderStatus = {
   PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',
