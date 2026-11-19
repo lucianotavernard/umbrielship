@@ -49,7 +49,8 @@ import { roleLabels } from '../../user/user.service';
           <ng-icon name="lucideChevronDown" class="!size-3.5 shrink-0 text-muted-foreground" />
         </button>
 
-        <t-dropdown-menu-content align="start" [sideOffset]="8" class="w-[214px] p-[5px]">
+        <!-- The menu takes the button's width and opens 4px under it, as the mareos does. -->
+        <t-dropdown-menu-content align="start" [sideOffset]="4" class="w-[anchor-size(width)] p-[5px]">
           <t-dropdown-menu-label
             class="px-2 py-[7px] text-[9px] font-bold tracking-[0.08em] text-muted-foreground uppercase"
           >
