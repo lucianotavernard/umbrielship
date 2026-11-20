@@ -42,6 +42,16 @@ export class WorkforceFacade {
       : null;
   }
 
+  /** Whether the Organization still has a Staff or a Team; its Assignments need a WorkOrder. */
+  async hasRecords(organizationId: string): Promise<boolean> {
+    const [staff, teams] = await Promise.all([
+      this.staffRepository.findMany(organizationId),
+      this.teamsRepository.findMany(organizationId),
+    ]);
+
+    return staff.length > 0 || teams.length > 0;
+  }
+
   async findAssigneesByWorkOrderId(
     organizationId: string,
     workOrderId: string,

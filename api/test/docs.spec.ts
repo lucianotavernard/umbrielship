@@ -265,7 +265,9 @@ describe('documents follow the acme platform', () => {
         '`WorkforceFacade`',
         '`WorkOrderModule` and `WorkforceModule`',
         'only through `WorkforceFacade`',
-        '`identity`, `customer` and `workforce` import no context',
+        // `identity` reads the others through their facades since AD-110.
+        '`customer` and `workforce` import no context',
+        '`identity` reads the other contexts only through `CustomerFacade.hasRecords`',
         '`staff`, `teams`, `assignments`',
         "@Roles('administrator')",
       ],

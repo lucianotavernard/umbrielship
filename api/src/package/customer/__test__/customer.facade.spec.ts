@@ -23,7 +23,7 @@ describe('CustomerFacade', () => {
       ),
     );
 
-    return new CustomerFacade(vessels);
+    return new CustomerFacade(vessels, customers);
   };
 
   it('[C40] returns plain vessel data for a Vessel of the Organization', async () => {
@@ -43,5 +43,12 @@ describe('CustomerFacade', () => {
 
     expect(await facade.findVesselById('A', 'missing')).toBeNull();
     expect(await facade.findVesselById('B', 'va')).toBeNull();
+  });
+
+  it('organization-list C9 tells whether an Organization has a Customer, never counting another', async () => {
+    const facade = setup();
+
+    expect(await facade.hasRecords('A')).toBe(true);
+    expect(await facade.hasRecords('B')).toBe(false);
   });
 });

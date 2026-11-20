@@ -17,8 +17,13 @@ type OrganizationRow = {
 export class PrismaOrganizationsRepository implements IOrganizationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(page: number, perPage: number): Promise<Organization[]> {
+  async findAll(
+    page: number,
+    perPage: number,
+    search?: string,
+  ): Promise<Organization[]> {
     const rows = await this.prisma.organization.findMany({
+      where: this.matching(search),
       orderBy: { name: 'asc' },
       take: perPage,
       skip: (page - 1) * perPage,
@@ -27,8 +32,8 @@ export class PrismaOrganizationsRepository implements IOrganizationsRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
-  async count(): Promise<number> {
-    return this.prisma.organization.count();
+  async count(search?: string): Promise<number> {
+    return this.prisma.organization.count({ where: this.matching(search) });
   }
 
   async findById(id: string): Promise<Organization | null> {
@@ -66,6 +71,22 @@ export class PrismaOrganizationsRepository implements IOrganizationsRepository {
 
       throw error;
     }
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.organization.delete({ where: { id } });
+  }
+
+  private matching(search?: string) {
+    const term = search?.trim();
+    if (!term) return undefined;
+
+    return {
+      OR: [
+        { name: { contains: term, mode: 'insensitive' as const } },
+        { email: { contains: term, mode: 'insensitive' as const } },
+      ],
+    };
   }
 
   private toDomain(row: OrganizationRow): Organization {

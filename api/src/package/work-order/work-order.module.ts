@@ -5,6 +5,7 @@ import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
 import { CustomerModule } from '../customer/customer.module.js';
 import { WorkforceModule } from '../workforce/workforce.module.js';
 import { CompleteInspectionUseCase } from './inspection/complete-inspection.use-case.js';
+import { WorkOrderFacade } from './work-order.facade.js';
 import { IInspectionsRepository } from './inspection/contracts/inspection-repository.contract.js';
 import { DiscardInspectionUseCase } from './inspection/discard-inspection.use-case.js';
 import { InspectionController } from './inspection/inspection.controller.js';
@@ -58,6 +59,7 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     InspectionController,
   ],
   providers: [
+    WorkOrderFacade,
     CreateWorkOrderUseCase,
     FetchWorkOrdersUseCase,
     GetWorkOrderByIdUseCase,
@@ -101,5 +103,6 @@ import { PrismaWorkOrderServicesRepository } from './work-order-service/work-ord
     },
     { provide: IInspectionsRepository, useClass: PrismaInspectionsRepository },
   ],
+  exports: [WorkOrderFacade],
 })
 export class WorkOrderModule {}

@@ -5,7 +5,7 @@ Umbrielship supports naval service companies: each one is an Organization that r
 ## Language
 
 **Organization**:
-A naval service company that uses the app. It has a unique name and a unique email (compared without case) and owns every Customer, Vessel and WorkOrder, so one Organization never sees another's records. The internal Organization (`isInternal`, named "Umbrielship") is created by the seed and the app never creates another: its Administrators create the other Organizations, their Users and their Invitations.
+A naval service company that uses the app. It has a unique name and a unique email (compared without case) and owns every Customer, Vessel and WorkOrder, so one Organization never sees another's records. The internal Organization (`isInternal`, named "Umbrielship") is created by the seed and the app never creates another: its Administrators create the other Organizations, their Users and their Invitations. An Organization is deleted only while it holds no Customer, WorkOrder, inspection template, Staff or Team; deleting it deletes its Memberships and Invitations, and a User it was active for moves to the next Organization it belongs to, or to none. The internal Organization is never deleted.
 *Avoid*: company, tenant, account
 
 **User**:

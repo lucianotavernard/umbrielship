@@ -1,11 +1,14 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 
+import { CustomerModule } from '@/package/customer/customer.module.js';
 import { ConfigService } from '@/package/shared/module/config/config.service.js';
 import { ConfigModule } from '@/package/shared/module/config/config.module.js';
 import { CryptographyModule } from '@/package/shared/module/cryptography/cryptography.module.js';
 import { MailModule } from '@/package/shared/module/mail/index.js';
 import { PrismaModule } from '@/package/shared/module/prisma/prisma.module.js';
+import { WorkOrderModule } from '@/package/work-order/work-order.module.js';
+import { WorkforceModule } from '@/package/workforce/workforce.module.js';
 
 import { AuthenticateUserUseCase } from './auth/authenticate-user.use-case.js';
 import { AuthenticationController } from './auth/authentication.controller.js';
@@ -32,6 +35,7 @@ import { PrismaInvitationsRepository } from './invitation/invitation.repository.
 import { ResendInvitationUseCase } from './invitation/resend-invitation.use-case.js';
 import { SendInvitationUseCase } from './invitation/send-invitation.use-case.js';
 import { CreateOrganizationUseCase } from './organization/create-organization.use-case.js';
+import { DeleteOrganizationUseCase } from './organization/delete-organization.use-case.js';
 import { FetchOrganizationsUseCase } from './organization/fetch-organizations.use-case.js';
 import { GetOrganizationByIdUseCase } from './organization/get-organization-by-id.use-case.js';
 import { InternalAdministratorGuard } from './organization/internal-administrator.guard.js';
@@ -50,6 +54,10 @@ import { PrismaUsersRepository } from './user/user.repository.js';
     CryptographyModule,
     MailModule,
     PrismaModule,
+    // Read only through their facades, to refuse deleting an Organization that holds records (AD-110).
+    CustomerModule,
+    WorkOrderModule,
+    WorkforceModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -73,6 +81,7 @@ import { PrismaUsersRepository } from './user/user.repository.js';
     SwitchOrganizationUseCase,
     InternalAdministratorGuard,
     CreateOrganizationUseCase,
+    DeleteOrganizationUseCase,
     FetchOrganizationsUseCase,
     GetOrganizationByIdUseCase,
     CreateUserUseCase,
