@@ -1,26 +1,18 @@
-import { Component, computed, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  lucideEllipsis,
-  lucideEye,
   lucideMail,
   lucidePencil,
   lucidePhone,
   lucideTrash2,
   lucideUsers,
-  lucideWrench,
 } from '@ng-icons/lucide';
 
 import { Checkbox } from '../../../shared/components/ui/form';
 import { initials } from '../../../shared/components/lib/initials';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../shared/components/ui/dropdown-menu';
+import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { StaffRow } from '../staff-filters';
 import { statusTones } from '../staff-status';
@@ -32,25 +24,22 @@ const AVATAR_TONES = [
   'bg-[#f4eff8] text-[#9275a6] dark:bg-[#271f33] dark:text-[#c3a8e6]',
 ];
 
-/** The mareos "Profissionais" table, with the row menu of AD-069. The page filters; this draws. */
+/** The mareos "Profissionais" table, with the row actions of AD-106. The page filters; this draws. */
 @Component({
   selector: 'staff-table-ui',
-  imports: [NgIcon, RouterLink, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Checkbox],
+  imports: [NgIcon, Skeleton, Button, Checkbox],
   viewProviders: [
     provideIcons({
-      lucideEllipsis,
-      lucideEye,
       lucideMail,
       lucidePencil,
       lucidePhone,
       lucideTrash2,
       lucideUsers,
-      lucideWrench,
     }),
   ],
   template: `
-    <div class="relative w-full overflow-x-auto">
-      <table class="w-full min-w-[820px] border-collapse text-left whitespace-nowrap">
+    <div class="relative mt-[14px] w-full overflow-x-auto">
+      <table class="w-full min-w-[720px] border-collapse text-left whitespace-nowrap">
         <thead class="h-[35px] border-t border-border">
           <tr class="text-[8px] font-bold tracking-[0.65px] text-muted-foreground">
             <th class="w-9 pr-2 text-center">
@@ -64,7 +53,6 @@ const AVATAR_TONES = [
               />
             </th>
             <th class="font-bold">PROFISSIONAL</th>
-            <th class="font-bold">ESPECIALIDADE</th>
             <th class="font-bold">EQUIPE</th>
             <th class="font-bold">CONTATO</th>
             <th class="text-right font-bold">STATUS</th>
@@ -76,8 +64,12 @@ const AVATAR_TONES = [
             @for (row of [1, 2, 3]; track row) {
               <tr data-slot="skeleton-row" class="h-[62px] border-t border-border">
                 <td></td>
-                <td><t-skeleton class="h-3 w-36 rounded" /></td>
-                <td><t-skeleton class="h-3 w-28 rounded" /></td>
+                <td>
+                  <div class="grid gap-1.5">
+                    <t-skeleton class="h-3 w-36 rounded" />
+                    <t-skeleton class="h-2.5 w-24 rounded" />
+                  </div>
+                </td>
                 <td><t-skeleton class="h-3 w-24 rounded" /></td>
                 <td><t-skeleton class="h-3 w-40 rounded" /></td>
                 <td><t-skeleton class="ml-auto h-5 w-20 rounded-full" /></td>
@@ -88,10 +80,14 @@ const AVATAR_TONES = [
             @for (person of rows(); track person.id; let index = $index) {
               <tr
                 data-slot="staff-row"
-                class="h-[62px] border-t border-border text-[10px] text-muted-foreground"
-                [class.bg-primary/5]="selected().has(person.id)"
+                tabindex="0"
+                class="group h-[62px] cursor-pointer border-t border-border text-[10px] text-muted-foreground outline-none hover:bg-muted/40 focus-visible:bg-muted/40 data-[selected]:bg-primary/5"
+                [attr.data-selected]="selected().has(person.id) ? '' : null"
+                (click)="open(person)"
+                (keydown.enter)="open(person)"
               >
-                <td class="w-9 pr-2 text-center">
+                <!-- The checkbox and the actions keep their own clicks: neither opens the profile. -->
+                <td class="w-9 pr-2 text-center" (click)="$event.stopPropagation()">
                   <input
                     type="checkbox"
                     tCheckbox
@@ -109,19 +105,16 @@ const AVATAR_TONES = [
                     >
                       {{ initialsOf(person.name) }}
                     </span>
-                    <a
-                      data-slot="staff-name"
-                      class="font-semibold text-foreground hover:text-primary hover:underline"
-                      [routerLink]="['/staff', person.id]"
-                    >
-                      {{ person.name }}
-                    </a>
+                    <span class="min-w-0">
+                      <span data-slot="staff-name" class="block max-w-[220px] truncate font-semibold text-foreground">{{
+                        person.name
+                      }}</span>
+                      <!-- The specialty sits under the name, with no column of its own (AD-108). -->
+                      <small data-slot="staff-specialty" class="mt-1 block max-w-[220px] truncate text-[9px] text-muted-foreground">{{
+                        person.specialty
+                      }}</small>
+                    </span>
                   </div>
-                </td>
-                <td>
-                  <span class="flex items-center gap-1.5"
-                    ><ng-icon name="lucideWrench" class="!size-[13px] shrink-0" />{{ person.specialty }}</span
-                  >
                 </td>
                 <td>
                   <span data-slot="staff-team" class="flex items-center gap-1.5"
@@ -147,33 +140,38 @@ const AVATAR_TONES = [
                     <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ person.status }}
                   </span>
                 </td>
-                <td class="pl-2 text-right">
-                  <t-dropdown-menu>
-                    <button
-                      tDropdownMenuTrigger
-                      type="button"
-                      class="inline-grid size-[27px] place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-foreground"
-                      [attr.aria-label]="'Ações para ' + person.name"
+                <td data-slot="row-actions" class="pl-2" (click)="$event.stopPropagation()">
+                  @if (canWrite()) {
+                    <!-- Shown on the row's hover or focus, and always where there is no hover (AD-106). -->
+                    <div
+                      class="flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100"
                     >
-                      <ng-icon name="lucideEllipsis" class="!size-[17px]" />
-                    </button>
-                    <t-dropdown-menu-content align="end" class="w-40">
-                      <a tDropdownMenuItem [routerLink]="['/staff', person.id]">
-                        <ng-icon name="lucideEye" />
-                        Ver perfil
-                      </a>
-                      @if (canWrite()) {
-                        <button tDropdownMenuItem type="button" (click)="edited.emit(person)">
-                          <ng-icon name="lucidePencil" />
-                          Editar
-                        </button>
-                        <button tDropdownMenuItem type="button" variant="destructive" (click)="deleted.emit(person)">
-                          <ng-icon name="lucideTrash2" />
-                          Excluir
-                        </button>
-                      }
-                    </t-dropdown-menu-content>
-                  </t-dropdown-menu>
+                      <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        class="size-[27px] rounded-[5px] text-muted-foreground hover:text-primary"
+                        [attr.aria-label]="'Editar profissional ' + person.name"
+                        (click)="edited.emit(person)"
+                      >
+                        <ng-icon name="lucidePencil" class="!size-3.5" />
+                        <span class="sr-only">Editar</span>
+                      </button>
+                      <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        class="size-[27px] rounded-[5px] text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+                        [attr.aria-label]="'Excluir profissional ' + person.name"
+                        (click)="deleted.emit(person)"
+                      >
+                        <ng-icon name="lucideTrash2" class="!size-3.5" />
+                        <span class="sr-only">Excluir</span>
+                      </button>
+                    </div>
+                  }
                 </td>
               </tr>
             }
@@ -201,6 +199,8 @@ export class StaffTable {
   edited = output<StaffRow>();
   deleted = output<StaffRow>();
 
+  private readonly router = inject(Router);
+
   protected readonly tones = AVATAR_TONES;
   protected readonly statusTones = statusTones;
   protected readonly initialsOf = initials;
@@ -211,4 +211,9 @@ export class StaffTable {
   protected readonly someSelected = computed(
     () => !this.allSelected() && this.rows().some((row) => this.selected().has(row.id)),
   );
+
+  /** A row opens the professional's profile (AD-106). */
+  protected open(person: StaffRow) {
+    void this.router.navigate(['/staff', person.id]);
+  }
 }

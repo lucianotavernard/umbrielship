@@ -101,78 +101,62 @@
     </section>
   } @else {
     <section aria-labelledby="staff-list-title" class="rounded-lg border border-border bg-card px-[18px] pt-[18px] pb-0">
-      <div class="flex flex-col gap-[14px] pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-[18px]">
+      <div class="flex flex-col items-start gap-[15px] sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 id="staff-list-title" class="text-[13px] font-normal text-foreground">Profissionais</h2>
           <p class="mt-[5px] text-[10px] text-muted-foreground">Cadastro e alocação dos técnicos da oficina.</p>
         </div>
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <button
-            type="button"
-            class="flex h-[32px] items-center justify-center gap-[7px] rounded-[5px] border border-border bg-card px-[11px] text-[10px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="selectedCount() === 0"
-            [attr.aria-label]="exportLabel()"
-            (click)="exportSelected()"
-          >
-            <ng-icon name="lucideDownload" class="!size-[15px]" />
-            Exportar{{ selectedCount() > 0 ? ' (' + selectedCount() + ')' : '' }}
-          </button>
-          <label
-            class="flex h-[32px] items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 sm:w-[230px]"
-          >
-            <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
-            <span class="sr-only">Buscar profissional</span>
-            <input
-              type="search"
-              class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
-              placeholder="Buscar profissional..."
-              [value]="search()"
-              (input)="search.set($any($event.target).value)"
-            />
-          </label>
-          <label class="sr-only" for="team-filter">Filtrar por equipe</label>
-          <select
-            id="team-filter"
-            class="flex h-[33px] w-full max-w-[190px] items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-auto"
-            [value]="team()"
-            (change)="team.set($any($event.target).value)"
-          >
-            <option value="">Todas as equipes</option>
-            @for (item of sortedTeams(); track item.id) {
-              <option [value]="item.id">{{ item.name }}</option>
-            }
-            <option [value]="noTeamFilter">{{ noTeam }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div role="group" aria-label="Filtrar por especialidade" class="mb-[3px] flex items-center gap-[7px] overflow-x-auto pb-px">
         <button
           type="button"
-          data-slot="specialty-chip"
-          class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-pressed:border-primary/20 aria-pressed:bg-primary/5 aria-pressed:font-semibold aria-pressed:text-primary"
-          [attr.aria-pressed]="specialty() === null"
-          (click)="specialty.set(null)"
+          class="flex h-[29px] items-center gap-[7px] rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="selectedCount() === 0"
+          [attr.aria-label]="exportLabel()"
+          (click)="exportSelected()"
         >
-          <span>Todas</span>
-          <span class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-pressed:bg-primary/10">{{
-            rows().length
-          }}</span>
+          <ng-icon name="lucideDownload" class="!size-[15px]" />
+          Exportar{{ selectedCount() > 0 ? ' (' + selectedCount() + ')' : '' }}
         </button>
-        @for (chip of chips(); track chip.specialty) {
-          <button
-            type="button"
-            data-slot="specialty-chip"
-            class="group flex h-[30px] shrink-0 items-center gap-[7px] rounded-[5px] border border-transparent px-[9px] text-[10px] whitespace-nowrap text-muted-foreground aria-pressed:border-primary/20 aria-pressed:bg-primary/5 aria-pressed:font-semibold aria-pressed:text-primary"
-            [attr.aria-pressed]="specialty() === chip.specialty"
-            (click)="specialty.set(chip.specialty)"
-          >
-            <span>{{ chip.specialty }}</span>
-            <span class="rounded-[4px] bg-muted px-[5px] py-[2px] text-[9px] group-aria-pressed:bg-primary/10">{{
-              chip.count
-            }}</span>
-          </button>
-        }
+      </div>
+
+      <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <label class="sr-only" for="specialty-filter">Filtrar por especialidade</label>
+        <select
+          id="specialty-filter"
+          class="flex h-8 w-full items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-[190px]"
+          [value]="specialty() ?? ''"
+          (change)="specialty.set($any($event.target).value || null)"
+        >
+          <option value="">Todas as especialidades</option>
+          @for (item of specialties(); track item) {
+            <option [value]="item">{{ item }}</option>
+          }
+        </select>
+        <label class="sr-only" for="team-filter">Filtrar por equipe</label>
+        <select
+          id="team-filter"
+          class="flex h-8 w-full items-center justify-between gap-2 rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-foreground sm:w-[160px]"
+          [value]="team()"
+          (change)="team.set($any($event.target).value)"
+        >
+          <option value="">Todas as equipes</option>
+          @for (item of sortedTeams(); track item.id) {
+            <option [value]="item.id">{{ item.name }}</option>
+          }
+          <option [value]="noTeamFilter">{{ noTeam }}</option>
+        </select>
+        <label
+          class="flex h-8 w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 sm:w-[270px]"
+        >
+          <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
+          <span class="sr-only">Buscar profissional</span>
+          <input
+            type="search"
+            class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+            placeholder="Buscar profissional..."
+            [value]="search()"
+            (input)="search.set($any($event.target).value)"
+          />
+        </label>
       </div>
 
       <staff-table-ui

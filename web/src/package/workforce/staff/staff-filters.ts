@@ -28,7 +28,7 @@ export function staffMetrics(rows: Pick<StaffRow, 'status'>[], teamCount: number
   };
 }
 
-/** "Todas" and each specialty with how many Staff have it, in `pt-BR` order. */
+/** Each specialty with how many Staff have it, in `pt-BR` order. */
 export function specialtyChips(rows: Pick<Staff, 'specialty'>[]): { specialty: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const row of rows) counts.set(row.specialty, (counts.get(row.specialty) ?? 0) + 1);

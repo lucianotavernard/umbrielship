@@ -61,7 +61,7 @@ describe('StaffList', () => {
     expect(page.metrics()).toEqual(['04', '03', '02']);
 
     await page.search('zzz');
-    await click(page.chip('Mecânico naval'));
+    await page.filterSpecialty('Mecânico naval');
     expect(page.metrics()).toEqual(['04', '03', '02']);
   });
 
@@ -72,22 +72,22 @@ describe('StaffList', () => {
     expect(page.column('staff-team')).toEqual(['Equipe Alfa', 'Equipe Bravo', 'Sem equipe', 'Equipe Alfa']);
     expect(page.column('staff-status')).toEqual(['Em serviço', 'Disponível', 'Disponível', 'Em serviço']);
     const camilaRow = page.rows()[0];
-    expect(camilaRow.textContent).toContain('Técnica elétrica');
+    // The specialty sits under the name, with no column of its own (AD-108).
+    expect(squash(camilaRow.querySelector('[data-slot="staff-specialty"]')?.textContent)).toBe('Técnica elétrica');
+    expect(squash(page.element.querySelector('thead')?.textContent)).not.toContain('ESPECIALIDADE');
     expect(camilaRow.textContent).toContain('camila.rocha@umbriel.test');
     expect(camilaRow.textContent).toContain('(13) 99712-3088');
     expect(squash(camilaRow.textContent)).toContain('CR');
-    expect(camilaRow.querySelector('[data-slot="staff-name"]')?.getAttribute('href')).toBe('/staff/camila');
+    expect(camilaRow.querySelector('a')).toBeNull();
     expect(page.range()).toBe('Exibindo 1–4 de 4 profissionais');
   });
 
-  it('workforce C12 filters by chip, team and search and shows both empty sentences', async () => {
+  it('workforce C12 filters by specialty, team and search and shows both empty sentences', async () => {
     const page = await StaffListPage.open();
 
-    expect(page.chipText('Todas')).toBe('Todas · 4');
-    expect(page.chipText('Mecânico naval')).toBe('Mecânico naval · 2');
-    expect(page.chipText('Técnica elétrica')).toBe('Técnica elétrica · 1');
-    await click(page.chip('Mecânico naval'));
-    expect(page.chip('Mecânico naval')?.getAttribute('aria-pressed')).toBe('true');
+    expect(page.specialties()).toEqual(['Todas as especialidades', 'Especialista hidráulico', 'Mecânico naval', 'Técnica elétrica']);
+    await page.filterSpecialty('Mecânico naval');
+    expect(page.element.querySelector<HTMLSelectElement>('#specialty-filter')!.value).toBe('Mecânico naval');
     expect(page.names()).toEqual(['Pedro Nascimento', 'Rafael Mendes']);
 
     const options = [...page.element.querySelectorAll<HTMLOptionElement>('#team-filter option')].map((option) =>
@@ -98,7 +98,7 @@ describe('StaffList', () => {
     expect(page.names()).toEqual(['Pedro Nascimento']);
 
     await page.filterTeam('');
-    await click(page.chip('Todas'));
+    await page.filterSpecialty('');
     await page.search('ALFA');
     expect(page.names()).toEqual(['Camila Rocha', 'Rafael Mendes']);
     expect(page.range()).toBe('Exibindo 1–2 de 2 profissionais');
@@ -167,7 +167,7 @@ describe('StaffList', () => {
     const success = vi.spyOn(toast, 'success');
     const page = await StaffListPage.open();
     // Filters on: the new professional still shows once saved, as the mareos clears them.
-    await click(page.chip('Técnica elétrica'));
+    await page.filterSpecialty('Técnica elétrica');
     await page.filterTeam('alfa');
     await page.search('camila');
 
@@ -198,7 +198,7 @@ describe('StaffList', () => {
     expect(page.names()).toHaveLength(5);
     expect(page.element.querySelector<HTMLInputElement>('input[placeholder="Buscar profissional..."]')!.value).toBe('');
     expect(page.element.querySelector<HTMLSelectElement>('#team-filter')!.value).toBe('');
-    expect(page.chip('Todas')?.getAttribute('aria-pressed')).toBe('true');
+    expect(page.element.querySelector<HTMLSelectElement>('#specialty-filter')!.value).toBe('');
   });
 
   it('workforce C14 keeps the drawer open on a 409', async () => {
@@ -224,18 +224,38 @@ describe('StaffList', () => {
     expect(field('#staff-name').value).toBe('rafael mendes');
   });
 
-  it('workforce C15 edits a professional from the row menu with its stored values', async () => {
+  it('workforce C11 a row opens the profile except on the checkbox and the actions, which show on hover', async () => {
+    const page = await StaffListPage.open();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const row = page.rows()[3];
+    expect(page.names()[3]).toBe('Rafael Mendes');
+
+    await click(row.querySelector('[data-slot="staff-name"]'));
+    expect(navigate).toHaveBeenLastCalledWith(['/staff', 'rafael']);
+
+    navigate.mockClear();
+    await click(byLabel('Selecionar profissional Rafael Mendes', page.element));
+    await click(page.actions('Rafael Mendes'));
+    expect(navigate).not.toHaveBeenCalled();
+
+    row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(navigate).toHaveBeenLastCalledWith(['/staff', 'rafael']);
+
+    const reveal = page.actions('Rafael Mendes').firstElementChild!;
+    expect(reveal.className).toContain('opacity-0');
+    expect(reveal.className).toContain('group-hover:opacity-100');
+  });
+
+  it('workforce C15 edits a professional from its row with its stored values', async () => {
     const success = vi.spyOn(toast, 'success');
     const page = await StaffListPage.open();
 
-    const menu = await page.openMenu('Rafael Mendes');
-    expect([...menu.querySelectorAll('a, button')].map((item) => squash(item.textContent))).toEqual([
-      'Ver perfil',
-      'Editar',
-      'Excluir',
+    const actions = page.actions('Rafael Mendes');
+    expect([...actions.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Editar profissional Rafael Mendes',
+      'Excluir profissional Rafael Mendes',
     ]);
-    expect(menu.querySelector('a')?.getAttribute('href')).toBe('/staff/rafael');
-    await click(buttonByText('Editar', menu));
+    await click(buttonByText('Editar', actions));
 
     expect(squash(drawer()!.textContent)).toContain('Editar profissional');
     expect(field('#staff-name').value).toBe(rafael.name);
@@ -268,7 +288,7 @@ describe('StaffList', () => {
     const error = vi.spyOn(toast, 'error');
     const page = await StaffListPage.open();
 
-    await click(buttonByText('Excluir', await page.openMenu('Pedro Nascimento')));
+    await click(buttonByText('Excluir', page.actions('Pedro Nascimento')));
     expect(squash(dialog()!.textContent)).toContain('Excluir profissional');
     expect(controller.match((req) => req.method === 'DELETE')).toHaveLength(0);
     await click(buttonByText('Confirmar', dialog()!));
@@ -277,7 +297,7 @@ describe('StaffList', () => {
     expect(success).toHaveBeenCalledWith('Profissional excluído com sucesso');
     expect(page.names()).not.toContain('Pedro Nascimento');
 
-    await click(buttonByText('Excluir', await page.openMenu('Rafael Mendes')));
+    await click(buttonByText('Excluir', page.actions('Rafael Mendes')));
     await click(buttonByText('Confirmar', dialog()!));
     controller
       .expectOne((req) => req.method === 'DELETE' && req.url === '/api/staff/rafael')
@@ -338,7 +358,13 @@ describe('StaffList', () => {
     await page.reload(['/api/teams']);
     expect(success).toHaveBeenCalledWith('Equipe criada com sucesso');
 
-    await click(buttonByText('Editar', await page.openMenu('Equipe Alfa')));
+    const actions = page.teamActions('Equipe Alfa');
+    expect([...actions.querySelectorAll('button')].map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Editar equipe Equipe Alfa',
+      'Excluir equipe Equipe Alfa',
+    ]);
+    expect(actions.firstElementChild!.className).toContain('group-hover:opacity-100');
+    await click(buttonByText('Editar', actions));
     expect(squash(drawer()!.textContent)).toContain('Editar equipe');
     expect(field('#team-name').value).toBe(alfa.name);
     expect(field('#team-specialty').value).toBe(alfa.specialty);
@@ -357,16 +383,16 @@ describe('StaffList', () => {
     const page = await StaffListPage.open();
     await click(page.tab('Equipes'));
 
-    await click(buttonByText('Excluir', await page.openMenu('Equipe Alfa')));
+    await click(buttonByText('Excluir', page.teamActions('Equipe Alfa')));
     expect(squash(dialog()!.textContent)).toContain('Excluir equipe');
     expect(squash(dialog()!.textContent)).toContain('Os 2 profissionais desta equipe ficarão sem equipe.');
     await click(buttonByText('Cancelar', dialog()!));
 
-    await click(buttonByText('Excluir', await page.openMenu('Equipe Bravo')));
+    await click(buttonByText('Excluir', page.teamActions('Equipe Bravo')));
     expect(squash(dialog()!.textContent)).toContain('O 1 profissional desta equipe ficará sem equipe.');
     await click(buttonByText('Cancelar', dialog()!));
 
-    await click(buttonByText('Excluir', await page.openMenu('Equipe Charlie')));
+    await click(buttonByText('Excluir', page.teamActions('Equipe Charlie')));
     expect(squash(dialog()!.textContent)).not.toContain('ficará sem equipe');
     expect(squash(dialog()!.textContent)).not.toContain('ficarão sem equipe');
     await click(buttonByText('Confirmar', dialog()!));
@@ -374,7 +400,7 @@ describe('StaffList', () => {
     await page.reload(['/api/teams', '/api/staff']);
     expect(success).toHaveBeenCalledWith('Equipe excluída com sucesso');
 
-    await click(buttonByText('Excluir', await page.openMenu('Equipe Alfa')));
+    await click(buttonByText('Excluir', page.teamActions('Equipe Alfa')));
     await click(buttonByText('Confirmar', dialog()!));
     controller
       .expectOne((req) => req.method === 'DELETE' && req.url === '/api/teams/alfa')
