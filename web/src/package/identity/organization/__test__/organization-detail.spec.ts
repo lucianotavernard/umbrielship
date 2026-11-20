@@ -470,4 +470,81 @@ describe('OrganizationDetail', () => {
     expect(invalidFields(drawer()!)).toEqual([]);
     expect(pending()).toEqual([]);
   });
+
+  const read = (root: ParentNode | null | undefined, selector: string) =>
+    [...(root?.querySelectorAll(selector) ?? [])].map((node) => squash(node));
+
+  it('organization-detail C1 shows the organization card, then Membros and Convites in sections of their own', async () => {
+    const element = await openPage();
+
+    expect(read(element, 'nav[aria-label="Navegação estrutural"] a, nav[aria-label="Navegação estrutural"] span')).toEqual([
+      'Voltar às organizações',
+      'Atlantic',
+    ]);
+    expect(element.querySelector('nav a')?.getAttribute('href')).toBe('/organizations');
+    expect(squash(element.querySelector('h1'))).toBe('Atlantic');
+    expect(squash(element.querySelector('[data-slot="type-pill"]'))).toBe('Externa');
+    expect(squash(element.querySelector('[data-slot="spec-email"] dd'))).toBe('ops@atlantic.test');
+    expect(squash(element.querySelector('[data-slot="spec-members"] dd'))).toBe('1');
+    expect(squash(element.querySelector('[data-slot="spec-invitations"] dd'))).toBe('1');
+
+    // Membros first, Convites under it, each in its own section with its table and its pager.
+    const sections = [...element.querySelectorAll('section[aria-labelledby]')].map((section) =>
+      section.getAttribute('aria-labelledby'),
+    );
+    expect(sections).toEqual(['organization-detail-title', 'organization-members-title', 'organization-invitations-title']);
+
+    const members = element.querySelector('section[aria-labelledby="organization-members-title"]')!;
+    expect(squash(members.querySelector('h2'))).toBe('Membros');
+    expect(read(members, 'thead th')).toEqual(['USUÁRIO', 'E-MAIL', 'PAPEL']);
+    expect(read(members, '[data-slot="member-name"]')).toEqual(['Ana']);
+    expect(read(members, '[data-slot="member-email"]')).toEqual(['ana@atlantic.test']);
+    expect(read(members, '[data-slot="role"]')).toEqual(['Operador']);
+    expect(squash(members.querySelector('[data-slot="range"]'))).toBe('Exibindo 1–1 de 1 membros');
+    expect(buttonByText('Novo usuário', members)).toBeDefined();
+
+    const invitations = element.querySelector('section[aria-labelledby="organization-invitations-title"]')!;
+    expect(squash(invitations.querySelector('h2'))).toBe('Convites');
+    expect(read(invitations, 'thead th')).toEqual(['E-MAIL', 'PAPEL', 'STATUS', 'Ações']);
+    expect(read(invitations, '[data-slot="invitation-email"]')).toEqual(['ana@atlantic.test']);
+    expect(read(invitations, '[data-slot="invitation-status"]')).toEqual(['Pendente']);
+    expect(invitations.querySelector('[aria-label="Reenviar convite para ana@atlantic.test"]')).not.toBeNull();
+    expect(squash(invitations.querySelector('[data-slot="range"]'))).toBe('Exibindo 1–1 de 1 convites');
+    expect(buttonByText('Novo convite', invitations)).toBeDefined();
+  });
+
+  it('organization-detail C2 the internal organization has no Convites section', async () => {
+    const fixture = TestBed.createComponent(OrganizationDetail);
+    fixture.componentRef.setInput('id', 'org-1');
+    await settle();
+    controller.expectOne('/api/organizations/org-1').flush({
+      organization: { id: 'org-1', name: 'Umbrielship', email: 'internal@umbrielship.test', isInternal: true },
+    });
+    controller.expectOne('/api/organizations/org-1/users?page=1&per_page=10').flush({ users: [], total: 0 });
+    controller.expectOne('/api/organizations/org-1/roles').flush({ roles: [] });
+    controller.expectOne('/api/organizations/org-1/invitations?page=1&per_page=10').flush({ invitations: [], total: 0 });
+    controller.expectOne('/api/users?not_in_organization=org-1&per_page=100').flush({ users: [], total: 0 });
+    await settle();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(squash(element.querySelector('[data-slot="type-pill"]'))).toBe('Interna');
+    expect(element.querySelector('section[aria-labelledby="organization-invitations-title"]')).toBeNull();
+    expect(element.querySelector('[data-slot="spec-invitations"]')).toBeNull();
+    expect(squash(element.querySelector('[data-slot="empty"]'))).toBe('Nenhum membro nesta organização.');
+  });
+
+  it('organization-detail C3 an unknown organization reads Organização não encontrada', async () => {
+    const fixture = TestBed.createComponent(OrganizationDetail);
+    fixture.componentRef.setInput('id', 'org-1');
+    await settle();
+    controller
+      .expectOne('/api/organizations/org-1')
+      .flush({ message: 'Organization not found' }, { status: 404, statusText: 'Not Found' });
+    for (const request of controller.match(() => true)) request.flush({ users: [], invitations: [], roles: [], total: 0 });
+    await settle();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(squash(element.querySelector('h1'))).toBe('Organização não encontrada');
+    expect(element.querySelector('section[aria-labelledby="organization-members-title"]')).toBeNull();
+  });
 });

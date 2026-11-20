@@ -68,7 +68,8 @@ describe('OrganizationDetail with inspectors', () => {
   it('inspector C20 shows the Inspetor badge and no Role counts', async () => {
     const element = await render();
 
-    const badges = [...element.querySelectorAll('t-badge')].map((badge) =>
+    // The Role of each member is a pill (AD-112).
+    const badges = [...element.querySelectorAll('[data-slot="role"]')].map((badge) =>
       badge.textContent?.trim(),
     );
     expect(badges).toContain('Inspetor');

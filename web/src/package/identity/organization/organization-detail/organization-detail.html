@@ -1,53 +1,154 @@
-<div class="border-b border-border">
-  <div class="mx-auto max-w-7xl px-6 py-4">
-    <a tButton variant="ghost" routerLink="/organizations">Voltar para Organizações</a>
-  </div>
+<div class="mx-auto w-full max-w-[1044px] px-[13px] pt-[18px] pb-[21px] sm:px-6 sm:pt-6 lg:px-[37px]">
+  <nav aria-label="Navegação estrutural" class="mb-[17px] flex items-center gap-[9px] text-[10px] text-muted-foreground">
+    <a routerLink="/organizations" class="inline-flex items-center gap-1.5 hover:text-primary">
+      <ng-icon name="lucideArrowLeft" class="!size-[15px]" />
+      Voltar às organizações
+    </a>
+    @if (organization(); as organization) {
+      <ng-icon name="lucideChevronRight" class="!size-3.5" />
+      <span class="truncate font-semibold text-foreground">{{ organization.name }}</span>
+    }
+  </nav>
+
+  @if (notFound()) {
+    <section class="mx-auto my-10 flex max-w-[430px] flex-col items-center gap-2.5 rounded-lg border border-border bg-card p-7 text-center">
+      <span class="grid size-[45px] place-items-center rounded-[11px] bg-[#edf3fa] text-[#5e8bb5] dark:bg-[#18283a] dark:text-[#8db4dc]">
+        <span>?</span>
+      </span>
+      <h1 class="text-[18px] font-normal text-foreground">Organização não encontrada</h1>
+      <p class="text-[11px] text-muted-foreground">Esse registro não existe ou foi excluído.</p>
+      <a routerLink="/organizations" class="mt-1 text-[11px] font-semibold text-primary">Voltar às organizações</a>
+    </section>
+  } @else {
+    <div class="flex flex-col gap-[15px]">
+      <section aria-labelledby="organization-detail-title" class="rounded-lg border border-border bg-card px-5 py-[19px]">
+        @if (organization(); as organization) {
+          <div class="flex items-start gap-[13px]">
+            <span
+              aria-hidden="true"
+              class="grid size-[45px] shrink-0 place-items-center rounded-[11px] bg-[#e9f3f3] text-[12px] font-bold text-[#4b9295] dark:bg-[#17302f] dark:text-[#7cc7c2]"
+            >
+              {{ initialsOf(organization.name) }}
+            </span>
+            <div class="min-w-0 flex-1">
+              <span class="block text-[8px] font-bold tracking-[0.8px] text-muted-foreground">ORGANIZAÇÃO</span>
+              <div class="mt-[5px] flex flex-wrap items-center gap-[9px]">
+                <h1 id="organization-detail-title" class="text-[20px] leading-tight font-normal tracking-[-0.45px] text-foreground">
+                  {{ organization.name }}
+                </h1>
+                <span
+                  data-slot="type-pill"
+                  class="inline-flex items-center rounded-full px-2 py-1 text-[8px] font-semibold whitespace-nowrap"
+                  [class]="
+                    organization.isInternal
+                      ? 'bg-[#e8eff7] text-[#3f6b96] dark:bg-[#18283a] dark:text-[#8db4dc]'
+                      : 'bg-muted text-muted-foreground'
+                  "
+                >
+                  {{ organization.isInternal ? 'Interna' : 'Externa' }}
+                </span>
+              </div>
+              <p class="mt-1.5 text-[10px] text-muted-foreground">Membros e convites de acesso da organização.</p>
+            </div>
+          </div>
+          <dl class="mt-[18px] grid grid-cols-2 gap-[14px] border-t border-border pt-[15px] sm:grid-cols-3">
+            <div class="col-span-2 min-w-0 sm:col-span-1" data-slot="spec-email">
+              <dt class="text-[9px] text-muted-foreground">E-mail</dt>
+              <dd class="mt-1.5 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-foreground">
+                <ng-icon name="lucideMail" class="!size-3.5 shrink-0 text-muted-foreground" />
+                <span class="truncate">{{ organization.email }}</span>
+              </dd>
+            </div>
+            <div class="min-w-0" data-slot="spec-members">
+              <dt class="text-[9px] text-muted-foreground">Membros</dt>
+              <dd class="mt-1.5 text-[10px] font-semibold text-foreground">{{ loadingUsers() ? '—' : usersTotal() }}</dd>
+            </div>
+            @if (acceptsInvitations()) {
+              <div class="min-w-0" data-slot="spec-invitations">
+                <dt class="text-[9px] text-muted-foreground">Convites</dt>
+                <dd class="mt-1.5 text-[10px] font-semibold text-foreground">
+                  {{ loadingInvitations() ? '—' : invitationsTotal() }}
+                </dd>
+              </div>
+            }
+          </dl>
+        } @else {
+          <div class="flex items-center gap-[13px]">
+            <t-skeleton class="size-[45px] rounded-[11px]" />
+            <div class="grid flex-1 gap-2">
+              <t-skeleton class="h-3 w-24 rounded" />
+              <t-skeleton class="h-5 w-48 rounded" />
+            </div>
+          </div>
+        }
+      </section>
+
+      <section aria-labelledby="organization-members-title" class="rounded-lg border border-border bg-card px-5 pt-[19px] pb-0">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 id="organization-members-title" class="text-[13px] font-normal text-foreground">Membros</h2>
+            <p class="mt-[5px] text-[10px] text-muted-foreground">Usuários com acesso a esta organização e seus papéis.</p>
+          </div>
+          <button
+            tButton
+            type="button"
+            class="h-[31px] gap-[7px] rounded-[5px] px-2.5 text-[10px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+            (click)="openUserSheet()"
+          >
+            <ng-icon name="lucideUserPlus" class="!size-[15px]" />
+            Novo usuário
+          </button>
+        </div>
+        <user-list-ui [loading]="loadingUsers()" [users]="users()" />
+        <t-list-pager
+          noun="membros"
+          [loading]="loadingUsers()"
+          [total]="usersTotal()"
+          [page]="usersPage()"
+          (pageChange)="usersPage.set($event)"
+        />
+      </section>
+
+      @if (acceptsInvitations()) {
+        <section
+          aria-labelledby="organization-invitations-title"
+          class="rounded-lg border border-border bg-card px-5 pt-[19px] pb-0"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h2 id="organization-invitations-title" class="text-[13px] font-normal text-foreground">Convites</h2>
+              <p class="mt-[5px] text-[10px] text-muted-foreground">
+                Convites para usuários que já existem entrarem nesta organização.
+              </p>
+            </div>
+            <button
+              tButton
+              type="button"
+              class="h-[31px] gap-[7px] rounded-[5px] px-2.5 text-[10px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+              (click)="openInvitationSheet()"
+            >
+              <ng-icon name="lucideMailPlus" class="!size-[15px]" />
+              Novo convite
+            </button>
+          </div>
+          <invitation-list-ui
+            [loading]="loadingInvitations()"
+            [invitations]="invitations()"
+            [resending]="resending()"
+            (resent)="resendInvitation($event)"
+          />
+          <t-list-pager
+            noun="convites"
+            [loading]="loadingInvitations()"
+            [total]="invitationsTotal()"
+            [page]="invitationsPage()"
+            (pageChange)="invitationsPage.set($event)"
+          />
+        </section>
+      }
+    </div>
+  }
 </div>
-
-<section class="mx-auto max-w-7xl space-y-8 px-6 py-8">
-  @if (organization(); as organization) {
-    <div>
-      <h1 class="text-3xl font-bold">{{ organization.name }}</h1>
-      <p class="mt-2 text-sm text-muted-foreground">{{ organization.email }}</p>
-    </div>
-  }
-
-  <div>
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-sm font-semibold">Usuários</h2>
-      <button tButton type="button" (click)="openUserSheet()">Novo usuário</button>
-    </div>
-    <user-list-ui [loading]="loadingUsers()" [users]="users()" />
-    <t-pagination
-      class="mt-4"
-      [page]="usersPage()"
-      [total]="usersTotal()"
-      [perPage]="perPage"
-      (changed)="usersPage.set($event)"
-    />
-  </div>
-
-  @if (acceptsInvitations()) {
-    <div>
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-sm font-semibold">Convites</h2>
-        <button tButton type="button" (click)="openInvitationSheet()">Novo convite</button>
-      </div>
-      <invitation-list-ui
-        [loading]="loadingInvitations()"
-        [invitations]="invitations()"
-        (resent)="resendInvitation($event)"
-      />
-      <t-pagination
-        class="mt-4"
-        [page]="invitationsPage()"
-        [total]="invitationsTotal()"
-        [perPage]="perPage"
-        (changed)="invitationsPage.set($event)"
-      />
-    </div>
-  }
-</section>
 
 <t-sheet
   kicker="ORGANIZAÇÃO / USUÁRIOS"
