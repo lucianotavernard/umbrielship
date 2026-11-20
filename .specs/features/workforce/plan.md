@@ -256,13 +256,17 @@ service's Responsável.
 | "Conheça os profissionais e organize os times da oficina." | "Conheça os profissionais e organize as equipes da oficina." | y - AD-081 |
 | Footers "Equipe técnica MARÉOS", "Gestão da equipe técnica" and "MARÉOS · Operação com rumo certo." | nothing | y - AD-081, AD-025 |
 | In-page notice "<nome> foi adicionado à equipe técnica." | the same sentence in a toast | y - AD-026 |
-| No row actions | "Ações para <nome>": "Ver perfil", "Editar", "Excluir" | y - AD-069 |
+| No row actions; the name links to the profile | the row opens the profile; "Editar" and "Excluir" as ghost icon buttons on the row's hover, for an `administrator` | y - AD-106 |
+| No row actions for teams | "Editar equipe" and "Excluir equipe" as ghost icon buttons on the row's hover, for an `administrator` | y - AD-107 |
+| Column "ESPECIALIDADE" in the professionals table | the specialty under the name, no column of its own | y - AD-108 |
+| The professional's profile 560px wide | 1044px wide at most, as the Customer detail | y - AD-109 |
 | No screen for teams | the tab "Equipes" | y - AD-066, AD-074 |
 | "Alocação na oficina" with only the team | the team and the open services | y - AD-071 |
 | "Equipe vinculada" always a team | "Sem equipe" when there is none | y - AD-070 |
 | "Oficina em operação", help, notifications | nothing | y - AD-025 |
 | Menu items without a screen ("Estoque e peças", "Relatórios") | omitted | y - AD-024 |
 | E-mail placeholder "nome@mareos.com.br" | "nome@empresa.com.br", as the Customer drawer | y - AD-025 |
+| Specialty chips "Todas <total>" and each specialty with its count; the search and "Filtrar por equipe" beside the title | a select "Filtrar por especialidade" ("Todas as especialidades", each specialty) before "Filtrar por equipe" and the search, on the row under the title and "Exportar" | y - AD-105 |
 
 ## Sources
 
