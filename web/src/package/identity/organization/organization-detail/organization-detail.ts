@@ -1,11 +1,22 @@
-import { httpResource } from '@angular/common/http';
+import { HttpStatusCode, httpResource } from '@angular/common/http';
 import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideArrowLeft,
+  lucideChevronRight,
+  lucideMail,
+  lucideMailPlus,
+  lucideUserPlus,
+} from '@ng-icons/lucide';
+
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
-import { resourceValue } from '../../../shared/components/lib/resource-value';
+import { initials } from '../../../shared/components/lib/initials';
 import { Button } from '../../../shared/components/ui/button';
-import { Pagination } from '../../../shared/components/ui/pagination';
+import { resourceValue } from '../../../shared/components/lib/resource-value';
+import { ListPager } from '../../../shared/components/ui/list-pager';
+import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { Sheet } from '../../../shared/components/ui/sheet';
 import { toast } from '../../../shared/components/ui/toaster';
 import { InvitationForm, InvitationFormValue } from '../../invitation/components/invitation-form';
@@ -29,14 +40,17 @@ import { GetOrganizationResponse } from '../organization.service';
   selector: 'organization-detail',
   imports: [
     RouterLink,
+    NgIcon,
     Button,
-    Pagination,
+    ListPager,
+    Skeleton,
     Sheet,
     UserForm,
     UserListUI,
     InvitationForm,
     InvitationListUI,
   ],
+  viewProviders: [provideIcons({ lucideArrowLeft, lucideChevronRight, lucideMail, lucideMailPlus, lucideUserPlus })],
   templateUrl: './organization-detail.html',
 })
 export class OrganizationDetail {
@@ -64,6 +78,7 @@ export class OrganizationDetail {
   );
 
   readonly perPage = 10;
+  protected readonly initialsOf = initials;
 
   usersPage = signal(1);
   invitationsPage = signal(1);
@@ -73,6 +88,10 @@ export class OrganizationDetail {
   resending = signal<string | null>(null);
 
   organization = computed(() => resourceValue(this.organizationResource)?.organization ?? null);
+  notFound = computed(
+    () =>
+      (this.organizationResource.error() as { status?: number } | undefined)?.status === HttpStatusCode.NotFound,
+  );
   acceptsInvitations = computed(() => this.organization()?.isInternal === false);
   users = computed(() => resourceValue(this.userResource)?.users ?? []);
   usersTotal = computed(() => resourceValue(this.userResource)?.total ?? 0);
