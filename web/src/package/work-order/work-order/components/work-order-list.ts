@@ -78,7 +78,7 @@ import { WorkOrder, workOrderStatusLabels, workOrderStatusTones } from '../work-
                       {{ labels[workOrder.status] }}
                     </span>
                   </td>
-                  <td class="h-[47px] px-2">
+                  <td class="h-[47px] pr-3 pl-2">
                     @if (canWrite()) {
                       <div class="flex justify-end">
                         <button

@@ -127,7 +127,7 @@ import { workOrderCode, workOrderStatusLabels, workOrderStatusTones } from '../w
                     {{ labels[order.status] }}
                   </span>
                 </td>
-                <td data-slot="row-actions" class="pr-[3px] text-right" (click)="$event.stopPropagation()">
+                <td data-slot="row-actions" class="pr-3 text-right" (click)="$event.stopPropagation()">
                   @if (canWrite()) {
                     <!-- Shown on the row's hover or focus, and always where there is no hover. -->
                     <div

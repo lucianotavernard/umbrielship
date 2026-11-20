@@ -98,7 +98,7 @@ export type VesselRow = Vessel & { customerName: string };
                 <td data-slot="type">{{ labels[vessel.type] }}</td>
                 <td data-slot="length" class="tabular-nums">{{ length(vessel.length) }} m</td>
                 <td data-slot="customer" class="font-medium text-foreground/80">{{ vessel.customerName }}</td>
-                <td data-slot="row-actions" (click)="$event.stopPropagation()">
+                <td data-slot="row-actions" class="pr-3" (click)="$event.stopPropagation()">
                   @if (canWrite()) {
                     <!-- Shown on the row's hover or focus, and always where there is no hover. -->
                     <div

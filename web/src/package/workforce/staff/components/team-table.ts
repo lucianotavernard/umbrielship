@@ -67,7 +67,7 @@ export type TeamRow = TeamListItem & { status: WorkforceStatus };
                     <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ team.status }}
                   </span>
                 </td>
-                <td data-slot="row-actions" class="pl-2">
+                <td data-slot="row-actions" class="pr-3 pl-2">
                   @if (canWrite()) {
                     <!-- Shown on the row's hover or focus, and always where there is no hover (AD-107). -->
                     <div
