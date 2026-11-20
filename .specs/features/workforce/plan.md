@@ -263,7 +263,7 @@ service's Responsável.
 | No screen for teams | the tab "Equipes" | y - AD-066, AD-074 |
 | "Alocação na oficina" with only the team | the team and the open services | y - AD-071 |
 | "Equipe vinculada" always a team | "Sem equipe" when there is none | y - AD-070 |
-| "Oficina em operação", help, notifications | nothing | y - AD-025 |
+| "Oficina em operação", help | nothing | y - AD-025 |
 | Menu items without a screen ("Estoque e peças", "Relatórios") | omitted | y - AD-024 |
 | E-mail placeholder "nome@mareos.com.br" | "nome@empresa.com.br", as the Customer drawer | y - AD-025 |
 | Specialty chips "Todas <total>" and each specialty with its count; the search and "Filtrar por equipe" beside the title | a select "Filtrar por especialidade" ("Todas as especialidades", each specialty) before "Filtrar por equipe" and the search, on the row under the title and "Exportar" | y - AD-105 |

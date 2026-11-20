@@ -46,8 +46,8 @@ Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C8 the profile show
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C9 on a phone Abrir menu opens the sidebar and a menu item closes it
 Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C9 picking the open page item closes the panel too
 
-**C10** - The shell shows none of "Oficina em operação", a help button, a notifications bell or the MARÉOS footer (AC 10)
-Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C10 shows no workshop status, help, notifications or MARÉOS footer
+**C10** - The shell shows none of "Oficina em operação", a help button or the MARÉOS footer; the notifications bell is AD-116's (AC 10)
+Proof: run web | ✓ app-shell.spec.ts > Shell > customer-ui C10 shows no workshop status, help or MARÉOS footer
 
 **C11** - At 640, 768, 1024, 1280 and 1536px wide, `/customers`, `/customers/:id`, `/vessels` and `/vessels/:id` have `scrollWidth` equal to the window width - unlike the overflow `.specs/features/customer-ui-redesign/captures/customer-list-375.jpg` shows (AC 11)
 Proof: walk - at each of the five widths open the four pages and read `document.documentElement.scrollWidth` against `innerWidth`

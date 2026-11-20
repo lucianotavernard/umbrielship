@@ -269,7 +269,7 @@ The Agenda shows each service at its start and each WorkOrder at its Docagem and
 | The mareos dashboard's "Ordens de serviço" panel, "Equipe técnica", "Estoque e peças", "Relatórios" | other modules; this change is the `work-order` module |
 | A rule that Docagem is not after Desdocagem | the API has none today; not asked |
 | In-page notices and in-drawer errors | toasts stay (AD-026) |
-| Notifications, help, workshop status, help card, page footer | no equivalent (AD-025) |
+| Help, workshop status, help card, page footer | no equivalent (AD-025) |
 
 ## Assumptions
 
@@ -305,7 +305,7 @@ The Agenda shows each service at its start and each WorkOrder at its Docagem and
 | "Tipo de serviço" select of categories | "Nome do serviço" text field | y - AD-044 |
 | "Equipe responsável", "Prazo previsto", "Prioridade"; "Defina prazo, prioridade e equipe técnica" | "Docagem", "Desdocagem", "Status"; "Defina o período e o status da ordem" | y - AD-034 |
 | In-page notices after an action | toasts | y - AD-026 |
-| "MARÉOS" footer, notifications, help, "Oficina em operação", menu counter "12" | nothing | y - AD-025 |
+| "MARÉOS" footer, help, "Oficina em operação", menu counter "12" | nothing | y - AD-025 |
 | Menu "Equipe técnica", "Organizações" in "MENU PRINCIPAL", "Estoque e peças", "Relatórios" | omitted; "Organizações" stays under "GESTÃO" | y - AD-024 |
 | "Templates", "Novo template", "TEMPLATE", "Criar outro template", "Templates ativos", "Nome do template", "Criar template", "template" in sentences | "Modelos", "Novo modelo", "MODELO", "Criar outro modelo", "Modelos ativos", "Nome do modelo", "Criar modelo", "modelo" | y - AD-046 |
 | "Gestão" / "Inspetor" switch and the demo notice | nothing; the Role decides | y - AD-038 |

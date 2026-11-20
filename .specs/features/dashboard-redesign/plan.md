@@ -159,7 +159,7 @@ WorkOrders of the active Organization, in the mareos look.
 | Creating, editing or deleting Staff or Teams from the dashboard | "Equipe técnica" does it (AD-066, AD-074); the panel's "Mais opções" opens it (AD-085) |
 | A filter panel behind "Filtros" | mareos draws a button that does nothing; omitted by AD-091 |
 | A keyboard shortcut (⌘K) to focus the search | mareos draws the key but binds nothing; omitted by AD-091 |
-| Notifications, help, "Oficina em operação", the page footer "MARÉOS · Operação com rumo certo." and "Última atualização há 2 min" | the shell omits them (AD-025) |
+| Help, "Oficina em operação", the page footer "MARÉOS · Operação com rumo certo." and "Última atualização há 2 min" | the shell omits them (AD-025) |
 | Any API change, a dashboard endpoint or server-side counts | the reads that exist carry every record (AD-023, AD-040); counting runs in the browser like the WorkOrder list and "Equipe técnica" |
 | Selecting rows with checkboxes on the dashboard | the mareos dashboard table has none; selection stays on `/work-orders` |
 
@@ -189,7 +189,7 @@ WorkOrders of the active Organization, in the mareos look.
 | Statuses "Aguardando peça", "Agendada", "Aguardando aprovação" | "Pendente", "Em andamento" | y - AD-034 |
 | Avatars coloured per row | one teal avatar | y - AD-044 |
 | Pages "1 2 3 … 8" | one button per page | y - AD-044 |
-| "Oficina em operação", help, notifications, the page footer and "Última atualização há 2 min" | nothing | y - AD-025 |
+| "Oficina em operação", help, the page footer and "Última atualização há 2 min" | nothing | y - AD-025 |
 | Card "Aguardando peças" | "Pendentes" | y - AD-088 |
 | Note "4 equipes mobilizadas" with no rule behind it | "<n> equipes mobilizadas", the Teams "Em serviço" | y - AD-088 |
 | Trends "vs. semana passada", "desde ontem", "vs. mês passado" and the notes "6 com prioridade alta", "2 entregas previstas hoje", "92% no prazo" | nothing | y - AD-091 |

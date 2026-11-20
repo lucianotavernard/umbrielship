@@ -117,7 +117,7 @@ The shell and the palette replace the header and the neutral theme on every page
 7. WHEN the user picks another Organization in that menu THEN the system SHALL call `POST /api/organizations/switch` with its id and reload into it, as the header switcher does today; picking the active one SHALL only close the menu
 8. The sidebar footer SHALL show the user's initials, name and active Role label; WHEN the user opens its "..." button and uses "Sair" THEN the system SHALL sign out and show `/auth`
 9. WHILE the window is narrower than 768px the sidebar SHALL be hidden and the topbar SHALL show "Abrir menu", which slides the sidebar in; WHEN the user picks a menu item there THEN the sidebar SHALL close and the page SHALL navigate
-10. The shell SHALL not show "Oficina em operação", a help button, a notifications bell or the footer "MARÉOS · Operação com rumo certo." (AD-025)
+10. The shell SHALL not show "Oficina em operação", a help button or the footer "MARÉOS · Operação com rumo certo." (AD-025); the notifications bell came back with AD-116
 11. WHILE the window is 640, 768, 1024, 1280 or 1536px wide the Customer and Vessel pages SHALL have no horizontal page scroll - only a table scrolls inside its panel - unlike `.specs/features/customer-ui-redesign/captures/customer-list-375.jpg`
 
 ### S2: Customers on one page, searched as the user types (P1)
@@ -210,7 +210,8 @@ The Vessel detail shows the profile, its WorkOrders and its Customer.
 | Customer logo, Vessel status, base port, `EMB-0001` code, mareos vessel types, Serviço/Categoria/Equipe/Prioridade on a WorkOrder | not in the stored model; the user chose to omit them (AD-021) |
 | Restructuring the dashboard, WorkOrder detail, inspection templates and Organization screens | only the palette and the shell reach them (AD-020); their content stays |
 | Sign-in and invitation accept pages in the shell | they are outside the authenticated layout; only the palette reaches them |
-| Notifications, help, workshop status, help card, page footer | no equivalent in the umbrielship (AD-025) |
+| Help, workshop status, help card, page footer | no equivalent in the umbrielship (AD-025) |
+| Notifications | the bell of the top bar, its notices derived from the WorkOrders and inspections (AD-116) |
 | In-page success notice and in-drawer error | the user kept toasts (AD-026) |
 | Server-side search | the user chose search in the browser over the whole list (AD-023) |
 | `take = page * 10` in `CustomerController.get` and `VesselController.get` (page 2 answers up to 20) | existing defect; no web caller sends `page` after this change - a separate fix |
@@ -244,7 +245,8 @@ The Vessel detail shows the profile, its WorkOrders and its Customer.
 | Vessel types "Barco pesqueiro", "Traineira", "Barco de apoio", "Lancha", "Rebocador", "Outro" | the seven current types ("Carga", "Tanque", "Passageiro", "Pesca", "Graneleiro", "Contêiner", "Outro") | y - AD-021 |
 | "Nova ordem de serviço" drawer with Serviço, Categoria, Equipe responsável, Prioridade | the current WorkOrder form | y - AD-021 |
 | Rows with no delete | "Excluir" with confirmation on Customer rows, Vessel rows and the Vessels of a Customer | y - AD-022 |
-| "MARÉOS" brand, "Oficina em operação", help, notifications, "Precisa de ajuda?", menu counter "12", page footer | "UMBRIELSHIP" brand; the rest omitted | y - AD-025 |
+| "MARÉOS" brand, "Oficina em operação", help, "Precisa de ajuda?", menu counter "12", page footer | "UMBRIELSHIP" brand; the rest omitted | y - AD-025 |
+| Three fixed notices ("Ordem de serviço atualizada", "Inspeção agendada", "Peças aguardando aprovação") and "Novas" | the notices of the Role, derived from the open WorkOrders and the inspection assignments, a dot until opened and "<n> novas" | y - AD-116 |
 | Menu items Ordens de serviço, Inspeções, Agenda, Equipe técnica, Estoque e peças, Relatórios | omitted; "Modelos de inspeção" added to "MENU PRINCIPAL" | y - AD-024 |
 | In-page notice after saving; error inside the drawer | toasts | y - AD-026 |
 | "Os proprietários são identificados a partir das embarcações cadastradas." | "Consulte, cadastre e atualize os clientes da sua organização." | y - AD-027 |
