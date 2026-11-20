@@ -84,15 +84,16 @@ Proof: browser - open `/staff` at 1440x1000 as an administrator, save `captures/
 Proof: run web | ✓ staff-filters.spec.ts > staffMetrics > workforce C10 counts staff, teams and available staff padded to two digits
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C10 shows the three metrics whatever the filters
 
-**C11** - The table shows each Staff's initials, its name linking to `/staff/:id`, specialty, team name or "Sem equipe", email, phone and status, ordered by name in `pt-BR`, with "Exibindo <n> de <total> profissionais" (AC 11)
+**C11** - The table shows each Staff's initials, its name with its specialty under it (AD-108), team name or "Sem equipe", email, phone and status, ordered by name in `pt-BR`, with "Exibindo <n> de <total> profissionais"; a row opens `/staff/:id` when clicked or on Enter, except on its checkbox and its actions (AC 11, AD-106)
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C11 shows each professional by name with sem equipe for none and the range
+Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C11 a row opens the profile except on the checkbox and the actions, which show on hover
 Proof: run web | ✓ staff-filters.spec.ts > sortStaff > workforce C11 orders by name in pt-BR
 
-**C12** - Search, team filter ("Todas as equipes", each Team, "Sem equipe" last) and specialty chips ("Todas <total>", each specialty with its count in `pt-BR` order) combine, a chip picked as `.specs/features/workforce/captures/staff-list-filtered.png`; nothing matching reads "Nenhum profissional encontrado com esses filtros." as `.specs/features/workforce/captures/staff-list-empty.png`; no Staff reads "Ainda não há profissionais cadastrados." (AC 12)
+**C12** - Search, team filter ("Todas as equipes", each Team, "Sem equipe" last) and "Filtrar por especialidade" ("Todas as especialidades", each specialty in `pt-BR` order, AD-105) combine, a specialty picked as `.specs/features/workforce/captures/staff-list-filtered.png`; nothing matching reads "Nenhum profissional encontrado com esses filtros." as `.specs/features/workforce/captures/staff-list-empty.png`; no Staff reads "Ainda não há profissionais cadastrados." (AC 12)
 Proof: run web | ✓ staff-filters.spec.ts > filterStaff > workforce C12 combines the search, the team and the specialty
 Proof: run web | ✓ staff-filters.spec.ts > specialtyChips > workforce C12 counts each specialty in pt-BR order
-Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C12 filters by chip, team and search and shows both empty sentences
-Proof: browser - pick the chip "Mecânico naval", save `captures/staff-list-filtered.running.png`
+Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C12 filters by specialty, team and search and shows both empty sentences
+Proof: browser - pick "Mecânico naval" in "Filtrar por especialidade", save `captures/staff-list-filtered.running.png`
 Proof: browser - search "zzz", save `captures/staff-list-empty.running.png`
 
 **C13** - Selecting rows enables "Exportar (<n>)", which downloads `equipe-tecnica.csv` with `Nome,Especialidade,Equipe,E-mail,Telefone,Status` and one line per selected Staff ("Sem equipe" for none); it is disabled with none and labelled by the count; "Selecionar todos os profissionais visíveis" selects or clears the rows shown (AC 13)
@@ -105,18 +106,18 @@ Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C14 keeps the dr
 Proof: run web | ✓ staff-form.spec.ts > StaffForm > workforce C14 lays the drawer as the standard with sem equipe first
 Proof: browser - use "Cadastrar profissional", save `captures/staff-drawer.running.png`
 
-**C15** - "Ações para <nome>" offers "Ver perfil" and, for an administrator, "Editar" (filled drawer, "Salvar alterações", `PUT`, toast "Profissional atualizado com sucesso") and "Excluir" (confirmation "Excluir profissional", `DELETE`, toast "Profissional excluído com sucesso"; a 409 toasts "Erro ao excluir profissional" and keeps the row) (AC 15)
-Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C15 edits a professional from the row menu with its stored values
+**C15** - For an administrator a row carries, on its hover or focus, "Editar profissional <nome>" (filled drawer, "Salvar alterações", `PUT`, toast "Profissional atualizado com sucesso") and "Excluir profissional <nome>" (confirmation "Excluir profissional", `DELETE`, toast "Profissional excluído com sucesso"; a 409 toasts "Erro ao excluir profissional" and keeps the row) (AC 15)
+Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C15 edits a professional from its row with its stored values
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C15 deletes after the confirmation and keeps the row on a 409
 
 **C16** - The tab "Equipes" lists the Teams by name with "Nome", "Especialidade", "Profissionais" and "Status", reads "Ainda não há equipes cadastradas." when empty, and survives a reload as `/staff?tab=equipes` (AC 16)
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C16 lists the teams in the equipes tab and keeps the tab in the url
 
-**C17** - "Nova equipe" opens its drawer and "Criar equipe" posts (toast "Equipe criada com sucesso"); "Ações para <equipe>" edits ("Salvar alterações", toast "Equipe atualizada com sucesso") and deletes after "Excluir equipe", whose text says how many professionals will be left with no team; a 409 toasts "Erro ao excluir equipe" (AC 17)
+**C17** - "Nova equipe" opens its drawer and "Criar equipe" posts (toast "Equipe criada com sucesso"); "Editar equipe <nome>", shown on the row's hover, edits ("Salvar alterações", toast "Equipe atualizada com sucesso") and deletes after "Excluir equipe", whose text says how many professionals will be left with no team; a 409 toasts "Erro ao excluir equipe" (AC 17)
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C17 creates and edits a team from its drawer
 Proof: run web | ✓ staff-list.spec.ts > StaffList > workforce C17 warns how many professionals lose the team before deleting it
 
-**C18** - An operator or inspector sees no "Cadastrar profissional", "Nova equipe", "Editar" or "Excluir"; "Ver perfil", the filters and "Exportar" stay (AC 18)
+**C18** - An operator or inspector sees no "Cadastrar profissional", "Nova equipe", "Editar" or "Excluir"; the row opening the profile, the filters and "Exportar" stay (AC 18)
 Proof: run web | ✓ staff-list.inspector.spec.ts > StaffList as a reader > workforce C18 shows no write control to an operator or an inspector
 
 ### S2 - A WorkOrderService gets its Responsável
@@ -267,11 +268,11 @@ Proof: run web | ✓ work-order-drawer.spec.ts > WorkOrderDrawer > workforce C41
 | Staff status rule, AC 29 (5 examples) | own on `PENDING` C29 · team on `IN_PROGRESS` C29 · turned `COMPLETED` C29 · no team and no Assignment C29 · `IN_PROGRESS` on a `CANCELLED` or `COMPLETED` WorkOrder C29 | - |
 | Team status rule, AC 30 (2 examples) | own on `IN_PROGRESS` C30 · member's own does not count C30 | - |
 | Filters rule, AC 12 (2 examples) | chip with "Sem equipe" C12 · search "ALFA" C12 | - |
-| source controls: `staff-list.png` (8) | "Cadastrar profissional" C14 · "Exportar" C13 · "Buscar profissional" C12 · "Filtrar por equipe" C12 · specialty chips C12 · "Selecionar todos os profissionais visíveis" C13 · row checkbox C13 · name link C11 | - |
+| source controls: `staff-list.png` (8) | "Cadastrar profissional" C14 · "Exportar" C13 · "Buscar profissional" C12 · "Filtrar por equipe" C12 · "Filtrar por especialidade" C12 · "Selecionar todos os profissionais visíveis" C13 · row checkbox C13 · name link C11 | - |
 | source controls: `staff-drawer.png` (8) | "Nome completo" C14 · "Especialidade" C14 · "Equipe" C14 · "E-mail" C14 · "Telefone" C14 · "Cancelar" C14 · "Fechar cadastro" C14 · "Criar profissional" C14 | - |
 | source controls: `staff-detail.png` (4) | breadcrumb "Equipe técnica" C31 · e-mail link C31 · phone link C31 · "Voltar à lista da equipe" C31 | - |
 | source controls: `staff-detail-not-found.png` (1) | "Voltar para a equipe" C33 | - |
-| controls the source does not draw (6) | "Ações para <nome>" C15 · tab "Equipes" C16 · "Nova equipe" C17 · "Ações para <equipe>" C17 · "Responsável" in the WorkOrder drawer C25, C26 · "Responsável" in "Novo serviço" and "Adicionar à agenda" C27 | - |
+| controls the source does not draw (6) | "Editar profissional" and "Excluir profissional" C15 · tab "Equipes" C16 · "Nova equipe" C17 · "Editar equipe" and "Excluir equipe" C17 · "Responsável" in the WorkOrder drawer C25, C26 · "Responsável" in "Novo serviço" and "Adicionar à agenda" C27 | - |
 | startup config: WorkforceModule (2 assemblies) | `AppModule` C39 and every smoke route C1-C38 · the HTTP test harness `bootHttp` C1-C8, C19 | - |
 
 ## Swept
