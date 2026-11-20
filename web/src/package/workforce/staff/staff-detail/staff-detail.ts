@@ -45,7 +45,7 @@ const card = 'rounded-lg border border-border bg-card';
     }),
   ],
   template: `
-    <div class="mx-auto w-full max-w-[560px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[31px]">
+    <div class="mx-auto w-full max-w-[1044px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[31px] lg:px-[37px]">
       @if (notFound()) {
         <section
           data-slot="not-found"
