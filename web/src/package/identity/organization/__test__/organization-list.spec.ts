@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { toast } from '../../../shared/components/ui/toaster';
 import { OrganizationList } from '../organization-list/organization-list';
@@ -36,6 +36,47 @@ describe('OrganizationList', () => {
 
   const squash = (node: Element | null | undefined) => node?.textContent?.replace(/\s+/g, ' ').trim();
   const drawer = () => document.querySelector<HTMLElement>('[data-slot="sheet-content"]');
+  const dialog = () => document.querySelector<HTMLElement>('[data-slot="dialog-content"]');
+
+  const member = (id: string, name: string) => ({ id, name });
+  const atlantic = {
+    id: 'org-1',
+    name: 'Atlantic',
+    email: 'ops@atlantic.test',
+    isInternal: false,
+    members: [],
+    memberCount: 0,
+  };
+  const umbrielship = {
+    id: 'internal',
+    name: 'Umbrielship',
+    email: 'internal@umbrielship.test',
+    isInternal: true,
+    members: [
+      member('u1', 'Ana Lima'),
+      member('u2', 'Bruno Costa'),
+      member('u3', 'Carla Dias'),
+      member('u4', 'Davi Melo'),
+    ],
+    memberCount: 5,
+  };
+  const vale = {
+    id: 'vale',
+    name: 'Estaleiro Vale',
+    email: 'contato@vale.test',
+    isInternal: false,
+    members: [],
+    memberCount: 0,
+  };
+  const porto = {
+    id: 'porto',
+    name: 'Porto Seguro Naval',
+    email: 'contato@porto.test',
+    isInternal: false,
+    members: [member('u5', 'Eva Rocha'), member('u6', 'Fábio Reis')],
+    memberCount: 2,
+  };
+  const three = { organizations: [vale, porto, umbrielship], total: 3 };
 
   async function click(target: Element | null | undefined) {
     if (!target) throw new Error('nothing to click');
@@ -118,15 +159,15 @@ describe('OrganizationList', () => {
     const fixture = TestBed.createComponent(OrganizationList);
     await settle();
     controller.expectOne('/api/organizations?page=1&per_page=10').flush({
-      organizations: [{ id: 'org-1', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false }],
+      organizations: [atlantic],
       total: 1,
     });
     await settle();
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('table[tTable]')?.textContent).toContain('Atlantic');
+    expect(element.querySelector('table')?.textContent).toContain('Atlantic');
     expect(element.textContent).toContain('ops@atlantic.test');
 
-    [...element.querySelectorAll('button')].find((button) => button.textContent?.includes('Nova Organização'))?.click();
+    [...element.querySelectorAll('button')].find((button) => button.textContent?.includes('Nova organização'))?.click();
     await settle();
     const sheet = element.querySelector('t-sheet');
     expect(sheet?.querySelector('#organization-name')).toBeTruthy();
@@ -160,12 +201,12 @@ describe('OrganizationList', () => {
     const element = fixture.nativeElement as HTMLElement;
     await settle();
     controller.expectOne('/api/organizations?page=1&per_page=10').flush({
-      organizations: [{ id: 'org-1', name: 'Atlantic', email: 'ops@atlantic.test', isInternal: false }],
+      organizations: [atlantic],
       total: 1,
     });
     await settle();
 
-    await click(buttonByText('Nova Organização', element));
+    await click(buttonByText('Nova organização', element));
     const sheet = drawer()!;
     expect(readFrame(sheet)).toEqual({
       kicker: 'GESTÃO / ORGANIZAÇÕES',
@@ -213,7 +254,7 @@ describe('OrganizationList', () => {
     await click(buttonByText('Cancelar', sheet));
     expect(drawer()).toBeNull();
     expect(pending()).toEqual([]);
-    await click(buttonByText('Nova Organização', element));
+    await click(buttonByText('Nova organização', element));
     expect(values()).toEqual(['', '']);
     expect(messages(drawer()!)).toEqual({});
     expect(errorCount(drawer()!)).toBe(0);
@@ -240,7 +281,7 @@ describe('OrganizationList', () => {
     expect(pending()).toEqual([]);
 
     // A failed request gives the save button back, enabled, with every value kept.
-    await click(buttonByText('Nova Organização', element));
+    await click(buttonByText('Nova organização', element));
     expect(values()).toEqual(['', '']);
     fill(drawer()!, '#organization-name', 'Atlantic');
     fill(drawer()!, '#organization-email', 'ops@atlantic.test');
@@ -263,5 +304,158 @@ describe('OrganizationList', () => {
     expect(messages(drawer()!)).toEqual({});
     expect(invalidFields(drawer()!)).toEqual([]);
     expect(pending()).toEqual([]);
+  });
+
+  async function openList(answer: object = three) {
+    const fixture = TestBed.createComponent(OrganizationList);
+    const element = fixture.nativeElement as HTMLElement;
+    await settle();
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush(answer);
+    await settle();
+    return element;
+  }
+
+  const rows = (element: HTMLElement) => [...element.querySelectorAll<HTMLElement>('[data-slot="organization-row"]')];
+  const cells = (element: HTMLElement, slot: string) =>
+    rows(element).map((row) => squash(row.querySelector(`[data-slot="${slot}"]`)));
+  const byLabel = (label: string, root: ParentNode = document) =>
+    root.querySelector<HTMLElement>(`[aria-label="${label}"]`);
+  const deleteSelected = (element: HTMLElement) =>
+    element.querySelector<HTMLButtonElement>('[data-slot="delete-selected"]')!;
+
+  it('organization-list C1 draws the header, the summary and each organization with its type and members', async () => {
+    const element = await openList();
+
+    expect(squash(element.querySelector('h1'))).toBe('Organizações');
+    expect(element.textContent).toContain('ADMINISTRAÇÃO / ACESSOS');
+    expect(element.textContent).toContain('Consulte as organizações e seus membros.');
+    expect(squash(element.querySelector('[data-slot="summary"]'))).toBe('3 organizações cadastradas');
+    expect(buttonByText('Nova organização', element)).toBeDefined();
+
+    expect([...element.querySelectorAll('thead th')].map((th) => squash(th))).toEqual(['', 'ORGANIZAÇÃO', 'TIPO', 'MEMBROS', 'Ações']);
+    expect(cells(element, 'organization-name')).toEqual(['Estaleiro Vale', 'Porto Seguro Naval', 'Umbrielship']);
+    expect(cells(element, 'organization-email')).toEqual([
+      'contato@vale.test',
+      'contato@porto.test',
+      'internal@umbrielship.test',
+    ]);
+    expect(cells(element, 'organization-type')).toEqual(['Externa', 'Externa', 'Interna']);
+    // Each member is a circle with its initials, then "+n" for the ones not named.
+    const circles = rows(element).map((row) =>
+      [...row.querySelectorAll('[data-slot="organization-members"] > span')].map((circle) => squash(circle)),
+    );
+    expect(circles).toEqual([[], ['ER', 'FR'], ['AL', 'BC', 'CD', 'DM', '+1']]);
+    expect(cells(element, 'organization-members')[0]).toBe('Sem membros');
+    expect(rows(element)[2].querySelector('[data-slot="organization-members"]')?.getAttribute('aria-label')).toBe(
+      'Ana Lima, Bruno Costa, Carla Dias, Davi Melo e mais 1',
+    );
+    expect(squash(element.querySelector('[data-slot="range"]'))).toBe('Exibindo 1–3 de 3 organizações');
+  });
+
+  it('organization-list C2 a row opens its organization except on the checkbox and the actions', async () => {
+    const element = await openList();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    await click(rows(element)[1].querySelector('[data-slot="organization-name"]'));
+    expect(navigate).toHaveBeenLastCalledWith(['/organizations', 'porto']);
+
+    navigate.mockClear();
+    await click(byLabel('Selecionar organização Porto Seguro Naval', element));
+    await click(rows(element)[1].querySelector('[data-slot="row-actions"]'));
+    expect(navigate).not.toHaveBeenCalled();
+
+    rows(element)[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(navigate).toHaveBeenLastCalledWith(['/organizations', 'vale']);
+  });
+
+  it('organization-list C3 the search asks the API from page 1 and says how many it found', async () => {
+    const element = await openList({ organizations: [vale, porto, umbrielship], total: 23 });
+    await click(byLabel('Próxima página', element));
+    controller.expectOne('/api/organizations?page=2&per_page=10').flush({ organizations: [atlantic], total: 23 });
+    await settle();
+
+    const search = element.querySelector<HTMLInputElement>('input[aria-label="Buscar organização"]')!;
+    search.value = 'vale';
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+    await settle();
+    controller.expectOne('/api/organizations?page=1&per_page=10&search=vale').flush({ organizations: [vale], total: 1 });
+    await settle();
+
+    expect(cells(element, 'organization-name')).toEqual(['Estaleiro Vale']);
+    expect(squash(element.querySelector('[data-slot="summary"]'))).toBe('1 organização encontrada');
+
+    await click(byLabel('Limpar busca', element));
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [], total: 0 });
+    await settle();
+    expect(squash(element.querySelector('[data-slot="empty"]'))).toBe('Nenhuma organização encontrada.');
+  });
+
+  it('organization-list C5 selects every external organization of the page, never the internal one', async () => {
+    const element = await openList();
+
+    expect(byLabel('Selecionar organização Umbrielship', element)?.hasAttribute('disabled')).toBe(true);
+    expect(rows(element)[2].querySelector('[aria-label^="Excluir organização"]')).toBeNull();
+    expect(deleteSelected(element).disabled).toBe(true);
+    expect(deleteSelected(element).getAttribute('aria-label')).toBe('Selecione organizações para excluir');
+
+    await click(byLabel('Selecionar todas as organizações visíveis', element));
+    expect(squash(deleteSelected(element))).toBe('Excluir (2)');
+    expect(deleteSelected(element).getAttribute('aria-label')).toBe('Excluir 2 organizações selecionadas');
+
+    await click(byLabel('Selecionar organização Porto Seguro Naval', element));
+    expect(squash(deleteSelected(element))).toBe('Excluir (1)');
+    expect((byLabel('Selecionar todas as organizações visíveis', element) as HTMLInputElement).indeterminate).toBe(true);
+  });
+
+  it('organization-list C6 Excluir on a row deletes after the confirmation and reloads', async () => {
+    const success = vi.spyOn(toast, 'success');
+    const element = await openList();
+
+    const reveal = rows(element)[0].querySelector('[data-slot="row-actions"] > div')!;
+    expect(reveal.className).toContain('opacity-0');
+    expect(reveal.className).toContain('group-hover:opacity-100');
+    await click(byLabel('Excluir organização Estaleiro Vale', element));
+
+    expect(squash(dialog()?.querySelector('h2'))).toBe('Excluir organização');
+    expect(dialog()?.textContent).toContain('Tem certeza que deseja excluir a organização Estaleiro Vale?');
+    expect(controller.match((request) => request.method === 'DELETE')).toHaveLength(0);
+    await click(buttonByText('Confirmar', dialog()!));
+
+    controller.expectOne((request) => request.method === 'DELETE' && request.url === '/api/organizations/vale').flush(null);
+    await settle();
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, umbrielship], total: 2 });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Organização excluída com sucesso');
+    expect(dialog()).toBeNull();
+    expect(cells(element, 'organization-name')).toEqual(['Porto Seguro Naval', 'Umbrielship']);
+  });
+
+  it('organization-list C7 Excluir (n) deletes each selected one and names the ones with records', async () => {
+    const success = vi.spyOn(toast, 'success');
+    const error = vi.spyOn(toast, 'error');
+    const element = await openList();
+
+    await click(byLabel('Selecionar todas as organizações visíveis', element));
+    await click(deleteSelected(element));
+    expect(squash(dialog()?.querySelector('h2'))).toBe('Excluir organizações');
+    expect(dialog()?.textContent).toContain('as 2 organizações selecionadas');
+    await click(buttonByText('Confirmar', dialog()!));
+
+    controller.expectOne((request) => request.method === 'DELETE' && request.url === '/api/organizations/vale').flush(null);
+    controller
+      .expectOne((request) => request.method === 'DELETE' && request.url === '/api/organizations/porto')
+      .flush({ message: 'Organization has records' }, { status: 409, statusText: 'Conflict' });
+    await settle();
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, umbrielship], total: 2 });
+    await settle();
+
+    expect(success).toHaveBeenCalledWith('Organização excluída com sucesso');
+    expect(error).toHaveBeenCalledWith('Erro ao excluir organização', {
+      description:
+        'Porto Seguro Naval tem clientes, ordens de serviço, modelos de inspeção, profissionais ou equipes e não pode ser excluída.',
+    });
+    // The refused one stays selected; the deleted one leaves the selection.
+    expect(squash(deleteSelected(element))).toBe('Excluir (1)');
   });
 });
