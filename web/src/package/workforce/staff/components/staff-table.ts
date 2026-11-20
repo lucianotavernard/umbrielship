@@ -140,7 +140,7 @@ const AVATAR_TONES = [
                     <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ person.status }}
                   </span>
                 </td>
-                <td data-slot="row-actions" class="pl-2" (click)="$event.stopPropagation()">
+                <td data-slot="row-actions" class="pr-3 pl-2" (click)="$event.stopPropagation()">
                   @if (canWrite()) {
                     <!-- Shown on the row's hover or focus, and always where there is no hover (AD-106). -->
                     <div

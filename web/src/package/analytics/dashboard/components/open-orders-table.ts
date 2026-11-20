@@ -123,7 +123,7 @@ import { Responsavel } from '../dashboard-summary';
                     {{ labels[order.status] }}
                   </span>
                 </td>
-                <td class="pr-[3px] text-right">
+                <td class="pr-3 text-right">
                   <t-dropdown-menu>
                     <button
                       tDropdownMenuTrigger
