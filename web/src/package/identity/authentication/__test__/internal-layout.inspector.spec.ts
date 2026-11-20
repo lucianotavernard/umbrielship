@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { PAGE_RELOAD } from '../../../shared/components/lib/page-reload';
 import { InternalLayout } from '../../../shared/components/internal-layout';
 import { AuthenticationService, MeOrganization } from '../authentication.service';
+import { flushNotificationReads } from '../../../shared/testing/notification-reads';
 
 const organizations: MeOrganization[] = [
   { id: 'org-a', name: 'Atlantic', isInternal: false, role: 'operator' },
@@ -43,7 +44,11 @@ describe('InternalLayout with an inspector Membership', () => {
     controller = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => controller.verify());
+  afterEach(() => {
+    // The bell's reads, empty: this spec is about the layout (AD-116).
+    flushNotificationReads(controller);
+    controller.verify();
+  });
 
   async function settle() {
     await new Promise((resolve) => setTimeout(resolve));

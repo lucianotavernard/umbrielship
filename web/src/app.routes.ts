@@ -135,6 +135,29 @@ export const routes: Routes = [
             (m) => m.OrganizationDetail,
           ),
       },
+      // The user menu's pages, before they have content (AD-114).
+      {
+        path: 'account',
+        title: 'Conta',
+        data: {
+          eyebrow: 'CONTA / PERFIL',
+          heading: 'Conta',
+          description: 'Seus dados de acesso e preferências.',
+          icon: 'lucideCircleUser',
+        },
+        loadComponent: () => import('./package/shared/components/coming-soon').then((m) => m.ComingSoon),
+      },
+      {
+        path: 'notifications',
+        title: 'Notificações',
+        data: {
+          eyebrow: 'CONTA / NOTIFICAÇÕES',
+          heading: 'Notificações',
+          description: 'Avisos sobre as ordens, as inspeções e a sua equipe.',
+          icon: 'lucideBell',
+        },
+        loadComponent: () => import('./package/shared/components/coming-soon').then((m) => m.ComingSoon),
+      },
     ],
   },
   {
