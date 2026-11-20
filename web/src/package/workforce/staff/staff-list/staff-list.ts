@@ -140,7 +140,8 @@ export class StaffList {
   );
 
   metrics = computed(() => staffMetrics(this.rows(), this.teams().length));
-  chips = computed(() => specialtyChips(this.rows()));
+  /** The specialties of "Filtrar por especialidade", in `pt-BR` order (AD-105). */
+  specialties = computed(() => specialtyChips(this.rows()).map((chip) => chip.specialty));
   /** The professionals the filters keep, every page included. */
   filtered = computed(() => filterStaff(this.rows(), this.team(), this.specialty(), this.search()));
   page = signal(1);

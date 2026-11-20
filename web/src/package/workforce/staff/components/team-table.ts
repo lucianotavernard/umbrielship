@@ -1,25 +1,20 @@
 import { Component, input, output } from '@angular/core';
 
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideEllipsis, lucidePencil, lucideTrash2, lucideUsers, lucideWrench } from '@ng-icons/lucide';
+import { lucidePencil, lucideTrash2, lucideUsers, lucideWrench } from '@ng-icons/lucide';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../shared/components/ui/dropdown-menu';
+import { Button } from '../../../shared/components/ui/button';
 import { Skeleton } from '../../../shared/components/ui/skeleton';
 import { statusTones, WorkforceStatus } from '../staff-status';
 import { TeamListItem } from '../staff.service';
 
 export type TeamRow = TeamListItem & { status: WorkforceStatus };
 
-/** The "Equipes" tab (AD-074): name, specialty, how many professionals and the status. */
+/** The "Equipes" tab (AD-074): name, specialty, how many professionals, the status and the row actions of AD-107. */
 @Component({
   selector: 'team-table-ui',
-  imports: [NgIcon, Skeleton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem],
-  viewProviders: [provideIcons({ lucideEllipsis, lucidePencil, lucideTrash2, lucideUsers, lucideWrench })],
+  imports: [NgIcon, Skeleton, Button],
+  viewProviders: [provideIcons({ lucidePencil, lucideTrash2, lucideUsers, lucideWrench })],
   template: `
     <div class="relative w-full overflow-x-auto">
       <table class="w-full min-w-[640px] border-collapse text-left whitespace-nowrap">
@@ -45,7 +40,7 @@ export type TeamRow = TeamListItem & { status: WorkforceStatus };
             }
           } @else {
             @for (team of rows(); track team.id) {
-              <tr data-slot="team-row" class="h-[56px] border-t border-border text-[10px] text-muted-foreground">
+              <tr data-slot="team-row" class="group h-[56px] border-t border-border text-[10px] text-muted-foreground">
                 <td>
                   <span class="flex items-center gap-2.5">
                     <span
@@ -72,28 +67,37 @@ export type TeamRow = TeamListItem & { status: WorkforceStatus };
                     <i class="size-[5px] rounded-full bg-current" aria-hidden="true"></i>{{ team.status }}
                   </span>
                 </td>
-                <td class="pl-2 text-right">
+                <td data-slot="row-actions" class="pl-2">
                   @if (canWrite()) {
-                    <t-dropdown-menu>
+                    <!-- Shown on the row's hover or focus, and always where there is no hover (AD-107). -->
+                    <div
+                      class="flex justify-end gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100"
+                    >
                       <button
-                        tDropdownMenuTrigger
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
                         type="button"
-                        class="inline-grid size-[27px] place-items-center rounded-[5px] text-muted-foreground hover:bg-muted hover:text-foreground"
-                        [attr.aria-label]="'Ações para ' + team.name"
+                        class="size-[27px] rounded-[5px] text-muted-foreground hover:text-primary"
+                        [attr.aria-label]="'Editar equipe ' + team.name"
+                        (click)="edited.emit(team)"
                       >
-                        <ng-icon name="lucideEllipsis" class="!size-[17px]" />
+                        <ng-icon name="lucidePencil" class="!size-3.5" />
+                        <span class="sr-only">Editar</span>
                       </button>
-                      <t-dropdown-menu-content align="end" class="w-40">
-                        <button tDropdownMenuItem type="button" (click)="edited.emit(team)">
-                          <ng-icon name="lucidePencil" />
-                          Editar
-                        </button>
-                        <button tDropdownMenuItem type="button" variant="destructive" (click)="deleted.emit(team)">
-                          <ng-icon name="lucideTrash2" />
-                          Excluir
-                        </button>
-                      </t-dropdown-menu-content>
-                    </t-dropdown-menu>
+                      <button
+                        tButton
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        class="size-[27px] rounded-[5px] text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20"
+                        [attr.aria-label]="'Excluir equipe ' + team.name"
+                        (click)="deleted.emit(team)"
+                      >
+                        <ng-icon name="lucideTrash2" class="!size-3.5" />
+                        <span class="sr-only">Excluir</span>
+                      </button>
+                    </div>
                   }
                 </td>
               </tr>

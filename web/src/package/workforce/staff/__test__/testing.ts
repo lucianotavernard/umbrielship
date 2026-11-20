@@ -187,15 +187,16 @@ export class StaffListPage {
     return squash(this.element.querySelector('[data-slot="empty"]')?.textContent);
   }
 
-  chip(name: string) {
-    return [...this.element.querySelectorAll<HTMLButtonElement>('[data-slot="specialty-chip"]')].find(
-      (chip) => squash(chip.querySelector('span')?.textContent) === name,
+  /** The options of "Filtrar por especialidade", as shown. */
+  specialties() {
+    return [...this.element.querySelectorAll<HTMLOptionElement>('#specialty-filter option')].map((option) =>
+      squash(option.textContent),
     );
   }
 
-  /** "Mecânico naval · 2": a chip's label and count. */
-  chipText(name: string) {
-    return [...(this.chip(name)?.querySelectorAll('span') ?? [])].map((span) => squash(span.textContent)).join(' · ');
+  /** Picks a specialty in "Filtrar por especialidade"; "" for "Todas as especialidades". */
+  async filterSpecialty(value: string) {
+    await type(this.element.querySelector<HTMLSelectElement>('#specialty-filter'), value);
   }
 
   async search(value: string) {
@@ -218,10 +219,17 @@ export class StaffListPage {
     );
   }
 
-  /** Opens "Ações para <nome>" and returns its menu. */
-  async openMenu(name: string) {
-    const trigger = byLabel<HTMLButtonElement>(`Ações para ${name}`, this.element);
-    await click(trigger);
-    return trigger!.closest('t-dropdown-menu')!.querySelector<HTMLElement>('t-dropdown-menu-content')!;
+  /** The actions cell of a professional's row: "Editar profissional <nome>" and "Excluir profissional <nome>". */
+  actions(name: string) {
+    const row = this.rows().find((item) => squash(item.querySelector('[data-slot="staff-name"]')?.textContent) === name);
+    return row!.querySelector<HTMLElement>('[data-slot="row-actions"]')!;
+  }
+
+  /** The actions cell of a Team's row: "Editar equipe <nome>" and "Excluir equipe <nome>". */
+  teamActions(name: string) {
+    const row = [...this.element.querySelectorAll<HTMLElement>('[data-slot="team-row"]')].find(
+      (item) => squash(item.querySelector('[data-slot="team-name"]')?.textContent) === name,
+    );
+    return row!.querySelector<HTMLElement>('[data-slot="row-actions"]')!;
   }
 }

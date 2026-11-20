@@ -62,7 +62,7 @@ describe('filterStaff', () => {
 
   it('workforce C12 combines the search, the team and the specialty', () => {
     expect(ids(filterStaff(rows, '', null, ''))).toEqual(['rafael', 'pedro', 'camila', 'joao']);
-    // The chip "Mecânico naval" holds Rafael (Equipe Alfa) and Pedro (no team).
+    // The specialty "Mecânico naval" holds Rafael (Equipe Alfa) and Pedro (no team).
     expect(ids(filterStaff(rows, '', 'Mecânico naval', ''))).toEqual(['rafael', 'pedro']);
     expect(ids(filterStaff(rows, NO_TEAM_FILTER, 'Mecânico naval', ''))).toEqual(['pedro']);
     expect(ids(filterStaff(rows, 'alfa', null, ''))).toEqual(['rafael', 'camila']);

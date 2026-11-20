@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import type { Role } from '../../../identity/user/user.service';
-import { buttonByText, byLabel, click, squash, StaffListPage } from './testing';
+import { buttonByText, byLabel, click, StaffListPage } from './testing';
 
 describe('StaffList as a reader', () => {
   beforeEach(() => {
@@ -20,8 +20,8 @@ describe('StaffList as a reader', () => {
       const page = await StaffListPage.open(role);
 
       expect(buttonByText('Cadastrar profissional', page.element)).toBeUndefined();
-      const menu = await page.openMenu('Rafael Mendes');
-      expect([...menu.querySelectorAll('a, button')].map((item) => squash(item.textContent))).toEqual(['Ver perfil']);
+      // No "Editar" or "Excluir" on a row; the row still opens the profile.
+      expect(page.actions('Rafael Mendes').querySelectorAll('button')).toHaveLength(0);
 
       // The filters and the export stay.
       expect(page.element.querySelector('input[placeholder="Buscar profissional..."]')).not.toBeNull();
@@ -31,7 +31,7 @@ describe('StaffList as a reader', () => {
 
       await click(page.tab('Equipes'));
       expect(buttonByText('Nova equipe', page.element)).toBeUndefined();
-      expect(page.element.querySelector('[aria-label^="Ações para Equipe"]')).toBeNull();
+      expect(page.teamActions('Equipe Alfa').querySelectorAll('button')).toHaveLength(0);
       expect(page.teamRows()).toHaveLength(3);
 
       await click(page.tab('Profissionais'));
