@@ -285,7 +285,7 @@ Proof: `cd web && npx ng test --watch=false --filter='\[C85\]'`
 **C86** - A user with `role` `administrator` and `organization.isInternal` true may open `/organizations`. An `operator` of the internal Organization, and an `administrator` whose `isInternal` is false, are routed to `/forbidden`, whose heading is `Acesso negado` (AC 30)
 Proof: `cd web && npx ng test --watch=false --filter='\[C86\]'`
 
-**C87** - The Organizations page renders `Atlantic` and `ops@atlantic.test` in `table[tTable]`, and zero organizations render `Nenhuma organização encontrada`. Submitting name `Atlantic` and email `ops@atlantic.test` from fields inside the `t-sheet` posts that body to `POST /api/organizations`. A name of 81 characters leaves the submit disabled and emits nothing (Surface name 1-80) (AC 30)
+**C87** - The Organizations page renders `Atlantic` and `ops@atlantic.test` in its table (AD-111), and zero organizations render `Nenhuma organização encontrada`. Submitting name `Atlantic` and email `ops@atlantic.test` from fields inside the `t-sheet` posts that body to `POST /api/organizations`. A name of 81 characters leaves the submit disabled and emits nothing (Surface name 1-80) (AC 30)
 Proof: `cd web && npx ng test --watch=false --filter='\[C87\]'`
 
 **C88** - Organization `org-1` shows user `Ana`, `ana@atlantic.test`, `Operador`, and invitation `ana@atlantic.test` with a `Reenviar` control. The user sheet posts `{ name: 'Ana', email: 'ana@atlantic.test', password: 'secret-pass', role: 'operator', organizationId: 'org-1' }` to `POST /api/users`. The invitation sheet posts `{ userId: 'user-1', organizationId: 'org-1', role: 'operator' }` to `POST /api/invitations`. `Reenviar` posts to `POST /api/invitations/inv-1/resend` (AC 30)
