@@ -1,25 +1,87 @@
-<header class="border-b border-border">
-  <div class="mx-auto flex max-w-7xl items-start justify-between gap-4 px-6 py-8">
+<div class="mx-auto w-full max-w-[1044px] px-[13px] pt-5 pb-[21px] sm:px-6 sm:pt-[25px] lg:px-[37px] lg:pt-[31px]">
+  <div class="mb-[23px] flex flex-col items-start gap-[15px] sm:flex-row sm:items-end sm:justify-between sm:gap-[18px]">
     <div>
-      <h1 class="text-3xl font-bold tracking-tight">Organizações</h1>
-      <p class="mt-2 text-sm text-muted-foreground">Lista de todas as organizações do sistema.</p>
+      <div class="flex items-center gap-2 text-[9px] font-bold tracking-[1px] text-muted-foreground">
+        <span class="h-px w-5 bg-muted-foreground/60"></span>
+        ADMINISTRAÇÃO / ACESSOS
+      </div>
+      <h1 class="mt-[9px] mb-[5px] text-[23px] leading-[1.2] font-normal tracking-[-0.7px] text-foreground sm:text-[25px]">
+        Organizações
+      </h1>
+      <p class="text-[12px] text-muted-foreground">Consulte as organizações e seus membros.</p>
     </div>
-    <button tButton type="button" (click)="openSheet()">Nova Organização</button>
+    <button
+      tButton
+      type="button"
+      class="h-[37px] gap-2 px-[13px] text-[11px] font-semibold shadow-[0_2px_3px_#087f8c22]"
+      (click)="openSheet()"
+    >
+      <ng-icon name="lucidePlus" class="!size-[17px]" />
+      Nova organização
+    </button>
   </div>
-</header>
 
-<section class="mx-auto max-w-7xl px-6 py-8">
-  <organization-list-ui [loading]="loading()" [organizations]="organizations()">
-    <t-pagination [page]="page()" [total]="total()" [perPage]="perPage" (changed)="changePage($event)" />
-  </organization-list-ui>
-</section>
+  <section aria-labelledby="organization-list-title" class="rounded-lg border border-border bg-card px-[18px] pt-[18px] pb-0">
+    <div class="flex flex-col items-start gap-[15px] sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 id="organization-list-title" class="text-[13px] font-normal text-foreground">Organizações</h2>
+        <p data-slot="summary" class="mt-[5px] text-[10px] text-muted-foreground">{{ summary() }}</p>
+      </div>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <button
+          type="button"
+          data-slot="delete-selected"
+          class="flex h-8 items-center justify-center gap-[7px] rounded-[5px] border border-border bg-card px-[9px] text-[10px] text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:text-muted-foreground disabled:opacity-50 disabled:hover:bg-card"
+          [disabled]="selectedCount() === 0"
+          [attr.aria-label]="deleteLabel()"
+          (click)="askDeleteSelected()"
+        >
+          <ng-icon name="lucideTrash2" class="!size-[15px]" />
+          Excluir{{ selectedCount() > 0 ? ' (' + selectedCount() + ')' : '' }}
+        </button>
+        <label
+          class="flex h-8 w-full items-center gap-2 rounded-[5px] border border-border px-2.5 text-muted-foreground focus-within:border-primary/50 sm:w-[240px]"
+        >
+          <ng-icon name="lucideSearch" class="!size-[15px] shrink-0" />
+          <input
+            type="search"
+            aria-label="Buscar organização"
+            class="min-w-0 flex-1 border-0 bg-transparent text-[10px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
+            placeholder="Buscar organização"
+            [value]="search()"
+            (input)="setSearch($any($event.target).value)"
+          />
+          @if (search()) {
+            <button type="button" aria-label="Limpar busca" class="grid place-items-center" (click)="setSearch('')">
+              <ng-icon name="lucideX" class="!size-[13px]" />
+            </button>
+          }
+        </label>
+      </div>
+    </div>
 
-<t-sheet
-  kicker="GESTÃO / ORGANIZAÇÕES"
-  title="Nova organização"
-  description="Preencha os campos abaixo para criar uma nova organização"
-  [isActive]="isSheetActive()"
-  (closed)="closeSheet()"
->
-  <organization-form-ui [loading]="submitting()" (closed)="closeSheet()" (submitted)="createOrganization($event)" />
-</t-sheet>
+    <organization-list-ui
+      [loading]="loading()"
+      [rows]="organizations()"
+      [selected]="selectedIds()"
+      (toggled)="toggle($event)"
+      (toggledAll)="toggleShown()"
+      (deleted)="askDelete([$event])"
+    />
+
+    <t-list-pager noun="organizações" [loading]="loading()" [total]="total()" [page]="page()" (pageChange)="goTo($event)" />
+  </section>
+</div>
+
+<organization-create-sheet-ui [isActive]="isSheetActive()" (closed)="closeSheet()" (created)="onCreated()" />
+
+<t-confirmation
+  [title]="confirmationTitle()"
+  [description]="confirmationDescription()"
+  confirmLabel="Confirmar"
+  cancelLabel="Cancelar"
+  [isActive]="deleting().length > 0"
+  [loading]="confirming()"
+  (closed)="closeDialog()"
+  (confirmed)="deleteOrganizations()"
+/>

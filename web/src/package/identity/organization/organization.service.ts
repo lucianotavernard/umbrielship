@@ -14,8 +14,19 @@ export type CreateOrganizationRequest = {
   email: string;
 };
 
+/** A member the list names: up to four per Organization, by name (AD-111). */
+export type OrganizationMember = {
+  id: string;
+  name: string;
+};
+
+export type OrganizationListItem = Organization & {
+  members: OrganizationMember[];
+  memberCount: number;
+};
+
 export type GetOrganizationsResponse = {
-  organizations: Organization[];
+  organizations: OrganizationListItem[];
   total: number;
 };
 
@@ -29,5 +40,10 @@ export class OrganizationService {
 
   createOrganization(request: CreateOrganizationRequest): Observable<Organization> {
     return this.http.post<Organization>('/api/organizations', request);
+  }
+
+  /** Answers 409 for the internal Organization and for one that still holds records (AD-110). */
+  deleteOrganization(id: string): Observable<void> {
+    return this.http.delete<void>(`/api/organizations/${id}`);
   }
 }
