@@ -2,7 +2,9 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -13,6 +15,7 @@ import {
 import { z } from 'zod';
 
 import { AlreadyExistsDomainException } from '@/package/shared/lib/exception/already-exists-domain.exception.js';
+import { ConflictDomainException } from '@/package/shared/lib/exception/conflict-domain.exception.js';
 import { NotFoundDomainException } from '@/package/shared/lib/exception/not-found-domain.exception.js';
 import { pageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
 import type { PageQueryParamSchema } from '@/package/shared/lib/http/page-query.js';
@@ -23,6 +26,7 @@ import { CountOrganizationRolesUseCase } from '../user/count-organization-roles.
 import { FetchOrganizationUsersUseCase } from '../user/fetch-organization-users.use-case.js';
 import { FetchOrganizationsUseCase } from './fetch-organizations.use-case.js';
 import { CreateOrganizationUseCase } from './create-organization.use-case.js';
+import { DeleteOrganizationUseCase } from './delete-organization.use-case.js';
 import { GetOrganizationByIdUseCase } from './get-organization-by-id.use-case.js';
 import { InternalAdministratorGuard } from './internal-administrator.guard.js';
 
@@ -35,6 +39,15 @@ type CreateOrganizationBodySchema = z.infer<
   typeof createOrganizationBodySchema
 >;
 
+// The page, and the text the names and emails must contain (AD-111).
+const fetchOrganizationsQuerySchema = pageQueryParamSchema.extend({
+  search: z.string().trim().max(80).optional(),
+});
+
+type FetchOrganizationsQuerySchema = z.infer<
+  typeof fetchOrganizationsQuerySchema
+>;
+
 @UseGuards(InternalAdministratorGuard)
 @Controller('/organizations')
 export class OrganizationController {
@@ -45,16 +58,18 @@ export class OrganizationController {
     private fetchOrganizationUsers: FetchOrganizationUsersUseCase,
     private countOrganizationRoles: CountOrganizationRolesUseCase,
     private fetchInvitations: FetchInvitationsUseCase,
+    private deleteOrganization: DeleteOrganizationUseCase,
   ) {}
 
   @Get()
   async get(
-    @Query(new ZodValidationPipe(pageQueryParamSchema))
-    { page, per_page }: PageQueryParamSchema,
+    @Query(new ZodValidationPipe(fetchOrganizationsQuerySchema))
+    { page, per_page, search }: FetchOrganizationsQuerySchema,
   ) {
     const { organizations, total } = await this.fetchOrganizations.handle({
       page,
       perPage: per_page,
+      search,
     });
 
     return {
@@ -100,6 +115,23 @@ export class OrganizationController {
     } catch (error) {
       if (error instanceof NotFoundDomainException) {
         throw new NotFoundException(error.message);
+      }
+
+      throw error;
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: string) {
+    try {
+      await this.deleteOrganization.handle({ id });
+    } catch (error) {
+      if (error instanceof NotFoundDomainException) {
+        throw new NotFoundException(error.message);
+      }
+      if (error instanceof ConflictDomainException) {
+        throw new ConflictException(error.message);
       }
 
       throw error;

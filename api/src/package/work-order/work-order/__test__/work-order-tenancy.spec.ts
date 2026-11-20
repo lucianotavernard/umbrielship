@@ -30,7 +30,7 @@ describe('WorkOrder tenancy', () => {
     const customers = new InMemoryCustomersRepository();
     vessels = new InMemoryVesselsRepository(customers);
     workOrders = new InMemoryWorkOrdersRepository();
-    facade = new CustomerFacade(vessels);
+    facade = new CustomerFacade(vessels, customers);
     customers.items.push(
       makeCustomer({ organizationId: 'A', email: 'a@x.test' }, 'ca'),
       makeCustomer({ organizationId: 'B', email: 'b@x.test' }, 'cb'),

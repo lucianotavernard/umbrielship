@@ -27,7 +27,7 @@ describe('CreateWorkOrderUseCase', () => {
     workOrders = new InMemoryWorkOrdersRepository();
     sut = new CreateWorkOrderUseCase(
       workOrders,
-      new CustomerFacade(vessels),
+      new CustomerFacade(vessels, customers),
       inMemoryWorkforce().facade,
     );
     customers.items.push(makeCustomer({}, 'customer-1'));
@@ -166,7 +166,7 @@ describe('CreateWorkOrderUseCase', () => {
     workforce.teams.items.push(makeTeam({ organizationId: 'B' }, 'zulu'));
     const sut = new CreateWorkOrderUseCase(
       workOrders,
-      new CustomerFacade(vessels),
+      new CustomerFacade(vessels, customers),
       workforce.facade,
     );
     return { workOrders, workforce, sut };

@@ -17,7 +17,7 @@ describe('GetWorkOrderByIdUseCase', () => {
     const customers = new InMemoryCustomersRepository();
     const vessels = new InMemoryVesselsRepository(customers);
     workOrders = new InMemoryWorkOrdersRepository();
-    sut = new GetWorkOrderByIdUseCase(workOrders, new CustomerFacade(vessels));
+    sut = new GetWorkOrderByIdUseCase(workOrders, new CustomerFacade(vessels, customers));
     customers.items.push(makeCustomer({}, 'customer-1'));
     vessels.items.push(
       makeVessel(

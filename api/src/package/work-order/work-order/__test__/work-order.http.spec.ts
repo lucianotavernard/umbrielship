@@ -71,7 +71,7 @@ const day = (date: string) => new Date(`${date}T00:00:00.000Z`);
 const customers = new InMemoryCustomersRepository();
 const vessels = new InMemoryVesselsRepository(customers);
 const workOrders = new InMemoryWorkOrdersRepository();
-const facade = new CustomerFacade(vessels);
+const facade = new CustomerFacade(vessels, customers);
 const workforce = inMemoryWorkforce();
 const useCases = {
   create: new CreateWorkOrderUseCase(workOrders, facade, workforce.facade),

@@ -7,16 +7,24 @@ const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 export class InMemoryOrganizationsRepository implements IOrganizationsRepository {
   public items: Organization[] = [];
 
-  private sorted() {
-    return [...this.items].sort((a, b) => a.name.localeCompare(b.name));
+  private sorted(search?: string) {
+    const term = search?.trim().toLowerCase() ?? '';
+    return [...this.items]
+      .filter(
+        (item) =>
+          !term ||
+          item.name.toLowerCase().includes(term) ||
+          item.email.toLowerCase().includes(term),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async findAll(page: number, perPage: number) {
-    return this.sorted().slice((page - 1) * perPage, page * perPage);
+  async findAll(page: number, perPage: number, search?: string) {
+    return this.sorted(search).slice((page - 1) * perPage, page * perPage);
   }
 
-  async count() {
-    return this.items.length;
+  async count(search?: string) {
+    return this.sorted(search).length;
   }
 
   async findById(id: string) {
@@ -46,5 +54,9 @@ export class InMemoryOrganizationsRepository implements IOrganizationsRepository
       throw new AlreadyExistsDomainException('Organization already exists');
     }
     this.items.push(organization);
+  }
+
+  async delete(id: string): Promise<void> {
+    this.items = this.items.filter((organization) => organization.id !== id);
   }
 }

@@ -177,6 +177,7 @@ describe('acme layout', () => {
         'GET /organizations',
         'POST /organizations',
         'GET /organizations/:id',
+        'DELETE /organizations/:id',
         'GET /organizations/:id/users',
         'GET /organizations/:id/roles',
         'GET /organizations/:id/invitations',
@@ -352,6 +353,33 @@ describe('acme layout', () => {
         'package/workforce/team/team.controller.ts Put',
         'package/workforce/team/team.controller.ts Delete',
       ].sort(),
+    );
+  });
+
+  it('organization-list C11 lets identity read other contexts only through their modules and facades', () => {
+    const allowed = ['.module.js', '.facade.js'];
+    let reached = 0;
+
+    for (const file of files.filter(
+      (path) =>
+        path.includes('/package/identity/') &&
+        path.endsWith('.ts') &&
+        !path.includes('/__test__/'),
+    )) {
+      for (const match of read(file).matchAll(
+        /from '([^']*package\/(?:customer|work-order|workforce)\/[^']*)'/g,
+      )) {
+        reached += 1;
+        expect(
+          allowed.some((suffix) => match[1].endsWith(suffix)),
+          `${rel(file)} imports ${match[1]}`,
+        ).toBe(true);
+      }
+    }
+    expect(reached).toBeGreaterThan(0);
+
+    expect(read(join(packageRoot, 'work-order/work-order.module.ts'))).toMatch(
+      /exports: \[WorkOrderFacade\]/,
     );
   });
 
