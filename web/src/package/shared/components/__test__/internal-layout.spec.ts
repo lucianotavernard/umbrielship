@@ -6,6 +6,7 @@ import { provideRouter, Router } from '@angular/router';
 
 import { InternalLayout } from '../internal-layout';
 import { PAGE_RELOAD } from '../lib/page-reload';
+import { flushNotificationReads } from '../../testing/notification-reads';
 
 @Component({ template: 'page' })
 class Page {}
@@ -24,7 +25,11 @@ describe('InternalLayout', () => {
     });
   });
 
-  afterEach(() => TestBed.inject(HttpTestingController).verify());
+  afterEach(() => {
+    // The bell's reads, empty: this spec is about the layout (AD-116).
+    flushNotificationReads(TestBed.inject(HttpTestingController));
+    TestBed.inject(HttpTestingController).verify();
+  });
 
   async function settle() {
     await new Promise((resolve) => setTimeout(resolve));

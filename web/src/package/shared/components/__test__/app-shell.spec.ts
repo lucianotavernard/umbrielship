@@ -11,6 +11,7 @@ import { InternalLayout } from '../internal-layout';
 import { PAGE_RELOAD } from '../lib/page-reload';
 import { THEME_KEY } from '../lib/theme';
 import { SidebarProvider } from '../ui/sidebar';
+import { flushNotificationReads } from '../../testing/notification-reads';
 
 @Component({ template: 'page' })
 class Page {}
@@ -30,6 +31,8 @@ const ROUTES = [
   'agenda',
   'organizations',
   'organizations/:id',
+  'account',
+  'notifications',
   'auth',
 ].map((path) => ({ path, component: Page }));
 
@@ -83,7 +86,11 @@ describe('Shell', () => {
     controller = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => controller.verify());
+  afterEach(() => {
+    // The bell's reads, empty: this spec is about the shell (AD-116).
+    flushNotificationReads(controller);
+    controller.verify();
+  });
 
   async function settle() {
     await new Promise((resolve) => setTimeout(resolve));
@@ -118,7 +125,8 @@ describe('Shell', () => {
     expect(inset.querySelector('router-outlet')).not.toBeNull();
     // The links live in the sidebar now, never in a header.
     expect(element.querySelector('header nav')).toBeNull();
-    expect(element.querySelector('header a')).toBeNull();
+    // Only the menus of the bell and the avatar hold links (AD-116, AD-118).
+    expect(element.querySelector('header a:not([role="menuitem"])')).toBeNull();
   });
 
   const SIX_ITEMS = [
@@ -302,7 +310,8 @@ describe('Shell', () => {
 
     const profileBlock = element.querySelector('[data-slot="profile"]')!;
     expect(
-      [...profileBlock.querySelectorAll(':scope > span, strong, small')].map((part) =>
+      // The block itself, not the user menu inside it.
+      [...profileBlock.querySelectorAll(':scope > span, :scope > span > strong, :scope > span > small')].map((part) =>
         part.textContent?.trim(),
       ),
     ).toEqual(['AS', expect.stringContaining('Ana Souza'), 'Ana Souza', 'Inspetor']);
@@ -318,6 +327,128 @@ describe('Shell', () => {
 
     expect(router.url).toBe('/auth');
     expect(localStorage.getItem('@umbriel:access-token')).toBeNull();
+  });
+
+  it('user-menu C1 names who is signed in and offers Conta and Notificações before Sair', async () => {
+    const { fixture, element } = await open([atlantic()], 'org-a');
+    const router = TestBed.inject(Router);
+
+    byLabel<HTMLButtonElement>(element, 'Abrir menu do usuário')!.click();
+    await settle();
+    fixture.detectChanges();
+
+    // Beside the sidebar on a desktop, its bottom on the profile's, 24px from the menu button (AD-115).
+    const menu = element.querySelector<HTMLElement>('[data-slot="profile"] t-dropdown-menu-content')!;
+    expect(menu.getAttribute('data-side')).toBe('right');
+    expect(menu.style.getPropertyValue('position-area')).toBe('right span-top');
+    expect(menu.style.margin).toBe('0px 0px 0px 24px');
+
+    const header = element.querySelector('[data-slot="user-menu-header"]')!;
+    expect(header.querySelector('span')?.textContent?.trim()).toBe('AS');
+    expect(header.querySelector('[data-slot="user-menu-name"]')?.textContent?.trim()).toBe('Ana Souza');
+    expect(header.querySelector('[data-slot="user-menu-email"]')?.textContent?.trim()).toBe('ana@atlantic.test');
+
+    const items = [...element.querySelectorAll<HTMLElement>('[data-slot="profile"] [role="menuitem"]')];
+    expect(items.map((item) => item.textContent?.trim())).toEqual(['Conta', 'Notificações', 'Sair']);
+    expect(items[0].getAttribute('href')).toBe('/account');
+    expect(items[1].getAttribute('href')).toBe('/notifications');
+
+    items[0].click();
+    await settle();
+    fixture.detectChanges();
+    expect(router.url).toBe('/account');
+    expect(element.querySelector('[data-slot="breadcrumb-section"]')?.textContent?.trim()).toBe('Conta');
+
+    await router.navigateByUrl('/notifications');
+    await settle();
+    fixture.detectChanges();
+    expect(element.querySelector('[data-slot="breadcrumb-section"]')?.textContent?.trim()).toBe('Notificações');
+
+    // On a phone the panel leaves no room beside it: the menu opens above the profile.
+    fixture.debugElement.query(By.directive(SidebarProvider)).injector.get(SidebarProvider).isMobile.set(true);
+    await settle();
+    fixture.detectChanges();
+    const phoneMenu = element.querySelector<HTMLElement>('[data-slot="profile"] t-dropdown-menu-content')!;
+    expect(phoneMenu.getAttribute('data-side')).toBe('top');
+    expect(phoneMenu.style.margin).toBe('0px 0px 4px');
+  });
+
+  it('organization-create C1 an internal Administrator ends the Organization menu with Nova organização, which creates one and opens it', async () => {
+    const { fixture, element } = await open([internal, atlantic('administrator')], 'org-u');
+    const router = TestBed.inject(Router);
+
+    byLabel<HTMLButtonElement>(element, 'Selecionar organização')!.click();
+    await settle();
+    fixture.detectChanges();
+    const switcher = element.querySelector('organization-switcher-ui')!;
+    const items = [...switcher.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+    // The Organizations first, "Nova organização" last.
+    expect(items.at(-1)?.textContent?.trim()).toBe('Nova organização');
+    expect(items.at(-1)?.getAttribute('data-slot')).toBe('create-organization');
+
+    items.at(-1)!.click();
+    await settle();
+    fixture.detectChanges();
+    const drawer = document.querySelector<HTMLElement>('[data-slot="sheet-content"]')!;
+    expect(drawer.querySelector('[data-slot="sheet-title"]')?.textContent?.trim()).toBe('Nova organização');
+
+    for (const [selector, value] of [
+      ['#organization-name', 'Estaleiro Boreal'],
+      ['#organization-email', 'contato@boreal.test'],
+    ]) {
+      const field = drawer.querySelector<HTMLInputElement>(selector)!;
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    await settle();
+    drawer.querySelector<HTMLButtonElement>('footer[data-slot="drawer-footer"] button[type="submit"]')!.click();
+    await settle();
+
+    const post = controller.expectOne((request) => request.method === 'POST' && request.url === '/api/organizations');
+    expect(post.request.body).toEqual({ name: 'Estaleiro Boreal', email: 'contato@boreal.test' });
+    post.flush({ id: 'org-new', name: 'Estaleiro Boreal', email: 'contato@boreal.test', isInternal: false });
+    await settle();
+    fixture.detectChanges();
+
+    expect(router.url).toBe('/organizations/org-new');
+    expect(document.querySelector('[data-slot="sheet-content"]')).toBeNull();
+  });
+
+  it('organization-create C2 an operator or an Administrator of an external Organization sees no Nova organização', async () => {
+    for (const role of ['operator', 'administrator'] as Role[]) {
+      const { fixture, element } = await open([atlantic(role)], 'org-a');
+      byLabel<HTMLButtonElement>(element, 'Selecionar organização')!.click();
+      await settle();
+      fixture.detectChanges();
+
+      expect(element.querySelector('[data-slot="create-organization"]'), role).toBeNull();
+      fixture.destroy();
+      flushNotificationReads(controller);
+    }
+  });
+
+  it('user-menu C3 the top bar avatar opens the same menu as the profile, Sair included', async () => {
+    const { fixture, element } = await open([atlantic()], 'org-a');
+    const router = TestBed.inject(Router);
+    const header = element.querySelector<HTMLElement>('main > header')!;
+
+    const avatar = byLabel<HTMLButtonElement>(header, 'Abrir menu da conta')!;
+    expect(avatar.textContent?.trim()).toBe('AS');
+    avatar.click();
+    await settle();
+    fixture.detectChanges();
+    expect(avatar.getAttribute('aria-expanded')).toBe('true');
+
+    expect(header.querySelector('[data-slot="user-menu-name"]')?.textContent?.trim()).toBe('Ana Souza');
+    expect(header.querySelector('[data-slot="user-menu-email"]')?.textContent?.trim()).toBe('ana@atlantic.test');
+    const items = [...header.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+    expect(items.map((item) => item.textContent?.trim())).toEqual(['Conta', 'Notificações', 'Sair']);
+    expect(items[0].getAttribute('href')).toBe('/account');
+    expect(items[1].getAttribute('href')).toBe('/notifications');
+
+    items[2].click();
+    await settle();
+    expect(router.url).toBe('/auth');
   });
 
   it('customer-ui C9 on a phone Abrir menu opens the sidebar and a menu item closes it', async () => {
@@ -375,6 +506,41 @@ describe('Shell', () => {
     expect(sidebar.openMobile()).toBe(false);
   });
 
+  it('sidebar C1 the top bar button collapses the sidebar to its icons and expands it back', async () => {
+    const { fixture, element } = await open([atlantic()], 'org-a');
+    const sidebar = element.querySelector<HTMLElement>('t-sidebar')!;
+    const trigger = () => element.querySelector<HTMLButtonElement>('header button[data-sidebar="trigger"]')!;
+
+    // Always there on a desktop, before the breadcrumb, with a rule between them (AD-113).
+    expect(trigger().getAttribute('aria-label')).toBe('Recolher menu');
+    expect(trigger().getAttribute('title')).toBe('Recolher menu (Ctrl+B)');
+    expect(trigger().getAttribute('aria-expanded')).toBe('true');
+    expect(sidebar.getAttribute('data-state')).toBe('expanded');
+    expect(sidebar.getAttribute('data-collapsible')).toBe('');
+
+    trigger().click();
+    fixture.detectChanges();
+    expect(sidebar.getAttribute('data-state')).toBe('collapsed');
+    expect(sidebar.getAttribute('data-collapsible')).toBe('icon');
+    expect(trigger().getAttribute('aria-label')).toBe('Expandir menu');
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    expect(localStorage.getItem('@umbriel:sidebar')).toBe('false');
+    // Collapsed, each item keeps its icon and names itself on hover.
+    const customers = [...element.querySelectorAll<HTMLAnchorElement>('nav a')].find(
+      (link) => link.textContent?.trim() === 'Clientes',
+    )!;
+    expect(customers.getAttribute('title')).toBe('Clientes');
+    // The name hides and the icon stays whole, so no letter of the name shows beside it.
+    expect(customers.querySelector('span')?.className).toContain('group-data-[collapsible=icon]:hidden');
+    expect(customers.className).toContain('[&>ng-icon]:shrink-0');
+
+    trigger().click();
+    fixture.detectChanges();
+    expect(sidebar.getAttribute('data-state')).toBe('expanded');
+    expect(trigger().getAttribute('aria-label')).toBe('Recolher menu');
+    expect(localStorage.getItem('@umbriel:sidebar')).toBe('true');
+  });
+
   it('customer-ui C57 the topbar scrolls with the page below 640 px', async () => {
     const { element } = await open([atlantic()], 'org-a');
 
@@ -386,7 +552,7 @@ describe('Shell', () => {
     expect(getComputedStyle(topbar).position).not.toBe('sticky');
   });
 
-  it('customer-ui C10 shows no workshop status, help, notifications or MARÉOS footer', async () => {
+  it('customer-ui C10 shows no workshop status, help or MARÉOS footer', async () => {
     const { element } = await open([atlantic()], 'org-a');
 
     expect(element.textContent).not.toContain('Oficina em operação');
@@ -394,6 +560,6 @@ describe('Shell', () => {
     expect(element.textContent).not.toContain('MARÉOS');
     expect(element.textContent).not.toContain('Operação com rumo certo.');
     expect(byLabel(element, 'Ajuda')).toBeNull();
-    expect(byLabel(element, 'Notificações')).toBeNull();
+    // The bell came back with AD-116; it is notification-menu.spec's.
   });
 });
