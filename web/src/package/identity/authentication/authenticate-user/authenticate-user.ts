@@ -1,5 +1,7 @@
 import { Component, inject, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideAnchor } from '@ng-icons/lucide';
 
 import { apiErrorMessage } from '../../../shared/components/lib/api-error-message';
 import { toast } from '../../../shared/components/ui/toaster';
@@ -8,10 +10,14 @@ import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'authenticate-user',
-  imports: [AuthenticationForm],
+  imports: [AuthenticationForm, NgIcon],
+  viewProviders: [provideIcons({ lucideAnchor })],
   templateUrl: './authenticate-user.html',
+  host: { class: 'block' },
 })
 export class AuthenticateUser {
+  protected readonly year = new Date().getFullYear();
+
   private readonly router = inject(Router);
   private readonly authenticationService = inject(AuthenticationService);
   private readonly form = viewChild.required(AuthenticationForm);

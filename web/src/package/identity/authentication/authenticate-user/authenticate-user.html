@@ -1,6 +1,79 @@
-<div class="flex min-h-svh items-center justify-center p-6">
-  <div class="w-full max-w-xs">
-    <span class="mb-8 block font-medium">Umbriel</span>
-    <authentication-form-ui (submitted)="signIn($event)" />
-  </div>
-</div>
+<main
+  class="grid min-h-svh w-full min-w-0 bg-background text-foreground min-[900px]:grid-cols-[minmax(420px,0.92fr)_minmax(0,1.08fr)]"
+>
+  <section
+    class="flex min-h-svh min-w-0 flex-col px-[clamp(22px,7vw,56px)] py-6 max-[420px]:px-5 max-[420px]:py-[21px] min-[900px]:p-[clamp(24px,4vw,64px)]"
+    aria-labelledby="authentication-title"
+  >
+    <div class="inline-flex w-max items-center gap-2.5 text-[15px] font-[750] tracking-[0.075em]">
+      <span class="grid size-[34px] shrink-0 place-items-center rounded-[10px] bg-primary text-primary-foreground">
+        <ng-icon name="lucideAnchor" class="!size-[18px]" />
+      </span>
+      <span>UMBRIEL<span class="text-primary">SHIP</span></span>
+    </div>
+
+    <div
+      class="mx-auto flex w-[min(100%,420px)] flex-1 flex-col justify-center py-10 min-[900px]:w-[min(100%,390px)]"
+    >
+      <div class="mb-[30px] max-[420px]:mb-[25px]">
+        <span class="mb-[11px] block text-[10px] font-[750] tracking-[0.15em] text-primary">BEM-VINDO DE VOLTA</span>
+        <h1
+          id="authentication-title"
+          class="text-[clamp(26px,3vw,32px)] leading-[1.2] font-[650] tracking-[-0.045em] text-foreground"
+        >
+          Acesse sua conta
+        </h1>
+        <p class="mt-2.5 text-[13px] leading-[1.6] text-muted-foreground">
+          Entre com suas credenciais para continuar a operação.
+        </p>
+      </div>
+
+      <authentication-form-ui (submitted)="signIn($event)" />
+
+      <p class="mt-[23px] text-center text-[11px] leading-[1.7] text-muted-foreground">
+        Ainda não tem uma conta?
+        <span class="font-semibold text-foreground">Fale com o administrador da sua organização.</span>
+      </p>
+    </div>
+
+    <footer class="flex justify-between gap-4 text-[10px] text-muted-foreground max-[420px]:text-[9px]">
+      <span>© {{ year }} Umbrielship</span>
+      <span>Operação com rumo certo.</span>
+    </footer>
+  </section>
+
+  <!-- The cover keeps its dark sea colours in both themes, as the mareos draws it. -->
+  <aside
+    class="relative hidden min-h-svh flex-col overflow-hidden bg-[#122b36] p-[clamp(24px,4vw,54px)] text-white min-[900px]:flex"
+    aria-label="Operação marítima"
+  >
+    <!-- A background, not an <img>: a phone, where the cover is hidden, never fetches it. -->
+    <div
+      aria-hidden="true"
+      data-slot="cover-image"
+      class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+      style="background-image: url('mareos-login-cover.png')"
+    ></div>
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,20,27,0.24)_0%,rgba(8,23,30,0.05)_42%,rgba(6,19,27,0.78)_100%),linear-gradient(90deg,rgba(7,20,27,0.12),transparent_60%)]"
+    ></div>
+
+    <div
+      class="relative flex w-max items-center gap-[9px] rounded-full border border-white/27 bg-[rgba(12,30,38,0.25)] px-3 py-[9px] text-[9px] font-[650] tracking-[0.12em] backdrop-blur-[8px]"
+    >
+      <span aria-hidden="true" class="size-1.5 rounded-full bg-[#78d2c1] shadow-[0_0_11px_#78d2c1]"></span>
+      GESTÃO MARÍTIMA, EM UM SÓ LUGAR
+    </div>
+
+    <div class="relative mx-auto my-auto max-w-[500px] pb-7">
+      <span class="text-[9px] font-bold tracking-[0.17em] text-[#a8e0d6]">CONTROLE SUA OPERAÇÃO</span>
+      <h2
+        class="mt-[13px] mb-2.5 max-w-[440px] text-[clamp(28px,4vw,48px)] leading-[1.08] font-[550] tracking-[-0.045em] text-white"
+      >
+        O próximo passo da sua jornada começa aqui.
+      </h2>
+      <p class="text-[13px] leading-[1.7] text-white/78">Ordens, equipes e embarcações em perfeita sintonia.</p>
+    </div>
+  </aside>
+</main>
