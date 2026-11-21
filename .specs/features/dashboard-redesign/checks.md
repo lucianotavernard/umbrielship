@@ -39,9 +39,9 @@ Proof: run web | ✓ dashboard-summary.spec.ts > periodItems > dashboard C6 keep
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C6 alternates esta semana and hoje
 Proof: browser - use the period button once at 1440x1114, save `captures/dashboard-period-today.running.png`
 
-**C7** - The Agenda list scrolls inside its panel when the period holds more items than the panel's height in `.specs/features/dashboard-redesign/captures/dashboard.png` shows, and the panel keeps that height; an empty period reads "Nenhum item na agenda hoje." or "Nenhum item na agenda nesta semana." (AC 7)
-Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C7 tells an empty today from an empty week
-Proof: walk - with more items this week than the panel shows, read the agenda list's `scrollHeight` above its `clientHeight` and the panel's height equal on "Esta semana" and "Hoje"
+**C7** - The Agenda shows only the first three items of the period by time (five today → 08:00, 09:00, 11:00; the week → Monday's Docagem first), and its list does not scroll (AD-119); an empty period reads "Nenhum item na agenda hoje." or "Nenhum item na agenda nesta semana." (AC 7)
+Proof: run web | ✓ dashboard-summary.spec.ts > periodItems > dashboard C7 keeps the first three items of the period by time
+Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C7 shows three items at most and tells an empty today from an empty week
 
 **C8** - Using an Agenda item opens `/work-orders/:workOrderId` of that item, and the items carry no "Mais opções" (AC 8)
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C8 opens the work order of an agenda item
@@ -49,10 +49,9 @@ Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C8 opens the work
 **C9** - "Ver agenda completa" opens `/agenda` (AC 9)
 Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C9 opens the agenda from ver agenda completa
 
-**C10** - "Equipes em campo" ("Disponibilidade das equipes") lists every Team by name in `pt-BR`, each as "Equipe <nome>" with "<especialidade> · <n> técnicos" ("1 técnico", "0 técnicos") and "Em serviço" or "Disponível" by AD-084; the list scrolls inside the panel when the Teams are more than the panel's height in `.specs/features/dashboard-redesign/captures/dashboard.png` shows (AC 10)
-Proof: run web | ✓ dashboard-summary.spec.ts > teamRows > dashboard C10 lists every team by name with specialty, count and status
-Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C10 shows each team of the organization in equipes em campo
-Proof: walk - with more Teams than the panel shows, read the team list's `scrollHeight` above its `clientHeight`
+**C10** - "Equipes em campo" ("Disponibilidade das equipes") lists the first three Teams by name in `pt-BR` (a fourth, "Ágil", pushes "Charlie" out: AD-120), each as "Equipe <nome>" with "<especialidade> · <n> técnicos" ("1 técnico", "0 técnicos") and "Em serviço" or "Disponível" by AD-084; the list does not scroll (AC 10)
+Proof: run web | ✓ dashboard-summary.spec.ts > teamRows > dashboard C10 lists the first three teams by name with specialty, count and status
+Proof: run web | ✓ dashboard.spec.ts > Dashboard > dashboard C10 shows the first three teams of the organization in equipes em campo
 
 **C11** - The panel's footer reads "<n> técnicos ativos" ("1 técnico ativo"), n every Staff of the Organization, beside the initials of the first two Staff by name and "+<n − 2>" past two: 7 → "JP", "RM", "+5"; 2 → two initials; 1 → one; 0 → none (AC 11)
 Proof: run web | ✓ dashboard-summary.spec.ts > teamFooter > dashboard C11 counts every staff and shows two initials and the rest

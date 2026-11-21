@@ -123,10 +123,10 @@ WorkOrders of the active Organization, in the mareos look.
    - a WorkOrder `#AB12CD34` docking Monday 08:00 and undocking Friday 17:00 with a service "Pintura do casco" starting Wednesday 10:30 whose Responsável is Team "Alfa" → three items, under SEG, QUA and SEX, reading "Docagem · #AB12CD34", "Pintura do casco · Equipe Alfa" and "Desdocagem · #AB12CD34"; the same service with no Responsável → "Pintura do casco · #AB12CD34"; the same WorkOrder `CANCELLED` → no item
 6. WHEN the user opens the page THEN the period button SHALL read "Esta semana" and the panel SHALL hold the items of Monday to Sunday of the current week; WHEN the user uses the period button THEN it SHALL switch to "Hoje" and hold only today's items, and the next use switches back to "Esta semana", as `dashboard-period-today.png` shows the button (`.specs/features/dashboard-redesign/captures/dashboard-period-today.png`) (AD-089)
    - on Wednesday 2026-11-18, an item on Sunday 2026-11-22 23:00 is in "Esta semana" and an item on Monday 2026-11-23 00:00 is not; an item on 2026-11-18 at 00:00 is in "Hoje"
-7. WHILE the period holds more items than the panel's height in `dashboard.png` the list SHALL scroll inside the panel and the page SHALL not grow; IF the period holds no item THEN the panel SHALL read "Nenhum item na agenda hoje." or "Nenhum item na agenda nesta semana." (AD-089, AD-092)
+7. WHILE the period holds more than three items the panel SHALL show only the first three by time, and the list SHALL not scroll (AD-119); IF the period holds no item THEN the panel SHALL read "Nenhum item na agenda hoje." or "Nenhum item na agenda nesta semana." (AD-089, AD-092)
 8. WHEN the user uses an Agenda item THEN the system SHALL open `/work-orders/:workOrderId` of that item (AD-047, AD-089); the items carry no "Mais opções" button (AD-091)
 9. WHEN the user uses "Ver agenda completa" THEN the system SHALL open `/agenda`
-10. The panel "Equipes em campo" ("Disponibilidade das equipes") SHALL list every Team of the Organization, ordered by name (`pt-BR`), each as "Equipe <nome>" (AD-093), with "<especialidade> · <n> técnicos" (n being the Staff whose Team it is) and its status "Em serviço" (amber dot) or "Disponível" (green dot) as AD-084 derives it; WHILE the Teams are more than the panel's height in `dashboard.png` holds the list SHALL scroll inside the panel (AD-085)
+10. The panel "Equipes em campo" ("Disponibilidade das equipes") SHALL list the first three Teams of the Organization by name (`pt-BR`) (AD-120), each as "Equipe <nome>" (AD-093), with "<especialidade> · <n> técnicos" (n being the Staff whose Team it is) and its status "Em serviço" (amber dot) or "Disponível" (green dot) as AD-084 derives it; the list SHALL not scroll (AD-085, AD-120)
     - Team "Alfa", specialty "Motor", 2 Staff, Responsável of a service `IN_PROGRESS` of an open WorkOrder → "Equipe Alfa", "Motor · 2 técnicos", "Em serviço"; Team "Charlie" with 1 Staff and no Assignment → "Equipe Charlie", "Elétrica · 1 técnico", "Disponível"; a Team with no Staff → "<especialidade> · 0 técnicos"
 11. The footer of "Equipes em campo" SHALL read "<n> técnicos ativos", n being every Staff of the Organization with or without a Team, beside the initials of the first two Staff by name (`pt-BR`) and "+<n − 2>" when there are more than two (AD-092)
     - 7 Staff, the first two by name "Joana Prado" and "Rafael Mendes" → "7 técnicos ativos", "JP", "RM", "+5"; 2 Staff → two initials and no "+"; 1 Staff → "1 técnico ativo" and one initial; no Staff → "0 técnicos ativos" and no initial
@@ -193,11 +193,11 @@ WorkOrders of the active Organization, in the mareos look.
 | Card "Aguardando peças" | "Pendentes" | y - AD-088 |
 | Note "4 equipes mobilizadas" with no rule behind it | "<n> equipes mobilizadas", the Teams "Em serviço" | y - AD-088 |
 | Trends "vs. semana passada", "desde ontem", "vs. mês passado" and the notes "6 com prioridade alta", "2 entregas previstas hoje", "92% no prazo" | nothing | y - AD-091 |
-| Three items under one day, whatever the period | the items of the period, grouped by day, scrolling inside the panel | y - AD-089 |
+| Three items under one day, whatever the period | the first three items of the period by time, grouped by day | y - AD-089, AD-119 |
 | Category tags "Revisão", "Hidráulica", "Mecânica" | "Serviço", "Docagem", "Desdocagem" | y - AD-091 |
 | "· Equipe Alfa" on every Agenda item | the service's Responsável, or the `#` code when it has none and on Docagem and Desdocagem | y - AD-087 |
 | "Mais opções" on each Agenda item | nothing; the item opens its WorkOrder | y - AD-091 |
-| Three fixed Teams, "Mais opções" with no action | every Team of the Organization with its derived status; "Mais opções" opens `/staff?tab=equipes` | y - AD-085 |
+| Three fixed Teams, "Mais opções" with no action | the first three Teams of the Organization by name with their derived status; "Mais opções" opens `/staff?tab=equipes` | y - AD-085, AD-120 |
 | Tabs "Aguardando" and "Agendadas" | "Pendentes" | y - AD-090 |
 | Column "EQUIPE" | "RESPONSÁVEL", the Responsável of the first service or "Sem responsável" | y - AD-086 |
 | "Filtros 2" and "⌘K" | nothing | y - AD-091 |
