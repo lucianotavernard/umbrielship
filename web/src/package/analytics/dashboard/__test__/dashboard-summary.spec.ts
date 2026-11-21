@@ -162,6 +162,7 @@ describe('periodItems', () => {
   it('dashboard C5 groups the items of the period by day with only the days that have items', () => {
     const responsavel = (serviceId: string) => (serviceId === pintura.id ? 'Equipe Alfa' : null);
 
+    // The week's first three items by time; Friday's Desdocagem is the fourth (AD-119).
     expect(view(periodItems(agendaItems([workOrder], names), 'WEEK', wednesday, responsavel))).toEqual([
       ['SEG', '16', [['08:00', 'Aurora', 'DOCKING', 'Docagem · #AB12CD34']]],
       [
@@ -172,6 +173,8 @@ describe('periodItems', () => {
           ['10:30', 'Aurora', 'SERVICE', 'Pintura do casco · Equipe Alfa'],
         ],
       ],
+    ]);
+    expect(view(periodItems(agendaItems([workOrder], names), 'TODAY', at(2026, 11, 20, 12, 0)))).toEqual([
       ['SEX', '20', [['17:00', 'Aurora', 'UNDOCKING', 'Desdocagem · #AB12CD34']]],
     ]);
 
@@ -199,21 +202,41 @@ describe('periodItems', () => {
       ],
       names,
     );
-    const lines = (period: 'WEEK' | 'TODAY') =>
-      periodItems(items, period, wednesday).flatMap((day) => day.items.map((item) => `${day.weekday} ${item.time} ${item.line}`));
+    const lines = (period: 'WEEK' | 'TODAY', from = items) =>
+      periodItems(from, period, wednesday).flatMap((day) => day.items.map((item) => `${day.weekday} ${item.time} ${item.line}`));
 
+    // Sunday 15 at 23:59 and Monday 23 at 00:00 fall outside the week.
+    expect(lines('WEEK', items.filter((item) => ['#00000001', '#00000002'].includes(item.code)))).toEqual([
+      'SEG 00:00 Docagem · #00000002',
+      'DOM 23:00 Desdocagem · #00000001',
+    ]);
     expect(lines('WEEK')).toEqual([
       'SEG 00:00 Docagem · #00000002',
       'TER 23:59 Docagem · #00000004',
       'QUA 00:00 Docagem · #00000003',
-      'QUA 23:59 Desdocagem · #00000003',
-      'QUI 00:00 Desdocagem · #00000004',
-      'DOM 23:00 Desdocagem · #00000001',
     ]);
-    // Sunday 15 at 23:59 and Monday 23 at 00:00 fall outside the week.
-    expect(lines('WEEK')).not.toContain('DOM 23:59 Docagem · #00000001');
-    expect(lines('WEEK')).not.toContain('SEG 00:00 Desdocagem · #00000002');
     expect(lines('TODAY')).toEqual(['QUA 00:00 Docagem · #00000003', 'QUA 23:59 Desdocagem · #00000003']);
+  });
+
+  it('dashboard C7 keeps the first three items of the period by time', () => {
+    // Five services today, given out of order, and a Docagem on Monday.
+    const today = (id: string, name: string, hours: number) => service(id, name, local(2026, 11, 18, hours, 0));
+    const busy = order(
+      'ab12cd34-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
+      'IN_PROGRESS',
+      local(2026, 11, 25, 17, 0),
+      [today('s5', 'Leme', 16), today('s1', 'Motor', 8), today('s4', 'Hélice', 14), today('s2', 'Casco', 9), today('s3', 'Pintura', 11)],
+      local(2026, 11, 16, 7, 0),
+    );
+    const times = (period: 'WEEK' | 'TODAY') =>
+      periodItems(agendaItems([busy], names), period, wednesday).flatMap((day) =>
+        day.items.map((item) => `${day.weekday} ${item.time} ${item.title}`),
+      );
+
+    expect(times('TODAY')).toEqual(['QUA 08:00 Motor', 'QUA 09:00 Casco', 'QUA 11:00 Pintura']);
+    expect(times('WEEK')).toEqual(['SEG 07:00 Docagem', 'QUA 08:00 Motor', 'QUA 09:00 Casco']);
+    // Fewer than three: every one.
+    expect(periodItems(agendaItems([workOrder], names), 'TODAY', wednesday).flatMap((day) => day.items).length).toBe(2);
   });
 });
 
@@ -230,7 +253,7 @@ describe('agendaLine', () => {
 });
 
 describe('teamRows', () => {
-  it('dashboard C10 lists every team by name with specialty, count and status', () => {
+  it('dashboard C10 lists the first three teams by name with specialty, count and status', () => {
     const teams: TeamListItem[] = [
       { id: 'charlie', name: 'Charlie', specialty: 'Elétrica', staffCount: 1 },
       { id: 'bravo', name: 'Bravo', specialty: 'Hidráulica', staffCount: 0 },
@@ -242,11 +265,14 @@ describe('teamRows', () => {
     ];
     const rows = teamRows(teams, [assignment('s1', { teamId: 'alfa' })], servicesInProgress(fleet));
 
+    // Charlie is the fourth by name (AD-120).
     expect(rows.map((row) => [row.name, row.line, row.status, row.tone])).toEqual([
       ['Equipe Ágil', 'Pintura · 3 técnicos', 'Disponível', 0],
       ['Equipe Alfa', 'Motor · 2 técnicos', 'Em serviço', 1],
       ['Equipe Bravo', 'Hidráulica · 0 técnicos', 'Disponível', 2],
-      ['Equipe Charlie', 'Elétrica · 1 técnico', 'Disponível', 0],
+    ]);
+    expect(teamRows([teams[0]], [], new Set()).map((row) => [row.name, row.line, row.status])).toEqual([
+      ['Equipe Charlie', 'Elétrica · 1 técnico', 'Disponível'],
     ]);
     expect(teamRows([], [], new Set())).toEqual([]);
   });

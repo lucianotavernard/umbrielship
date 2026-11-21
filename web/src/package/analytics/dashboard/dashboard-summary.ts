@@ -70,9 +70,12 @@ export type DashboardAgendaItem = AgendaItem & { line: string };
 /** A day of the panel: "QUA" and "18", and its items by time. */
 export type AgendaDay = { key: string; weekday: string; day: string; items: DashboardAgendaItem[] };
 
+/** How many Agenda items the panel shows: the first of the period by time (AD-119). */
+export const DASHBOARD_AGENDA_LIMIT = 3;
+
 /**
- * The items of "Esta semana" (Monday to Sunday holding `now`) or "Hoje", grouped by day in order,
- * only the days that have items, each item with its line (AD-087, AD-089). `items` come sorted.
+ * The first three items of "Esta semana" (Monday to Sunday holding `now`) or "Hoje" by time, grouped
+ * by day in order, only the days that have items, each item with its line (AD-087, AD-089, AD-119).
  */
 export function periodItems(
   items: AgendaItem[],
@@ -82,7 +85,10 @@ export function periodItems(
 ): AgendaDay[] {
   const days = period === 'WEEK' ? weekDays(now) : [startOfDay(now)];
   const byDay = new Map<string, AgendaDay>();
-  for (const item of [...itemsOn(items, days)].sort((a, b) => a.at.getTime() - b.at.getTime())) {
+  const first = [...itemsOn(items, days)]
+    .sort((a, b) => a.at.getTime() - b.at.getTime())
+    .slice(0, DASHBOARD_AGENDA_LIMIT);
+  for (const item of first) {
     const key = dateKey(item.at);
     let day = byDay.get(key);
     if (!day) {
@@ -139,10 +145,14 @@ export function techniciansLabel(count: number): string {
   return count === 1 ? '1 técnico' : `${count} técnicos`;
 }
 
-/** Every Team by name in `pt-BR` as "Equipe <nome>", "<especialidade> · <n> técnicos" and its status (AD-084, AD-085, AD-093). */
+/** How many Teams the panel lists: the first by name (AD-120). */
+export const DASHBOARD_TEAM_LIMIT = 3;
+
+/** The first three Teams by name in `pt-BR` as "Equipe <nome>", "<especialidade> · <n> técnicos" and its status (AD-084, AD-085, AD-093, AD-120). */
 export function teamRows(teams: TeamListItem[], assignments: Assignment[], inProgress: ReadonlySet<string>): TeamRow[] {
   return [...teams]
     .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+    .slice(0, DASHBOARD_TEAM_LIMIT)
     .map((team, index) => ({
       id: team.id,
       name: `Equipe ${team.name}`,
