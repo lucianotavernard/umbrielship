@@ -13,7 +13,7 @@ const body = {
   organizationId: 'A',
   name: 'Camila Rocha',
   specialty: 'Técnica elétrica',
-  email: 'camila.rocha@umbriel.test',
+  email: 'camila.rocha@mareos.test',
   phone: '(13) 99712-3088',
 };
 
@@ -28,7 +28,7 @@ describe('CreateStaffUseCase', () => {
       organizationId: 'A',
       name: '  Camila Rocha ',
       specialty: ' Técnica elétrica  ',
-      email: '  Camila.Rocha@Umbriel.TEST ',
+      email: '  Camila.Rocha@Mareos.TEST ',
       phone: ' (13) 99712-3088 ',
     });
 
@@ -37,7 +37,7 @@ describe('CreateStaffUseCase', () => {
       organizationId: 'A',
       name: 'Camila Rocha',
       specialty: 'Técnica elétrica',
-      email: 'camila.rocha@umbriel.test',
+      email: 'camila.rocha@mareos.test',
       phone: '(13) 99712-3088',
       teamId: null,
     });
@@ -73,11 +73,11 @@ describe('CreateStaffUseCase', () => {
       makeStaff({
         organizationId: 'A',
         name: 'Outro',
-        email: 'camila.rocha@umbriel.test',
+        email: 'camila.rocha@mareos.test',
       }),
     );
 
-    const promise = sut.handle({ ...body, email: 'CAMILA.ROCHA@umbriel.test' });
+    const promise = sut.handle({ ...body, email: 'CAMILA.ROCHA@mareos.test' });
 
     await expect(promise).rejects.toBeInstanceOf(AlreadyExistsDomainException);
     await expect(promise).rejects.toThrow('Staff email already exists');
@@ -89,7 +89,7 @@ describe('CreateStaffUseCase', () => {
       makeStaff({
         organizationId: 'B',
         name: 'Camila Rocha',
-        email: 'camila.rocha@umbriel.test',
+        email: 'camila.rocha@mareos.test',
       }),
     );
 

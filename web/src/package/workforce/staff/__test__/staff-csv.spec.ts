@@ -6,7 +6,7 @@ const rows: StaffRow[] = [
     id: 'rafael',
     name: 'Rafael Mendes',
     specialty: 'Mecânico naval',
-    email: 'rafael@umbriel.test',
+    email: 'rafael@mareos.test',
     phone: '(13) 99821-4401',
     teamId: 'alfa',
     teamName: 'Equipe Alfa',
@@ -16,7 +16,7 @@ const rows: StaffRow[] = [
     id: 'pedro',
     name: '=Pedro',
     specialty: 'Técnico "geral"',
-    email: 'pedro@umbriel.test',
+    email: 'pedro@mareos.test',
     phone: '(13) 2',
     teamId: null,
     teamName: NO_TEAM,
@@ -30,8 +30,8 @@ describe('staffCsv', () => {
 
     expect(lines).toEqual([
       '"Nome","Especialidade","Equipe","E-mail","Telefone","Status"',
-      '"Rafael Mendes","Mecânico naval","Equipe Alfa","rafael@umbriel.test","(13) 99821-4401","Em serviço"',
-      `"'=Pedro","Técnico ""geral""","Sem equipe","pedro@umbriel.test","(13) 2","Disponível"`,
+      '"Rafael Mendes","Mecânico naval","Equipe Alfa","rafael@mareos.test","(13) 99821-4401","Em serviço"',
+      `"'=Pedro","Técnico ""geral""","Sem equipe","pedro@mareos.test","(13) 2","Disponível"`,
     ]);
   });
 });

@@ -19,7 +19,7 @@ export const rafael: Staff = {
   id: 'rafael',
   name: 'Rafael Mendes',
   specialty: 'Mecânico naval',
-  email: 'rafael.mendes@umbriel.test',
+  email: 'rafael.mendes@mareos.test',
   phone: '(13) 99821-4401',
   teamId: 'alfa',
 };
@@ -27,7 +27,7 @@ export const camila: Staff = {
   id: 'camila',
   name: 'Camila Rocha',
   specialty: 'Técnica elétrica',
-  email: 'camila.rocha@umbriel.test',
+  email: 'camila.rocha@mareos.test',
   phone: '(13) 99712-3088',
   teamId: 'alfa',
 };
@@ -35,7 +35,7 @@ export const joao: Staff = {
   id: 'joao',
   name: 'João Ferreira',
   specialty: 'Especialista hidráulico',
-  email: 'joao.ferreira@umbriel.test',
+  email: 'joao.ferreira@mareos.test',
   phone: '(13) 99640-1157',
   teamId: 'bravo',
 };
@@ -43,7 +43,7 @@ export const pedro: Staff = {
   id: 'pedro',
   name: 'Pedro Nascimento',
   specialty: 'Mecânico naval',
-  email: 'pedro.nascimento@umbriel.test',
+  email: 'pedro.nascimento@mareos.test',
   phone: '+55 (13) 99771-2083',
   teamId: null,
 };

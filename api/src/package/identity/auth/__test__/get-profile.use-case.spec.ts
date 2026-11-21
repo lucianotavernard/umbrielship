@@ -18,7 +18,7 @@ describe('GetProfileUseCase', () => {
     sut = new GetProfileUseCase(users, organizations);
     organizations.items.push(
       makeOrganization(
-        { name: 'Umbrielship', email: 'i@x.test', isInternal: true },
+        { name: 'maréOS', email: 'i@x.test', isInternal: true },
         'org-1',
       ),
       makeOrganization({ name: 'Atlantic', email: 'a@x.test' }, 'org-2'),
@@ -41,14 +41,14 @@ describe('GetProfileUseCase', () => {
     expect(user).toEqual({
       id: 'user-1',
       name: 'Maria Souza',
-      email: 'maria@umbrielship.test',
+      email: 'maria@mareos.test',
       role: 'operator',
       organization: { id: 'org-2', name: 'Atlantic', isInternal: false },
       organizations: [
         { id: 'org-2', name: 'Atlantic', isInternal: false, role: 'operator' },
         {
           id: 'org-1',
-          name: 'Umbrielship',
+          name: 'maréOS',
           isInternal: true,
           role: 'administrator',
         },

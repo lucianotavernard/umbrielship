@@ -46,7 +46,7 @@ describe('DeleteOrganizationUseCase', () => {
     );
 
     organizations.items.push(
-      makeOrganization({ name: 'Umbrielship', email: 'internal@umbrielship.test', isInternal: true }, 'internal'),
+      makeOrganization({ name: 'maréOS', email: 'internal@mareos.test', isInternal: true }, 'internal'),
       makeOrganization({ name: 'Estaleiro Vale', email: 'contato@vale.test' }, 'vale'),
       makeOrganization({ name: 'Porto Seguro Naval', email: 'contato@porto.test' }, 'porto'),
     );

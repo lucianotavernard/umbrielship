@@ -13,7 +13,7 @@ const valid = {
   WEB_ORIGIN: 'http://localhost:4200',
   MAIL_HOST: 'localhost',
   MAIL_PORT: '1025',
-  MAIL_FROM: 'no-reply@umbrielship.local',
+  MAIL_FROM: 'no-reply@mareos.local',
 };
 
 const original = { ...process.env };
@@ -44,7 +44,7 @@ describe('sharedConfigFactory', () => {
     expect(config.mail).toEqual({
       host: 'localhost',
       port: 1025,
-      from: 'no-reply@umbrielship.local',
+      from: 'no-reply@mareos.local',
       user: undefined,
       pass: undefined,
     });

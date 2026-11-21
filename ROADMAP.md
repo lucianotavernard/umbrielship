@@ -1,6 +1,6 @@
 # Roadmap
 
-Umbrielship manages the work a naval service company does for its customers: Customers own Vessels, a Vessel receives WorkOrders, and a WorkOrder is made of services documented with images.
+maréOS manages the work a naval service company does for its customers: Customers own Vessels, a Vessel receives WorkOrders, and a WorkOrder is made of services documented with images.
 
 Each item ends with a **Status** line that records what the code in `api` and `web` has today. Items 1 to 6 describe what exists. Item 7 is a **proposal** written by the agent that created this file, not a commitment: the owner confirms, edits or deletes it before it is built.
 

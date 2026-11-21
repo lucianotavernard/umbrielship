@@ -36,8 +36,8 @@ cd "$API_DIR"
 export NODE_ENV=development PORT="$API_PORT" JWT_SECRET=smoke-secret JWT_EXPIRATION_IN=1d
 export DATABASE_URL="postgresql://postgres:pw@127.0.0.1:$PG_PORT/umb"
 export REDIS_URL="redis://127.0.0.1:$RD_PORT" WEB_ORIGIN="http://localhost:4200"
-export MAIL_HOST=127.0.0.1 MAIL_PORT="$SMTP_PORT" MAIL_FROM="no-reply@umbrielship.local"
-export SEED_ADMIN_EMAIL=admin@umbrielship.test SEED_ADMIN_PASSWORD=change-me-123
+export MAIL_HOST=127.0.0.1 MAIL_PORT="$SMTP_PORT" MAIL_FROM="no-reply@mareos.local"
+export SEED_ADMIN_EMAIL=admin@mareos.test SEED_ADMIN_PASSWORD=change-me-123
 
 npm run build >/dev/null 2>&1 || { echo "build failed"; exit 1; }
 npx prisma migrate deploy >/dev/null 2>&1 || { echo "migrate failed"; exit 1; }
@@ -71,11 +71,11 @@ wait_mail() { # wait_mail <count>
 
 start_api
 echo "sessions and /me"
-req POST /sessions "" '{"email":"admin@umbrielship.test","password":"wrong"}'; check "wrong password" 401 "$STATUS"
-req POST /sessions "" '{"email":"admin@umbrielship.test","password":"change-me-123"}'; check "sign in" 201 "$STATUS"
+req POST /sessions "" '{"email":"admin@mareos.test","password":"wrong"}'; check "wrong password" 401 "$STATUS"
+req POST /sessions "" '{"email":"admin@mareos.test","password":"change-me-123"}'; check "sign in" 201 "$STATUS"
 T="$(echo "$BODY" | jq -r '.access_token')"
 req GET /me "$T"; check "/me" 200 "$STATUS"
-check "/me organization" "Umbrielship/true/administrator" "$(echo "$BODY" | jq -r '.user.organization.name + "/" + (.user.organization.isInternal|tostring) + "/" + .user.role')"
+check "/me organization" "maréOS/true/administrator" "$(echo "$BODY" | jq -r '.user.organization.name + "/" + (.user.organization.isInternal|tostring) + "/" + .user.role')"
 req GET /whoami "$T"; check "/whoami is gone" 404 "$STATUS"
 req GET /me; check "/me without token" 401 "$STATUS"
 
@@ -162,21 +162,21 @@ staff_body() { # staff_body <name> <email> [teamId]
 }
 req POST /teams "$TA" '{"name":"Equipe Alfa","specialty":"Motor"}'; TEAM_A="$(echo "$BODY" | jq -r '.team.id')"
 req POST /teams "$TA" '{"name":"equipe alfa","specialty":"Motor"}'; check "workforce C6 team name in another case" 409 "$STATUS"
-req POST /staff "$TA" "{\"name\":\"  Rafael Mendes \",\"specialty\":\" Mecânico naval \",\"email\":\" Rafael@Umbriel.TEST \",\"phone\":\" (13) 99821-4401 \",\"teamId\":\"$TEAM_A\"}"; ST1="$(echo "$BODY" | jq -r '.staff.id')"
+req POST /staff "$TA" "{\"name\":\"  Rafael Mendes \",\"specialty\":\" Mecânico naval \",\"email\":\" Rafael@Mareos.TEST \",\"phone\":\" (13) 99821-4401 \",\"teamId\":\"$TEAM_A\"}"; ST1="$(echo "$BODY" | jq -r '.staff.id')"
 req GET "/staff/$ST1" "$TA"
-check "workforce C1 staff stored trimmed and lower-cased" "Rafael Mendes|Mecânico naval|rafael@umbriel.test|(13) 99821-4401" "$(echo "$BODY" | jq -r '.staff | [.name, .specialty, .email, .phone] | join("|")')"
-req POST /staff "$TA" "$(staff_body 'RAFAEL MENDES' other@umbriel.test)"; check "workforce C2 staff name in another case" 409 "$STATUS"
-req POST /staff "$TA" "$(staff_body 'Outro Nome' RAFAEL@umbriel.test)"; check "workforce C2 staff email in another case" 409 "$STATUS"
-req POST /staff "$TB" "$(staff_body 'Rafael Mendes' rafael@umbriel.test)"; check "workforce C2 same staff name in another organization" 201 "$STATUS"
-req POST /staff "$TA" "$(staff_body 'Camila Rocha' camila@umbriel.test "$TEAM_A")"; ST2="$(echo "$BODY" | jq -r '.staff.id')"
+check "workforce C1 staff stored trimmed and lower-cased" "Rafael Mendes|Mecânico naval|rafael@mareos.test|(13) 99821-4401" "$(echo "$BODY" | jq -r '.staff | [.name, .specialty, .email, .phone] | join("|")')"
+req POST /staff "$TA" "$(staff_body 'RAFAEL MENDES' other@mareos.test)"; check "workforce C2 staff name in another case" 409 "$STATUS"
+req POST /staff "$TA" "$(staff_body 'Outro Nome' RAFAEL@mareos.test)"; check "workforce C2 staff email in another case" 409 "$STATUS"
+req POST /staff "$TB" "$(staff_body 'Rafael Mendes' rafael@mareos.test)"; check "workforce C2 same staff name in another organization" 201 "$STATUS"
+req POST /staff "$TA" "$(staff_body 'Camila Rocha' camila@mareos.test "$TEAM_A")"; ST2="$(echo "$BODY" | jq -r '.staff.id')"
 req GET /teams "$TA"; check "workforce C6 team staffCount" 2 "$(echo "$BODY" | jq -r --arg id "$TEAM_A" '.teams[] | select(.id == $id) | .staffCount')"
-req PUT "/staff/$ST1" "$TA" "{\"name\":\"Rafael Mendes\",\"specialty\":\"Mecânica naval\",\"email\":\"rafael@umbriel.test\",\"phone\":\"1\",\"teamId\":\"$TEAM_A\"}"
+req PUT "/staff/$ST1" "$TA" "{\"name\":\"Rafael Mendes\",\"specialty\":\"Mecânica naval\",\"email\":\"rafael@mareos.test\",\"phone\":\"1\",\"teamId\":\"$TEAM_A\"}"
 req GET "/staff/$ST1" "$TA"
 check "workforce C4 staff edit reads back" "Mecânica naval/team" "$(echo "$BODY" | jq -r --arg t "$TEAM_A" '.staff.specialty + "/" + (if .staff.teamId == $t then "team" else "no team" end)')"
 # Two creates of one name at once: the unique index keeps one.
 CONCURRENT=()
 for who in c1 c2; do
-  curl -s -o "/tmp/smoke-concurrent-$SUFFIX-$who" -w '%{http_code}' -X POST "http://127.0.0.1:$API_PORT/staff" -H 'Content-Type: application/json' -H "Authorization: Bearer $TA" -d "$(staff_body 'Concorrente' "$who@umbriel.test")" > "/tmp/smoke-concurrent-$SUFFIX-$who.status" &
+  curl -s -o "/tmp/smoke-concurrent-$SUFFIX-$who" -w '%{http_code}' -X POST "http://127.0.0.1:$API_PORT/staff" -H 'Content-Type: application/json' -H "Authorization: Bearer $TA" -d "$(staff_body 'Concorrente' "$who@mareos.test")" > "/tmp/smoke-concurrent-$SUFFIX-$who.status" &
   CONCURRENT+=("$!")
 done
 # Only the two requests: a bare `wait` would also wait for the API process.
@@ -193,8 +193,8 @@ check "workforce C38 concurrent loser message" "Staff name already exists" "$LOS
 rm -f /tmp/smoke-concurrent-$SUFFIX-*
 # A team with two members and no Assignment leaves them with no team.
 req POST /teams "$TA" '{"name":"Equipe Bravo","specialty":"Hidráulica"}'; TEAM_B="$(echo "$BODY" | jq -r '.team.id')"
-req POST /staff "$TA" "$(staff_body 'João Ferreira' joao@umbriel.test "$TEAM_B")"; ST3="$(echo "$BODY" | jq -r '.staff.id')"
-req POST /staff "$TA" "$(staff_body 'Marina Alves' marina@umbriel.test "$TEAM_B")"; ST4="$(echo "$BODY" | jq -r '.staff.id')"
+req POST /staff "$TA" "$(staff_body 'João Ferreira' joao@mareos.test "$TEAM_B")"; ST3="$(echo "$BODY" | jq -r '.staff.id')"
+req POST /staff "$TA" "$(staff_body 'Marina Alves' marina@mareos.test "$TEAM_B")"; ST4="$(echo "$BODY" | jq -r '.staff.id')"
 req DELETE "/teams/$TEAM_B" "$TA"
 team_of() { req GET "/staff/$1" "$TA"; echo "$BODY" | jq -r '.staff.teamId'; }
 check "workforce C7 team members left with no team" "null/null" "$(team_of "$ST3")/$(team_of "$ST4")"

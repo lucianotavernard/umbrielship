@@ -4,7 +4,7 @@ import type { ClassValue } from 'clsx';
 
 import { cn } from '../../lib/cn';
 
-const STORAGE_KEY = '@umbriel:sidebar';
+const STORAGE_KEY = '@mareos:sidebar';
 const MOBILE_QUERY = '(max-width: 767px)';
 const KEYBOARD_SHORTCUT = 'b';
 

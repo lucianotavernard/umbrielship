@@ -118,7 +118,7 @@ export const makeUser = (
   return User.create(
     {
       name: 'Maria Souza',
-      email: 'maria@umbrielship.test',
+      email: 'maria@mareos.test',
       password: 'secret123-hashed',
       activeOrganizationId: 'org-1',
       memberships: [{ organizationId: 'org-1', role: 'operator' }],

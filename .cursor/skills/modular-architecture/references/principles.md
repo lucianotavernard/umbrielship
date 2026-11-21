@@ -1,6 +1,6 @@
 # Principles
 
-| # | Principle | Rule in Umbrielship | Example |
+| # | Principle | Rule in maréOS | Example |
 | --- | --- | --- | --- |
 | 1 | Flat by aggregate | One concept is one folder, `package/<context>/<aggregate>/`; no layered tree inside the context | `customer/vessel/` |
 | 2 | Ports and adapters | Repositories are abstract classes in `contracts/`, named `I<Plural>Repository`, bound in `<context>.module.ts` | `{ provide: IVesselsRepository, useClass: PrismaVesselsRepository }` |

@@ -47,10 +47,10 @@ describe('OrganizationList', () => {
     members: [],
     memberCount: 0,
   };
-  const umbrielship = {
+  const mareos = {
     id: 'internal',
-    name: 'Umbrielship',
-    email: 'internal@umbrielship.test',
+    name: 'maréOS',
+    email: 'internal@mareos.test',
     isInternal: true,
     members: [
       member('u1', 'Ana Lima'),
@@ -76,7 +76,7 @@ describe('OrganizationList', () => {
     members: [member('u5', 'Eva Rocha'), member('u6', 'Fábio Reis')],
     memberCount: 2,
   };
-  const three = { organizations: [vale, porto, umbrielship], total: 3 };
+  const three = { organizations: [vale, porto, mareos], total: 3 };
 
   async function click(target: Element | null | undefined) {
     if (!target) throw new Error('nothing to click');
@@ -333,11 +333,11 @@ describe('OrganizationList', () => {
     expect(buttonByText('Nova organização', element)).toBeDefined();
 
     expect([...element.querySelectorAll('thead th')].map((th) => squash(th))).toEqual(['', 'ORGANIZAÇÃO', 'TIPO', 'MEMBROS', 'Ações']);
-    expect(cells(element, 'organization-name')).toEqual(['Estaleiro Vale', 'Porto Seguro Naval', 'Umbrielship']);
+    expect(cells(element, 'organization-name')).toEqual(['Estaleiro Vale', 'Porto Seguro Naval', 'maréOS']);
     expect(cells(element, 'organization-email')).toEqual([
       'contato@vale.test',
       'contato@porto.test',
-      'internal@umbrielship.test',
+      'internal@mareos.test',
     ]);
     expect(cells(element, 'organization-type')).toEqual(['Externa', 'Externa', 'Interna']);
     // Each member is a circle with its initials, then "+n" for the ones not named.
@@ -369,7 +369,7 @@ describe('OrganizationList', () => {
   });
 
   it('organization-list C3 the search asks the API from page 1 and says how many it found', async () => {
-    const element = await openList({ organizations: [vale, porto, umbrielship], total: 23 });
+    const element = await openList({ organizations: [vale, porto, mareos], total: 23 });
     await click(byLabel('Próxima página', element));
     controller.expectOne('/api/organizations?page=2&per_page=10').flush({ organizations: [atlantic], total: 23 });
     await settle();
@@ -393,7 +393,7 @@ describe('OrganizationList', () => {
   it('organization-list C5 selects every external organization of the page, never the internal one', async () => {
     const element = await openList();
 
-    expect(byLabel('Selecionar organização Umbrielship', element)?.hasAttribute('disabled')).toBe(true);
+    expect(byLabel('Selecionar organização maréOS', element)?.hasAttribute('disabled')).toBe(true);
     expect(rows(element)[2].querySelector('[aria-label^="Excluir organização"]')).toBeNull();
     expect(deleteSelected(element).disabled).toBe(true);
     expect(deleteSelected(element).getAttribute('aria-label')).toBe('Selecione organizações para excluir');
@@ -423,12 +423,12 @@ describe('OrganizationList', () => {
 
     controller.expectOne((request) => request.method === 'DELETE' && request.url === '/api/organizations/vale').flush(null);
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, umbrielship], total: 2 });
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, mareos], total: 2 });
     await settle();
 
     expect(success).toHaveBeenCalledWith('Organização excluída com sucesso');
     expect(dialog()).toBeNull();
-    expect(cells(element, 'organization-name')).toEqual(['Porto Seguro Naval', 'Umbrielship']);
+    expect(cells(element, 'organization-name')).toEqual(['Porto Seguro Naval', 'maréOS']);
   });
 
   it('organization-list C7 Excluir (n) deletes each selected one and names the ones with records', async () => {
@@ -447,7 +447,7 @@ describe('OrganizationList', () => {
       .expectOne((request) => request.method === 'DELETE' && request.url === '/api/organizations/porto')
       .flush({ message: 'Organization has records' }, { status: 409, statusText: 'Conflict' });
     await settle();
-    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, umbrielship], total: 2 });
+    controller.expectOne('/api/organizations?page=1&per_page=10').flush({ organizations: [porto, mareos], total: 2 });
     await settle();
 
     expect(success).toHaveBeenCalledWith('Organização excluída com sucesso');

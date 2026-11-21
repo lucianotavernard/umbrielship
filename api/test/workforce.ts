@@ -30,7 +30,7 @@ export const makeStaff = (override: Partial<StaffProps> = {}, id?: string) =>
       organizationId: 'org-1',
       name: 'Rafael Mendes',
       specialty: 'Mecânico naval',
-      email: 'rafael.mendes@umbriel.test',
+      email: 'rafael.mendes@mareos.test',
       phone: '(13) 99821-4401',
       teamId: null,
       ...override,

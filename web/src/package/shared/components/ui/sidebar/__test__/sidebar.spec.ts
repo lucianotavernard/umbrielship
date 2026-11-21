@@ -73,11 +73,11 @@ describe('t-sidebar', () => {
     expect(sidebar.getAttribute('data-state')).toBe('collapsed');
     expect(sidebar.getAttribute('data-collapsible')).toBe('icon');
     expect(link.getAttribute('title')).toBe('Clientes');
-    expect(localStorage.getItem('@umbriel:sidebar')).toBe('false');
+    expect(localStorage.getItem('@mareos:sidebar')).toBe('false');
   });
 
   it('starts collapsed when that was the last choice', async () => {
-    localStorage.setItem('@umbriel:sidebar', 'false');
+    localStorage.setItem('@mareos:sidebar', 'false');
 
     const { sidebar } = await render();
 

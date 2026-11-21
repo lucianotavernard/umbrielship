@@ -44,8 +44,8 @@ cd "$API_DIR"
 export NODE_ENV=development PORT="$API_PORT" JWT_SECRET=boot-secret JWT_EXPIRATION_IN=1d
 export DATABASE_URL="postgresql://postgres:pw@127.0.0.1:$PG_PORT/umb"
 export REDIS_URL="redis://127.0.0.1:$RD_PORT" WEB_ORIGIN="http://localhost:4200"
-export MAIL_HOST=127.0.0.1 MAIL_PORT="$SMTP_PORT" MAIL_FROM="no-reply@umbrielship.local"
-export SEED_ADMIN_EMAIL=admin@umbrielship.test SEED_ADMIN_PASSWORD=change-me-123
+export MAIL_HOST=127.0.0.1 MAIL_PORT="$SMTP_PORT" MAIL_FROM="no-reply@mareos.local"
+export SEED_ADMIN_EMAIL=admin@mareos.test SEED_ADMIN_PASSWORD=change-me-123
 
 npm run build >/dev/null 2>&1 || { echo "build failed"; exit 1; }
 npx prisma migrate deploy >/dev/null 2>&1 || { echo "migrate failed"; exit 1; }
@@ -77,7 +77,7 @@ printf 'PNG-S3' >"$WORK/image.png"
 echo "npm run start:prod"
 start_api start:prod
 req GET /me; check "prod: /me without token" 401 "$STATUS"
-req POST /sessions "" '{"email":"admin@umbrielship.test","password":"change-me-123"}'; check "prod: sign in" 201 "$STATUS"
+req POST /sessions "" '{"email":"admin@mareos.test","password":"change-me-123"}'; check "prod: sign in" 201 "$STATUS"
 T="$(echo "$BODY" | jq -r '.access_token')"
 req POST /customers "$T" '{"name":"Cust","email":"cust@x.test","phone":"1","address":{"address":"r","state":"SP","city":"Santos"}}'; check "prod: customer" 201 "$STATUS"
 C="$(echo "$BODY" | jq -r '.customer.id // .id')"

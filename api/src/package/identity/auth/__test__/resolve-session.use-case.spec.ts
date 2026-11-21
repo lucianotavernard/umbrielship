@@ -18,7 +18,7 @@ describe('ResolveSessionUseCase', () => {
     sut = new ResolveSessionUseCase(users, organizations);
     organizations.items.push(
       makeOrganization(
-        { name: 'Umbrielship', email: 'i@x.test', isInternal: true },
+        { name: 'maréOS', email: 'i@x.test', isInternal: true },
         'org-1',
       ),
     );

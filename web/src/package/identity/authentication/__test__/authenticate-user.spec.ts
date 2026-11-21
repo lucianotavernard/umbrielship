@@ -51,10 +51,11 @@ describe('AuthenticateUser', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('draws the mareos sign-in with the Umbrielship brand and nothing the app does not have', async () => {
+  it('draws the sign-in with the maréOS brand and nothing the app does not have', async () => {
     const element = await render();
 
-    expect(element.querySelector('section')?.textContent).toContain('UMBRIELSHIP');
+    expect(element.querySelector('section')?.textContent).toContain('MARÉOS');
+    expect(element.querySelector('footer')?.textContent).toContain(`© ${new Date().getFullYear()} maréOS`);
     expect(element.querySelector('h1')?.textContent?.trim()).toBe('Acesse sua conta');
     expect(element.textContent).toContain('BEM-VINDO DE VOLTA');
     expect(element.textContent).toContain('Fale com o administrador da sua organização.');
@@ -66,7 +67,7 @@ describe('AuthenticateUser', () => {
     expect(cover.classList.contains('bg-cover')).toBe(true);
     expect(cover.getAttribute('aria-hidden')).toBe('true');
     expect(element.querySelector('aside img')).toBeNull();
-    expect(element.textContent).not.toContain('MARÉ');
+    expect(element.textContent).not.toContain('Umbriel');
     expect(element.textContent).not.toContain('Esqueceu sua senha?');
     expect(element.textContent).not.toContain('Manter conectado');
     expect(element.querySelector('input[type="checkbox"]')).toBeNull();
@@ -88,7 +89,7 @@ describe('AuthenticateUser', () => {
     request.flush({ access_token: 'tok-84' });
     await settle();
 
-    expect(localStorage.getItem('@umbriel:access-token')).toBe('tok-84');
+    expect(localStorage.getItem('@mareos:access-token')).toBe('tok-84');
     expect(TestBed.inject(Router).url).toBe('/dashboard');
   });
 

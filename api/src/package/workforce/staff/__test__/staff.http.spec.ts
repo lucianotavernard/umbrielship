@@ -103,7 +103,7 @@ beforeEach(() => {
       {
         organizationId: ORGANIZATION,
         name: 'Rafael Mendes',
-        email: 'rafael@umbriel.test',
+        email: 'rafael@mareos.test',
       },
       RAFAEL,
     ),
@@ -111,12 +111,12 @@ beforeEach(() => {
       {
         organizationId: ORGANIZATION,
         name: 'Camila Rocha',
-        email: 'camila@umbriel.test',
+        email: 'camila@mareos.test',
       },
       CAMILA,
     ),
     makeStaff(
-      { organizationId: OTHER, name: 'Ana Souza', email: 'ana@umbriel.test' },
+      { organizationId: OTHER, name: 'Ana Souza', email: 'ana@mareos.test' },
       STRANGER,
     ),
   ];
@@ -128,7 +128,7 @@ const auth = (role: Role) => ({ Authorization: `Bearer ${tokens[role]}` });
 const body = (override: object = {}) => ({
   name: 'Marina Alves',
   specialty: 'Técnica de manutenção',
-  email: 'marina@umbriel.test',
+  email: 'marina@mareos.test',
   phone: '(13) 99154-6620',
   ...override,
 });
@@ -141,7 +141,7 @@ describe('POST /staff', () => {
       .send(
         body({
           name: ' Marina Alves ',
-          email: ' Marina@Umbriel.test ',
+          email: ' Marina@Mareos.test ',
           teamId: TEAM,
         }),
       );
@@ -152,7 +152,7 @@ describe('POST /staff', () => {
         id: expect.any(String),
         name: 'Marina Alves',
         specialty: 'Técnica de manutenção',
-        email: 'marina@umbriel.test',
+        email: 'marina@mareos.test',
         phone: '(13) 99154-6620',
         teamId: TEAM,
       },
@@ -161,7 +161,7 @@ describe('POST /staff', () => {
     const noTeam = await agent()
       .post('/staff')
       .set(auth('administrator'))
-      .send(body({ name: 'Pedro', email: 'pedro@umbriel.test' }));
+      .send(body({ name: 'Pedro', email: 'pedro@mareos.test' }));
     expect(noTeam.status).toBe(201);
     expect(noTeam.body.staff.teamId).toBeNull();
   });
@@ -195,7 +195,7 @@ describe('POST /staff', () => {
     expect(
       (
         await post(
-          body({ name: 'a5', email: `${'a'.repeat(244)}@umbriel.test` }),
+          body({ name: 'a5', email: `${'a'.repeat(245)}@mareos.test` }),
         )
       ).status,
     ).toBe(400);
@@ -217,7 +217,7 @@ describe('POST /staff', () => {
     expect(used.body.message).toBe('Staff name already exists');
 
     const email = await post(
-      body({ name: 'Novo', email: 'CAMILA@umbriel.test' }),
+      body({ name: 'Novo', email: 'CAMILA@mareos.test' }),
     );
     expect(email.status).toBe(409);
     expect(email.body.message).toBe('Staff email already exists');
@@ -267,7 +267,7 @@ describe('PUT /staff/:id', () => {
       .send(
         body({
           name: 'Rafael Mendes',
-          email: 'rafael@umbriel.test',
+          email: 'rafael@mareos.test',
           specialty: 'Mecânica naval',
           teamId: TEAM,
         }),

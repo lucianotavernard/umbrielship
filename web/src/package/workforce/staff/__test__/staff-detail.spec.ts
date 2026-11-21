@@ -59,7 +59,7 @@ describe('StaffDetail', () => {
     // The block of "Alocação na oficina" carries the professional's status, as the mareos draws it.
     expect(text(element, 'allocation-status')).toBe('Disponível');
     expect(element.querySelector('[data-slot="profile-email"]')?.getAttribute('href')).toBe(
-      'mailto:pedro.nascimento@umbriel.test',
+      'mailto:pedro.nascimento@mareos.test',
     );
     expect(element.querySelector('[data-slot="profile-phone"]')?.getAttribute('href')).toBe('tel:+5513997712083');
     expect(element.textContent).toContain('Contato profissional');

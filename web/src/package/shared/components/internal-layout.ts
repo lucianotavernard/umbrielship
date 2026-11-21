@@ -151,7 +151,7 @@ const LABELS: Record<string, string> = {
               <ng-icon name="lucideAnchor" class="!size-[19px]" />
             </span>
             <span class="text-[17px] font-extrabold tracking-[0.4px] whitespace-nowrap group-data-[collapsible=icon]:hidden"
-              >UMBRIEL<span class="text-primary">SHIP</span></span
+              >MARÉ<span class="text-primary">OS</span></span
             >
           </div>
 

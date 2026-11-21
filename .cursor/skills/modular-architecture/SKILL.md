@@ -1,7 +1,7 @@
 ---
 name: modular-architecture
 description: >
-  Umbrielship API architecture guide. ALWAYS read this skill BEFORE adding or changing a NestJS
+  maréOS API architecture guide. ALWAYS read this skill BEFORE adding or changing a NestJS
   module, use case, controller, repository, contract, facade, Prisma model, or a dependency
   between contexts in `api/`. The layout is flat by aggregate (`package/<context>/<aggregate>/`),
   tenant-scoped by `organizationId`, ESM, and differs from generic NestJS habits; reasoning
@@ -13,7 +13,7 @@ description: >
   "customer", "work-order", "identity", "shared".
 ---
 
-# Modular Architecture (Umbrielship API)
+# Modular Architecture (maréOS API)
 
 `api/` is one NestJS 12 app (ESM, TypeScript `strict`), one PostgreSQL database, one Prisma schema,
 three contexts (`identity`, `customer`, `work-order`) plus `shared/`. It follows the acme layout.

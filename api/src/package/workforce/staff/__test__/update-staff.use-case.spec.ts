@@ -18,7 +18,7 @@ describe('UpdateStaffUseCase', () => {
         {
           organizationId: 'A',
           name: 'Rafael Mendes',
-          email: 'rafael@umbriel.test',
+          email: 'rafael@mareos.test',
         },
         'rafael',
       ),
@@ -26,7 +26,7 @@ describe('UpdateStaffUseCase', () => {
         {
           organizationId: 'A',
           name: 'Camila Rocha',
-          email: 'camila@umbriel.test',
+          email: 'camila@mareos.test',
         },
         'camila',
       ),
@@ -39,13 +39,13 @@ describe('UpdateStaffUseCase', () => {
       id: 'rafael',
       name: 'RAFAEL MENDES',
       specialty: 'Mecânico naval',
-      email: 'Rafael@umbriel.test',
+      email: 'Rafael@mareos.test',
       phone: '(13) 1',
     });
 
     expect(staff.id).toBe('rafael');
     expect(staff.name).toBe('RAFAEL MENDES');
-    expect(staff.email).toBe('rafael@umbriel.test');
+    expect(staff.email).toBe('rafael@mareos.test');
   });
 
   it('workforce C2 refuses the email of another staff', async () => {
@@ -54,7 +54,7 @@ describe('UpdateStaffUseCase', () => {
       id: 'rafael',
       name: 'Rafael Mendes',
       specialty: 'Mecânico naval',
-      email: 'CAMILA@umbriel.test',
+      email: 'CAMILA@mareos.test',
       phone: '(13) 1',
     });
 
@@ -62,7 +62,7 @@ describe('UpdateStaffUseCase', () => {
     await expect(promise).rejects.toThrow('Staff email already exists');
     expect(
       workforce.staff.items.find((item) => item.id === 'rafael')!.email,
-    ).toBe('rafael@umbriel.test');
+    ).toBe('rafael@mareos.test');
   });
 
   it('workforce C2 refuses the name of another staff on edit', async () => {
@@ -71,7 +71,7 @@ describe('UpdateStaffUseCase', () => {
       id: 'rafael',
       name: ' camila rocha',
       specialty: 'Mecânico naval',
-      email: 'rafael@umbriel.test',
+      email: 'rafael@mareos.test',
       phone: '(13) 1',
     });
 
@@ -90,7 +90,7 @@ describe('UpdateStaffUseCase', () => {
       id: 'rafael',
       name: ' Rafael M. ',
       specialty: ' Especialista hidráulico ',
-      email: ' Rafael.M@Umbriel.test ',
+      email: ' Rafael.M@Mareos.test ',
       phone: ' (13) 2 ',
       teamId: 'team-a',
     });
@@ -100,7 +100,7 @@ describe('UpdateStaffUseCase', () => {
     ).toMatchObject({
       name: 'Rafael M.',
       specialty: 'Especialista hidráulico',
-      email: 'rafael.m@umbriel.test',
+      email: 'rafael.m@mareos.test',
       phone: '(13) 2',
       teamId: 'team-a',
     });

@@ -4,7 +4,7 @@ const row = (overrides: Partial<StaffRow>): StaffRow => ({
   id: 'id',
   name: 'Nome',
   specialty: 'Mecânico naval',
-  email: 'nome@umbriel.test',
+  email: 'nome@mareos.test',
   phone: '(13) 1',
   teamId: null,
   teamName: NO_TEAM,

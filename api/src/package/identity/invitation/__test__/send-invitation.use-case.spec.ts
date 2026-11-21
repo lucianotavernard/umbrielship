@@ -33,7 +33,7 @@ describe('SendInvitationUseCase', () => {
     organizations.items.push(
       makeOrganization({ name: 'Dest', email: 'd@x.test' }, 'dest'),
       makeOrganization(
-        { name: 'Umbrielship', email: 'u@x.test', isInternal: true },
+        { name: 'maréOS', email: 'u@x.test', isInternal: true },
         'internal',
       ),
     );

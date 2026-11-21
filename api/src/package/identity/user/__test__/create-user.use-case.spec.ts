@@ -69,7 +69,7 @@ describe('CreateUserUseCase', () => {
   it('inspector C2 stores a Membership with Role inspector in an ordinary and in the internal Organization', async () => {
     organizations.items.push(
       makeOrganization(
-        { name: 'Umbrielship', email: 'i@x.test', isInternal: true },
+        { name: 'maréOS', email: 'i@x.test', isInternal: true },
         'org-internal',
       ),
     );

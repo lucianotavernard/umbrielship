@@ -1,4 +1,4 @@
-export const THEME_KEY = '@umbriel:theme';
+export const THEME_KEY = '@mareos:theme';
 
 export type Theme = 'light' | 'dark';
 
@@ -13,7 +13,7 @@ export function saveTheme(theme: Theme, storage: Storage = localStorage) {
 }
 
 /**
- * Applies the theme kept in `@umbriel:theme` before the app boots, so a reload keeps the user's
+ * Applies the theme kept in `@mareos:theme` before the app boots, so a reload keeps the user's
  * choice. With nothing kept, the page keeps the theme `index.html` starts with.
  */
 export function restoreTheme(

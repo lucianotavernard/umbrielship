@@ -7,8 +7,8 @@ import { PrismaClient } from './generated/prisma/client.js';
 
 // Creates the internal Organization and its first Administrator. Safe to run twice, and on a
 // database the tenancy migration already backfilled (it reuses the internal Organization).
-const INTERNAL_ORGANIZATION_NAME = 'Umbrielship';
-const INTERNAL_ORGANIZATION_EMAIL = 'internal@umbrielship.local';
+const INTERNAL_ORGANIZATION_NAME = 'maréOS';
+const INTERNAL_ORGANIZATION_EMAIL = 'internal@mareos.local';
 
 async function main() {
   const email = process.env.SEED_ADMIN_EMAIL;

@@ -96,14 +96,14 @@ describe('NotificationMenu', () => {
     ]);
     expect(element.querySelector('[data-slot="notification-dot"]')).toBeNull();
     expect(trigger(element).getAttribute('aria-label')).toBe('Notificações');
-    expect(JSON.parse(localStorage.getItem('@umbriel:notifications-seen:user-1')!)).toEqual([
+    expect(JSON.parse(localStorage.getItem('@mareos:notifications-seen:user-1')!)).toEqual([
       'overdue:aaaaaaaa-late',
       'due-today:bbbbbbbb-today',
     ]);
   });
 
   it('notifications C5 shows no dot for notices already seen by this user', async () => {
-    localStorage.setItem('@umbriel:notifications-seen:user-1', JSON.stringify(['overdue:aaaaaaaa-late']));
+    localStorage.setItem('@mareos:notifications-seen:user-1', JSON.stringify(['overdue:aaaaaaaa-late']));
     const { element } = await render('administrator');
     controller.expectOne('/api/work-orders').flush({ workOrders: [order('aaaaaaaa-late', at(8))], total: 1 });
     controller.expectOne('/api/vessels').flush(vessels);

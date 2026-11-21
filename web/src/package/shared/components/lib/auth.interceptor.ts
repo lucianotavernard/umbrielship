@@ -6,7 +6,7 @@ import { catchError, EMPTY, throwError } from 'rxjs';
 import { AuthenticationService } from '../../../identity/authentication/authentication.service';
 import { toast } from '../ui/toaster';
 
-const TOKEN_KEY = '@umbriel:access-token';
+const TOKEN_KEY = '@mareos:access-token';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);

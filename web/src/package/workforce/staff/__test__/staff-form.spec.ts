@@ -53,7 +53,7 @@ describe('StaffForm', () => {
 
     await type(element.querySelector('#staff-name'), 'x'.repeat(121));
     await type(element.querySelector('#staff-specialty'), 'Mecânico naval');
-    await type(element.querySelector('#staff-email'), 'ana@umbriel.test');
+    await type(element.querySelector('#staff-email'), 'ana@mareos.test');
     await type(element.querySelector('#staff-phone'), '1'.repeat(31));
     await click(buttonByText('Criar profissional', element));
     expect(fixture.componentInstance.sent).toEqual([]);
@@ -62,7 +62,7 @@ describe('StaffForm', () => {
     await type(element.querySelector('#staff-phone'), '(13) 1');
     await click(buttonByText('Criar profissional', element));
     expect(fixture.componentInstance.sent).toEqual([
-      { name: 'Ana Souza', specialty: 'Mecânico naval', email: 'ana@umbriel.test', phone: '(13) 1', teamId: null },
+      { name: 'Ana Souza', specialty: 'Mecânico naval', email: 'ana@mareos.test', phone: '(13) 1', teamId: null },
     ]);
 
     fixture.componentInstance.form().load({ id: 's', name: 'Ana', specialty: 'x', email: 'a@x.test', phone: '1', teamId: 'alfa' });

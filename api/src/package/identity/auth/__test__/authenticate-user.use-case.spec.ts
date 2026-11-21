@@ -22,7 +22,7 @@ describe('AuthenticateUserUseCase', () => {
     users.items.push(
       makeUser({
         id: 'u1',
-        email: 'maria@umbrielship.test',
+        email: 'maria@mareos.test',
         password: 'secret123-hashed',
       }),
     );
@@ -30,19 +30,19 @@ describe('AuthenticateUserUseCase', () => {
 
   it('[C15] throws WrongCredentialsException for an unknown email', async () => {
     await expect(
-      sut.handle({ email: 'nobody@umbrielship.test', password: 'secret123' }),
+      sut.handle({ email: 'nobody@mareos.test', password: 'secret123' }),
     ).rejects.toBeInstanceOf(WrongCredentialsException);
   });
 
   it('[C15] throws WrongCredentialsException for a wrong password', async () => {
     await expect(
-      sut.handle({ email: 'maria@umbrielship.test', password: 'other' }),
+      sut.handle({ email: 'maria@mareos.test', password: 'other' }),
     ).rejects.toBeInstanceOf(WrongCredentialsException);
   });
 
   it('[C15] returns an access token encrypted from { sub: user id }', async () => {
     const { accessToken } = await sut.handle({
-      email: 'maria@umbrielship.test',
+      email: 'maria@mareos.test',
       password: 'secret123',
     });
 

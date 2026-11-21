@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Checks the tenancy migration against a throwaway PostgreSQL 17 (Docker).
-# Usage: migration-check.sh backfill | roles | constraints | drift | seed | workforce
+# Usage: migration-check.sh backfill | roles | constraints | drift | seed | workforce | rebrand
 set -euo pipefail
 
-MODE="${1:?mode: backfill|roles|constraints|drift|seed|workforce}"
+MODE="${1:?mode: backfill|roles|constraints|drift|seed|workforce|rebrand}"
 API_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 MIG_DIR="$API_DIR/src/package/shared/module/prisma/migrations"
 NEW_MIGRATION="20261108120000_add_tenancy"
-CONTAINER="umbrielship-migcheck-$$"
+CONTAINER="mareos-migcheck-$$"
 
 docker run -d --rm --name "$CONTAINER" -e POSTGRES_PASSWORD=pw -p 127.0.0.1::5432 postgres:17 >/dev/null
 trap 'docker rm -f "$CONTAINER" >/dev/null 2>&1 || true' EXIT
@@ -30,6 +30,12 @@ apply_old() {
   return 0
 }
 apply_new() { psql_db "$1" < "$MIG_DIR/$NEW_MIGRATION/migration.sql" >/dev/null; }
+apply_after() {
+  for d in $(ls "$MIG_DIR" | grep -v migration_lock | sort); do
+    [ "$d" \> "$NEW_MIGRATION" ] && psql_db "$1" < "$MIG_DIR/$d/migration.sql" >/dev/null
+  done
+  return 0
+}
 db_url() { echo "postgresql://postgres:pw@127.0.0.1:$PORT/$1"; }
 
 fixture() {
@@ -110,10 +116,10 @@ seed)
   cd "$API_DIR"
   # empty database
   new_db sd1
-  export DATABASE_URL="$(db_url sd1)" SEED_ADMIN_EMAIL=admin@umbrielship.test SEED_ADMIN_PASSWORD=change-me-123
+  export DATABASE_URL="$(db_url sd1)" SEED_ADMIN_EMAIL=admin@mareos.test SEED_ADMIN_PASSWORD=change-me-123
   npx prisma migrate deploy >/dev/null 2>&1
   npx prisma db seed >/dev/null 2>&1 || fail "seed on empty database"
-  count() { q "$1" "select (select count(*) from organizations where \"isInternal\")||'/'||(select count(*) from organizations)||'/'||(select count(*) from users where email='admin@umbrielship.test')||'/'||(select count(*) from memberships m join users u on u.id=m.\"userId\" join organizations o on o.id=m.\"organizationId\" where u.email='admin@umbrielship.test' and o.\"isInternal\" and m.role='administrator')||'/'||(select count(*) from users u join organizations o on o.id=u.\"activeOrganizationId\" where u.email='admin@umbrielship.test' and o.\"isInternal\")"; }
+  count() { q "$1" "select (select count(*) from organizations where \"isInternal\")||'/'||(select count(*) from organizations)||'/'||(select count(*) from users where email='admin@mareos.test')||'/'||(select count(*) from memberships m join users u on u.id=m.\"userId\" join organizations o on o.id=m.\"organizationId\" where u.email='admin@mareos.test' and o.\"isInternal\" and m.role='administrator')||'/'||(select count(*) from users u join organizations o on o.id=u.\"activeOrganizationId\" where u.email='admin@mareos.test' and o.\"isInternal\")"; }
   first="$(count sd1)"; expect "$first" "1/1/1/1/1" "seed empty"
   npx prisma db seed >/dev/null 2>&1 || fail "second seed"
   expect "$(count sd1)" "$first" "seed twice"
@@ -124,7 +130,7 @@ seed)
   npx prisma db seed >/dev/null 2>&1 || fail "seed on backfilled database"
   npx prisma db seed >/dev/null 2>&1 || fail "second seed on backfilled database"
   expect "$(q sd2 "select count(*) from organizations")" 1 "backfilled organizations"
-  expect "$(q sd2 "select count(*) from users where email='admin@umbrielship.test'")" 1 "backfilled admin user"
+  expect "$(q sd2 "select count(*) from users where email='admin@mareos.test'")" 1 "backfilled admin user"
   expect "$before" "1/3" "before seed"
   echo "ok seed"
   ;;
@@ -155,6 +161,19 @@ workforce)
   done
   [ "$(q wf "select count(*) from pg_indexes where tablename='assignments' and indexdef like '%(\"workOrderId\")%'")" -ge 1 ] || fail "assignments has no workOrderId index"
   echo "ok workforce"
+  ;;
+rebrand)
+  # AD-123: the internal Organization the backfill named "Umbrielship" becomes "maréOS".
+  new_db rb; apply_old rb; fixture rb; apply_new rb; apply_after rb
+  expect "$(q rb "select name||':'||email||':'||\"isInternal\" from organizations")" "maréOS:internal@mareos.local:true" "renamed internal organization"
+  new_db rbe; apply_old rbe; apply_new rbe; apply_after rbe
+  expect "$(q rbe "select count(*) from organizations")" 0 "empty database organizations"
+  # A name or email another Organization already holds is left on the internal one as it was.
+  new_db rbt; apply_old rbt; fixture rbt; apply_new rbt
+  q rbt "insert into organizations (id,name,email) values ('ox','MARÉOS','x@x.test')" >/dev/null
+  apply_after rbt
+  expect "$(q rbt "select name||':'||email from organizations where \"isInternal\"")" "Umbrielship:internal@mareos.local" "name already taken"
+  echo "ok rebrand"
   ;;
 *) fail "unknown mode $MODE" ;;
 esac

@@ -1,7 +1,7 @@
 ---
 name: roadmap-execution
 description: >-
-  Orchestrate the build of Umbrielship by walking ROADMAP.md one item at a time through the
+  Orchestrate the build of maréOS by walking ROADMAP.md one item at a time through the
   tlc-plan -> tlc-implement pipeline, with CONTEXT.md as the binding vocabulary. The
   orchestrator picks the next item whose Status line is not "built", cleans the environment,
   dispatches a Planner and a Builder sub-agent, runs the gates, and confirms the item now reads
@@ -9,7 +9,7 @@ description: >-
   reports the roadmap complete and stops. Use for "build the next roadmap item", "advance the
   roadmap", "run the roadmap loop", "roadmap-execution", or under /loop.
 metadata:
-  project: umbrielship
+  project: mareos
   version: 0.1.0
 ---
 

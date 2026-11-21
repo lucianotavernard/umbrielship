@@ -37,9 +37,9 @@ export type MeResponse = {
 
 const WRITERS: Role[] = ['administrator', 'operator'];
 
-const TOKEN_KEY = '@umbriel:access-token';
-const ORGANIZATION_SWITCHED_KEY = '@umbriel:organization-switched';
-const ORGANIZATION_CHANGED_KEY = '@umbriel:organization-changed';
+const TOKEN_KEY = '@mareos:access-token';
+const ORGANIZATION_SWITCHED_KEY = '@mareos:organization-switched';
+const ORGANIZATION_CHANGED_KEY = '@mareos:organization-changed';
 
 @Service()
 export class AuthenticationService {

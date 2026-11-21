@@ -54,7 +54,7 @@ describe('InternalLayout', () => {
     const fixture = TestBed.createComponent(InternalLayout);
     await settle();
     const organizations: MeOrganization[] = [
-      { id: 'org-a', name: 'Umbrielship', isInternal: true, role: 'administrator' },
+      { id: 'org-a', name: 'maréOS', isInternal: true, role: 'administrator' },
       { id: 'org-b', name: 'Atlantic', isInternal: false, role: 'operator' },
     ];
     const session = controller.expectOne('/api/me');
@@ -85,11 +85,11 @@ describe('InternalLayout', () => {
     const session = controller.expectOne('/api/me');
     expect(session.request.method).toBe('GET');
     session.flush(
-      profile([{ id: 'org-a', name: 'Umbrielship', isInternal: true, role: 'administrator' }], 'org-a'),
+      profile([{ id: 'org-a', name: 'maréOS', isInternal: true, role: 'administrator' }], 'org-a'),
     );
     await settle();
     const element = document.body;
-    expect(element.textContent).toContain('Umbrielship');
+    expect(element.textContent).toContain('maréOS');
     controller.expectNone('/api/organizations/switch');
   });
 });

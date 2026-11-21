@@ -19,7 +19,7 @@ import type { GetOrganizationInspectionAssignmentsResponse } from '../../inspect
 import type { GetWorkOrdersResponse } from '../../work-order/work-order.service';
 import { buildNotifications, type UserNotification } from '../notifications';
 
-const SEEN_KEY = '@umbriel:notifications-seen';
+const SEEN_KEY = '@mareos:notifications-seen';
 
 const ICONS: Record<UserNotification['kind'], { icon: string; tone: string }> = {
   overdue: { icon: 'lucideTriangleAlert', tone: 'bg-[#fbefed] text-[#b86b61] dark:bg-[#2e1d1b] dark:text-[#e3a49b]' },

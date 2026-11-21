@@ -75,7 +75,7 @@ describe('StaffList', () => {
     // The specialty sits under the name, with no column of its own (AD-108).
     expect(squash(camilaRow.querySelector('[data-slot="staff-specialty"]')?.textContent)).toBe('Técnica elétrica');
     expect(squash(page.element.querySelector('thead')?.textContent)).not.toContain('ESPECIALIDADE');
-    expect(camilaRow.textContent).toContain('camila.rocha@umbriel.test');
+    expect(camilaRow.textContent).toContain('camila.rocha@mareos.test');
     expect(camilaRow.textContent).toContain('(13) 99712-3088');
     expect(squash(camilaRow.textContent)).toContain('CR');
     expect(camilaRow.querySelector('a')).toBeNull();
@@ -146,8 +146,8 @@ describe('StaffList', () => {
       expect(content.split('\r\n')).toEqual([
         '﻿"Nome","Especialidade","Equipe","E-mail","Telefone","Status"',
         // A value a spreadsheet would run as a formula ("+55…") is kept as text.
-        `"Pedro Nascimento","Mecânico naval","Sem equipe","pedro.nascimento@umbriel.test","'+55 (13) 99771-2083","Disponível"`,
-        '"Rafael Mendes","Mecânico naval","Equipe Alfa","rafael.mendes@umbriel.test","(13) 99821-4401","Em serviço"',
+        `"Pedro Nascimento","Mecânico naval","Sem equipe","pedro.nascimento@mareos.test","'+55 (13) 99771-2083","Disponível"`,
+        '"Rafael Mendes","Mecânico naval","Equipe Alfa","rafael.mendes@mareos.test","(13) 99821-4401","Em serviço"',
       ]);
 
       // "Selecionar todos" takes the rows the filters show, then clears them.
@@ -176,7 +176,7 @@ describe('StaffList', () => {
     await type(field('#staff-name'), 'Marina Alves');
     await type(field('#staff-specialty'), 'Técnica de manutenção');
     await type(field<HTMLSelectElement>('#staff-team'), 'bravo');
-    await type(field('#staff-email'), 'marina.alves@umbriel.test');
+    await type(field('#staff-email'), 'marina.alves@mareos.test');
     await type(field('#staff-phone'), '(13) 99154-6620');
     await click(buttonByText('Criar profissional', drawer()!));
 
@@ -184,7 +184,7 @@ describe('StaffList', () => {
     expect(post.request.body).toEqual({
       name: 'Marina Alves',
       specialty: 'Técnica de manutenção',
-      email: 'marina.alves@umbriel.test',
+      email: 'marina.alves@mareos.test',
       phone: '(13) 99154-6620',
       teamId: 'bravo',
     });
@@ -208,7 +208,7 @@ describe('StaffList', () => {
     await click(buttonByText('Cadastrar profissional', page.element));
     await type(field('#staff-name'), 'rafael mendes');
     await type(field('#staff-specialty'), 'Mecânico naval');
-    await type(field('#staff-email'), 'outro@umbriel.test');
+    await type(field('#staff-email'), 'outro@mareos.test');
     await type(field('#staff-phone'), '(13) 1');
     await click(buttonByText('Criar profissional', drawer()!));
 

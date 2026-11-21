@@ -93,7 +93,7 @@ const longerThan = (limit: number, message: string) => ({ value }: { value: () =
           @for (item of model().items; track $index; let index = $index, first = $first, last = $last) {
             <div tDrawerEntry data-slot="question-editor" [heading]="'Pergunta ' + number(index)">
               @if (model().items.length > 1) {
-                <!-- Reordering is the umbrielship's own, shown once there is something to reorder (AD-051). -->
+                <!-- Reordering is the app's own, shown once there is something to reorder (AD-051). -->
                 <div tDrawerEntryActions class="flex items-center gap-1">
                   <button
                     tButton
@@ -183,7 +183,7 @@ export class InspectionTemplateForm {
 
   protected readonly maxQuestions = MAX_QUESTIONS;
   protected readonly questionTypes = QUESTION_TYPES;
-  /** The mareos "Tipo de resposta" options, plus the score the umbrielship also asks (AD-019). */
+  /** The mareos design's "Tipo de resposta" options, plus the score the app also asks (AD-019). */
   protected readonly optionLabels: Record<QuestionType, string> = {
     TEXT: 'Texto livre',
     YES_NO: 'Sim ou não',

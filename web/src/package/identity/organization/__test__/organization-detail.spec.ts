@@ -518,7 +518,7 @@ describe('OrganizationDetail', () => {
     fixture.componentRef.setInput('id', 'org-1');
     await settle();
     controller.expectOne('/api/organizations/org-1').flush({
-      organization: { id: 'org-1', name: 'Umbrielship', email: 'internal@umbrielship.test', isInternal: true },
+      organization: { id: 'org-1', name: 'maréOS', email: 'internal@mareos.test', isInternal: true },
     });
     controller.expectOne('/api/organizations/org-1/users?page=1&per_page=10').flush({ users: [], total: 0 });
     controller.expectOne('/api/organizations/org-1/roles').flush({ roles: [] });

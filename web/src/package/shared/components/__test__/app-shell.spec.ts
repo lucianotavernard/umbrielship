@@ -62,7 +62,7 @@ const atlantic = (role: Role = 'operator'): MeOrganization => ({
 });
 const internal: MeOrganization = {
   id: 'org-u',
-  name: 'Umbrielship',
+  name: 'maréOS',
   isInternal: true,
   role: 'administrator',
 };
@@ -143,7 +143,7 @@ describe('Shell', () => {
   it('work-order-ui C16 lists six items in the mareos order and Organizações only for the internal Administrator', async () => {
     const operator = await open([atlantic()], 'org-a');
 
-    expect(operator.element.textContent?.replace(/\s+/g, '')).toContain('UMBRIELSHIP');
+    expect(operator.element.textContent?.replace(/\s+/g, '')).toContain('MARÉOS');
     expect(operator.element.textContent).toContain('MENU PRINCIPAL');
     expect(menuLinks(operator.element)).toEqual(SIX_ITEMS);
     expect(operator.element.textContent).not.toContain('GESTÃO');
@@ -278,7 +278,7 @@ describe('Shell', () => {
     expect(items).toEqual([
       { parts: ['PA', 'Pescados Atlântico', 'Operador'], checked: true },
       { parts: ['CB', 'Costa Branca Reparos', 'Inspetor'], checked: false },
-      { parts: ['U', 'Umbrielship', 'Administrador'], checked: false },
+      { parts: ['M', 'maréOS', 'Administrador'], checked: false },
     ]);
   });
 
@@ -304,7 +304,7 @@ describe('Shell', () => {
   });
 
   it('customer-ui C8 the profile shows the user and Sair signs out to /auth', async () => {
-    localStorage.setItem('@umbriel:access-token', 'token');
+    localStorage.setItem('@mareos:access-token', 'token');
     const { fixture, element } = await open([atlantic('inspector')], 'org-a');
     const router = TestBed.inject(Router);
 
@@ -326,7 +326,7 @@ describe('Shell', () => {
     await settle();
 
     expect(router.url).toBe('/auth');
-    expect(localStorage.getItem('@umbriel:access-token')).toBeNull();
+    expect(localStorage.getItem('@mareos:access-token')).toBeNull();
   });
 
   it('user-menu C1 names who is signed in and offers Conta and Notificações before Sair', async () => {
@@ -524,7 +524,7 @@ describe('Shell', () => {
     expect(sidebar.getAttribute('data-collapsible')).toBe('icon');
     expect(trigger().getAttribute('aria-label')).toBe('Expandir menu');
     expect(trigger().getAttribute('aria-expanded')).toBe('false');
-    expect(localStorage.getItem('@umbriel:sidebar')).toBe('false');
+    expect(localStorage.getItem('@mareos:sidebar')).toBe('false');
     // Collapsed, each item keeps its icon and names itself on hover.
     const customers = [...element.querySelectorAll<HTMLAnchorElement>('nav a')].find(
       (link) => link.textContent?.trim() === 'Clientes',
@@ -538,7 +538,7 @@ describe('Shell', () => {
     fixture.detectChanges();
     expect(sidebar.getAttribute('data-state')).toBe('expanded');
     expect(trigger().getAttribute('aria-label')).toBe('Recolher menu');
-    expect(localStorage.getItem('@umbriel:sidebar')).toBe('true');
+    expect(localStorage.getItem('@mareos:sidebar')).toBe('true');
   });
 
   it('customer-ui C57 the topbar scrolls with the page below 640 px', async () => {
@@ -552,12 +552,12 @@ describe('Shell', () => {
     expect(getComputedStyle(topbar).position).not.toBe('sticky');
   });
 
-  it('customer-ui C10 shows no workshop status, help or MARÉOS footer', async () => {
+  it('customer-ui C10 shows no workshop status, help or "MARÉOS · Operação com rumo certo." footer', async () => {
     const { element } = await open([atlantic()], 'org-a');
 
     expect(element.textContent).not.toContain('Oficina em operação');
     expect(element.textContent).not.toContain('Precisa de ajuda?');
-    expect(element.textContent).not.toContain('MARÉOS');
+    expect(element.textContent).not.toContain('MARÉOS ·');
     expect(element.textContent).not.toContain('Operação com rumo certo.');
     expect(byLabel(element, 'Ajuda')).toBeNull();
     // The bell came back with AD-116; it is notification-menu.spec's.

@@ -21,7 +21,7 @@ const url = '/uploads/work-order-service-images/photo.png';
 
 describe('RemoveWorkOrderServiceImageUseCase', () => {
   beforeEach(async () => {
-    cwd = await mkdtemp(join(tmpdir(), 'umbrielship-remove-image-'));
+    cwd = await mkdtemp(join(tmpdir(), 'mareos-remove-image-'));
     await mkdir(join(cwd, 'uploads/work-order-service-images'), {
       recursive: true,
     });

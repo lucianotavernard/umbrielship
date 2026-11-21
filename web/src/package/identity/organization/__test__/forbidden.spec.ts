@@ -14,8 +14,8 @@ function me(role: 'administrator' | 'operator', isInternal: boolean) {
       name: 'Ana',
       email: 'ana@atlantic.test',
       role,
-      organization: { id: 'org-1', name: 'Umbrielship', isInternal },
-      organizations: [{ id: 'org-1', name: 'Umbrielship', isInternal, role }],
+      organization: { id: 'org-1', name: 'maréOS', isInternal },
+      organizations: [{ id: 'org-1', name: 'maréOS', isInternal, role }],
     },
   };
 }
