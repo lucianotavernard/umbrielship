@@ -49,7 +49,7 @@ const FLEET_CARDS = [
   ['Concluídas no mês', '01'],
 ];
 
-/** The Agenda of the week of Monday 16 November, as the fleet draws it. */
+/** The Agenda of the week of Monday 16 November by time; the panel shows the first three (AD-119). */
 const WEEK_ITEMS = [
   ['08:00', 'Aurora', 'Docagem', 'Docagem · #AB12CD34'],
   ['08:30', 'Aurora', 'Serviço', 'Motor · Rafael Mendes'],
@@ -195,14 +195,12 @@ describe('Dashboard', () => {
     expect(page.agendaDays()).toEqual([
       ['SEG', '16'],
       ['TER', '17'],
-      ['QUA', '18'],
-      ['SEX', '20'],
     ]);
-    expect(page.agendaItems()).toEqual(WEEK_ITEMS);
+    expect(page.agendaItems()).toEqual(WEEK_ITEMS.slice(0, 3));
     const perDay = [...panel.querySelectorAll('[data-slot="agenda-day"]')].map(
       (day) => day.querySelectorAll('[data-slot="agenda-item"]').length,
     );
-    expect(perDay).toEqual([1, 4, 2, 1]);
+    expect(perDay).toEqual([1, 2]);
   });
 
   it('dashboard C6 alternates esta semana and hoje', async () => {
@@ -211,17 +209,18 @@ describe('Dashboard', () => {
     expect(page.text('button[data-slot="period"]', page.agendaPanel())).toBe('Esta semana');
     await click(page.periodButton());
     expect(page.text('button[data-slot="period"]', page.agendaPanel())).toBe('Hoje');
+    // Today holds four items: the first three by time.
     expect(page.agendaDays()).toEqual([['TER', '17']]);
-    expect(page.agendaItems()).toEqual(WEEK_ITEMS.slice(1, 5));
+    expect(page.agendaItems()).toEqual(WEEK_ITEMS.slice(1, 4));
 
     await click(page.periodButton());
     expect(page.text('button[data-slot="period"]', page.agendaPanel())).toBe('Esta semana');
-    expect(page.agendaItems()).toEqual(WEEK_ITEMS);
+    expect(page.agendaItems()).toEqual(WEEK_ITEMS.slice(0, 3));
     // The period never asks the API.
     expect(sent()).toEqual([]);
   });
 
-  it('dashboard C7 tells an empty today from an empty week', async () => {
+  it('dashboard C7 shows three items at most and tells an empty today from an empty week', async () => {
     let page = await DashboardPage.open({ workOrders: [orderC, orderD] });
     const empty = () => page.text('[data-slot="agenda-empty"]');
 
@@ -239,10 +238,17 @@ describe('Dashboard', () => {
     await click(page.periodButton());
     expect(page.agendaItems()).toEqual([]);
     expect(empty()).toBe('Nenhum item na agenda hoje.');
-    // The list scrolls inside the panel at a fixed height.
+    // Three items at most: the list keeps the panel's height and never scrolls.
     const list = page.agendaPanel().querySelector('[data-slot="agenda-list"]')!;
-    expect(list.classList).toContain('overflow-y-auto');
-    expect([...list.classList].some((token) => /^h-\[\d+px\]$/.test(token))).toBe(true);
+    expect(list.classList).not.toContain('overflow-y-auto');
+    expect([...list.classList].some((token) => /^min-h-\[\d+px\]$/.test(token))).toBe(true);
+    page.fixture.destroy();
+
+    // The fleet's week holds eight items, today four.
+    page = await DashboardPage.open();
+    expect(page.agendaItems().length).toBe(3);
+    await click(page.periodButton());
+    expect(page.agendaItems().length).toBe(3);
   });
 
   it('dashboard C8 opens the work order of an agenda item', async () => {
@@ -255,11 +261,6 @@ describe('Dashboard', () => {
       `/work-orders/${orderA.id}`,
       `/work-orders/${orderA.id}`,
       `/work-orders/${orderB.id}`,
-      `/work-orders/${orderB.id}`,
-      `/work-orders/${orderB.id}`,
-      `/work-orders/${orderE.id}`,
-      `/work-orders/${orderA.id}`,
-      `/work-orders/${orderA.id}`,
     ]);
 
     await click(items[2]);
@@ -278,8 +279,8 @@ describe('Dashboard', () => {
     expect(router.url).toBe('/agenda');
   });
 
-  it('dashboard C10 shows each team of the organization in equipes em campo', async () => {
-    const page = await DashboardPage.open();
+  it('dashboard C10 shows the first three teams of the organization in equipes em campo', async () => {
+    let page = await DashboardPage.open();
     const panel = page.element.querySelector<HTMLElement>('[data-slot="teams-panel"]')!;
 
     expect(page.text('h2', panel)).toBe('Equipes em campo');
@@ -289,8 +290,16 @@ describe('Dashboard', () => {
       ['Equipe Bravo', 'Hidráulica · 3 técnicos', 'Em serviço'],
       ['Equipe Charlie', 'Elétrica · 2 técnicos', 'Disponível'],
     ]);
-    const list = panel.querySelector('[data-slot="team-list"]')!;
-    expect(list.classList).toContain('overflow-y-auto');
+    expect(panel.querySelector('[data-slot="team-list"]')!.classList).not.toContain('overflow-y-auto');
+    page.fixture.destroy();
+
+    // A fourth Team, "Ágil", comes first by name and pushes Charlie out (AD-120).
+    page = await DashboardPage.open({ teams: [...teams, { id: 'agil', name: 'Ágil', specialty: 'Pintura', staffCount: 0 }] });
+    expect(page.teamRows()).toEqual([
+      ['Equipe Ágil', 'Pintura · 0 técnicos', 'Disponível'],
+      ['Equipe Alfa', 'Motor · 2 técnicos', 'Disponível'],
+      ['Equipe Bravo', 'Hidráulica · 3 técnicos', 'Em serviço'],
+    ]);
   });
 
   it('dashboard C11 shows the technicians footer', async () => {
@@ -486,6 +495,8 @@ describe('Dashboard', () => {
     // An operator names no Responsável.
     expect(sheet.textContent).not.toContain('Serviços a realizar');
 
+    // An earlier Docagem, so the edit shows among the agenda's first three (AD-119).
+    await type('#wo-start', '2026-11-16T07:00');
     await type('#wo-end', '2026-11-19T18:00');
     await type('#wo-status', 'IN_PROGRESS');
     await click(buttonByText('Salvar alterações', drawer()!));
@@ -493,13 +504,18 @@ describe('Dashboard', () => {
     const put = controller.expectOne(`/api/work-orders/${orderB.id}`);
     expect(put.request.method).toBe('PUT');
     expect(put.request.body).toEqual({
-      startDate: local(2026, 11, 17, 10, 0),
+      startDate: local(2026, 11, 16, 7, 0),
       endDate: local(2026, 11, 19, 18, 0),
       status: 'IN_PROGRESS',
     });
     put.flush(null);
     await settle();
-    const edited = { ...orderB, endDate: local(2026, 11, 19, 18, 0), status: 'IN_PROGRESS' as const };
+    const edited = {
+      ...orderB,
+      startDate: local(2026, 11, 16, 7, 0),
+      endDate: local(2026, 11, 19, 18, 0),
+      status: 'IN_PROGRESS' as const,
+    };
     await page.reload(fleet.map((order) => (order.id === orderB.id ? edited : order)));
 
     expect(success).toHaveBeenCalledWith('Ordem atualizada com sucesso', expect.anything());
@@ -517,12 +533,12 @@ describe('Dashboard', () => {
     expect(page.agendaDays()).toEqual([
       ['SEG', '16'],
       ['TER', '17'],
-      ['QUA', '18'],
-      ['QUI', '19'],
-      ['SEX', '20'],
     ]);
-    expect(page.agendaItems()).toContainEqual(['18:00', 'Vento Leste', 'Desdocagem', 'Desdocagem · #CD56EF78']);
-    expect(page.agendaItems()).not.toContainEqual(['14:30', 'Vento Leste', 'Desdocagem', 'Desdocagem · #CD56EF78']);
+    expect(page.agendaItems()).toEqual([
+      ['07:00', 'Vento Leste', 'Docagem', 'Docagem · #CD56EF78'],
+      ['08:00', 'Aurora', 'Docagem', 'Docagem · #AB12CD34'],
+      ['08:30', 'Aurora', 'Serviço', 'Motor · Rafael Mendes'],
+    ]);
   });
 
   it("dashboard C18 an administrator's responsável refreshes the row, the team and the note", async () => {
@@ -683,7 +699,8 @@ describe('Dashboard', () => {
     await type('#wo-vessel', 'v-lul');
     await type('#wo-service-name-0', 'Motor');
     await type('#wo-service-description-0', 'Revisão geral');
-    await type('#wo-start', '2026-11-19T08:00');
+    // Monday at 07:00, first of the week, so the agenda's first three show it (AD-119).
+    await type('#wo-start', '2026-11-16T07:00');
     await type('#wo-end', '2026-11-21T17:30');
     await type('#wo-status', 'IN_PROGRESS');
     await click(buttonByText('Criar ordem', drawer()!));
@@ -691,7 +708,7 @@ describe('Dashboard', () => {
     const post = controller.expectOne((req) => req.method === 'POST' && req.url === '/api/work-orders');
     expect(post.request.body).toEqual({
       vesselId: 'v-lul',
-      startDate: local(2026, 11, 19, 8, 0),
+      startDate: local(2026, 11, 16, 7, 0),
       endDate: local(2026, 11, 21, 17, 30),
       status: 'IN_PROGRESS',
       services: [{ name: 'Motor', description: 'Revisão geral' }],
@@ -699,11 +716,11 @@ describe('Dashboard', () => {
     const created: WorkOrder = {
       id: 'ff001122-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
       vesselId: 'v-lul',
-      startDate: local(2026, 11, 19, 8, 0),
+      startDate: local(2026, 11, 16, 7, 0),
       endDate: local(2026, 11, 21, 17, 30),
       status: 'IN_PROGRESS',
       services: [
-        { id: 'ff001122-s1', name: 'Motor', startDate: local(2026, 11, 19, 8, 0), endDate: local(2026, 11, 21, 17, 30), status: 'PENDING' },
+        { id: 'ff001122-s1', name: 'Motor', startDate: local(2026, 11, 16, 7, 0), endDate: local(2026, 11, 21, 17, 30), status: 'PENDING' },
       ],
     };
     post.flush({ workOrder: created }, { status: 201, statusText: 'Created' });
@@ -715,8 +732,11 @@ describe('Dashboard', () => {
     expect(page.cards()[0]).toEqual(['Ordens em aberto', '04']);
     expect(page.cards()[1]).toEqual(['Em execução', '03']);
     expect(page.codes()).toEqual(['#CD56EF78', '#AA000001', '#AB12CD34', '#FF001122']);
-    expect(page.agendaItems()).toContainEqual(['08:00', 'Lula Branca', 'Serviço', 'Motor · #FF001122']);
-    expect(page.agendaItems()).toContainEqual(['17:30', 'Lula Branca', 'Desdocagem', 'Desdocagem · #FF001122']);
+    expect(page.agendaItems()).toEqual([
+      ['07:00', 'Lula Branca', 'Docagem', 'Docagem · #FF001122'],
+      ['07:00', 'Lula Branca', 'Serviço', 'Motor · #FF001122'],
+      ['08:00', 'Aurora', 'Docagem', 'Docagem · #AB12CD34'],
+    ]);
   });
 
   it('dashboard C21 offers responsável to an administrator only', async () => {
@@ -742,7 +762,8 @@ describe('Dashboard', () => {
     await type('#wo-service-name-0', 'Motor');
     await type('#wo-service-description-0', 'Revisão geral');
     await type('#wo-service-assignee-0', 'team:bravo');
-    await type('#wo-start', '2026-11-19T08:00');
+    // Monday at 07:00, first of the week, so the agenda's first three show it (AD-119).
+    await type('#wo-start', '2026-11-16T07:00');
     await type('#wo-end', '2026-11-21T17:30');
     await click(buttonByText('Criar ordem', drawer()!));
 
@@ -751,11 +772,11 @@ describe('Dashboard', () => {
     const created: WorkOrder = {
       id: 'ff001122-5e6f-4a7b-8c9d-0e1f2a3b4c5d',
       vesselId: 'v-lul',
-      startDate: local(2026, 11, 19, 8, 0),
+      startDate: local(2026, 11, 16, 7, 0),
       endDate: local(2026, 11, 21, 17, 30),
       status: 'PENDING',
       services: [
-        { id: 'ff001122-s1', name: 'Motor', startDate: local(2026, 11, 19, 8, 0), endDate: local(2026, 11, 21, 17, 30), status: 'PENDING' },
+        { id: 'ff001122-s1', name: 'Motor', startDate: local(2026, 11, 16, 7, 0), endDate: local(2026, 11, 21, 17, 30), status: 'PENDING' },
       ],
     };
     post.flush({ workOrder: created }, { status: 201, statusText: 'Created' });
@@ -769,7 +790,7 @@ describe('Dashboard', () => {
       ],
     );
     expect(page.text('[data-slot="responsavel-name"]', page.rowOf('#FF001122'))).toBe('Equipe Bravo');
-    expect(page.agendaItems()).toContainEqual(['08:00', 'Lula Branca', 'Serviço', 'Motor · Equipe Bravo']);
+    expect(page.agendaItems()).toContainEqual(['07:00', 'Lula Branca', 'Serviço', 'Motor · Equipe Bravo']);
   });
 
   it('dashboard C23 shows skeletons and no sem responsável until the reads answer', async () => {
