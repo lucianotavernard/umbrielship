@@ -36,12 +36,36 @@ describe('AuthenticationForm', () => {
     expect(emailInput.classList.contains('ng-invalid')).toBe(true);
     expect(emailInput.classList.contains('[&.ng-invalid.ng-touched]:border-destructive')).toBe(true);
     expect(emailInput.classList.contains('text-[11px]')).toBe(false);
-    // The label keeps its own size and its touched red rule.
-    expect(emailLabel.classList.contains('text-sm')).toBe(true);
+    // The label keeps the sign-in page's size (12px, never the drawer's 10px) and turns red
+    // through its group, as its input sits in a wrapper beside it.
+    expect(emailLabel.classList.contains('text-[12px]')).toBe(true);
     expect(emailLabel.classList.contains('text-[10px]')).toBe(false);
-    expect(emailLabel.classList.contains('[&:has(~input.ng-invalid.ng-touched)]:text-destructive')).toBe(true);
+    expect(emailLabel.closest('t-form-group')?.classList.contains('group/field')).toBe(true);
+    expect(emailLabel.classList.contains('group-has-[input.ng-invalid.ng-touched]/field:text-destructive')).toBe(true);
     // None of the drawer's marks.
     expect(element.querySelector('[data-invalid]')).toBeNull();
     expect(element.querySelector('[data-slot="error"]')).toBeNull();
+  });
+
+  it('shows and hides the password from the eye button', async () => {
+    const passwordInput = element.querySelector<HTMLInputElement>('#password')!;
+    const toggle = element.querySelector<HTMLButtonElement>('button[aria-label="Mostrar senha"]')!;
+
+    expect(passwordInput.type).toBe('password');
+    expect(toggle.type).toBe('button');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+
+    toggle.click();
+    await fixture.whenStable();
+
+    expect(passwordInput.type).toBe('text');
+    expect(toggle.getAttribute('aria-label')).toBe('Ocultar senha');
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+
+    toggle.click();
+    await fixture.whenStable();
+
+    expect(passwordInput.type).toBe('password');
+    expect(toggle.getAttribute('aria-label')).toBe('Mostrar senha');
   });
 });
